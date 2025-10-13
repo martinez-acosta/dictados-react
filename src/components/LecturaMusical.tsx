@@ -164,9 +164,22 @@ const EXERCISE_CONFIGS = {
 
   // ========== EJERCICIOS CLÁSICOS (originales) ==========
   'clasico-lineas-sol': {
-    name: '📖 Clásico: Líneas (E4–G4–B4–D5–F5)',
+    name: '📖 Clásico: Líneas Clave Sol (Mi-Sol-Si-Re-Fa)',
     notes: ['e/4','g/4','b/4','d/5','f/5'],
-    description: 'Notas en líneas de la clave de Sol.'
+    description: 'Solo notas sobre las líneas de la clave de Sol: Mi4, Sol4, Si4, Re5, Fa5.',
+    clefNotes: {
+      treble: ['e/4','g/4','b/4','d/5','f/5'],
+      bass: ['g/2','b/2','d/3','f/3','a/3']
+    }
+  },
+  'clasico-lineas-fa': {
+    name: '📖 Clásico: Líneas Clave Fa 4ª (Sol-Si-Re-Fa-La)',
+    notes: ['g/2','b/2','d/3','f/3','a/3'],
+    description: 'Solo notas sobre las líneas de la clave de Fa en 4ª línea: Sol2, Si2, Re3, Fa3, La3.',
+    clefNotes: {
+      treble: ['e/4','g/4','b/4','d/5','f/5'],
+      bass: ['g/2','b/2','d/3','f/3','a/3']
+    }
   },
   'clasico-espacios-sol': {
     name: '📖 Clásico: Espacios (F4–A4–C5–E5)',
