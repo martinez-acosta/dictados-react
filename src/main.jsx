@@ -15,7 +15,7 @@ import './styles.css'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/dictados-react">
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/dictados" element={<DictadosMelodicos />} />
