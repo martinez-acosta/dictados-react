@@ -7,7 +7,7 @@ import {
 import { PlayArrow, Pause, RestartAlt, ArrowBack, Undo, Delete, Visibility, VisibilityOff } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as Tone from 'tone'
-import { Factory, Stave, StaveNote, Formatter, Beam } from 'vexflow'
+import { Factory, Stave, StaveNote, Formatter, Beam, Voice } from 'vexflow'
 import FigurasYSilenciosTable, { FIGURAS_TABLE } from './FigurasYSilenciosTable'
 
 // ------------------ Audio persistente (sampler + metrónomo + master) ------------------
@@ -60,6 +60,49 @@ function mountCleanTarget(host: HTMLDivElement, id: string) {
   return target
 }
 
+function createBeamGroups(notes: StaveNote[]) {
+  const beams: Beam[] = []
+  let current: StaveNote[] = []
+
+  const flush = () => {
+    if (current.length > 1) {
+      beams.push(new Beam(current))
+    }
+    current = []
+  }
+
+  notes.forEach((note, idx) => {
+    const beamCount = typeof note.getBeamCount === 'function' ? note.getBeamCount() : 0
+    const isRest = typeof note.isRest === 'function'
+      ? note.isRest()
+      : note.getDuration().includes('r')
+
+    if (beamCount === 0 || isRest) {
+      flush()
+      return
+    }
+
+    current.push(note)
+
+    const next = notes[idx + 1]
+    if (!next) {
+      flush()
+      return
+    }
+    const nextBeamCount = typeof next.getBeamCount === 'function' ? next.getBeamCount() : 0
+    const nextIsRest = typeof next.isRest === 'function'
+      ? next.isRest()
+      : next.getDuration().includes('r')
+
+    if (nextBeamCount !== beamCount || nextIsRest) {
+      flush()
+    }
+  })
+
+  flush()
+  return beams
+}
+
 // ------------------ VexFlow: medida y "snippet" para paleta ------------------
 function VFMeasure({ notes, ts, highlight }: { notes: string[], ts: '4/4', highlight?: number }) {
   const hostRef = useRef<HTMLDivElement | null>(null)
@@ -82,14 +125,17 @@ function VFMeasure({ notes, ts, highlight }: { notes: string[], ts: '4/4', highl
         if (highlight === i) note.setStyle({ fillStyle: '#ff6b35', strokeStyle: '#ff6b35' })
         return note
       })
-      Formatter.FormatAndDraw(ctx, stave, vs)
 
-      // Beam para pares de 8 consecutivas (doble corchea)
-      const beams = Beam.generateBeams(
-        vs,
-        { groups: [new (Beam as any).Groups(2)] } as any // fallback genérico
-      )
-      beams.forEach((b: any) => b.setContext(ctx).draw())
+      const voice = new Voice({ num_beats: 4, beat_value: 4 })
+      if (typeof (voice as any).setStrict === 'function') (voice as any).setStrict(false)
+      else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
+      voice.addTickables(vs)
+
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], width - 80)
+      voice.draw(ctx, stave)
+
+      const beams = createBeamGroups(vs)
+      beams.forEach(b => b.setContext(ctx).draw())
     } catch (e) {
       // Si no hay API Groups en la versión, haz un beam simple por pares adyacentes:
       try {
@@ -124,12 +170,16 @@ function VFSnippet({ durations }: { durations: string[] }) {
     stave.addClef('treble').setContext(ctx).draw()
     try {
       const notes = durations.map(d => new StaveNote({ clef: 'treble', keys: ['b/4'], duration: d }))
-      Formatter.FormatAndDraw(ctx, stave, notes)
-      // Si son dos “8”, dibuja barra (beam)
-      if (durations.length === 2 && durations.every(d => d === '8')) {
-        const beams = Beam.generateBeams(notes)
-        beams.forEach((b: any) => b.setContext(ctx).draw())
-      }
+      const voice = new Voice({ num_beats: 4, beat_value: 4 })
+      if (typeof (voice as any).setStrict === 'function') (voice as any).setStrict(false)
+      else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
+      voice.addTickables(notes)
+
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], PAL_STAVE_W - 8)
+      voice.draw(ctx, stave)
+
+      const beams = createBeamGroups(notes)
+      beams.forEach(b => b.setContext(ctx).draw())
     } catch (e) {
       console.warn('VF snippet error:', e)
     }
