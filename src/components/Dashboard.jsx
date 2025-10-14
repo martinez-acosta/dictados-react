@@ -232,6 +232,42 @@ export default function Dashboard() {
                   boxShadow: 3
                 }
               }}
+              onClick={() => navigate('/ritmica-alturas')}
+            >
+              <AccessTime sx={{ fontSize: 64, color: '#9c27b0', mb: 2 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                Rítmica con Alturas
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Dictados rítmicos combinados con identificación de alturas de notas
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{
+                  py: 1.5,
+                  backgroundColor: '#9c27b0',
+                  '&:hover': { backgroundColor: '#7b1fa2' }
+                }}
+                fullWidth
+                onClick={() => navigate('/ritmica-alturas')}
+              >
+                Comenzar Rítmica con Alturas
+              </Button>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper
+              sx={{
+                p: 3,
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 3
+                }
+              }}
               onClick={() => navigate('/intervalos-piano')}
             >
               <Piano sx={{ fontSize: 64, color: 'info.main', mb: 2 }} />

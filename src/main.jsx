@@ -10,6 +10,7 @@ import VocalTrainer from './components/VocalTrainer.tsx'
 import TriadTrainer from './components/TriadTrainer.tsx'
 import IntervalsTrainer from './components/IntervalsTrainer.tsx'
 import RitmicaTrainer from './components/RitmicaTrainer.tsx'
+import RitmicaConAlturas from './components/RitmicaConAlturas.tsx'
 import LecturaMusical from './components/LecturaMusical.tsx'
 import './styles.css'
 
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/triadas" element={<TriadTrainer />} />
         <Route path="/intervalos-trainer" element={<IntervalsTrainer />} />
         <Route path="/ritmica" element={<RitmicaTrainer />} />
+        <Route path="/ritmica-alturas" element={<RitmicaConAlturas />} />
         <Route path="/intervalos-piano" element={<IntervalosPiano/>} />
         <Route path="/lectura-musical" element={<LecturaMusical />} />
       </Routes>
