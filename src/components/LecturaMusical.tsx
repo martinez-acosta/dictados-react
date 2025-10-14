@@ -7,7 +7,6 @@ import { PlayArrow, Pause, ArrowBack, Refresh, AccessTime } from '@mui/icons-mat
 import { Factory, StaveNote, Stave, TickContext, Formatter } from 'vexflow'
 import * as Tone from 'tone'
 import { useNavigate } from 'react-router-dom'
-import AlwaysOnTuner from './AlwaysOnTuner'
 
 // ---------------- Audio globals (persistentes) ----------------
 let samplerRef: Tone.Sampler | null = null
@@ -790,19 +789,6 @@ export default function LecturaMusical() {
           <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'text.secondary', fontStyle: 'italic', textAlign: 'center' }}>
             💡 En 4/4: redonda=4 beats, blanca=2, negra=1, corchea=0.5. {jazzStyle ? '🎺 Jazz: énfasis en beats 2 y 4 (backbeat).' : '🎼 Clásico: énfasis en beat 1.'} Loop infinito hasta pulsar "Detener".
           </Typography>
-        </Paper>
-
-        {/* Afinador integrado */}
-        <Paper sx={{ p: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1, color: 'primary.main' }}>
-            🎛 Afinador para Bajo / Voz
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-            Usa el micrófono para ajustar tu afinación antes o durante la lectura. Selecciona el modo Bajo o Voz con los radios del afinador.
-          </Typography>
-          <Box sx={{ borderRadius: 1, border: '1px solid #e0e0e0', p: 1 }}>
-            <AlwaysOnTuner />
-          </Box>
         </Paper>
 
         {/* Instrucciones */}
