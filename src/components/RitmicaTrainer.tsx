@@ -261,8 +261,8 @@ export default function RitmicaTablaYEntrenador() {
   // Total de compases disponibles en cada ejercicio
   const barsCount = 2 as const
 
-  const [bpm, setBpm] = useState(80)
-  const [repeats, setRepeats] = useState<number>(2)
+  const [bpm, setBpm] = useState(60)
+  const [repeats, setRepeats] = useState<number>(5)
   const [includeRests, setIncludeRests] = useState<boolean>(true)
   const [solution, setSolution] = useState<Medida[]>([])
   const [answers, setAnswers] = useState<Medida[]>([])
