@@ -208,8 +208,8 @@ export default function RitmicaTablaYEntrenador() {
   const navigate = useNavigate()
   const timeoutsRef = useRef<number[]>([])
 
-  // Solo 1 compás
-  const barsCount = 1 as const
+  // Total de compases disponibles en cada ejercicio
+  const barsCount = 2 as const
 
   const [bpm, setBpm] = useState(80)
   const [repeats, setRepeats] = useState<number>(2)
@@ -218,10 +218,11 @@ export default function RitmicaTablaYEntrenador() {
   const [answers, setAnswers] = useState<Medida[]>([])
   const [activeBar, setActiveBar] = useState(0)
   const [graded, setGraded] = useState<boolean[]>([])
-  const [showSolution, setShowSolution] = useState(false)
+  const [showSolution, setShowSolution] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentBeat, setCurrentBeat] = useState(0) // 0..3
   const [currentNoteIndex, setCurrentNoteIndex] = useState<number | null>(null)
+  const [currentBar, setCurrentBar] = useState<number | null>(null)
 
   const target = 4
 
@@ -243,6 +244,7 @@ export default function RitmicaTablaYEntrenador() {
     if (!silent) setIsPlaying(false)
     setCurrentBeat(0)
     setCurrentNoteIndex(null)
+    setCurrentBar(null)
   }
 
   function nuevaSecuencia() {
@@ -251,7 +253,7 @@ export default function RitmicaTablaYEntrenador() {
     setAnswers(Array.from({length:barsCount}, () => ({ notes: [] })))
     setActiveBar(0)
     setGraded(Array(barsCount).fill(false))
-    setShowSolution(false)
+    // setShowSolution(false) // Removido para que mantenga el estado del usuario
     pauseAll(true)
   }
 
@@ -294,7 +296,7 @@ export default function RitmicaTablaYEntrenador() {
     setShowSolution(true)
   }
 
-  async function playSequence(seq: Medida[], reps = repeats) {
+  async function playSequence(seq: Medida[], reps = repeats, barOffset = 0) {
     if (!seq.length) return
     await ensureAudio()
 
@@ -303,48 +305,68 @@ export default function RitmicaTablaYEntrenador() {
     setIsPlaying(true)
     setCurrentBeat(0)
     setCurrentNoteIndex(null)
+    setCurrentBar(null)
 
     const base = 60 / Math.max(30, Math.min(240, bpm))
+    const safeReps = Math.max(1, Math.min(6, reps))
     let acc = 0
 
-    for (let r = 0; r < Math.max(1, Math.min(6, reps)); r++) {
-      // Conteo (primer loop)
+    for (let r = 0; r < safeReps; r++) {
+      // Conteo inicial en la primera repetición
       if (r === 0) {
-        for (let i=0;i<4;i++) {
+        for (let i = 0; i < 4; i++) {
           const to = window.setTimeout(() => {
-            metroRef!.triggerAttackRelease(i===0?'A5':'F5','16n')
+            metroRef!.triggerAttackRelease(i === 0 ? 'A5' : 'F5', '16n')
             setCurrentBeat(i)
-          }, acc*1000 + i*base*1000)
+            setCurrentBar(null)
+            setCurrentNoteIndex(null)
+          }, (acc + i * base) * 1000)
           timeoutsRef.current.push(to)
         }
-        acc += base*4
-      }
-      const m = seq[0]
-
-      // Metrónomo: click en cada beat
-      for (let beat = 0; beat < 4; beat++) {
-        const beatTime = acc + beat * base
-        const to = window.setTimeout(() => {
-          if (beat === 0) metroRef!.triggerAttackRelease('A5','16n')
-          else metroRef!.triggerAttackRelease('F5','16n')
-          setCurrentBeat(beat)
-        }, beatTime * 1000)
-        timeoutsRef.current.push(to)
+        acc += base * 4
       }
 
-      // Notas con resaltado
-      let noteAcc = 0
-      m.notes.forEach((dur, idx) => {
-        const secs = (DUR_TO_PULSES[dur] || 0) * base
-        const to = window.setTimeout(()=>{
-          setCurrentNoteIndex(idx)
-          if (!dur.endsWith('r')) samplerRef!.triggerAttackRelease('C4', Math.max(0.06, secs*0.9))
-        }, (acc + noteAcc)*1000)
-        timeoutsRef.current.push(to)
-        noteAcc += secs
-      })
+      for (let localIndex = 0; localIndex < seq.length; localIndex++) {
+        const measure = seq[localIndex]
+        const globalIndex = barOffset + localIndex
+        const measureStart = acc
 
-      acc += base*4
+        // Marca el inicio del compás y limpia el resaltado previo
+        const startTo = window.setTimeout(() => {
+          setCurrentBar(globalIndex)
+          setCurrentNoteIndex(null)
+        }, measureStart * 1000)
+        timeoutsRef.current.push(startTo)
+
+        // Metrónomo: click en cada beat del compás
+        for (let beat = 0; beat < 4; beat++) {
+          const beatTime = measureStart + beat * base
+          const to = window.setTimeout(() => {
+            metroRef!.triggerAttackRelease(beat === 0 ? 'A5' : 'F5', '16n')
+            setCurrentBeat(beat)
+            setCurrentBar(globalIndex)
+          }, beatTime * 1000)
+          timeoutsRef.current.push(to)
+        }
+
+        // Notas con resaltado
+        let noteAcc = 0
+        measure.notes.forEach((dur, idx) => {
+          const secs = (DUR_TO_PULSES[dur] || 0) * base
+          const to = window.setTimeout(() => {
+            setCurrentBar(globalIndex)
+            setCurrentNoteIndex(idx)
+            if (!dur.endsWith('r')) {
+              samplerRef!.triggerAttackRelease('C4', Math.max(0.06, secs * 0.9))
+            }
+          }, (measureStart + noteAcc) * 1000)
+          timeoutsRef.current.push(to)
+          noteAcc += secs
+        })
+
+        acc += base * 4
+      }
+
       acc += 0.05
       acc += base
     }
@@ -353,10 +375,10 @@ export default function RitmicaTablaYEntrenador() {
       setIsPlaying(false)
       setCurrentBeat(0)
       setCurrentNoteIndex(null)
-    }, acc*1000 + 50)
+      setCurrentBar(null)
+    }, acc * 1000 + 50)
     timeoutsRef.current.push(endTo)
   }
-
   // ------------------ Render ------------------
   // Base para la paleta: tomamos las filas de la tabla w, h, q y 8 (usaremos 8 como doble corchea)
   const rowW = FIGURAS_TABLE.find(r => r.id === 'w')!
@@ -372,7 +394,7 @@ export default function RitmicaTablaYEntrenador() {
           Volver al menú
         </Button>
         <Typography variant="h6" sx={{ fontWeight:800, color:'#0b2a50' }}>
-          🎵 Figuras & Silencios + Dictado (1 compás)
+          🎵 Figuras & Silencios + Dictado (2 compases)
         </Typography>
       </Stack>
 
@@ -386,7 +408,7 @@ export default function RitmicaTablaYEntrenador() {
       <Paper sx={{ p:2 }}>
         <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb:1 }}>
           <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-            <Typography variant="subtitle1" sx={{ fontWeight:700 }}>Entrenamiento (solo 1 compás)</Typography>
+            <Typography variant="subtitle1" sx={{ fontWeight:700 }}>Entrenamiento (2 compases)</Typography>
 
             <TextField size="small" type="number" label="BPM" value={bpm}
                        onChange={e=>setBpm(Number(e.target.value))}
@@ -535,7 +557,7 @@ export default function RitmicaTablaYEntrenador() {
           </Grid>
         </Stack>
 
-        {/* Respuesta — 1 solo compás */}
+        {/* Respuesta — 2 compases */}
         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 1, pt: 0.5 }}>
           {answers.map((m, idx) => {
             const sum = m.notes.reduce((a, d) => a + (DUR_TO_PULSES[d] || 0), 0)
@@ -587,7 +609,7 @@ export default function RitmicaTablaYEntrenador() {
                       <Delete fontSize="small" />
                     </IconButton>
                     <Button size="small" variant="outlined" startIcon={<PlayArrow />}
-                      onClick={(e) => { e.stopPropagation(); pauseAll(true); playSequence([solution[idx]], repeats) }}
+                      onClick={(e) => { e.stopPropagation(); pauseAll(true); playSequence([solution[idx]], repeats, idx) }}
                       sx={{ ml: 1 }}>
                       Oír
                     </Button>
@@ -598,7 +620,7 @@ export default function RitmicaTablaYEntrenador() {
                   <VFMeasure
                     notes={m.notes.length > 0 ? m.notes : ['qr']}
                     ts="4/4"
-                    highlight={isPlaying && idx === 0 ? currentNoteIndex ?? undefined : undefined}
+                    highlight={isPlaying && idx === currentBar ? currentNoteIndex ?? undefined : undefined}
                   />
                 </Box>
 
@@ -611,7 +633,7 @@ export default function RitmicaTablaYEntrenador() {
                       <VFMeasure
                         notes={solution[idx].notes}
                         ts="4/4"
-                        highlight={isPlaying && idx === 0 ? currentNoteIndex ?? undefined : undefined}
+                        highlight={isPlaying && idx === currentBar ? currentNoteIndex ?? undefined : undefined}
                       />
                     </Box>
                   </Box>
