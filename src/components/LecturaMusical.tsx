@@ -263,6 +263,7 @@ export default function LecturaMusical() {
   const [randomFigure, setRandomFigure] = useState(false)
   const [showNoteLabels, setShowNoteLabels] = useState(true)
   const [jazzStyle, setJazzStyle] = useState(true) // metrónomo estilo jazz (2 y 4 fuertes)
+  const [reverseOrder, setReverseOrder] = useState(false) // invertir orden del ejercicio
 
   const [currentExercise, setCurrentExercise] = useState<string[]>([])
   const [durSeq, setDurSeq] = useState<DurationSym[]>([])
@@ -490,15 +491,21 @@ export default function LecturaMusical() {
     setMetronomeActive(true)
     setCurrentBeat(0)
 
+    // Si reverseOrder está activo, invertir el orden de reproducción
+    const playbackOrder = reverseOrder
+      ? [...currentExercise].map((_, i) => currentExercise.length - 1 - i)
+      : currentExercise.map((_, i) => i)
+
     // programar notas exactamente en su beat y se repetirán por el loop del Transport
     let accBeats = 0
-    currentExercise.forEach((key, i) => {
+    playbackOrder.forEach((originalIndex, playbackIndex) => {
+      const key = currentExercise[originalIndex]
       const startAt = beatsToBBS(accBeats) // "bar:beat:0"
-      const d = durSeq[i] ?? 'h'
+      const d = durSeq[originalIndex] ?? 'h'
       const durNotation = toneDur(d)
       const spn = keyToSPN(key)
       Tone.Transport.schedule((time) => {
-        setCurrentNoteIndex(i)
+        setCurrentNoteIndex(originalIndex) // Destacar la nota correcta en el pentagrama
         samplerRef!.triggerAttackRelease(spn, durNotation, time)
       }, startAt)
       accBeats += beatsFromDur(d)
@@ -599,6 +606,11 @@ export default function LecturaMusical() {
               <FormControlLabel
                 control={<Switch checked={jazzStyle} onChange={(e)=>setJazzStyle(e.target.checked)} />}
                 label={jazzStyle ? "🎺 Metrónomo Jazz (2 y 4)" : "🎼 Metrónomo Clásico (1)"}
+                sx={{ mb: 1 }}
+              />
+              <FormControlLabel
+                control={<Switch checked={reverseOrder} onChange={(e)=>setReverseOrder(e.target.checked)} />}
+                label="🔄 Invertir orden (fin → inicio)"
               />
             </Grid>
 
