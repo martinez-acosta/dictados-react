@@ -9,7 +9,7 @@ import { PlayArrow, Pause, RestartAlt, ArrowBack, Visibility, VisibilityOff, Und
 import { useNavigate } from 'react-router-dom'
 import * as Tone from 'tone'
 import { Factory, Stave, StaveNote, Formatter, Beam, Voice } from 'vexflow'
-import { FIGURAS_TABLE } from './FigurasYSilenciosTable'
+import FigurasYSilenciosTable, { FIGURAS_TABLE } from './FigurasYSilenciosTable'
 
 // ------------------ Audio persistente ------------------
 let masterRef: Tone.Gain | null = null
@@ -226,6 +226,17 @@ function generateMeasureWithPitches(includeRests: boolean, pitchPool: string[]):
       ]
     }
   }
+
+  // Garantía: si no llegamos exactamente a 4, completar con negras
+  const finalSum = seq.reduce((a, n) => a + (DUR_TO_PULSES[n.duration] || 0), 0)
+  if (Math.abs(finalSum - target) > 1e-6) {
+    const remaining = target - finalSum
+    while (seq.reduce((a, n) => a + (DUR_TO_PULSES[n.duration] || 0), 0) < target - 1e-6) {
+      const pitch = pickRandom(pitchPool)
+      seq.push({ duration: 'q', pitch })
+    }
+  }
+
   return { notes: seq }
 }
 
@@ -253,11 +264,13 @@ function VFMeasure({ notes, ts, highlight, showGrading, graded }: {
     if (!host) return
     mountCleanTarget(host, idRef.current)
 
-    const width = 225
-    const height = 105
+    const width = 280
+    const height = 79
     const vf = new Factory({ renderer: { elementId: idRef.current, width, height } })
     const ctx = vf.getContext()
-    const stave = new Stave(6, 6, width - 22)
+    ctx.scale(0.75, 0.75)
+    const staveWidth = (width - 22) * 1.33
+    const stave = new Stave(6, 6, staveWidth)
     stave.addClef('treble').addTimeSignature(ts).setContext(ctx).draw()
 
     try {
@@ -277,7 +290,7 @@ function VFMeasure({ notes, ts, highlight, showGrading, graded }: {
       else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
       voice.addTickables(vs)
 
-      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], width - 40)
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], staveWidth - 40)
       voice.draw(ctx, stave)
 
       const beams = createBeamGroups(vs)
@@ -291,7 +304,7 @@ function VFMeasure({ notes, ts, highlight, showGrading, graded }: {
 }
 
 // Paleta snippet pequeño
-const PAL_W = 90, PAL_H = 80, PAL_STAVE_X = 4, PAL_STAVE_Y = 8, PAL_STAVE_W = PAL_W - 10
+const PAL_W = 68, PAL_H = 60, PAL_STAVE_X = 4, PAL_STAVE_Y = 8, PAL_STAVE_W = (PAL_W - 10) * 1.33
 function VFSnippet({ durations }: { durations: string[] }) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const idRef = useRef(`vf-snip-${Math.random().toString(36).slice(2)}`)
@@ -303,6 +316,7 @@ function VFSnippet({ durations }: { durations: string[] }) {
 
     const vf = new Factory({ renderer: { elementId: idRef.current, width: PAL_W, height: PAL_H } })
     const ctx = vf.getContext()
+    ctx.scale(0.75, 0.75)
     const stave = new Stave(PAL_STAVE_X, PAL_STAVE_Y, PAL_STAVE_W)
     stave.addClef('treble').setContext(ctx).draw()
     try {
@@ -312,7 +326,7 @@ function VFSnippet({ durations }: { durations: string[] }) {
       else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
       voice.addTickables(notes)
 
-      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], PAL_STAVE_W - 6)
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], PAL_STAVE_W - 8)
       voice.draw(ctx, stave)
 
       const beams = createBeamGroups(notes)
@@ -569,6 +583,12 @@ export default function RitmicaConAlturas() {
         </Typography>
       </Stack>
 
+      <Grid>
+        <Grid>
+          <FigurasYSilenciosTable />
+        </Grid>
+      </Grid>
+
       <Paper sx={{ p:2 }}>
         <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb:1 }} flexWrap="wrap">
           <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
@@ -657,18 +677,18 @@ export default function RitmicaConAlturas() {
             <Grid container spacing={1}>
               {[rowW, rowH, rowQ].map((r, i) => (
                 <Grid item key={`${r.id}-pal-${i}`} xs={6} sm={3} md={3} lg={2.4 as any}>
-                  <Paper variant="outlined" sx={{ p: 0.5, cursor: 'pointer', minHeight: PAL_H + 12, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(r.durNota)}>
+                  <Paper variant="outlined" sx={{ p: 0.4, cursor: 'pointer', minHeight: PAL_H + 10, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(r.durNota)}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <VFSnippet durations={[r.durNota]} />
-                      <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Figura</Typography>
+                      <Typography variant="caption" sx={{ fontSize: 7, mt: 0.15 }}>Figura</Typography>
                     </Box>
                   </Paper>
 
                   {includeRests && (
-                    <Paper variant="outlined" sx={{ p: 0.5, mt: 0.5, cursor: 'pointer', minHeight: PAL_H + 14, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(r.durSilencio)}>
+                    <Paper variant="outlined" sx={{ p: 0.4, mt: 0.4, cursor: 'pointer', minHeight: PAL_H + 11, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(r.durSilencio)}>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <VFSnippet durations={[r.durSilencio]} />
-                        <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Silencio</Typography>
+                        <Typography variant="caption" sx={{ fontSize: 7, mt: 0.15 }}>Silencio</Typography>
                       </Box>
                     </Paper>
                   )}
@@ -676,18 +696,18 @@ export default function RitmicaConAlturas() {
               ))}
 
               <Grid item key={'double8'} xs={6} sm={3} md={3} lg={2.4 as any}>
-                <Paper variant="outlined" sx={{ p: 0.5, cursor: 'pointer', minHeight: PAL_H + 12, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(['8','8'])}>
+                <Paper variant="outlined" sx={{ p: 0.4, cursor: 'pointer', minHeight: PAL_H + 10, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(['8','8'])}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <VFSnippet durations={['8','8']} />
-                    <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Doble corchea</Typography>
+                    <Typography variant="caption" sx={{ fontSize: 7, mt: 0.15 }}>Doble corchea</Typography>
                   </Box>
                 </Paper>
 
                 {includeRests && (
-                  <Paper variant="outlined" sx={{ p: 0.5, mt: 0.5, cursor: 'pointer', minHeight: PAL_H + 14, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive('qr')}>
+                  <Paper variant="outlined" sx={{ p: 0.4, mt: 0.4, cursor: 'pointer', minHeight: PAL_H + 11, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive('qr')}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <VFSnippet durations={['qr']} />
-                      <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Silencio (¼)</Typography>
+                      <Typography variant="caption" sx={{ fontSize: 7, mt: 0.15 }}>Silencio (¼)</Typography>
                     </Box>
                   </Paper>
                 )}
@@ -703,7 +723,7 @@ export default function RitmicaConAlturas() {
             const isActive = mode === 'exam' && idx === activeBar
 
             return (
-              <Paper key={`bar-${idx}`} variant="outlined" onClick={() => mode === 'exam' && setActiveBar(idx)} sx={{ flex: '1 1 auto', minWidth: '320px', p: 1.5, cursor: mode === 'exam' ? 'pointer' : 'default', borderColor: isActive ? 'primary.main' : 'divider', borderWidth: isActive ? 2 : 1, bgcolor: isActive ? 'rgba(25,118,210,.03)' : undefined }}>
+              <Paper key={`bar-${idx}`} variant="outlined" onClick={() => mode === 'exam' && setActiveBar(idx)} sx={{ flex: '1 1 auto', minWidth: '350px', p: 1.5, cursor: mode === 'exam' ? 'pointer' : 'default', borderColor: isActive ? 'primary.main' : 'divider', borderWidth: isActive ? 2 : 1, bgcolor: isActive ? 'rgba(25,118,210,.03)' : undefined }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Typography sx={{ fontWeight: 700, color: isActive ? 'primary.main' : 'text.primary' }}>
