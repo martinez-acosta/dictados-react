@@ -5,14 +5,14 @@ import { Factory, Stave, StaveNote, Formatter, Beam, StaveTie, Voice } from 'vex
 
 // ------------------- Constantes de UI -------------------
 const BG = '#fff' // Fuerza blanco real
-const MAIN_W = 168, MAIN_H = 120
-const VAR_W  = 138, VAR_H  = 120
+const MAIN_W = 84, MAIN_H = 60
+const VAR_W  = 69, VAR_H  = 60
 const STAVE_X = 10,  STAVE_Y = 12
 const VAR_STAVE_X = 8, VAR_STAVE_Y = 10
 const STAVE_RIGHT_PAD = 26
-const MAIN_STAVE_W = MAIN_W - STAVE_X - STAVE_RIGHT_PAD
-const VAR_STAVE_W  = VAR_W  - VAR_STAVE_X - STAVE_RIGHT_PAD
-const ROW_MIN_H = Math.max(MAIN_H, VAR_H) + 16
+const MAIN_STAVE_W = (MAIN_W - STAVE_X - STAVE_RIGHT_PAD) * 2
+const VAR_STAVE_W  = (VAR_W  - VAR_STAVE_X - STAVE_RIGHT_PAD) * 2
+const ROW_MIN_H = Math.max(MAIN_H, VAR_H) + 8
 const VALUE_COL_WIDTH = 64
 
 // -----------------------------------------------------------------------------
@@ -68,6 +68,7 @@ function VFPairCell({ note, rest }: { note: string; rest: string }) {
     try {
       const vf = new Factory({ renderer: { elementId: idRef.current, width: MAIN_W, height: MAIN_H } })
       const ctx = vf.getContext()
+      ctx.scale(0.5, 0.5)
       const stave = new Stave(STAVE_X, STAVE_Y, MAIN_STAVE_W)
       stave.addClef('treble').setContext(ctx).draw()
       const n1 = new StaveNote({ clef: 'treble', keys: ['b/4'], duration: note })
@@ -115,6 +116,7 @@ function VFVariantCell({ forId }: { forId: string }) {
     try {
       const vf = new Factory({ renderer: { elementId: idRef.current, width: VAR_W, height: VAR_H } })
       const ctx = vf.getContext()
+      ctx.scale(0.5, 0.5)
       const stave = new Stave(VAR_STAVE_X, VAR_STAVE_Y, VAR_STAVE_W).addClef('treble')
       stave.setContext(ctx).draw()
 

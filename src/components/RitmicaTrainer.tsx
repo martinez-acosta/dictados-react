@@ -113,11 +113,12 @@ function VFMeasure({ notes, ts, highlight }: { notes: string[], ts: '4/4', highl
     if (!host) return
     mountCleanTarget(host, idRef.current)
 
-    const width = 600
-    const height = 110
+    const width = 156
+    const height = 94
     const vf = new Factory({ renderer: { elementId: idRef.current, width, height } })
     const ctx = vf.getContext()
-    const stave = new Stave(8, 8, width - 60)
+    ctx.scale(0.78, 0.78)
+    const stave = new Stave(6, 6, (width - 16) * 1.28)
     stave.addClef('treble').addTimeSignature(ts).setContext(ctx).draw()
     try {
       const vs = notes.map((d, i) => {
@@ -131,7 +132,7 @@ function VFMeasure({ notes, ts, highlight }: { notes: string[], ts: '4/4', highl
       else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
       voice.addTickables(vs)
 
-      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], width - 80)
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], (width - 26) * 1.28)
       voice.draw(ctx, stave)
 
       const beams = createBeamGroups(vs)
@@ -154,7 +155,7 @@ function VFMeasure({ notes, ts, highlight }: { notes: string[], ts: '4/4', highl
   return <div ref={hostRef} />
 }
 
-const PAL_W = 110, PAL_H = 96, PAL_STAVE_X = 6, PAL_STAVE_Y = 10, PAL_STAVE_W = PAL_W - 14
+const PAL_W = 79, PAL_H = 70, PAL_STAVE_X = 4, PAL_STAVE_Y = 8, PAL_STAVE_W = (PAL_W - 10) * 1.28
 function VFSnippet({ durations }: { durations: string[] }) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const idRef = useRef(`vf-snip-${Math.random().toString(36).slice(2)}`)
@@ -166,6 +167,7 @@ function VFSnippet({ durations }: { durations: string[] }) {
 
     const vf = new Factory({ renderer: { elementId: idRef.current, width: PAL_W, height: PAL_H } })
     const ctx = vf.getContext()
+    ctx.scale(0.78, 0.78)
     const stave = new Stave(PAL_STAVE_X, PAL_STAVE_Y, PAL_STAVE_W)
     stave.addClef('treble').setContext(ctx).draw()
     try {
@@ -175,7 +177,7 @@ function VFSnippet({ durations }: { durations: string[] }) {
       else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
       voice.addTickables(notes)
 
-      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], PAL_STAVE_W - 8)
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], PAL_STAVE_W - 6)
       voice.draw(ctx, stave)
 
       const beams = createBeamGroups(notes)
@@ -259,7 +261,7 @@ export default function RitmicaTablaYEntrenador() {
   const timeoutsRef = useRef<number[]>([])
 
   // Total de compases disponibles en cada ejercicio
-  const barsCount = 2 as const
+  const barsCount = 4 as const
 
   const [bpm, setBpm] = useState(60)
   const [repeats, setRepeats] = useState<number>(5)
@@ -444,7 +446,7 @@ export default function RitmicaTablaYEntrenador() {
           Volver al menú
         </Button>
         <Typography variant="h6" sx={{ fontWeight:800, color:'#0b2a50' }}>
-          🎵 Figuras & Silencios + Dictado (2 compases)
+          🎵 Figuras & Silencios + Dictado (4 compases)
         </Typography>
       </Stack>
 
@@ -458,7 +460,7 @@ export default function RitmicaTablaYEntrenador() {
       <Paper sx={{ p:2 }}>
         <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb:1 }}>
           <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-            <Typography variant="subtitle1" sx={{ fontWeight:700 }}>Entrenamiento (2 compases)</Typography>
+            <Typography variant="subtitle1" sx={{ fontWeight:700 }}>Entrenamiento (4 compases)</Typography>
 
             <TextField size="small" type="number" label="BPM" value={bpm}
                        onChange={e=>setBpm(Number(e.target.value))}
@@ -525,8 +527,8 @@ export default function RitmicaTablaYEntrenador() {
 
         {/* Paleta — redonda, blanca, negra y DOBLE CORCHEA (+ silencios si aplica) */}
         <Stack spacing={1} sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-            Figuras disponibles: redonda, blanca, negra y <strong>doble corchea</strong>{includeRests ? ' + silencios' : ''}
+          <Typography variant="caption" sx={{ fontWeight: 600, fontSize: 11 }}>
+            Figuras: redonda, blanca, negra, doble corchea{includeRests ? ' + silencios' : ''}
           </Typography>
           <Grid container spacing={1}>
             {/* Redonda */}
@@ -535,7 +537,7 @@ export default function RitmicaTablaYEntrenador() {
                 <Paper
                   variant="outlined"
                   sx={{
-                    p: 1, cursor: 'pointer', minHeight: PAL_H + 38,
+                    p: 0.5, cursor: 'pointer', minHeight: PAL_H + 12,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' },
                     transition: 'all 0.2s ease'
@@ -544,7 +546,7 @@ export default function RitmicaTablaYEntrenador() {
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <VFSnippet durations={[r.durNota]} />
-                    <Typography variant="caption" sx={{ fontSize: 11, mt: 0.25 }}>Figura</Typography>
+                    <Typography variant="caption" sx={{ fontSize: 8, mt: 0.15 }}>Figura</Typography>
                   </Box>
                 </Paper>
 
@@ -552,7 +554,7 @@ export default function RitmicaTablaYEntrenador() {
                   <Paper
                     variant="outlined"
                     sx={{
-                      p: 1, mt: 0.5, cursor: 'pointer', minHeight: PAL_H + 38,
+                      p: 0.5, mt: 0.5, cursor: 'pointer', minHeight: PAL_H + 13,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' },
                       transition: 'all 0.2s ease'
@@ -561,7 +563,7 @@ export default function RitmicaTablaYEntrenador() {
                   >
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <VFSnippet durations={[r.durSilencio]} />
-                      <Typography variant="caption" sx={{ fontSize: 11, mt: 0.25 }}>Silencio</Typography>
+                      <Typography variant="caption" sx={{ fontSize: 8, mt: 0.15 }}>Silencio</Typography>
                     </Box>
                   </Paper>
                 )}
@@ -573,7 +575,7 @@ export default function RitmicaTablaYEntrenador() {
               <Paper
                 variant="outlined"
                 sx={{
-                  p: 1, cursor: 'pointer', minHeight: PAL_H + 38,
+                  p: 0.4, cursor: 'pointer', minHeight: PAL_H + 10,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' },
                   transition: 'all 0.2s ease'
@@ -582,7 +584,7 @@ export default function RitmicaTablaYEntrenador() {
               >
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <VFSnippet durations={['8','8']} />
-                  <Typography variant="caption" sx={{ fontSize: 11, mt: 0.25 }}>Doble corchea</Typography>
+                  <Typography variant="caption" sx={{ fontSize: 7, mt: 0.12 }}>Doble corchea</Typography>
                 </Box>
               </Paper>
 
@@ -590,7 +592,7 @@ export default function RitmicaTablaYEntrenador() {
                 <Paper
                   variant="outlined"
                   sx={{
-                    p: 1, mt: 0.5, cursor: 'pointer', minHeight: PAL_H + 38,
+                    p: 0.4, mt: 0.4, cursor: 'pointer', minHeight: PAL_H + 11,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' },
                     transition: 'all 0.2s ease'
@@ -599,7 +601,7 @@ export default function RitmicaTablaYEntrenador() {
                 >
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <VFSnippet durations={['qr']} />
-                    <Typography variant="caption" sx={{ fontSize: 11, mt: 0.25 }}>Silencio (¼)</Typography>
+                    <Typography variant="caption" sx={{ fontSize: 7, mt: 0.12 }}>Silencio (¼)</Typography>
                   </Box>
                 </Paper>
               )}
@@ -607,7 +609,7 @@ export default function RitmicaTablaYEntrenador() {
           </Grid>
         </Stack>
 
-        {/* Respuesta — 2 compases */}
+        {/* Respuesta — 4 compases */}
         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 1, pt: 0.5 }}>
           {answers.map((m, idx) => {
             const sum = m.notes.reduce((a, d) => a + (DUR_TO_PULSES[d] || 0), 0)
@@ -621,8 +623,8 @@ export default function RitmicaTablaYEntrenador() {
                 onClick={() => setActiveBar(idx)}
                 sx={{
                   flex: '1 1 auto',
-                  minWidth: '360px',
-                  p: 1.5,
+                  minWidth: '180px',
+                  p: 0.75,
                   cursor: 'pointer',
                   borderColor: activeBar === idx ? 'primary.main' : 'divider',
                   borderWidth: activeBar === idx ? 2 : 1,

@@ -2,9 +2,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box, Paper, Stack, Typography, Grid, Button, Chip, Divider,
-  TextField, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch
+  TextField, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch,
+  IconButton
 } from '@mui/material'
-import { PlayArrow, Pause, RestartAlt, ArrowBack, Visibility, VisibilityOff } from '@mui/icons-material'
+import { PlayArrow, Pause, RestartAlt, ArrowBack, Visibility, VisibilityOff, Undo, Delete, CheckCircle } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as Tone from 'tone'
 import { Factory, Stave, StaveNote, Formatter, Beam, Voice } from 'vexflow'
@@ -56,12 +57,46 @@ const NOTE_RANGES: Record<string, string[]> = {
   'E1-E2': ['e/1','f/1','g/1','a/1','b/1','c/2','d/2','e/2'], // Bajo grave
 }
 
+const NOTE_NAMES: Record<string, string> = {
+  'c/1':'Do1','d/1':'Re1','e/1':'Mi1','f/1':'Fa1','g/1':'Sol1','a/1':'La1','b/1':'Si1',
+  'c/2':'Do2','d/2':'Re2','e/2':'Mi2','f/2':'Fa2','g/2':'Sol2','a/2':'La2','b/2':'Si2',
+  'c/3':'Do3','d/3':'Re3','e/3':'Mi3','f/3':'Fa3','g/3':'Sol3','a/3':'La3','b/3':'Si3',
+  'c/4':'Do4','d/4':'Re4','e/4':'Mi4','f/4':'Fa4','g/4':'Sol4','a/4':'La4','b/4':'Si4',
+  'c/5':'Do5','d/5':'Re5','e/5':'Mi5','f/5':'Fa5','g/5':'Sol5','a/5':'La5','b/5':'Si5',
+}
+
 // Convertir VexFlow key a notación científica para Tone.js
 function keyToSPN(key: string): string {
   const [l, oct] = key.split('/')
   const letter = l[0].toUpperCase()
   const sharp = l.includes('#') ? '#' : ''
   return `${letter}${sharp}${oct}`
+}
+
+// Parse nota de entrada (ej: "C4" o "Do4" -> "c/4")
+function parseNoteInput(input: string, rangeKeys: string[]): { valid: boolean; key?: string } {
+  if (!input) return { valid: false }
+  const trimmed = input.trim().toLowerCase()
+
+  // Intentar formato científico: C4, D3, etc.
+  const scientificMatch = trimmed.match(/^([a-g])(\d)$/i)
+  if (scientificMatch) {
+    const key = `${scientificMatch[1].toLowerCase()}/${scientificMatch[2]}`
+    if (rangeKeys.includes(key)) return { valid: true, key }
+  }
+
+  // Intentar formato solfeo: Do4, Re3, etc.
+  const solfegeMap: Record<string, string> = {
+    'do': 'c', 're': 'd', 'mi': 'e', 'fa': 'f', 'sol': 'g', 'la': 'a', 'si': 'b'
+  }
+  const solfegeMatch = trimmed.match(/^(do|re|mi|fa|sol|la|si)(\d)$/i)
+  if (solfegeMatch) {
+    const letter = solfegeMap[solfegeMatch[1].toLowerCase()]
+    const key = `${letter}/${solfegeMatch[2]}`
+    if (rangeKeys.includes(key)) return { valid: true, key }
+  }
+
+  return { valid: false }
 }
 
 // ------------------ Helpers VexFlow ------------------
@@ -170,7 +205,7 @@ function generateMeasureWithPitches(includeRests: boolean, pitchPool: string[]):
     const will = sum + pick.pulses
     if (will <= target + 1e-6) {
       pick.add.forEach(dur => {
-        const pitch = dur.endsWith('r') ? 'b/4' : pickRandom(pitchPool) // silencios no tienen pitch
+        const pitch = dur.endsWith('r') ? 'b/4' : pickRandom(pitchPool)
         seq.push({ duration: dur, pitch })
       })
       sum = +(sum + pick.pulses).toFixed(3)
@@ -203,7 +238,13 @@ function equalMeasures(a: NoteWithPitch[], b: NoteWithPitch[]) {
 }
 
 // ------------------ Componente VexFlow ------------------
-function VFMeasure({ notes, ts, highlight }: { notes: NoteWithPitch[], ts: '4/4', highlight?: number }) {
+function VFMeasure({ notes, ts, highlight, showGrading, graded }: {
+  notes: NoteWithPitch[],
+  ts: '4/4',
+  highlight?: number,
+  showGrading?: boolean,
+  graded?: boolean[]
+}) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const idRef = useRef(`vf-meas-${Math.random().toString(36).slice(2)}`)
 
@@ -212,17 +253,22 @@ function VFMeasure({ notes, ts, highlight }: { notes: NoteWithPitch[], ts: '4/4'
     if (!host) return
     mountCleanTarget(host, idRef.current)
 
-    const width = 600
-    const height = 180
+    const width = 225
+    const height = 105
     const vf = new Factory({ renderer: { elementId: idRef.current, width, height } })
     const ctx = vf.getContext()
-    const stave = new Stave(8, 8, width - 60)
+    const stave = new Stave(6, 6, width - 22)
     stave.addClef('treble').addTimeSignature(ts).setContext(ctx).draw()
 
     try {
       const vs = notes.map((n, i) => {
         const note = new StaveNote({ clef: 'treble', keys: [n.pitch], duration: n.duration })
-        if (highlight === i) note.setStyle({ fillStyle: '#ff6b35', strokeStyle: '#ff6b35' })
+        if (highlight === i) {
+          note.setStyle({ fillStyle: '#ff6b35', strokeStyle: '#ff6b35' })
+        } else if (showGrading && graded && graded[i] !== undefined) {
+          const color = graded[i] ? '#34d399' : '#fb7185'
+          note.setStyle({ fillStyle: color, strokeStyle: color })
+        }
         return note
       })
 
@@ -231,7 +277,7 @@ function VFMeasure({ notes, ts, highlight }: { notes: NoteWithPitch[], ts: '4/4'
       else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
       voice.addTickables(vs)
 
-      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], width - 80)
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], width - 40)
       voice.draw(ctx, stave)
 
       const beams = createBeamGroups(vs)
@@ -239,9 +285,44 @@ function VFMeasure({ notes, ts, highlight }: { notes: NoteWithPitch[], ts: '4/4'
     } catch (e) {
       console.warn('VF measure error:', e)
     }
-  }, [notes, ts, highlight])
+  }, [notes, ts, highlight, showGrading, graded])
 
   return <div ref={hostRef} />
+}
+
+// Paleta snippet pequeño
+const PAL_W = 90, PAL_H = 80, PAL_STAVE_X = 4, PAL_STAVE_Y = 8, PAL_STAVE_W = PAL_W - 10
+function VFSnippet({ durations }: { durations: string[] }) {
+  const hostRef = useRef<HTMLDivElement | null>(null)
+  const idRef = useRef(`vf-snip-${Math.random().toString(36).slice(2)}`)
+
+  useEffect(() => {
+    const host = hostRef.current
+    if (!host) return
+    mountCleanTarget(host, idRef.current)
+
+    const vf = new Factory({ renderer: { elementId: idRef.current, width: PAL_W, height: PAL_H } })
+    const ctx = vf.getContext()
+    const stave = new Stave(PAL_STAVE_X, PAL_STAVE_Y, PAL_STAVE_W)
+    stave.addClef('treble').setContext(ctx).draw()
+    try {
+      const notes = durations.map(d => new StaveNote({ clef: 'treble', keys: ['b/4'], duration: d }))
+      const voice = new Voice({ num_beats: 4, beat_value: 4 })
+      if (typeof (voice as any).setStrict === 'function') (voice as any).setStrict(false)
+      else if ((Voice as any).Mode) (voice as any).setMode((Voice as any).Mode.SOFT)
+      voice.addTickables(notes)
+
+      new Formatter({ align_rests: true }).joinVoices([voice]).format([voice], PAL_STAVE_W - 6)
+      voice.draw(ctx, stave)
+
+      const beams = createBeamGroups(notes)
+      beams.forEach(b => b.setContext(ctx).draw())
+    } catch (e) {
+      console.warn('VF snippet error:', e)
+    }
+  }, [durations])
+
+  return <div ref={hostRef} style={{ width: PAL_W, height: PAL_H }} />
 }
 
 // ------------------ Componente principal ------------------
@@ -249,18 +330,24 @@ export default function RitmicaConAlturas() {
   const navigate = useNavigate()
   const timeoutsRef = useRef<number[]>([])
 
-  const barsCount = 2 as const
+  const barsCount = 4 as const
 
   const [bpm, setBpm] = useState(60)
   const [repeats, setRepeats] = useState<number>(5)
   const [includeRests, setIncludeRests] = useState<boolean>(true)
   const [noteRange, setNoteRange] = useState<string>('C4-C5')
+  const [mode, setMode] = useState<'train' | 'exam'>('train')
   const [solution, setSolution] = useState<Medida[]>([])
+  const [answers, setAnswers] = useState<Medida[]>([])
+  const [activeBar, setActiveBar] = useState(0)
+  const [graded, setGraded] = useState<boolean[][]>([])
   const [showSolution, setShowSolution] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentBeat, setCurrentBeat] = useState(0)
   const [currentNoteIndex, setCurrentNoteIndex] = useState<number | null>(null)
   const [currentBar, setCurrentBar] = useState<number | null>(null)
+  // Para inputs de texto
+  const [noteInputs, setNoteInputs] = useState<string[][]>([[],[],[],[]])
 
   const pitchPool = useMemo(() => NOTE_RANGES[noteRange] || NOTE_RANGES['C4-C5'], [noteRange])
 
@@ -288,7 +375,101 @@ export default function RitmicaConAlturas() {
   function nuevaSecuencia() {
     const sol = Array.from({length: barsCount}, () => generateMeasureWithPitches(includeRests, pitchPool))
     setSolution(sol)
+    setAnswers(Array.from({length: barsCount}, () => ({ notes: [] })))
+    setNoteInputs(Array.from({length: barsCount}, () => []))
+    setActiveBar(0)
+    setGraded([])
     pauseAll(true)
+  }
+
+  function addToActive(durs: string[] | string, pitches?: string[]) {
+    const durations = Array.isArray(durs) ? durs : [durs]
+    setAnswers(prev => {
+      const copy = prev.map(m => ({ notes:[...m.notes] }))
+      const current = copy[activeBar]
+      const sum = totalPulses(current.notes)
+      const addVal = durations.reduce((a,d)=>a+(DUR_TO_PULSES[d]||0),0)
+      if (sum + addVal <= 4 + 1e-6) {
+        durations.forEach((dur, i) => {
+          const pitch = pitches && pitches[i] ? pitches[i] : (dur.endsWith('r') ? 'b/4' : 'c/4')
+          current.notes.push({ duration: dur, pitch })
+        })
+      }
+      return copy
+    })
+    // Actualizar inputs
+    setNoteInputs(prev => {
+      const copy = prev.map(arr => [...arr])
+      durations.forEach((dur) => {
+        if (!dur.endsWith('r')) {
+          copy[activeBar].push('')
+        }
+      })
+      return copy
+    })
+  }
+
+  function undoActive() {
+    setAnswers(prev => {
+      const copy = prev.map(m => ({ notes:[...m.notes] }))
+      const last = copy[activeBar].notes.pop()
+      return copy
+    })
+    setNoteInputs(prev => {
+      const copy = prev.map(arr => [...arr])
+      if (copy[activeBar].length > 0) {
+        copy[activeBar].pop()
+      }
+      return copy
+    })
+  }
+
+  function clearActive() {
+    setAnswers(prev => {
+      const copy = prev.map(m => ({ notes:[...m.notes] }))
+      copy[activeBar].notes = []
+      return copy
+    })
+    setNoteInputs(prev => {
+      const copy = prev.map(arr => [...arr])
+      copy[activeBar] = []
+      return copy
+    })
+  }
+
+  function updateNotePitch(barIdx: number, noteIdx: number, input: string) {
+    const parsed = parseNoteInput(input, pitchPool)
+    setNoteInputs(prev => {
+      const copy = prev.map(arr => [...arr])
+      copy[barIdx][noteIdx] = input
+      return copy
+    })
+    if (parsed.valid && parsed.key) {
+      setAnswers(prev => {
+        const copy = prev.map(m => ({ notes:[...m.notes] }))
+        if (copy[barIdx].notes[noteIdx]) {
+          copy[barIdx].notes[noteIdx].pitch = parsed.key!
+        }
+        return copy
+      })
+    }
+  }
+
+  const allComplete = useMemo(() =>
+    answers.every(m => Math.abs(totalPulses(m.notes) - 4) < 1e-6),
+    [answers]
+  )
+
+  function calificar() {
+    const res = answers.map((m,i) => {
+      return m.notes.map((n, j) => {
+        const sol = solution[i].notes[j]
+        if (!sol) return false
+        return n.duration === sol.duration && n.pitch === sol.pitch
+      })
+    })
+    setGraded(res)
+    setShowSolution(true)
   }
 
   async function playSequence(seq: Medida[], reps = repeats, barOffset = 0) {
@@ -307,7 +488,6 @@ export default function RitmicaConAlturas() {
     let acc = 0
 
     for (let r = 0; r < safeReps; r++) {
-      // Conteo inicial
       if (r === 0) {
         for (let i = 0; i < 4; i++) {
           const to = window.setTimeout(() => {
@@ -332,7 +512,6 @@ export default function RitmicaConAlturas() {
         }, measureStart * 1000)
         timeoutsRef.current.push(startTo)
 
-        // Metrónomo
         for (let beat = 0; beat < 4; beat++) {
           const beatTime = measureStart + beat * base
           const to = window.setTimeout(() => {
@@ -343,7 +522,6 @@ export default function RitmicaConAlturas() {
           timeoutsRef.current.push(to)
         }
 
-        // Notas con alturas
         let noteAcc = 0
         measure.notes.forEach((n, idx) => {
           const secs = (DUR_TO_PULSES[n.duration] || 0) * base
@@ -375,23 +553,36 @@ export default function RitmicaConAlturas() {
     timeoutsRef.current.push(endTo)
   }
 
+  // Paleta de figuras
+  const rowW = FIGURAS_TABLE.find(r => r.id === 'w')!
+  const rowH = FIGURAS_TABLE.find(r => r.id === 'h')!
+  const rowQ = FIGURAS_TABLE.find(r => r.id === 'q')!
+
   return (
     <Box sx={{ width:'100%', px:2, pb:4 }}>
-      {/* Header */}
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb:2 }}>
         <Button variant="outlined" startIcon={<ArrowBack />} onClick={()=>navigate('/')}>
           Volver al menú
         </Button>
         <Typography variant="h6" sx={{ fontWeight:800, color:'#0b2a50' }}>
-          🎼 Dictado Rítmico con Alturas (2 compases)
+          🎼 Dictado Rítmico con Alturas (4 compases)
         </Typography>
       </Stack>
 
-      {/* ENTRENAMIENTO */}
       <Paper sx={{ p:2 }}>
         <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between" sx={{ mb:1 }} flexWrap="wrap">
           <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-            <Typography variant="subtitle1" sx={{ fontWeight:700 }}>Entrenamiento (2 compases)</Typography>
+            <Typography variant="subtitle1" sx={{ fontWeight:700 }}>
+              {mode === 'train' ? 'Modo: Entrenamiento' : 'Modo: Examen'}
+            </Typography>
+
+            <FormControl size="small" sx={{ width: 120 }}>
+              <InputLabel>Modo</InputLabel>
+              <Select value={mode} onChange={(e) => setMode(e.target.value as 'train' | 'exam')} label="Modo">
+                <MenuItem value="train">Entrenamiento</MenuItem>
+                <MenuItem value="exam">Examen</MenuItem>
+              </Select>
+            </FormControl>
 
             <TextField size="small" type="number" label="BPM" value={bpm}
                        onChange={e=>setBpm(Number(e.target.value))}
@@ -403,11 +594,7 @@ export default function RitmicaConAlturas() {
 
             <FormControl size="small" sx={{ width: 150 }}>
               <InputLabel>Rango de notas</InputLabel>
-              <Select
-                value={noteRange}
-                onChange={(e) => setNoteRange(e.target.value)}
-                label="Rango de notas"
-              >
+              <Select value={noteRange} onChange={(e) => setNoteRange(e.target.value)} label="Rango de notas">
                 <MenuItem value="C3-C4">Do3 - Do4</MenuItem>
                 <MenuItem value="C4-C5">Do4 - Do5</MenuItem>
                 <MenuItem value="C3-C5">Do3 - Do5</MenuItem>
@@ -447,22 +634,13 @@ export default function RitmicaConAlturas() {
 
         <Divider sx={{ my:1.5 }} />
 
-        {/* Indicador visual del metrónomo */}
         {isPlaying && (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, py: 1, mb: 2, backgroundColor: 'rgba(33, 150, 243, 0.08)', borderRadius: 1 }}>
             <Typography variant="body2" sx={{ fontWeight: 'bold', mr: 1 }}>
               {bpm} BPM:
             </Typography>
             {[0,1,2,3].map(beat => (
-              <Box
-                key={beat}
-                sx={{
-                  width: 22, height: 22, borderRadius: '50%',
-                  backgroundColor: currentBeat === beat ? '#2196f3' : '#e0e0e0',
-                  transition: 'background-color 0.1s ease',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}
-              >
+              <Box key={beat} sx={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: currentBeat === beat ? '#2196f3' : '#e0e0e0', transition: 'background-color 0.1s ease', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Typography variant="caption" sx={{ color: currentBeat === beat ? 'white' : '#666', fontWeight: 'bold' }}>
                   {beat + 1}
                 </Typography>
@@ -471,53 +649,133 @@ export default function RitmicaConAlturas() {
           </Box>
         )}
 
-        {/* Compases de solución */}
+        {mode === 'exam' && (
+          <Stack spacing={1} sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              Figuras disponibles: redonda, blanca, negra y <strong>doble corchea</strong>{includeRests ? ' + silencios' : ''}
+            </Typography>
+            <Grid container spacing={1}>
+              {[rowW, rowH, rowQ].map((r, i) => (
+                <Grid item key={`${r.id}-pal-${i}`} xs={6} sm={3} md={3} lg={2.4 as any}>
+                  <Paper variant="outlined" sx={{ p: 0.5, cursor: 'pointer', minHeight: PAL_H + 12, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(r.durNota)}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <VFSnippet durations={[r.durNota]} />
+                      <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Figura</Typography>
+                    </Box>
+                  </Paper>
+
+                  {includeRests && (
+                    <Paper variant="outlined" sx={{ p: 0.5, mt: 0.5, cursor: 'pointer', minHeight: PAL_H + 14, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(r.durSilencio)}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <VFSnippet durations={[r.durSilencio]} />
+                        <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Silencio</Typography>
+                      </Box>
+                    </Paper>
+                  )}
+                </Grid>
+              ))}
+
+              <Grid item key={'double8'} xs={6} sm={3} md={3} lg={2.4 as any}>
+                <Paper variant="outlined" sx={{ p: 0.5, cursor: 'pointer', minHeight: PAL_H + 12, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive(['8','8'])}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <VFSnippet durations={['8','8']} />
+                    <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Doble corchea</Typography>
+                  </Box>
+                </Paper>
+
+                {includeRests && (
+                  <Paper variant="outlined" sx={{ p: 0.5, mt: 0.5, cursor: 'pointer', minHeight: PAL_H + 14, display: 'flex', alignItems: 'center', justifyContent: 'center', '&:hover': { bgcolor: 'rgba(25,118,210,.05)', transform: 'translateY(-1px)' }, transition: 'all 0.2s ease' }} onClick={() => addToActive('qr')}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <VFSnippet durations={['qr']} />
+                      <Typography variant="caption" sx={{ fontSize: 8, mt: 0.2 }}>Silencio (¼)</Typography>
+                    </Box>
+                  </Paper>
+                )}
+              </Grid>
+            </Grid>
+          </Stack>
+        )}
+
         <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 1, pt: 0.5 }}>
-          {solution.map((m, idx) => {
+          {(mode === 'exam' ? answers : solution).map((m, idx) => {
             const sum = totalPulses(m.notes)
             const complete = Math.abs(sum - 4) < 1e-6
+            const isActive = mode === 'exam' && idx === activeBar
 
             return (
-              <Paper
-                key={`sol-${idx}`}
-                variant="outlined"
-                sx={{
-                  flex: '1 1 auto',
-                  minWidth: '360px',
-                  p: 1.5,
-                  borderColor: 'primary.main',
-                  borderWidth: 1
-                }}
-              >
+              <Paper key={`bar-${idx}`} variant="outlined" onClick={() => mode === 'exam' && setActiveBar(idx)} sx={{ flex: '1 1 auto', minWidth: '320px', p: 1.5, cursor: mode === 'exam' ? 'pointer' : 'default', borderColor: isActive ? 'primary.main' : 'divider', borderWidth: isActive ? 2 : 1, bgcolor: isActive ? 'rgba(25,118,210,.03)' : undefined }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography sx={{ fontWeight: 700, color: 'primary.main' }}>
+                    <Typography sx={{ fontWeight: 700, color: isActive ? 'primary.main' : 'text.primary' }}>
                       Compás {idx + 1}
                     </Typography>
-                    <Chip size="small" label={complete ? '4/4 ✓' : `${sum.toFixed(2)} / 4`}
-                          color={complete ? 'success' : 'default'}
-                          variant={complete ? 'filled' : 'outlined'}
-                    />
+                    <Chip size="small" label={complete ? '4/4 ✓' : `${sum.toFixed(2)} / 4`} color={complete ? 'success' : 'default'} variant={complete ? 'filled' : 'outlined'} />
+                    {mode === 'exam' && graded.length > 0 && graded[idx] && (
+                      <Chip size="small" label={`${graded[idx].filter(Boolean).length}/${graded[idx].length}`} color={graded[idx].every(Boolean) ? 'success' : 'warning'} variant="outlined" />
+                    )}
                   </Stack>
 
-                  <Button size="small" variant="outlined" startIcon={<PlayArrow />}
-                    onClick={(e) => { e.stopPropagation(); pauseAll(true); playSequence([solution[idx]], repeats, idx) }}>
-                    Oír
-                  </Button>
+                  {mode === 'exam' && (
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); undoActive() }} disabled={activeBar !== idx || m.notes.length === 0}>
+                        <Undo fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); clearActive() }} disabled={activeBar !== idx || m.notes.length === 0}>
+                        <Delete fontSize="small" />
+                      </IconButton>
+                      <Button size="small" variant="outlined" startIcon={<PlayArrow />} onClick={(e) => { e.stopPropagation(); pauseAll(true); playSequence([solution[idx]], repeats, idx) }}>
+                        Oír
+                      </Button>
+                    </Stack>
+                  )}
+                  {mode === 'train' && (
+                    <Button size="small" variant="outlined" startIcon={<PlayArrow />} onClick={(e) => { e.stopPropagation(); pauseAll(true); playSequence([solution[idx]], repeats, idx) }}>
+                      Oír
+                    </Button>
+                  )}
                 </Stack>
 
-                {showSolution && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <VFMeasure
-                      notes={m.notes.length > 0 ? m.notes : [{ duration: 'qr', pitch: 'b/4' }]}
-                      ts="4/4"
-                      highlight={isPlaying && idx === currentBar ? currentNoteIndex ?? undefined : undefined}
-                    />
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: mode === 'exam' || showSolution ? 1 : 0 }}>
+                  <VFMeasure
+                    notes={m.notes.length > 0 ? m.notes : [{ duration: 'qr', pitch: 'b/4' }]}
+                    ts="4/4"
+                    highlight={isPlaying && idx === currentBar ? currentNoteIndex ?? undefined : undefined}
+                    showGrading={mode === 'exam' && graded.length > 0}
+                    graded={graded[idx]}
+                  />
+                </Box>
+
+                {mode === 'exam' && m.notes.length > 0 && (
+                  <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                    {m.notes.filter(n => !n.duration.endsWith('r')).map((n, noteIdx) => {
+                      const input = noteInputs[idx]?.[noteIdx] || ''
+                      const parsed = parseNoteInput(input, pitchPool)
+                      return (
+                        <Grid item xs={6} md={4} key={`input-${idx}-${noteIdx}`}>
+                          <TextField fullWidth size="small" label={`Nota ${noteIdx + 1}`} value={input} onChange={(e) => updateNotePitch(idx, noteIdx, e.target.value)} error={Boolean(input && !parsed.valid)} helperText={input && !parsed.valid ? 'Ej: C4 o Do4' : NOTE_NAMES[n.pitch] || n.pitch} />
+                        </Grid>
+                      )
+                    })}
+                  </Grid>
+                )}
+
+                {mode === 'train' && showSolution && (
+                  <Box sx={{ borderTop: '1px dashed #ddd', pt: 1, mt: 1 }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+                      💡 Solución correcta:
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <VFMeasure
+                        notes={solution[idx].notes}
+                        ts="4/4"
+                        highlight={isPlaying && idx === currentBar ? currentNoteIndex ?? undefined : undefined}
+                      />
+                    </Box>
                   </Box>
                 )}
 
-                {!showSolution && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 180, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1 }}>
+                {mode === 'train' && !showSolution && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 60, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1, mt: 1 }}>
                     <Typography variant="body2" color="text.secondary">
                       Solución oculta
                     </Typography>
@@ -528,8 +786,19 @@ export default function RitmicaConAlturas() {
           })}
         </Box>
 
+        {mode === 'exam' && (
+          <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt:2 }}>
+            <Button variant="outlined" onClick={()=>{setAnswers(Array.from({length:barsCount},()=>({notes:[]})));setNoteInputs(Array.from({length:barsCount},()=>[]))}}>
+              Limpiar todo
+            </Button>
+            <Button variant="contained" startIcon={<CheckCircle />} onClick={calificar} disabled={!allComplete}>
+              Calificar
+            </Button>
+          </Stack>
+        )}
+
         <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'text.secondary', fontStyle: 'italic' }}>
-          💡 Este ejercicio combina ritmo y altura. Escucha atentamente tanto la duración como la nota que suena.
+          💡 {mode === 'train' ? 'Modo entrenamiento: escucha y observa la solución.' : 'Modo examen: construye el ritmo con la paleta y escribe la altura de cada nota (ej: C4 o Do4).'}
         </Typography>
       </Paper>
     </Box>
