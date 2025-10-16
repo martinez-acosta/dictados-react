@@ -1,6 +1,6 @@
 import React from 'react'
 import { Container, Paper, Typography, Box, Button, Grid } from '@mui/material'
-import { MusicNote, GraphicEq, Home, Piano, RecordVoiceOver, LibraryMusic, AccessTime, MenuBook } from '@mui/icons-material'
+import { MusicNote, GraphicEq, Home, Piano, RecordVoiceOver, LibraryMusic, AccessTime, MenuBook, GraphicEqOutlined } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
@@ -20,6 +20,42 @@ export default function Dashboard() {
         </Box>
 
         <Grid container spacing={3}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper
+              sx={{
+                p: 3,
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 3
+                }
+              }}
+              onClick={() => navigate('/afinador')}
+            >
+              <GraphicEqOutlined sx={{ fontSize: 64, color: '#9c27b0', mb: 2 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                Afinador Cromático
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Afina tu instrumento con detección de pitch en tiempo real y historial de notas
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{
+                  py: 1.5,
+                  backgroundColor: '#9c27b0',
+                  '&:hover': { backgroundColor: '#7b1fa2' }
+                }}
+                fullWidth
+                onClick={() => navigate('/afinador')}
+              >
+                Abrir Afinador
+              </Button>
+            </Paper>
+          </Grid>
+
           <Grid item xs={12} sm={6} md={4}>
             <Paper
               sx={{
