@@ -12,6 +12,7 @@ import IntervalsTrainer from './components/IntervalsTrainer.tsx'
 import RitmicaTrainer from './components/RitmicaTrainer.tsx'
 import RitmicaConAlturas from './components/RitmicaConAlturas.tsx'
 import LecturaMusical from './components/LecturaMusical.tsx'
+import TunerPage from './components/TunerPage.tsx'
 import './styles.css'
 
 createRoot(document.getElementById('root')).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter basename="/dictados-react">
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/afinador" element={<TunerPage />} />
         <Route path="/dictados" element={<DictadosMelodicos />} />
         <Route path="/intervalos" element={<EjerciciosIntervalos />} />
         <Route path="/bajo" element={<BajoTrainer />} />
