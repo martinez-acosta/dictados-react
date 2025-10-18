@@ -229,6 +229,11 @@ const TREBLE_EXERCISES = {
       treble: ['g/4','a/5','g/4','c/4','d/4','e/4','f/5','b/3'],
       bass: ['g/2','a/3','g/2','c/2','d/2','e/2','f/3','b/1']
     }
+  },
+  'dandelot-sol-completo': {
+    name: '📖 Dandelot Completo: Do4–Si5 (1 línea adicional)',
+    notes: ['c/4','d/4','e/4','f/4','g/4','a/4','b/4','c/5','d/5','e/5','f/5','g/5','a/5','b/5'],
+    description: 'Lectura integral en clave de Sol con todas las notas naturales, incluyendo las líneas adicionales inferiores y superiores (Do4 y Si5).'
   }
 } as const
 const BASS_EXERCISES = {
