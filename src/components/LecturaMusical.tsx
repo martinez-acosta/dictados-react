@@ -245,21 +245,25 @@ function getNotePool(
 function generateExercise(notePool: readonly string[], length: number = 30): string[] {
   const out: string[] = []
   const notes = notePool
+  if (notes.length === 0) return out
 
-  // Hacer más aleatorio evitando repeticiones consecutivas
-  let lastNote = ''
+  const uniqueCount = new Set(notes).size
+  const historyLimit = uniqueCount >= 4 ? 3 : uniqueCount === 3 ? 2 : uniqueCount === 2 ? 1 : 0
+
+  // Hacer más aleatorio evitando repeticiones consecutivas y patrones cortos
   for (let i = 0; i < length; i++) {
     let newNote = pick(notes)
-    // Evitar la misma nota consecutiva si hay más de una opción
-    if (notes.length > 1) {
+    if (historyLimit > 0) {
+      const recent = out.slice(-historyLimit)
+      const avoid = new Set(recent)
       let attempts = 0
-      while (newNote === lastNote && attempts < 10) {
+      const maxAttempts = 30
+      while (avoid.has(newNote) && attempts < maxAttempts) {
         newNote = pick(notes)
         attempts++
       }
     }
     out.push(newNote)
-    lastNote = newNote
   }
   return out
 }
