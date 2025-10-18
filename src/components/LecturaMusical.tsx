@@ -261,6 +261,16 @@ const BASS_EXERCISES = {
     name: '🎼 Fa 5: Intervalos graves (3as y 4as)',
     notes: ['c/2','e/2','f/2','a/2','b/2','d/3','e/3','g/3','a/2','c/3'],
     description: 'Salta entre terceras y cuartas para agilizar la lectura a primera vista.'
+  },
+  'fa-dandelot-do-escala': {
+    name: '🎼 Fa Dandelot: Do-Re-Mi-Fa-Sol-Fa-Mi-Re-Do',
+    notes: ['c/3','d/3','e/3','f/3','g/3','f/3','e/3','d/3','c/3'],
+    description: 'Motivo melódico Dandelot en clave de Fa: escala ascendente y descendente de Do mayor (5 notas).'
+  },
+  'fa-dandelot-sol-escala': {
+    name: '🎼 Fa Dandelot: Sol-La-Si-Do-Si-La-Sol',
+    notes: ['g/2','a/2','b/2','c/3','b/2','a/2','g/2'],
+    description: 'Motivo melódico Dandelot en clave de Fa: patrón Sol-La-Si-Do con retorno simétrico.'
   }
 } as const
 
