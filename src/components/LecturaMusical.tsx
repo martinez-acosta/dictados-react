@@ -116,7 +116,7 @@ type ExerciseConfig = {
 }
 
 // ---------------- Configuración de ejercicios ----------------
-const EXERCISE_CONFIGS = {
+const TREBLE_EXERCISES = {
   // ========== PROGRESIÓN INCREMENTAL JAZZ — C4 a La5 ==========
   'jazz-1-do-sol': {
     name: '🎺 Jazz 1: Do y Sol (quinta justa)',
@@ -231,7 +231,51 @@ const EXERCISE_CONFIGS = {
     }
   }
 } as const
-type ExerciseKey = keyof typeof EXERCISE_CONFIGS
+const BASS_EXERCISES = {
+  'fa-lineas-basicas': {
+    name: '🎼 Fa 1: Líneas de la clave de Fa (Sol2-Si2-Re3-Fa3-La3)',
+    notes: ['g/2','b/2','d/3','f/3','a/3'],
+    description: 'Refuerza la lectura de las cinco líneas principales en clave de Fa.'
+  },
+  'fa-espacios-basicos': {
+    name: '🎼 Fa 2: Espacios de la clave de Fa (La2-Do3-Mi3-Sol3)',
+    notes: ['a/2','c/3','e/3','g/3'],
+    description: 'Lectura de notas en espacios de la clave de Fa, ideal para la mano izquierda.'
+  },
+  'fa-walking-bass': {
+    name: '🎼 Fa 3: Walking bass en Do',
+    notes: ['c/2','d/2','e/2','f/2','g/2','a/2','b/2','c/3','d/3','e/3','f/3','g/3'],
+    description: 'Patrón tipo walking bass en registro grave para desarrollar fluidez.'
+  },
+  'fa-arpegios': {
+    name: '🎼 Fa 4: Arpegios de Do mayor (dos octavas)',
+    notes: ['c/2','e/2','g/2','c/3','e/3','g/3','c/4'],
+    description: 'Arpegios ascendentes típicos en la mano izquierda para reforzar intervalos.'
+  },
+  'fa-intervalos-graves': {
+    name: '🎼 Fa 5: Intervalos graves (3as y 4as)',
+    notes: ['c/2','e/2','f/2','a/2','b/2','d/3','e/3','g/3','a/2','c/3'],
+    description: 'Salta entre terceras y cuartas para agilizar la lectura a primera vista.'
+  }
+} as const
+
+const EXERCISES_BY_CLEF = {
+  treble: TREBLE_EXERCISES,
+  bass: BASS_EXERCISES
+} as const
+
+type ExerciseCollections = typeof EXERCISES_BY_CLEF
+type ExerciseKeyByClef<C extends ClefType> = keyof ExerciseCollections[C]
+type ExerciseKey = ExerciseKeyByClef<'treble'> | ExerciseKeyByClef<'bass'>
+
+function resolveExerciseConfig(clef: ClefType, key: ExerciseKey): ExerciseConfig {
+  const map = EXERCISES_BY_CLEF[clef] as Record<string, ExerciseConfig>
+  if (Object.prototype.hasOwnProperty.call(map, key)) {
+    return map[key]
+  }
+  const firstKey = Object.keys(map)[0]
+  return map[firstKey]
+}
 
 function getNotePool(
   config: ExerciseConfig,
@@ -296,8 +340,17 @@ export default function LecturaMusical() {
   const staff1Ref = useRef<HTMLDivElement | null>(null)
   const metronomeIdRef = useRef<number | null>(null)
 
-  const config: ExerciseConfig = EXERCISE_CONFIGS[selectedExercise]
   const clef = selectedClef
+  useEffect(() => {
+    const currentMap = EXERCISES_BY_CLEF[clef] as Record<string, ExerciseConfig>
+    if (!Object.prototype.hasOwnProperty.call(currentMap, selectedExercise)) {
+      const firstKey = Object.keys(currentMap)[0]
+      if (firstKey) setSelectedExercise(firstKey as ExerciseKey)
+    }
+  }, [clef, selectedExercise])
+
+  const currentExerciseMap = EXERCISES_BY_CLEF[clef]
+  const config = useMemo(() => resolveExerciseConfig(clef, selectedExercise), [clef, selectedExercise])
   const notePool = useMemo(() => getNotePool(config, clef), [config, clef])
   const noteDisplayPool = useMemo(() => Array.from(new Set(notePool)), [notePool])
   const lineReferences = useMemo(() => CLEF_LINE_REFERENCES[clef], [clef])
@@ -565,7 +618,7 @@ export default function LecturaMusical() {
                   onChange={(e) => setSelectedExercise(e.target.value as ExerciseKey)}
                   label="Ejercicio"
                 >
-                  {Object.entries(EXERCISE_CONFIGS).map(([key, cfg]) => (
+                  {Object.entries(currentExerciseMap).map(([key, cfg]) => (
                     <MenuItem key={key} value={key}>{cfg.name}</MenuItem>
                   ))}
                 </Select>
