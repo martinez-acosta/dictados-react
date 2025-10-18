@@ -100,10 +100,20 @@ const NOTE_NAMES: Record<string, string> = {
   'c/6':'Do6'
 }
 
-const CLEF_LINE_REFERENCES: Record<'treble' | 'bass', readonly string[]> = {
+type ClefType = 'treble' | 'bass'
+type ClefNotesMap = Readonly<Record<ClefType, readonly string[]>>
+
+const CLEF_LINE_REFERENCES: Record<ClefType, readonly string[]> = {
   treble: ['e/4','g/4','b/4','d/5','f/5'], // Mi4, Sol4, Si4, Re5, Fa5
   bass: ['g/2','b/2','d/3','f/3','a/3']    // Sol2, Si2, Re3, Fa3, La3
 } as const
+
+type ExerciseConfig = {
+  readonly name: string
+  readonly notes: readonly string[]
+  readonly description: string
+  readonly clefNotes?: ClefNotesMap
+}
 
 // ---------------- Configuración de ejercicios ----------------
 const EXERCISE_CONFIGS = {
@@ -210,21 +220,29 @@ const EXERCISE_CONFIGS = {
       treble: ['g/4','a/4','g/4','c/5','d/5','f/5','b/4','g/5'],
       bass: ['g/2','a/2','g/2','c/3','d/3','f/3','b/2','g/3']
     }
+  },
+  'dandelot-sol-la-lineas': {
+    name: '📖 Dandelot: Sol-La-Sol-Do-Re-Mi-Fa-Si (con líneas adicionales)',
+    notes: ['g/4','a/5','g/4','c/4','d/4','e/4','f/5','b/3'],
+    description: 'Motivo Dandelot con líneas adicionales: La5 (línea superior), Do4, Re4 y Mi4 (debajo del pentagrama), Fa5, y Si3 (línea inferior). Practica lectura completa fuera del pentagrama.',
+    clefNotes: {
+      treble: ['g/4','a/5','g/4','c/4','d/4','e/4','f/5','b/3'],
+      bass: ['g/2','a/3','g/2','c/2','d/2','e/2','f/3','b/1']
+    }
   }
 } as const
 type ExerciseKey = keyof typeof EXERCISE_CONFIGS
-type ClefType = 'treble' | 'bass'
 
 function getNotePool(
-  config: typeof EXERCISE_CONFIGS[ExerciseKey],
+  config: ExerciseConfig,
   clef: ClefType
-): string[] {
+): readonly string[] {
   const clefSpecific = config.clefNotes?.[clef]
   if (clefSpecific && clefSpecific.length > 0) return clefSpecific
   return config.notes
 }
 
-function generateExercise(notePool: string[], length: number = 30): string[] {
+function generateExercise(notePool: readonly string[], length: number = 30): string[] {
   const out: string[] = []
   const notes = notePool
 
@@ -274,7 +292,7 @@ export default function LecturaMusical() {
   const staff1Ref = useRef<HTMLDivElement | null>(null)
   const metronomeIdRef = useRef<number | null>(null)
 
-  const config = EXERCISE_CONFIGS[selectedExercise]
+  const config: ExerciseConfig = EXERCISE_CONFIGS[selectedExercise]
   const clef = selectedClef
   const notePool = useMemo(() => getNotePool(config, clef), [config, clef])
   const noteDisplayPool = useMemo(() => Array.from(new Set(notePool)), [notePool])
