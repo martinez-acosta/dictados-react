@@ -8,7 +8,10 @@ node_modules/
 
 # Production
 /build
-/dist
+dist/
+
+# GitHub Pages deploy
+.nojekyll
 
 # Misc
 .DS_Store
