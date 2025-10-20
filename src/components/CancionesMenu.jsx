@@ -13,7 +13,7 @@ export default function CancionesMenu() {
       artista: 'Conquistando Fronteras',
       tonalidad: 'E',
       bpm: 143,
-      archivo: '/src/RompeElCielo.html',
+      archivo: '/dictados-react/src/RompeElCielo.html',
       color: '#ff6b35'
     },
     {
@@ -22,7 +22,7 @@ export default function CancionesMenu() {
       artista: 'Conquistando Fronteras',
       tonalidad: 'E',
       bpm: 95,
-      archivo: '/src/Sopla.html',
+      archivo: '/dictados-react/src/Sopla.html',
       color: '#4ecdc4'
     }
   ]
