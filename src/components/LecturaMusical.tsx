@@ -238,40 +238,45 @@ const TREBLE_EXERCISES = {
   }
 } as const
 const BASS_EXERCISES = {
-  'fa-lineas-basicas': {
-    name: '🎼 Fa 1: Líneas de la clave de Fa (Sol2-Si2-Re3-Fa3-La3)',
-    notes: ['g/2','b/2','d/3','f/3','a/3'],
-    description: 'Refuerza la lectura de las cinco líneas principales en clave de Fa.'
+  'fa-lineas-c2-c3': {
+    name: '🎼 Fa 1: Líneas Do2-Do3 (Mi2-Sol2-Si2-Re3-Fa3) [suena 8vb]',
+    notes: ['e/2','g/2','b/2','d/3','f/3'],
+    description: 'Líneas del pentagrama escritas en Do2-Do3 (suenan Do1-Do2). Notación estándar del bajo eléctrico con 8vb implícita.'
   },
-  'fa-espacios-basicos': {
-    name: '🎼 Fa 2: Espacios de la clave de Fa (La2-Do3-Mi3-Sol3)',
-    notes: ['a/2','c/3','e/3','g/3'],
-    description: 'Lectura de notas en espacios de la clave de Fa, ideal para la mano izquierda.'
+  'fa-espacios-c2-c3': {
+    name: '🎼 Fa 2: Espacios Do2-Do3 (Fa2-La2-Do3-Mi3) [suena 8vb]',
+    notes: ['f/2','a/2','c/3','e/3'],
+    description: 'Espacios del pentagrama escritos en Do2-Do3 (suenan Do1-Do2). Registro grave del bajo eléctrico.'
   },
-  'fa-walking-bass': {
-    name: '🎼 Fa 3: Walking bass en Do',
-    notes: ['c/2','d/2','e/2','f/2','g/2','a/2','b/2','c/3','d/3','e/3','f/3','g/3'],
-    description: 'Patrón tipo walking bass en registro grave para desarrollar fluidez.'
+  'fa-escala-do-c2-c3': {
+    name: '🎼 Fa 3: Escala Do mayor (C2-C3) [suena C1-C2]',
+    notes: ['c/2','d/2','e/2','f/2','g/2','a/2','b/2','c/3'],
+    description: 'Escala de Do mayor escrita C2-C3 (suena C1-C2): notación estándar del bajo, una octava completa.'
   },
-  'fa-arpegios': {
-    name: '🎼 Fa 4: Arpegios de Do mayor (dos octavas)',
-    notes: ['c/2','e/2','g/2','c/3','e/3','g/3','c/4'],
-    description: 'Arpegios ascendentes típicos en la mano izquierda para reforzar intervalos.'
+  'fa-walking-bass-c2-c3': {
+    name: '🎼 Fa 4: Walking bass Do2-Do3 [suena C1-C2]',
+    notes: ['c/2','d/2','e/2','f/2','g/2','a/2','b/2','c/3'],
+    description: 'Walking bass escrito C2-C3 (suena C1-C2): notación estándar del bajo eléctrico, una octava completa.'
   },
-  'fa-intervalos-graves': {
-    name: '🎼 Fa 5: Intervalos graves (3as y 4as)',
-    notes: ['c/2','e/2','f/2','a/2','b/2','d/3','e/3','g/3','a/2','c/3'],
-    description: 'Salta entre terceras y cuartas para agilizar la lectura a primera vista.'
+  'fa-arpegios-c2-c3': {
+    name: '🎼 Fa 5: Arpegios Do mayor (C2-C3) [suena C1-C2]',
+    notes: ['c/2','e/2','g/2','c/3','g/2','e/2'],
+    description: 'Arpegio de Do mayor escrito C2-C3 (suena C1-C2): notación estándar del bajo eléctrico.'
   },
-  'fa-dandelot-do-escala': {
-    name: '🎼 Fa Dandelot: Do-Re-Mi-Fa-Sol-Fa-Mi-Re-Do',
-    notes: ['c/3','d/3','e/3','f/3','g/3','f/3','e/3','d/3','c/3'],
-    description: 'Motivo melódico Dandelot en clave de Fa: escala ascendente y descendente de Do mayor (5 notas).'
+  'fa-quintas-c2-c3': {
+    name: '🎼 Fa 6: Quintas Do2-Do3 [suena C1-C2]',
+    notes: ['c/2','g/2','f/2','c/3','d/2','a/2','e/2','b/2'],
+    description: 'Saltos de quinta escritos C2-C3 (suenan C1-C2): patrón típico de líneas de bajo eléctrico.'
   },
-  'fa-dandelot-sol-escala': {
-    name: '🎼 Fa Dandelot: Sol-La-Si-Do-Si-La-Sol',
+  'fa-dandelot-do-c2-c3': {
+    name: '🎼 Fa Dandelot: Do-Re-Mi-Fa-Sol (C2-G2) [suena C1-G1]',
+    notes: ['c/2','d/2','e/2','f/2','g/2','f/2','e/2','d/2','c/2'],
+    description: 'Motivo Dandelot escrito en C2-G2 (suena C1-G1): notación estándar del bajo, escala de 5 notas.'
+  },
+  'fa-dandelot-sol-c2-c3': {
+    name: '🎼 Fa Dandelot: Sol-La-Si-Do (G2-C3) [suena G1-C2]',
     notes: ['g/2','a/2','b/2','c/3','b/2','a/2','g/2'],
-    description: 'Motivo melódico Dandelot en clave de Fa: patrón Sol-La-Si-Do con retorno simétrico.'
+    description: 'Motivo Dandelot escrito G2-C3 (suena G1-C2): notación estándar del bajo, completa el rango Do1-Do2.'
   }
 } as const
 
@@ -512,7 +517,8 @@ export default function LecturaMusical() {
         staveNotes.forEach((_, i) => {
           const label = NOTE_NAMES[notes[i]] ?? notes[i]
           const x = leftEdge + (span * (i + 0.5)) / notes.length
-          const y = stave.getYForLine(4) + 25
+          // En clave de Fa: arriba (línea 0 - 15px), en clave de Sol: abajo (línea 4 + 25px)
+          const y = clef === 'bass' ? stave.getYForLine(0) - 15 : stave.getYForLine(4) + 25
           ctx.fillStyle = highlight === i ? '#ff6b35' : '#666'
           ctx.font = '12px Arial'
           const w = ctx.measureText(label).width
@@ -533,7 +539,8 @@ export default function LecturaMusical() {
         try { note.draw() } catch {}
         if (showLabels) {
           const label = NOTE_NAMES[notes[i]] ?? notes[i]
-          const y = stave.getYForLine(4) + 25
+          // En clave de Fa: arriba (línea 0 - 15px), en clave de Sol: abajo (línea 4 + 25px)
+          const y = clef === 'bass' ? stave.getYForLine(0) - 15 : stave.getYForLine(4) + 25
           ctx.fillStyle = highlight === i ? '#ff6b35' : '#666'
           ctx.font = '12px Arial'
           const w = ctx.measureText(label).width
