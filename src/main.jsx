@@ -13,6 +13,7 @@ import RitmicaTrainer from './components/RitmicaTrainer.tsx'
 import RitmicaConAlturas from './components/RitmicaConAlturas.tsx'
 import LecturaMusical from './components/LecturaMusical.tsx'
 import TunerPage from './components/TunerPage.tsx'
+import CancionesMenu from './components/CancionesMenu.jsx'
 import './styles.css'
 
 createRoot(document.getElementById('root')).render(
@@ -31,8 +32,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/ritmica-alturas" element={<RitmicaConAlturas />} />
         <Route path="/intervalos-piano" element={<IntervalosPiano/>} />
         <Route path="/lectura-musical" element={<LecturaMusical />} />
+        <Route path="/canciones" element={<CancionesMenu />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
 )
-

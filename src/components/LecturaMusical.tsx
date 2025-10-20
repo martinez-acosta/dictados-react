@@ -7,6 +7,7 @@ import { PlayArrow, Pause, ArrowBack, Refresh, AccessTime } from '@mui/icons-mat
 import { Factory, StaveNote, Stave, TickContext, Formatter } from 'vexflow'
 import * as Tone from 'tone'
 import { useNavigate } from 'react-router-dom'
+import AlwaysOnTuner from './AlwaysOnTuner'
 
 // ---------------- Audio globals (persistentes) ----------------
 let samplerRef: Tone.Sampler | null = null
@@ -344,6 +345,7 @@ export default function LecturaMusical() {
   const [showNoteLabels, setShowNoteLabels] = useState(true)
   const [jazzStyle, setJazzStyle] = useState(true) // metrónomo estilo jazz (2 y 4 fuertes)
   const [reverseOrder, setReverseOrder] = useState(false) // invertir orden del ejercicio
+  const [tunerEnabled, setTunerEnabled] = useState(false)
 
   const [currentExercise, setCurrentExercise] = useState<string[]>([])
   const [durSeq, setDurSeq] = useState<DurationSym[]>([])
@@ -356,15 +358,17 @@ export default function LecturaMusical() {
   const metronomeIdRef = useRef<number | null>(null)
 
   const clef = selectedClef
+  const currentExerciseMap = EXERCISES_BY_CLEF[clef]
   useEffect(() => {
-    const currentMap = EXERCISES_BY_CLEF[clef] as Record<string, ExerciseConfig>
-    if (!Object.prototype.hasOwnProperty.call(currentMap, selectedExercise)) {
-      const firstKey = Object.keys(currentMap)[0]
+    setTunerEnabled(clef === 'bass')
+  }, [clef])
+  useEffect(() => {
+    if (!Object.prototype.hasOwnProperty.call(currentExerciseMap, selectedExercise)) {
+      const firstKey = Object.keys(currentExerciseMap)[0]
       if (firstKey) setSelectedExercise(firstKey as ExerciseKey)
     }
-  }, [clef, selectedExercise])
+  }, [currentExerciseMap, selectedExercise])
 
-  const currentExerciseMap = EXERCISES_BY_CLEF[clef]
   const config = useMemo(() => resolveExerciseConfig(clef, selectedExercise), [clef, selectedExercise])
   const notePool = useMemo(() => getNotePool(config, clef), [config, clef])
   const noteDisplayPool = useMemo(() => Array.from(new Set(notePool)), [notePool])
@@ -700,6 +704,11 @@ export default function LecturaMusical() {
               <FormControlLabel
                 control={<Switch checked={reverseOrder} onChange={(e)=>setReverseOrder(e.target.checked)} />}
                 label="🔄 Invertir orden (fin → inicio)"
+                sx={{ mb: 1 }}
+              />
+              <FormControlLabel
+                control={<Switch checked={tunerEnabled} onChange={(e)=>setTunerEnabled(e.target.checked)} />}
+                label="🎯 Mostrar afinador"
               />
             </Grid>
 
@@ -748,6 +757,18 @@ export default function LecturaMusical() {
             </Grid>
           </Grid>
         </Paper>
+
+        {tunerEnabled && (
+          <Paper sx={{ p: 2, borderLeft: '4px solid #4caf50' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'primary.dark' }}>
+              🎯 Afinador en tiempo real
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+              Afina antes de leer: mantén tu instrumento cerca y verifica la afinación mientras practicas la clave seleccionada.
+            </Typography>
+            <AlwaysOnTuner />
+          </Paper>
+        )}
 
         {/* Descripción del ejercicio */}
         <Paper sx={{ p: 2, bgcolor: 'rgba(25, 118, 210, 0.05)' }}>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Container, Paper, Typography, Box, Button, Grid } from '@mui/material'
-import { MusicNote, GraphicEq, Home, Piano, RecordVoiceOver, LibraryMusic, AccessTime, MenuBook, GraphicEqOutlined } from '@mui/icons-material'
+import { MusicNote, GraphicEq, Home, Piano, RecordVoiceOver, LibraryMusic, AccessTime, MenuBook, GraphicEqOutlined, QueueMusic } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
@@ -377,7 +377,7 @@ export default function Dashboard() {
                 Lectura Musical
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Practica la lectura de notas estilo Dandelot con ejercicios progresivos
+                Practica la lectura de notas estilo Dandelot con ejercicios progresivos en claves de Sol y Fa.
               </Typography>
               <Button
                 variant="contained"
@@ -390,6 +390,42 @@ export default function Dashboard() {
                 onClick={() => navigate('/lectura-musical')}
               >
                 Comenzar Lectura
+              </Button>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper
+              sx={{
+                p: 3,
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 3
+                }
+              }}
+              onClick={() => navigate('/canciones')}
+            >
+              <QueueMusic sx={{ fontSize: 64, color: '#ff6b35', mb: 2 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                Canciones
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Letras y acordes de canciones para práctica y adoración
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{
+                  py: 1.5,
+                  backgroundColor: '#ff6b35',
+                  '&:hover': { backgroundColor: '#ff5722' }
+                }}
+                fullWidth
+                onClick={() => navigate('/canciones')}
+              >
+                Ver Canciones
               </Button>
             </Paper>
           </Grid>
