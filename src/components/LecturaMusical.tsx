@@ -92,13 +92,29 @@ const RANGE_2OCT_CHROMATIC: string[] = [
 
 // Nombres en español
 const NOTE_NAMES: Record<string, string> = {
-  'c/2':'Do2','d/2':'Re2','e/2':'Mi2','f/2':'Fa2','g/2':'Sol2','a/2':'La2','b/2':'Si2',
+  'b/1':'Si1',
+  'c/2':'Do2','d/2':'Re2','e/2':'Mi2','f/2':'Fa2','f#/2':'Fa#2','g/2':'Sol2','a/2':'La2','b/2':'Si2','bb/2':'Sib2',
   'c/3':'Do3','d/3':'Re3','e/3':'Mi3','f/3':'Fa3','g/3':'Sol3','a/3':'La3','b/3':'Si3',
   'c/4':'Do4','c#/4':'Do#4','d/4':'Re4','d#/4':'Re#4','e/4':'Mi4','f/4':'Fa4','f#/4':'Fa#4',
   'g/4':'Sol4','g#/4':'Sol#4','a/4':'La4','a#/4':'La#4','b/4':'Si4',
   'c/5':'Do5','c#/5':'Do#5','d/5':'Re5','d#/5':'Re#5','e/5':'Mi5','f/5':'Fa5','f#/5':'Fa#5',
   'g/5':'Sol5','g#/5':'Sol#5','a/5':'La5','a#/5':'La#5','b/5':'Si5',
   'c/6':'Do6'
+}
+
+// Mapeo de nota escrita vs nota que suena (para bajo con 8vb)
+const NOTE_WRITTEN: Record<string, string> = {
+  'b/1':'Si1',
+  'c/2':'Do2','d/2':'Re2','e/2':'Mi2','f/2':'Fa2','f#/2':'Fa#2','g/2':'Sol2','a/2':'La2','b/2':'Si2','bb/2':'Sib2',
+  'c/3':'Do3','d/3':'Re3','e/3':'Mi3','f/3':'Fa3','g/3':'Sol3','a/3':'La3','b/3':'Si3',
+  'c/4':'Do4','d/4':'Re4','e/4':'Mi4','f/4':'Fa4','g/4':'Sol4','a/4':'La4','b/4':'Si4',
+}
+
+const NOTE_SOUNDS: Record<string, string> = {
+  'b/1':'Si0',
+  'c/2':'Do1','d/2':'Re1','e/2':'Mi1','f/2':'Fa1','f#/2':'Fa#1','g/2':'Sol1','a/2':'La1','b/2':'Si1','bb/2':'Sib1',
+  'c/3':'Do2','d/3':'Re2','e/3':'Mi2','f/3':'Fa2','g/3':'Sol2','a/3':'La2','b/3':'Si2',
+  'c/4':'Do3','d/4':'Re3','e/4':'Mi3','f/4':'Fa3','g/4':'Sol3','a/4':'La3','b/4':'Si3',
 }
 
 type ClefType = 'treble' | 'bass'
@@ -277,6 +293,11 @@ const BASS_EXERCISES = {
     name: '🎼 Fa Dandelot: Sol-La-Si-Do (G2-C3) [suena G1-C2]',
     notes: ['g/2','a/2','b/2','c/3','b/2','a/2','g/2'],
     description: 'Motivo Dandelot escrito G2-C3 (suena G1-C2): notación estándar del bajo, completa el rango Do1-Do2.'
+  },
+  'fa-escala-do-c2-c4': {
+    name: '🎼 Fa 9: Escala Do mayor (C2-C4) [suena C1-C3]',
+    notes: ['c/2','d/2','e/2','f/2','g/2','a/2','b/2','c/3','d/3','e/3','f/3','g/3','a/3','b/3','c/4'],
+    description: 'Escala de Do mayor escrita C2-C4 (suena C1-C3): dos octavas completas del bajo eléctrico, registro grave a medio.'
   }
 } as const
 
@@ -515,14 +536,29 @@ export default function LecturaMusical() {
         const rightEdge = stave.getX() + stave.getWidth() - rightPad
         const span = Math.max(1, rightEdge - leftEdge)
         staveNotes.forEach((_, i) => {
-          const label = NOTE_NAMES[notes[i]] ?? notes[i]
           const x = leftEdge + (span * (i + 0.5)) / notes.length
-          // En clave de Fa: arriba (línea 0 - 15px), en clave de Sol: abajo (línea 4 + 25px)
-          const y = clef === 'bass' ? stave.getYForLine(0) - 15 : stave.getYForLine(4) + 25
+          const baseY = stave.getYForLine(4) + (clef === 'bass' ? 40 : 25)
           ctx.fillStyle = highlight === i ? '#ff6b35' : '#666'
-          ctx.font = '12px Arial'
-          const w = ctx.measureText(label).width
-          ctx.fillText(label, x - w / 2, y)
+          ctx.font = '10px Arial'
+
+          if (clef === 'bass') {
+            // Clave de Fa: dos líneas (nota escrita arriba, nota que suena abajo)
+            const written = NOTE_WRITTEN[notes[i]] ?? NOTE_NAMES[notes[i]] ?? notes[i]
+            const sounds = NOTE_SOUNDS[notes[i]] ?? ''
+            const w1 = ctx.measureText(written).width
+            ctx.fillText(written, x - w1 / 2, baseY)
+            if (sounds) {
+              ctx.font = '9px Arial'
+              ctx.fillStyle = highlight === i ? '#ff6b35' : '#999'
+              const w2 = ctx.measureText(`(${sounds})`).width
+              ctx.fillText(`(${sounds})`, x - w2 / 2, baseY + 11)
+            }
+          } else {
+            // Clave de Sol: una línea normal
+            const label = NOTE_NAMES[notes[i]] ?? notes[i]
+            const w = ctx.measureText(label).width
+            ctx.fillText(label, x - w / 2, baseY)
+          }
         })
       }
     } catch {
@@ -538,13 +574,28 @@ export default function LecturaMusical() {
         note.setTickContext(tc).setStave(stave)
         try { note.draw() } catch {}
         if (showLabels) {
-          const label = NOTE_NAMES[notes[i]] ?? notes[i]
-          // En clave de Fa: arriba (línea 0 - 15px), en clave de Sol: abajo (línea 4 + 25px)
-          const y = clef === 'bass' ? stave.getYForLine(0) - 15 : stave.getYForLine(4) + 25
+          const baseY = stave.getYForLine(4) + (clef === 'bass' ? 40 : 25)
           ctx.fillStyle = highlight === i ? '#ff6b35' : '#666'
-          ctx.font = '12px Arial'
-          const w = ctx.measureText(label).width
-          ctx.fillText(label, xCenter - w / 2, y)
+          ctx.font = '10px Arial'
+
+          if (clef === 'bass') {
+            // Clave de Fa: dos líneas (nota escrita arriba, nota que suena abajo)
+            const written = NOTE_WRITTEN[notes[i]] ?? NOTE_NAMES[notes[i]] ?? notes[i]
+            const sounds = NOTE_SOUNDS[notes[i]] ?? ''
+            const w1 = ctx.measureText(written).width
+            ctx.fillText(written, xCenter - w1 / 2, baseY)
+            if (sounds) {
+              ctx.font = '9px Arial'
+              ctx.fillStyle = highlight === i ? '#ff6b35' : '#999'
+              const w2 = ctx.measureText(`(${sounds})`).width
+              ctx.fillText(`(${sounds})`, xCenter - w2 / 2, baseY + 11)
+            }
+          } else {
+            // Clave de Sol: una línea normal
+            const label = NOTE_NAMES[notes[i]] ?? notes[i]
+            const w = ctx.measureText(label).width
+            ctx.fillText(label, xCenter - w / 2, baseY)
+          }
         }
         accBeats += nb
       })
@@ -789,9 +840,12 @@ export default function LecturaMusical() {
             <Typography variant="body2" sx={{ fontWeight: 600, mr: 1 }}>
               Notas disponibles:
             </Typography>
-            {noteDisplayPool.map(n => (
-              <Chip key={n} size="small" label={NOTE_NAMES[n] ?? n} variant="outlined" color="primary" />
-            ))}
+            {noteDisplayPool.map(n => {
+              const written = NOTE_WRITTEN[n] ?? NOTE_NAMES[n] ?? n
+              const sounds = NOTE_SOUNDS[n]
+              const label = clef === 'bass' && sounds ? `${written} (${sounds})` : (NOTE_NAMES[n] ?? n)
+              return <Chip key={n} size="small" label={label} variant="outlined" color="primary" />
+            })}
           </Stack>
         </Paper>
 
@@ -804,7 +858,8 @@ export default function LecturaMusical() {
             Lee las notas siguiendo el metrónomo (4/4). El ejercicio se repite en bucle hasta que detengas.
           </Typography>
           <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary', textAlign: 'center' }}>
-            Clave actual: {clef === 'treble' ? 'Sol (G clef)' : 'Fa en 4ª línea (F clef)'}.
+            Clave actual: {clef === 'treble' ? 'Sol (G clef)' : 'Fa en 4ª línea (F clef)'}
+            {clef === 'bass' && <span style={{ color: '#ff6b35', fontWeight: 600 }}> - Notación 8vb: se escribe Do2 pero suena Do1 🎸</span>}
           </Typography>
 
           {(metronomeActive || isPlaying) && (
@@ -889,18 +944,23 @@ export default function LecturaMusical() {
             <Box sx={{ mt: 2, textAlign: 'center' }}>
               <Typography variant="caption" sx={{ fontWeight: 600, mr: 1 }}>Secuencia actual:</Typography>
               <Box sx={{ mt: 1 }}>
-                {currentExercise.map((note, i) => (
-                  <Chip
-                    key={`${note}-${i}`}
-                    size="small"
-                    label={`${NOTE_NAMES[note] ?? note} · ${durSeq[i] ?? duration}`}
-                    sx={{
-                      mr: 0.5, mb: 0.5,
-                      bgcolor: currentNoteIndex === i ? '#ff6b35' : undefined,
-                      color: currentNoteIndex === i ? 'white' : undefined
-                    }}
-                  />
-                ))}
+                {currentExercise.map((note, i) => {
+                  const written = NOTE_WRITTEN[note] ?? NOTE_NAMES[note] ?? note
+                  const sounds = NOTE_SOUNDS[note]
+                  const noteLabel = clef === 'bass' && sounds ? `${written} (${sounds})` : (NOTE_NAMES[note] ?? note)
+                  return (
+                    <Chip
+                      key={`${note}-${i}`}
+                      size="small"
+                      label={`${noteLabel} · ${durSeq[i] ?? duration}`}
+                      sx={{
+                        mr: 0.5, mb: 0.5,
+                        bgcolor: currentNoteIndex === i ? '#ff6b35' : undefined,
+                        color: currentNoteIndex === i ? 'white' : undefined
+                      }}
+                    />
+                  )
+                })}
               </Box>
             </Box>
           )}
