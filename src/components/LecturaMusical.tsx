@@ -134,100 +134,6 @@ type ExerciseConfig = {
 
 // ---------------- Configuración de ejercicios ----------------
 const TREBLE_EXERCISES = {
-  // ========== PROGRESIÓN INCREMENTAL JAZZ — C4 a La5 ==========
-  'jazz-1-do-sol': {
-    name: '🎺 Jazz 1: Do y Sol (quinta justa)',
-    notes: ['c/4','g/4','c/5','g/5'],
-    description: 'Intervalos ancla del jazz: quinta justa. Base visual para leer el pentagrama.'
-  },
-  'jazz-2-do-sol-adyacentes': {
-    name: '🎺 Jazz 2: Do-Re-Mi + Sol-La-Si (6 notas diatónicas)',
-    notes: ['c/4','d/4','e/4','g/4','a/4','b/4','c/5','d/5','e/5','g/5','a/5','b/5','c/6'],
-    description: 'Añade notas adyacentes a Do y Sol. Movimiento conjunto por pasos.'
-  },
-  'jazz-3-escala-mayor': {
-    name: '🎺 Jazz 3: Escala mayor completa (7 notas)',
-    notes: ['c/4','d/4','e/4','f/4','g/4','a/4','b/4','c/5','d/5','e/5','f/5','g/5','a/5'],
-    description: 'Añade Fa. Escala diatónica completa de Do mayor: Do-Re-Mi-Fa-Sol-La-Si.'
-  },
-  'jazz-4-triada-mayor': {
-    name: '🎺 Jazz 4: Tríada Do-Mi-Sol (enfoque armónico)',
-    notes: ['c/4','e/4','g/4','c/5','e/5','g/5'],
-    description: 'Acorde mayor básico (1-3-5). Reduce a las notas esenciales del acorde.'
-  },
-  'jazz-5-cmaj7': {
-    name: '🎺 Jazz 5: Cmaj7 (Do-Mi-Sol-Si)',
-    notes: ['c/4','e/4','g/4','b/4','c/5','e/5','g/5'],
-    description: 'Añade Si (séptima mayor). Acorde jazz fundamental: Cmaj7.'
-  },
-  'jazz-6-septimas': {
-    name: '🎺 Jazz 6: Acordes de séptima completos',
-    notes: ['c/4','d/4','e/4','f/4','g/4','a/4','b/4','c/5','d/5','e/5','f/5','g/5','a/5'],
-    description: 'Todas las notas diatónicas. Base armónica del jazz (maj7, dom7, min7).'
-  },
-  'jazz-7-pentatonica': {
-    name: '🎺 Jazz 7: Pentatónica mayor (sin Fa ni Si)',
-    notes: ['c/4','d/4','e/4','g/4','a/4','c/5','d/5','e/5','g/5','a/5'],
-    description: 'Quita Fa y Si. Pentatónica para improvisación fluida (evita tensiones).'
-  },
-  'jazz-8-blues-notes': {
-    name: '🎺 Jazz 8: Blues con notas blue (b3, b5, b7)',
-    notes: ['c/4','d#/4','e/4','f/4','f#/4','g/4','a#/4','c/5','d#/5','e/5','f/5','f#/5','g/5','a/5'],
-    description: 'Añade Mib, Fa#, Sib. Escala de blues con color característico del jazz.'
-  },
-  'jazz-9-cromatico': {
-    name: '🎺 Jazz 9: Cromático completo (las 12 notas)',
-    notes: ['c/4','c#/4','d/4','d#/4','e/4','f/4','f#/4','g/4','g#/4','a/4','a#/4','b/4',
-            'c/5','c#/5','d/5','d#/5','e/5','f/5','f#/5','g/5','g#/5','a/5'],
-    description: 'Todas las cromáticas C4-A5 (22 notas). Aproximaciones cromáticas típicas del bebop.'
-  },
-  'jazz-10-maestro': {
-    name: '🎺 Jazz 10: Maestro — Todas las notas (nivel avanzado)',
-    notes: ['c/4','c#/4','d/4','d#/4','e/4','f/4','f#/4','g/4','g#/4','a/4','a#/4','b/4',
-            'c/5','c#/5','d/5','d#/5','e/5','f/5','f#/5','g/5','g#/5','a/5'],
-    description: 'Consolidación: lectura cromática completa C4-A5. ¡Dominio total del pentagrama!'
-  },
-
-  // ========== EJERCICIOS CLÁSICOS (originales) ==========
-  'clasico-lineas-sol': {
-    name: '📖 Clásico: Líneas Clave Sol (Mi-Sol-Si-Re-Fa)',
-    notes: ['e/4','g/4','b/4','d/5','f/5'],
-    description: 'Solo notas sobre las líneas de la clave de Sol: Mi4, Sol4, Si4, Re5, Fa5.',
-    clefNotes: {
-      treble: ['e/4','g/4','b/4','d/5','f/5'],
-      bass: ['g/2','b/2','d/3','f/3','a/3']
-    }
-  },
-  'clasico-lineas-fa': {
-    name: '📖 Clásico: Líneas Clave Fa 4ª (Sol-Si-Re-Fa-La)',
-    notes: ['g/2','b/2','d/3','f/3','a/3'],
-    description: 'Solo notas sobre las líneas de la clave de Fa en 4ª línea: Sol2, Si2, Re3, Fa3, La3.',
-    clefNotes: {
-      treble: ['e/4','g/4','b/4','d/5','f/5'],
-      bass: ['g/2','b/2','d/3','f/3','a/3']
-    }
-  },
-  'clasico-espacios-sol': {
-    name: '📖 Clásico: Espacios (F4–A4–C5–E5)',
-    notes: ['f/4','a/4','c/5','e/5'],
-    description: 'Notas en espacios de la clave de Sol.'
-  },
-  'clasico-arpegio-mayor': {
-    name: '📖 Clásico: Arpegios C mayor (2 octavas)',
-    notes: ['c/4','e/4','g/4','c/5','e/5','g/5'],
-    description: '1–3–5 en dos registros.'
-  },
-  'clasico-terceras': {
-    name: '📖 Clásico: Saltos por terceras',
-    notes: ['c/4','e/4','g/4','b/4','d/5','f/5','a/5','c/5','e/5','g/5','b/5'],
-    description: 'Patrones 1–3–5…'
-  },
-  'clasico-cuartas-quintas': {
-    name: '📖 Clásico: Saltos de 4ª/5ª',
-    notes: ['c/4','f/4','g/4','d/5','a/5','e/5','b/5','g/5','c/5','f/5'],
-    description: 'Saltos medios típicos.'
-  },
-
   // ========== DANDELOT (LECTURA DIRIGIDA) ==========
   'dandelot-sol-la': {
     name: '📖 Dandelot: Sol-La-Sol-Do-Re-Fa-Si',
@@ -236,6 +142,15 @@ const TREBLE_EXERCISES = {
     clefNotes: {
       treble: ['g/4','a/4','g/4','c/5','d/5','f/5','b/4','g/5'],
       bass: ['g/2','a/2','g/2','c/3','d/3','f/3','b/2','g/3']
+    }
+  },
+  'dandelot-sol-do': {
+    name: '📖 Dandelot: Do4-Do5-Sol4-Sol5',
+    notes: ['c/4','c/5','g/4','g/5'],
+    description: 'Intervalos de quinta justa (Sol-Do) en dos octavas: Do4, Do5, Sol4, Sol5. Base visual para orientación en el pentagrama.',
+    clefNotes: {
+      treble: ['c/4','c/5','g/4','g/5'],
+      bass: ['c/2','c/3','g/2','g/3']
     }
   },
   'dandelot-sol-la-lineas': {
@@ -248,9 +163,9 @@ const TREBLE_EXERCISES = {
     }
   },
   'dandelot-sol-completo': {
-    name: '📖 Dandelot Completo: Do4–Si5 (1 línea adicional)',
-    notes: ['c/4','d/4','e/4','f/4','g/4','a/4','b/4','c/5','d/5','e/5','f/5','g/5','a/5','b/5'],
-    description: 'Lectura integral en clave de Sol con todas las notas naturales, incluyendo las líneas adicionales inferiores y superiores (Do4 y Si5).'
+    name: '📖 Dandelot Completo: Si3–Si5 (2 líneas adicionales)',
+    notes: ['b/3','c/4','d/4','e/4','f/4','g/4','a/4','b/4','c/5','d/5','e/5','f/5','g/5','a/5','b/5'],
+    description: 'Lectura integral en clave de Sol con todas las notas naturales, incluyendo las líneas adicionales inferiores y superiores (Si3 y Si5).'
   }
 } as const
 const BASS_EXERCISES = {
@@ -363,7 +278,7 @@ function randomDurations(len: number): DurationSym[] {
 export default function LecturaMusical() {
   const navigate = useNavigate()
 
-  const [selectedExercise, setSelectedExercise] = useState<ExerciseKey>('jazz-1-do-sol')
+  const [selectedExercise, setSelectedExercise] = useState<ExerciseKey>('dandelot-sol-la')
   const [selectedClef, setSelectedClef] = useState<ClefType>('treble')
   const [bpm, setBpm] = useState(60)
   const [duration, setDuration] = useState<DurationSym>('q') // por defecto NEGRA (walking bass)
