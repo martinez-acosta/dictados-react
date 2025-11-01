@@ -213,6 +213,27 @@ const BASS_EXERCISES = {
     name: '🎼 Fa 9: Escala Do mayor (C2-C4) [suena C1-C3]',
     notes: ['c/2','d/2','e/2','f/2','g/2','a/2','b/2','c/3','d/3','e/3','f/3','g/3','a/3','b/3','c/4'],
     description: 'Escala de Do mayor escrita C2-C4 (suena C1-C3): dos octavas completas del bajo eléctrico, registro grave a medio.'
+  },
+  // ========== DANDELOT CLAVE DE FA (progresión pedagógica específica) ==========
+  'fa-dandelot-fa-do': {
+    name: '🎼 Fa Dandelot: Fa2-Fa3-Do3-Do4 (quintas)',
+    notes: ['f/2','f/3','c/3','c/4'],
+    description: 'Intervalos de quinta justa (Fa-Do) en dos octavas: Fa2, Fa3, Do3, Do4 (suenan Fa1, Fa2, Do2, Do3). Base visual para orientación en el pentagrama de fa.'
+  },
+  'fa-dandelot-fa-basico': {
+    name: '🎼 Fa Dandelot: Fa-Sol-Fa-La-Si-Re-Mi (motivo básico)',
+    notes: ['f/3','g/2','f/3','a/2','b/2','d/3','e/2','f/2'],
+    description: 'Motivo Dandelot escrito Fa3-Sol2-Fa3-La2-Si2-Re3-Mi2-Fa2 (suena Fa2-Sol1-Fa2-La1-Si1-Re2-Mi1-Fa1). Trabajo melódico dentro del pentagrama de fa.'
+  },
+  'fa-dandelot-fa-lineas': {
+    name: '🎼 Fa Dandelot: Con líneas adicionales (Re2-Do4)',
+    notes: ['f/3','c/4','f/3','d/2','e/2','f/2','b/3','c/2'],
+    description: 'Motivo Dandelot con líneas adicionales: Do4, Si3 (arriba del pentagrama), Re2 y Do2 (debajo). Practica lectura fuera del pentagrama de fa. Suena Re1-Do3.'
+  },
+  'fa-dandelot-fa-completo': {
+    name: '🎼 Fa Dandelot Completo: Mi2-Mi4 (2 octavas completas)',
+    notes: ['e/2','f/2','g/2','a/2','b/2','c/3','d/3','e/3','f/3','g/3','a/3','b/3','c/4','d/4','e/4'],
+    description: 'Lectura integral en clave de Fa escrita Mi2-Mi4 (suena Mi1-Mi3): todas las notas naturales con líneas adicionales. Dos octavas completas para dominio total de la clave de fa.'
   }
 } as const
 
