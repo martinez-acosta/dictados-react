@@ -15,7 +15,7 @@ export default function BassArpeggiosPage() {
             Volver al menú
           </Button>
           <Typography variant="h5" sx={{ fontWeight: 700, color: '#0b2a50', flex: 1 }}>
-            🎵 Arpegios de 7ª para Bajo
+            🎵 Arpegios para Bajo
           </Typography>
         </Box>
 
@@ -23,8 +23,8 @@ export default function BassArpeggiosPage() {
 
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Typography variant="body2" color="text.secondary">
-            Referencia rápida: Dm7 (1-b3-5-b7), G7 (1-3-5-b7) y Cmaj7 (1-3-5-7). Selecciona cualquier fundamental para ver
-            las cuatro notas del arpegio y tres modos de ejecución sugeridos.
+            Referencia rápida: Triadas (mayor, menor, disminuida, aumentada) y cuatríadas con séptima (m7, 7, maj7, m7♭5).
+            Usa los selectores para escuchar el arpegio en cualquier tonalidad y ver patrones aplicables en el bajo.
           </Typography>
         </Paper>
       </Stack>
