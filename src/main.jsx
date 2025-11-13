@@ -14,6 +14,7 @@ import RitmicaConAlturas from './components/RitmicaConAlturas.tsx'
 import LecturaMusical from './components/LecturaMusical.tsx'
 import TunerPage from './components/TunerPage.tsx'
 import CancionesMenu from './components/CancionesMenu.jsx'
+import BassArpeggiosPage from './components/BassArpeggiosPage.tsx'
 import './styles.css'
 
 createRoot(document.getElementById('root')).render(
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/dictados" element={<DictadosMelodicos />} />
         <Route path="/intervalos" element={<EjerciciosIntervalos />} />
         <Route path="/bajo" element={<BajoTrainer />} />
+        <Route path="/arpegios-bajo" element={<BassArpeggiosPage />} />
         <Route path="/vocal" element={<VocalTrainer />} />
         <Route path="/triadas" element={<TriadTrainer />} />
         <Route path="/intervalos-trainer" element={<IntervalsTrainer />} />

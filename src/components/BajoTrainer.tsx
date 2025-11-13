@@ -8,9 +8,7 @@ import { Factory, StaveNote, Stave, Accidental, Formatter } from 'vexflow'
 import * as Tone from 'tone'
 import { useNavigate } from 'react-router-dom'
 import AlwaysOnTuner from './AlwaysOnTuner'
-
-// Mantener sampler entre renders
-let toneSamplerRef: Tone.Sampler | null = null
+import { getYamahaSampler, releaseYamahaVoices } from '../utils/yamahaSampler'
 
 // ---------------- Claves ----------------
 const CLEF_CONFIGS = {
@@ -507,22 +505,7 @@ export default function BajoTrainer() {
   // (El encadenado automático se maneja directamente en el callback del final de ciclo)
 
   async function loadYamaha() {
-    if (toneSamplerRef) return toneSamplerRef
-    await Tone.start()
-    toneSamplerRef = new Tone.Sampler({
-      urls: {
-        A0:'A0.mp3', C1:'C1.mp3','D#1':'Ds1.mp3','F#1':'Fs1.mp3',
-        A1:'A1.mp3', C2:'C2.mp3','D#2':'Ds2.mp3','F#2':'Fs2.mp3',
-        A2:'A2.mp3', C3:'C3.mp3','D#3':'Ds3.mp3','F#3':'Fs3.mp3',
-        A3:'A3.mp3', C4:'C4.mp3','D#4':'Ds4.mp3','F#4':'Fs4.mp3',
-        A4:'A4.mp3', C5:'C5.mp3','D#5':'Ds5.mp3','F#5':'Fs5.mp3',
-        A5:'A5.mp3', C6:'C6.mp3'
-      },
-      release: 1,
-      baseUrl: 'https://tonejs.github.io/audio/salamander/'
-    }).toDestination()
-    await Tone.loaded()
-    return toneSamplerRef
+    return getYamahaSampler()
   }
 
   function ensureAudio() { if (ctx && ctx.state === 'suspended') ctx.resume() }
@@ -539,7 +522,7 @@ export default function BajoTrainer() {
       try { Tone.Transport.clear(metronomeIdRef.current) } catch {}
       metronomeIdRef.current = null
     }
-    if (toneSamplerRef) { try { (toneSamplerRef as any).releaseAll?.() } catch {} }
+    releaseYamahaVoices()
     setMetronomeActive(false)
     setCurrentBeat(0)
     // Asegurar que futuros reinicios no choquen con el guard inicial
@@ -723,7 +706,7 @@ export default function BajoTrainer() {
     // Limpiar bandera de auto siguiente para no interferir con futuros toques manuales
     if (launchingFromAuto) autoNextRef.current = false
 
-    await loadYamaha()
+    const sampler = await loadYamaha()
 
     // Configurar Tone.Transport
     Tone.Transport.cancel(0)
@@ -757,9 +740,9 @@ export default function BajoTrainer() {
         setCurrentPlayingNote(i)
         setCurrentNoteDisplay({ spn: prettyFromKey(noteKey), solfege: labelSolfege(noteKey), show: true })
 
-        if (toneSamplerRef) {
+        if (sampler) {
           // Usar segundos para duración para respetar BPM exactamente
-          toneSamplerRef.triggerAttackRelease(toneNoteFromKey(noteKey), noteDurSec, time)
+          sampler.triggerAttackRelease(toneNoteFromKey(noteKey), noteDurSec, time)
         } else {
           pianoLike(freqOfKey(noteKey), time, noteDurSec * 0.95)
         }

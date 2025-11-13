@@ -166,6 +166,39 @@ export default function Dashboard() {
                   boxShadow: 3
                 }
               }}
+              onClick={() => navigate('/arpegios-bajo')}
+            >
+              <QueueMusic sx={{ fontSize: 64, color: '#4caf50', mb: 2 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                Arpegios de Bajo
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Consulta las notas 1-3-5-7 y patrones sugeridos para acordes m7, 7 y maj7.
+              </Typography>
+              <Button
+                variant="contained"
+                color="success"
+                fullWidth
+                onClick={() => navigate('/arpegios-bajo')}
+                sx={{ py: 1.5 }}
+              >
+                Abrir Arpegios
+              </Button>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper
+              sx={{
+                p: 3,
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 3
+                }
+              }}
               onClick={() => navigate('/vocal')}
             >
               <RecordVoiceOver sx={{ fontSize: 64, color: 'warning.main', mb: 2 }} />

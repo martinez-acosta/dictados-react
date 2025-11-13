@@ -169,6 +169,11 @@ const TREBLE_EXERCISES = {
   }
 } as const
 const BASS_EXERCISES = {
+  'fa-solo-lineas': {
+    name: '🎼 Fa: Solo líneas (Sol2-Si2-Re3-Fa3-La3) [suena 8vb]',
+    notes: ['g/2','b/2','d/3','f/3','a/3'],
+    description: 'Ejercicio enfocado únicamente en las cinco líneas del pentagrama de fa: Sol2, Si2, Re3, Fa3 y La3 (suenan Sol1, Si1, Re2, Fa2, La2). Practica la lectura de las líneas sin espacios.'
+  },
   'fa-lineas-c2-c3': {
     name: '🎼 Fa 1: Líneas Do2-Do3 (Mi2-Sol2-Si2-Re3-Fa3) [suena 8vb]',
     notes: ['e/2','g/2','b/2','d/3','f/3'],
