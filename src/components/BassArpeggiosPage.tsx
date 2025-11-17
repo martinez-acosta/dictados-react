@@ -3,6 +3,7 @@ import { Box, Stack, Button, Typography, Paper } from '@mui/material'
 import { ArrowBack } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import BassArpeggioExplorer from './BassArpeggioExplorer'
+import AlwaysOnTuner from './AlwaysOnTuner'
 
 export default function BassArpeggiosPage() {
   const navigate = useNavigate()
@@ -18,6 +19,13 @@ export default function BassArpeggiosPage() {
             🎵 Arpegios para Bajo
           </Typography>
         </Box>
+
+        <Paper variant="outlined" sx={{ p: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+            Afinador
+          </Typography>
+          <AlwaysOnTuner />
+        </Paper>
 
         <BassArpeggioExplorer />
 
