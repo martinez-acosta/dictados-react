@@ -6,6 +6,7 @@ import DictadosMelodicos from './components/DictadosMelodicos.jsx'
 import EjerciciosIntervalos from './components/EjerciciosIntervalos.tsx'
 import IntervalosPiano from './components/IntervalosPiano'
 import BajoTrainer from './components/BajoTrainer.tsx'
+import BassScaleSuite from './components/BassScaleSuite.tsx'
 import VocalTrainer from './components/VocalTrainer.tsx'
 import TriadTrainer from './components/TriadTrainer.tsx'
 import IntervalsTrainer from './components/IntervalsTrainer.tsx'
@@ -26,6 +27,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/dictados" element={<DictadosMelodicos />} />
         <Route path="/intervalos" element={<EjerciciosIntervalos />} />
         <Route path="/bajo" element={<BajoTrainer />} />
+        <Route path="/bajo-suite" element={<BassScaleSuite />} />
         <Route path="/arpegios-bajo" element={<BassArpeggiosPage />} />
         <Route path="/vocal" element={<VocalTrainer />} />
         <Route path="/triadas" element={<TriadTrainer />} />

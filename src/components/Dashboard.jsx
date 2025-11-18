@@ -68,6 +68,39 @@ export default function Dashboard() {
                   boxShadow: 3
                 }
               }}
+              onClick={() => navigate('/bajo-suite')}
+            >
+              <MusicNote sx={{ fontSize: 64, color: '#f06292', mb: 2 }} />
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                Suite Bajo (Escala + Arpegios)
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+                Cuatro pentagramas en clave de Fa: escala mayor, menor y arpegios encadenados con afinador integrado.
+              </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                fullWidth
+                onClick={() => navigate('/bajo-suite')}
+                sx={{ py: 1.5 }}
+              >
+                Abrir Suite
+              </Button>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper
+              sx={{
+                p: 3,
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: 3
+                }
+              }}
               onClick={() => navigate('/dictados')}
             >
               <MusicNote sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
