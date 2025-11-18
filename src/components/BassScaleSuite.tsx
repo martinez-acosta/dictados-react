@@ -175,6 +175,7 @@ export default function BassScaleSuite() {
     'minor-arpeggio': null
   })
   const timerRefs = useRef<number[]>([])
+  const isPlayingRef = useRef(false)
 
   const patternData = useMemo<PatternWithNotes[]>(
     () => PATTERN_CONFIGS.map((pattern) => ({
@@ -200,7 +201,8 @@ export default function BassScaleSuite() {
       }
       container.innerHTML = ''
 
-      const width = Math.max(420, pattern.notes.length * 38)
+      const parentWidth = container.parentElement?.clientWidth ?? 560
+      const width = Math.max(420, parentWidth - 16)
       const height = 150
       const factory = new Factory({
         renderer: { elementId: container.id, width, height }
@@ -219,7 +221,7 @@ export default function BassScaleSuite() {
         const [pc] = key.split('/')
         if (pc.includes('#')) {
           note.addModifier(new Accidental('#'), 0)
-        } else if (pc.endsWith('b')) {
+        } else if (pc.length > 1 && pc.endsWith('b')) {
           note.addModifier(new Accidental('b'), 0)
         }
 
@@ -230,7 +232,8 @@ export default function BassScaleSuite() {
       })
 
       Formatter.FormatAndDraw(ctx, stave, vexNotes)
-      container.style.minWidth = `${width}px`
+      container.style.width = '100%'
+      container.style.minWidth = '0'
       container.style.minHeight = `${height}px`
     })
   }, [patternData, activeSegment, activeIndex, noteFigure])
@@ -253,6 +256,7 @@ export default function BassScaleSuite() {
     setIsPlaying(false)
     setActiveSegment(null)
     setActiveIndex(null)
+    isPlayingRef.current = false
   }
 
   const handlePlay = async () => {
@@ -260,21 +264,23 @@ export default function BassScaleSuite() {
     const sampler = await getYamahaSampler()
     await Tone.start()
     setIsPlaying(true)
+    isPlayingRef.current = true
 
-    const secondsPerBeat = 60 / Math.max(30, Math.min(240, bpm))
+    const clampedBpm = Math.max(30, Math.min(240, bpm))
+    const secondsPerBeat = 60 / clampedBpm
     const noteSeconds = secondsPerBeat * FIGURE_TO_BEATS[noteFigure]
     const segmentGapSeconds = secondsPerBeat * SEGMENT_GAP_BEATS
-    const startAt = Tone.now() + 0.2
     let offsetSeconds = 0
 
     patternData.forEach((pattern) => {
       pattern.notes.forEach((key, idx) => {
         const noteName = keyToToneName(key)
-        sampler.triggerAttackRelease(noteName, Math.max(0.2, noteSeconds * 0.9), startAt + offsetSeconds)
         const timerId = window.setTimeout(() => {
+          if (!isPlayingRef.current) return
           setActiveSegment(pattern.id)
           setActiveIndex(idx)
-        }, (offsetSeconds + noteSeconds * 0.2) * 1000)
+          sampler.triggerAttackRelease(noteName, Math.max(0.2, noteSeconds * 0.9))
+        }, offsetSeconds * 1000)
         timerRefs.current.push(timerId)
         offsetSeconds += noteSeconds
       })
@@ -332,7 +338,7 @@ export default function BassScaleSuite() {
             borderRadius: 2,
             border: '1px solid #e0e0e0',
             bgcolor: '#fafafa',
-            overflowX: 'auto',
+            overflow: 'hidden',
             px: 1,
             py: 1
           }}
