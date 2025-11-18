@@ -3,7 +3,10 @@ import {
   Box,
   Button,
   Chip,
+  Checkbox,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   InputLabel,
   MenuItem,
   Paper,
@@ -139,6 +142,13 @@ const PATTERN_CONFIGS: readonly PatternConfig[] = [
   }
 ] as const
 
+const DEFAULT_PATTERN_SELECTION: Record<PatternId, boolean> = {
+  'major-scale': true,
+  'minor-scale': true,
+  'major-arpeggio': true,
+  'minor-arpeggio': true
+}
+
 function keyToAmericanLabel(key: string) {
   const [pc, octave] = key.split('/')
   const label = NOTE_LABELS[pc] ?? pc.toUpperCase()
@@ -175,6 +185,7 @@ export default function BassScaleSuite() {
     'minor-arpeggio': null
   })
   const timerRefs = useRef<number[]>([])
+  const [enabledPatterns, setEnabledPatterns] = useState<Record<PatternId, boolean>>(DEFAULT_PATTERN_SELECTION)
   const isPlayingRef = useRef(false)
 
   const patternData = useMemo<PatternWithNotes[]>(
@@ -191,6 +202,11 @@ export default function BassScaleSuite() {
       return acc
     }, {} as Record<PatternId, PatternWithNotes>)
   }, [patternData])
+
+  const selectedPatternData = useMemo(
+    () => patternData.filter((pattern) => enabledPatterns[pattern.id]),
+    [patternData, enabledPatterns]
+  )
 
   useEffect(() => {
     patternData.forEach((pattern) => {
@@ -261,6 +277,7 @@ export default function BassScaleSuite() {
 
   const handlePlay = async () => {
     stopPlayback()
+    if (!selectedPatternData.length) return
     const sampler = await getYamahaSampler()
     await Tone.start()
     setIsPlaying(true)
@@ -270,27 +287,31 @@ export default function BassScaleSuite() {
     const secondsPerBeat = 60 / clampedBpm
     const noteSeconds = secondsPerBeat * FIGURE_TO_BEATS[noteFigure]
     const segmentGapSeconds = secondsPerBeat * SEGMENT_GAP_BEATS
-    let offsetSeconds = 0
 
-    patternData.forEach((pattern) => {
-      pattern.notes.forEach((key, idx) => {
-        const noteName = keyToToneName(key)
-        const timerId = window.setTimeout(() => {
-          if (!isPlayingRef.current) return
-          setActiveSegment(pattern.id)
-          setActiveIndex(idx)
-          sampler.triggerAttackRelease(noteName, Math.max(0.2, noteSeconds * 0.9))
-        }, offsetSeconds * 1000)
-        timerRefs.current.push(timerId)
-        offsetSeconds += noteSeconds
+    const scheduleCycle = () => {
+      if (!isPlayingRef.current) return
+      let offsetSeconds = 0
+      selectedPatternData.forEach((pattern) => {
+        pattern.notes.forEach((key, idx) => {
+          const noteName = keyToToneName(key)
+          const timerId = window.setTimeout(() => {
+            if (!isPlayingRef.current) return
+            setActiveSegment(pattern.id)
+            setActiveIndex(idx)
+            sampler.triggerAttackRelease(noteName, Math.max(0.2, noteSeconds * 0.9))
+          }, offsetSeconds * 1000)
+          timerRefs.current.push(timerId)
+          offsetSeconds += noteSeconds
+        })
+        offsetSeconds += segmentGapSeconds
       })
-      offsetSeconds += segmentGapSeconds
-    })
+      const loopTimer = window.setTimeout(() => {
+        scheduleCycle()
+      }, offsetSeconds * 1000)
+      timerRefs.current.push(loopTimer)
+    }
 
-    const doneTimer = window.setTimeout(() => {
-      stopPlayback()
-    }, (offsetSeconds + 0.2) * 1000)
-    timerRefs.current.push(doneTimer)
+    scheduleCycle()
   }
 
   const handleRootChange = (event: SelectChangeEvent) => {
@@ -309,7 +330,18 @@ export default function BassScaleSuite() {
     }
   }
 
-  const renderPatternCard = (pattern?: PatternWithNotes) => {
+  const handlePatternToggle = (patternId: PatternId) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (isPlayingRef.current) {
+      stopPlayback()
+    }
+    const checked = event.target.checked
+    setEnabledPatterns((prev) => ({
+      ...prev,
+      [patternId]: checked
+    }))
+  }
+
+  const renderPatternCard = (pattern?: PatternWithNotes, isEnabled = true) => {
     if (!pattern) return null
     return (
       <Paper
@@ -319,7 +351,9 @@ export default function BassScaleSuite() {
           borderLeft: `6px solid ${pattern.color}`,
           height: '100%',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          opacity: isEnabled ? 1 : 0.45,
+          transition: 'opacity 0.2s ease'
         }}
       >
         <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1}>
@@ -330,6 +364,11 @@ export default function BassScaleSuite() {
             {pattern.description}
           </Typography>
         </Stack>
+        {!isEnabled && (
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+            (No se reproducirá hasta que marques su checkbox.)
+          </Typography>
+        )}
 
         <Box
           sx={{
@@ -370,162 +409,184 @@ export default function BassScaleSuite() {
     )
   }
 
-  const gridItems = [
-    {
-      key: 'selector',
-      node: (
-        <Paper
-          variant="outlined"
-          sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%', gap: 2 }}
+  const hasActivePatterns = selectedPatternData.length > 0
+
+  const selectorCard = (
+    <Paper
+      variant="outlined"
+      sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%', gap: 2 }}
+    >
+      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        Selector de tonalidad
+      </Typography>
+      <FormControl fullWidth size="small">
+        <InputLabel>Tonalidad</InputLabel>
+        <Select
+          label="Tonalidad"
+          value={selectedRoot}
+          onChange={handleRootChange}
+          MenuProps={{ PaperProps: { style: { maxHeight: 280 } } }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Selector de tonalidad
-          </Typography>
-          <FormControl fullWidth size="small">
-            <InputLabel>Tonalidad</InputLabel>
-            <Select
-              label="Tonalidad"
-              value={selectedRoot}
-              onChange={handleRootChange}
-              MenuProps={{ PaperProps: { style: { maxHeight: 280 } } }}
-            >
-              {ROOT_NOTES.map((note) => (
-                <MenuItem key={note} value={note}>
-                  {note}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth size="small">
-            <InputLabel>Figura</InputLabel>
-            <Select
-              label="Figura"
-              value={noteFigure}
-              onChange={handleFigureChange}
-            >
-              {FIGURE_OPTIONS.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            label="BPM"
-            type="number"
-            size="small"
-            value={bpm}
-            onChange={handleBpmChange}
-            inputProps={{ min: 30, max: 220 }}
-            fullWidth
+          {ROOT_NOTES.map((note) => (
+            <MenuItem key={note} value={note}>
+              {note}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <InputLabel>Figura</InputLabel>
+        <Select
+          label="Figura"
+          value={noteFigure}
+          onChange={handleFigureChange}
+        >
+          {FIGURE_OPTIONS.map((opt) => (
+            <MenuItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <TextField
+        label="BPM"
+        type="number"
+        size="small"
+        value={bpm}
+        onChange={handleBpmChange}
+        inputProps={{ min: 30, max: 220 }}
+        fullWidth
+      />
+      <FormGroup sx={{ border: '1px solid #e0e0e0', borderRadius: 1.5, p: 1.5 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+          Patrones incluidos
+        </Typography>
+        {PATTERN_CONFIGS.map((pattern) => (
+          <FormControlLabel
+            key={`toggle-${pattern.id}`}
+            control={
+              <Checkbox
+                checked={enabledPatterns[pattern.id]}
+                onChange={handlePatternToggle(pattern.id)}
+                size="small"
+              />
+            }
+            label={pattern.title}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={isPlaying ? <Pause /> : <PlayArrow />}
-            onClick={isPlaying ? stopPlayback : handlePlay}
-            fullWidth
-          >
-            {isPlaying ? 'Detener suite' : 'Reproducir suite'}
-          </Button>
-          <Typography variant="body2" color="text.secondary">
-            Configura tonalidad, figura rítmica (todas las notas usan esa duración) y BPM antes de reproducir la suite.
-            Con figuras largas tendrás notas sostenidas, mientras que con corcheas escucharás el patrón más veloz.
-          </Typography>
-        </Paper>
-      )
-    },
-    patternMap['major-scale'] && { key: 'major-scale', node: renderPatternCard(patternMap['major-scale']) },
-    patternMap['minor-scale'] && { key: 'minor-scale', node: renderPatternCard(patternMap['minor-scale']) },
-    {
-      key: 'tuner',
-      node: (
-        <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Afinador siempre activo
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Mantén tu referencia en la misma vista. Ajusta cuerdas antes de tocar cada patrón.
-          </Typography>
-          <AlwaysOnTuner />
-        </Paper>
-      )
-    },
-    patternMap['major-arpeggio'] && { key: 'major-arpeggio', node: renderPatternCard(patternMap['major-arpeggio']) },
-    patternMap['minor-arpeggio'] && { key: 'minor-arpeggio', node: renderPatternCard(patternMap['minor-arpeggio']) },
-    {
-      key: 'guide',
-      node: (
-        <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Guía rápida
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Elige una tonalidad, pulsa reproducir y deja que la suite te lleve por la escala mayor, la menor natural y
-            ambos arpegios. Cada nota resaltada muestra su cifrado americano.
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Usa el mismo patrón técnico para ambos arpegios: 1–3–5–8 descendiendo con digitación espejo para memorizar
-            saltos amplios.
-          </Typography>
-        </Paper>
-      )
-    },
-    {
-      key: 'order',
-      node: (
-        <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-            Orden de reproducción
-          </Typography>
-          <Stack spacing={1.5}>
-            {PATTERN_CONFIGS.map((pattern, idx) => (
-              <Stack key={pattern.id} direction="row" spacing={1} alignItems="flex-start">
-                <Chip label={idx + 1} color="primary" size="small" />
-                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    {pattern.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {pattern.description}
-                  </Typography>
-                </Box>
-              </Stack>
-            ))}
-          </Stack>
-        </Paper>
-      )
-    },
-    {
-      key: 'tonalities',
-      node: (
-        <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Tonalidades disponibles
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Toca una tonalidad para rehacer la suite y practicar otra posición.
-          </Typography>
-          <Stack direction="row" spacing={1} flexWrap="wrap">
-            {ROOT_NOTES.map((note) => {
-              const isActive = selectedRoot === note
-              return (
-                <Chip
-                  key={`tonality-${note}`}
-                  label={note}
-                  color={isActive ? 'primary' : 'default'}
-                  variant={isActive ? 'filled' : 'outlined'}
-                  onClick={() => setSelectedRoot(note)}
-                  clickable
-                  sx={{ mb: 1 }}
-                />
-              )
-            })}
-          </Stack>
-        </Paper>
-      )
-    }
-  ].filter((item): item is { key: string; node: React.ReactNode } => Boolean(item && item.node))
+        ))}
+      </FormGroup>
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={isPlaying ? <Pause /> : <PlayArrow />}
+        onClick={isPlaying ? stopPlayback : handlePlay}
+        fullWidth
+        disabled={!hasActivePatterns}
+      >
+        {isPlaying ? 'Detener suite' : 'Reproducir suite'}
+      </Button>
+      <Typography variant="body2" color="text.secondary">
+        Configura tonalidad, figura rítmica, BPM y qué patrones quieres encadenar. La suite se repetirá en bucle
+        hasta que presiones detener.
+      </Typography>
+    </Paper>
+  )
+
+  const tunerCard = (
+    <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        Afinador siempre activo
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        Mantén tu referencia en la misma vista. Ajusta cuerdas antes de tocar cada patrón.
+      </Typography>
+      <AlwaysOnTuner />
+    </Paper>
+  )
+
+  const guideCard = (
+    <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        Guía rápida
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        Elige una tonalidad, pulsa reproducir y deja que la suite te lleve por la escala mayor, la menor natural y
+        ambos arpegios. Cada nota resaltada muestra su cifrado americano.
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        Usa el mismo patrón técnico para ambos arpegios: 1–3–5–8 descendiendo con digitación espejo para memorizar
+        saltos amplios.
+      </Typography>
+    </Paper>
+  )
+
+  const orderCard = (
+    <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+        Orden de reproducción
+      </Typography>
+      {hasActivePatterns ? (
+        <Stack spacing={1.5}>
+          {selectedPatternData.map((pattern, idx) => (
+            <Stack key={`${pattern.id}-order`} direction="row" spacing={1} alignItems="flex-start">
+              <Chip label={idx + 1} color="primary" size="small" />
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                  {pattern.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {pattern.description}
+                </Typography>
+              </Box>
+            </Stack>
+          ))}
+        </Stack>
+      ) : (
+        <Typography variant="body2" color="text.secondary">
+          No hay patrones seleccionados. Marca al menos uno para escuchar la suite.
+        </Typography>
+      )}
+    </Paper>
+  )
+
+  const tonalitiesCard = (
+    <Paper variant="outlined" sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        Tonalidades disponibles
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Toca una tonalidad para rehacer la suite y practicar otra posición.
+      </Typography>
+      <Stack direction="row" spacing={1} flexWrap="wrap">
+        {ROOT_NOTES.map((note) => {
+          const isActive = selectedRoot === note
+          return (
+            <Chip
+              key={`tonality-${note}`}
+              label={note}
+              color={isActive ? 'primary' : 'default'}
+              variant={isActive ? 'filled' : 'outlined'}
+              onClick={() => setSelectedRoot(note)}
+              clickable
+              sx={{ mb: 1 }}
+            />
+          )
+        })}
+      </Stack>
+    </Paper>
+  )
+
+  const column1 = [selectorCard, tunerCard, guideCard]
+  const column2 = [
+    patternMap['major-scale'] && renderPatternCard(patternMap['major-scale'], enabledPatterns['major-scale']),
+    patternMap['major-arpeggio'] && renderPatternCard(patternMap['major-arpeggio'], enabledPatterns['major-arpeggio']),
+    orderCard
+  ].filter(Boolean) as React.ReactNode[]
+  const column3 = [
+    patternMap['minor-scale'] && renderPatternCard(patternMap['minor-scale'], enabledPatterns['minor-scale']),
+    patternMap['minor-arpeggio'] && renderPatternCard(patternMap['minor-arpeggio'], enabledPatterns['minor-arpeggio']),
+    tonalitiesCard
+  ].filter(Boolean) as React.ReactNode[]
 
   return (
     <Box sx={{ width: '100%', px: { xs: 1, sm: 2, md: 4 }, py: 3 }}>
@@ -546,15 +607,16 @@ export default function BassScaleSuite() {
             gap: { xs: 2, md: 3 },
             gridTemplateColumns: {
               xs: 'repeat(1, minmax(0, 1fr))',
-              sm: 'repeat(2, minmax(0, 1fr))',
-              lg: 'minmax(220px, 0.7fr) repeat(2, minmax(0, 1fr))'
+              md: 'minmax(260px, 0.5fr) repeat(2, minmax(0, 1fr))'
             }
           }}
         >
-          {gridItems.map(({ key, node }) => (
-            <Box key={key} sx={{ minHeight: '100%' }}>
-              {node}
-            </Box>
+          {[column1, column2, column3].map((columnNodes, columnIdx) => (
+            <Stack key={`col-${columnIdx}`} spacing={2}>
+              {columnNodes.map((node, idx) => (
+                <Box key={`col-${columnIdx}-item-${idx}`}>{node}</Box>
+              ))}
+            </Stack>
           ))}
         </Box>
       </Stack>
