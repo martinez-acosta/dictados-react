@@ -576,15 +576,16 @@ export default function BassScaleSuite() {
     </Paper>
   )
 
-  const column1 = [selectorCard, tunerCard, guideCard]
+  const column1 = [selectorCard, guideCard]
   const column2 = [
     patternMap['major-scale'] && renderPatternCard(patternMap['major-scale'], enabledPatterns['major-scale']),
     patternMap['major-arpeggio'] && renderPatternCard(patternMap['major-arpeggio'], enabledPatterns['major-arpeggio']),
-    orderCard
+    tunerCard
   ].filter(Boolean) as React.ReactNode[]
   const column3 = [
     patternMap['minor-scale'] && renderPatternCard(patternMap['minor-scale'], enabledPatterns['minor-scale']),
     patternMap['minor-arpeggio'] && renderPatternCard(patternMap['minor-arpeggio'], enabledPatterns['minor-arpeggio']),
+    orderCard,
     tonalitiesCard
   ].filter(Boolean) as React.ReactNode[]
 
