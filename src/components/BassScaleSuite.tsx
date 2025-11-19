@@ -13,12 +13,13 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
+  Switch,
   TextField,
   Typography
 } from '@mui/material'
 import { ArrowBack, Pause, PlayArrow } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
-import { Factory, Stave, StaveNote, Accidental, Formatter } from 'vexflow'
+import { Factory, Stave, StaveNote, Accidental, Formatter, Annotation } from 'vexflow'
 import * as Tone from 'tone'
 import AlwaysOnTuner from './AlwaysOnTuner'
 import { getYamahaSampler, releaseYamahaVoices } from '../utils/yamahaSampler'
@@ -186,6 +187,7 @@ export default function BassScaleSuite() {
   })
   const timerRefs = useRef<number[]>([])
   const [enabledPatterns, setEnabledPatterns] = useState<Record<PatternId, boolean>>(DEFAULT_PATTERN_SELECTION)
+  const [showNoteLabels, setShowNoteLabels] = useState(true)
   const isPlayingRef = useRef(false)
 
   const patternData = useMemo<PatternWithNotes[]>(
@@ -219,7 +221,7 @@ export default function BassScaleSuite() {
 
       const parentWidth = container.parentElement?.clientWidth ?? 560
       const width = Math.max(420, parentWidth - 16)
-      const height = 150
+      const height = showNoteLabels ? 200 : 150
       const factory = new Factory({
         renderer: { elementId: container.id, width, height }
       })
@@ -241,6 +243,13 @@ export default function BassScaleSuite() {
           note.addModifier(new Accidental('b'), 0)
         }
 
+        if (showNoteLabels) {
+          const annotation = new Annotation(keyToAmericanLabel(key))
+            .setFont('Arial', 10)
+            .setVerticalJustification(Annotation.VerticalJustify.BOTTOM)
+          note.addModifier(annotation, 0)
+        }
+
         if (activeSegment === pattern.id && activeIndex === idx) {
           note.setStyle({ fillStyle: '#ff6b35', strokeStyle: '#ff6b35' })
         }
@@ -252,7 +261,7 @@ export default function BassScaleSuite() {
       container.style.minWidth = '0'
       container.style.minHeight = `${height}px`
     })
-  }, [patternData, activeSegment, activeIndex, noteFigure])
+  }, [patternData, activeSegment, activeIndex, noteFigure, showNoteLabels])
 
   useEffect(() => {
     return () => {
@@ -390,21 +399,6 @@ export default function BassScaleSuite() {
           />
         </Box>
 
-        <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
-          {pattern.notes.map((note, idx) => {
-            const isActive = activeSegment === pattern.id && activeIndex === idx
-            return (
-              <Chip
-                key={`${pattern.id}-${note}-${idx}`}
-                label={keyToAmericanLabel(note)}
-                color={isActive ? 'primary' : 'default'}
-                variant={isActive ? 'filled' : 'outlined'}
-                size="small"
-                sx={{ mb: 1 }}
-              />
-            )
-          })}
-        </Stack>
       </Paper>
     )
   }
@@ -475,6 +469,15 @@ export default function BassScaleSuite() {
           />
         ))}
       </FormGroup>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={showNoteLabels}
+            onChange={(e) => setShowNoteLabels(e.target.checked)}
+          />
+        }
+        label="Mostrar notas (cifrado americano)"
+      />
       <Button
         variant="contained"
         color="primary"
