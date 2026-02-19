@@ -1,54 +1,57 @@
-import React from 'react'
-import { Container, Paper, Typography, Box, Button, Grid } from '@mui/material'
-import { MusicNote, ArrowBack } from '@mui/icons-material'
-import { useNavigate } from 'react-router-dom'
+import React from "react";
+import { Container, Paper, Typography, Box, Button, Grid } from "@mui/material";
+import { MusicNote, ArrowBack } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 export default function CancionesMenu() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const canciones = [
     {
-      id: 'rompe-el-cielo',
-      titulo: 'Rompe el Cielo',
-      artista: 'Conquistando Fronteras',
-      tonalidad: 'E',
+      id: "rompe-el-cielo",
+      titulo: "Rompe el Cielo",
+      artista: "Conquistando Fronteras",
+      tonalidad: "E",
       bpm: 143,
-      archivo: '/dictados-react/src/RompeElCielo.html',
-      color: '#ff6b35'
+      archivo: "/dictados-react/src/RompeElCielo.html",
+      color: "#ff6b35",
     },
     {
-      id: 'sopla',
-      titulo: 'Sopla',
-      artista: 'Conquistando Fronteras',
-      tonalidad: 'E',
+      id: "sopla",
+      titulo: "Sopla",
+      artista: "Conquistando Fronteras",
+      tonalidad: "E",
       bpm: 95,
-      archivo: '/dictados-react/src/Sopla.html',
-      color: '#4ecdc4'
-    }
-  ]
+      archivo: "/dictados-react/src/Sopla.html",
+      color: "#4ecdc4",
+    },
+  ];
 
   const abrirCancion = (archivo) => {
     // Abrir el archivo HTML en una nueva pestaña
-    window.open(archivo, '_blank')
-  }
+    window.open(archivo, "_blank");
+  };
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
           <Button
             variant="outlined"
             startIcon={<ArrowBack />}
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
           >
             Volver al menú
           </Button>
-          <Box sx={{ flex: 1, textAlign: 'center' }}>
-            <MusicNote sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-            <Typography variant="h3" sx={{ fontWeight: 700, color: '#0b2a50', mb: 1 }}>
+          <Box sx={{ flex: 1, textAlign: "center" }}>
+            <MusicNote sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
+            <Typography
+              variant="h3"
+              sx={{ fontWeight: 700, color: "#0b2a50", mb: 1 }}
+            >
               🎵 Canciones
             </Typography>
-            <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+            <Typography variant="h6" sx={{ color: "text.secondary" }}>
               Letras y acordes para práctica
             </Typography>
           </Box>
@@ -60,14 +63,14 @@ export default function CancionesMenu() {
               <Paper
                 sx={{
                   p: 3,
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
+                  textAlign: "center",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
                   borderLeft: `4px solid ${cancion.color}`,
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 3
-                  }
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: 3,
+                  },
                 }}
                 onClick={() => abrirCancion(cancion.archivo)}
               >
@@ -75,18 +78,28 @@ export default function CancionesMenu() {
                 <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
                   {cancion.titulo}
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "text.secondary", mb: 2 }}
+                >
                   {cancion.artista}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    justifyContent: "center",
+                    mb: 2,
+                  }}
+                >
                   <Typography
                     variant="caption"
                     sx={{
-                      bgcolor: 'rgba(0,0,0,0.05)',
+                      bgcolor: "rgba(0,0,0,0.05)",
                       px: 1.5,
                       py: 0.5,
                       borderRadius: 1,
-                      fontWeight: 600
+                      fontWeight: 600,
                     }}
                   >
                     {cancion.tonalidad}
@@ -94,11 +107,11 @@ export default function CancionesMenu() {
                   <Typography
                     variant="caption"
                     sx={{
-                      bgcolor: 'rgba(0,0,0,0.05)',
+                      bgcolor: "rgba(0,0,0,0.05)",
                       px: 1.5,
                       py: 0.5,
                       borderRadius: 1,
-                      fontWeight: 600
+                      fontWeight: 600,
                     }}
                   >
                     {cancion.bpm} BPM
@@ -111,10 +124,10 @@ export default function CancionesMenu() {
                   sx={{
                     py: 1.5,
                     backgroundColor: cancion.color,
-                    '&:hover': {
+                    "&:hover": {
                       backgroundColor: cancion.color,
-                      filter: 'brightness(0.9)'
-                    }
+                      filter: "brightness(0.9)",
+                    },
                   }}
                 >
                   Ver Letra y Acordes
@@ -125,5 +138,5 @@ export default function CancionesMenu() {
         </Grid>
       </Paper>
     </Container>
-  )
+  );
 }

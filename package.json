@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css}\" \"*.{js,json,md,html}\"",
     "preview": "vite preview",
     "deploy": "./deploy.sh"
   },
@@ -21,6 +22,7 @@
     "vexflow": "^4.2.3"
   },
   "devDependencies": {
+    "prettier": "^3.6.2",
     "vite": "^5.4.0"
   }
 }

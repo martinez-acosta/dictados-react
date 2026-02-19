@@ -1,20 +1,34 @@
-import React from 'react'
-import { Container, Paper, Typography, Box, Button, Grid } from '@mui/material'
-import { MusicNote, GraphicEq, Home, Piano, RecordVoiceOver, LibraryMusic, AccessTime, MenuBook, GraphicEqOutlined, QueueMusic } from '@mui/icons-material'
-import { useNavigate } from 'react-router-dom'
+import React from "react";
+import { Container, Paper, Typography, Box, Button, Grid } from "@mui/material";
+import {
+  MusicNote,
+  GraphicEq,
+  Home,
+  Piano,
+  RecordVoiceOver,
+  LibraryMusic,
+  AccessTime,
+  MenuBook,
+  GraphicEqOutlined,
+  QueueMusic,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Home sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-          <Typography variant="h3" sx={{ fontWeight: 700, color: '#0b2a50', mb: 2 }}>
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Home sx={{ fontSize: 48, color: "primary.main", mb: 2 }} />
+          <Typography
+            variant="h3"
+            sx={{ fontWeight: 700, color: "#0b2a50", mb: 2 }}
+          >
             🎼 Centro de Ejercicios Musicales
           </Typography>
-          <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+          <Typography variant="h6" sx={{ color: "text.secondary" }}>
             Selecciona el tipo de ejercicio que deseas practicar
           </Typography>
         </Box>
@@ -24,32 +38,38 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/afinador')}
+              onClick={() => navigate("/afinador")}
             >
-              <GraphicEqOutlined sx={{ fontSize: 64, color: '#9c27b0', mb: 2 }} />
+              <GraphicEqOutlined
+                sx={{ fontSize: 64, color: "#9c27b0", mb: 2 }}
+              />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Afinador Cromático
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Afina tu instrumento con detección de pitch en tiempo real y historial de notas
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Afina tu instrumento con detección de pitch en tiempo real y
+                historial de notas
               </Typography>
               <Button
                 variant="contained"
                 sx={{
                   py: 1.5,
-                  backgroundColor: '#9c27b0',
-                  '&:hover': { backgroundColor: '#7b1fa2' }
+                  backgroundColor: "#9c27b0",
+                  "&:hover": { backgroundColor: "#7b1fa2" },
                 }}
                 fullWidth
-                onClick={() => navigate('/afinador')}
+                onClick={() => navigate("/afinador")}
               >
                 Abrir Afinador
               </Button>
@@ -60,28 +80,32 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/bajo-suite')}
+              onClick={() => navigate("/bajo-suite")}
             >
-              <MusicNote sx={{ fontSize: 64, color: '#f06292', mb: 2 }} />
+              <MusicNote sx={{ fontSize: 64, color: "#f06292", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Suite Bajo (Escala + Arpegios)
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Cuatro pentagramas en clave de Fa: escala mayor, menor y arpegios encadenados con afinador integrado.
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Cuatro pentagramas en clave de Fa: escala mayor, menor y
+                arpegios encadenados con afinador integrado.
               </Typography>
               <Button
                 variant="contained"
                 color="secondary"
                 fullWidth
-                onClick={() => navigate('/bajo-suite')}
+                onClick={() => navigate("/bajo-suite")}
                 sx={{ py: 1.5 }}
               >
                 Abrir Suite
@@ -93,27 +117,31 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/dictados')}
+              onClick={() => navigate("/dictados")}
             >
-              <MusicNote sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+              <MusicNote sx={{ fontSize: 64, color: "primary.main", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Dictados Melódicos
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Practica el reconocimiento auditivo de melodías en diferentes claves
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Practica el reconocimiento auditivo de melodías en diferentes
+                claves
               </Typography>
               <Button
                 variant="contained"
                 fullWidth
-                onClick={() => navigate('/dictados')}
+                onClick={() => navigate("/dictados")}
                 sx={{ py: 1.5 }}
               >
                 Comenzar Dictados
@@ -125,28 +153,33 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/intervalos')}
+              onClick={() => navigate("/intervalos")}
             >
-              <GraphicEq sx={{ fontSize: 64, color: 'secondary.main', mb: 2 }} />
+              <GraphicEq
+                sx={{ fontSize: 64, color: "secondary.main", mb: 2 }}
+              />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Ejercicios de Intervalos
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
                 Mejora tu oído musical identificando intervalos musicales
               </Typography>
               <Button
                 variant="contained"
                 color="secondary"
                 fullWidth
-                onClick={() => navigate('/intervalos')}
+                onClick={() => navigate("/intervalos")}
                 sx={{ py: 1.5 }}
               >
                 Comenzar Intervalos
@@ -158,28 +191,31 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/bajo')}
+              onClick={() => navigate("/bajo")}
             >
-              <Piano sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
+              <Piano sx={{ fontSize: 64, color: "success.main", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Entrenador de Bajo
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
                 Practica escalas y notas con pentagrama interactivo
               </Typography>
               <Button
                 variant="contained"
                 color="success"
                 fullWidth
-                onClick={() => navigate('/bajo')}
+                onClick={() => navigate("/bajo")}
                 sx={{ py: 1.5 }}
               >
                 Comenzar Bajo
@@ -191,28 +227,32 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/arpegios-bajo')}
+              onClick={() => navigate("/arpegios-bajo")}
             >
-              <QueueMusic sx={{ fontSize: 64, color: '#4caf50', mb: 2 }} />
+              <QueueMusic sx={{ fontSize: 64, color: "#4caf50", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Arpegios de Bajo
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Consulta las notas 1-3-5-7 y patrones sugeridos para acordes m7, 7 y maj7.
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Consulta las notas 1-3-5-7 y patrones sugeridos para acordes m7,
+                7 y maj7.
               </Typography>
               <Button
                 variant="contained"
                 color="success"
                 fullWidth
-                onClick={() => navigate('/arpegios-bajo')}
+                onClick={() => navigate("/arpegios-bajo")}
                 sx={{ py: 1.5 }}
               >
                 Abrir Arpegios
@@ -224,28 +264,33 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/vocal')}
+              onClick={() => navigate("/vocal")}
             >
-              <RecordVoiceOver sx={{ fontSize: 64, color: 'warning.main', mb: 2 }} />
+              <RecordVoiceOver
+                sx={{ fontSize: 64, color: "warning.main", mb: 2 }}
+              />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Entrenador Vocal
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
                 Practica escalas vocales en clave de Sol con afinador integrado
               </Typography>
               <Button
                 variant="contained"
                 color="warning"
                 fullWidth
-                onClick={() => navigate('/vocal')}
+                onClick={() => navigate("/vocal")}
                 sx={{ py: 1.5 }}
               >
                 Comenzar Vocal
@@ -257,28 +302,32 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/triadas')}
+              onClick={() => navigate("/triadas")}
             >
-              <LibraryMusic sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
+              <LibraryMusic sx={{ fontSize: 64, color: "error.main", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Entrenador de Tríadas
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Practica tríadas (mayor, menor, disminuida, aumentada) y sus inversiones
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Practica tríadas (mayor, menor, disminuida, aumentada) y sus
+                inversiones
               </Typography>
               <Button
                 variant="contained"
                 color="error"
                 fullWidth
-                onClick={() => navigate('/triadas')}
+                onClick={() => navigate("/triadas")}
                 sx={{ py: 1.5 }}
               >
                 Comenzar Tríadas
@@ -290,32 +339,35 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/ritmica')}
+              onClick={() => navigate("/ritmica")}
             >
-              <AccessTime sx={{ fontSize: 64, color: 'purple', mb: 2 }} />
+              <AccessTime sx={{ fontSize: 64, color: "purple", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Rítmica
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
                 Aprende figuras, silencios, batimientos y compases musicales
               </Typography>
               <Button
                 variant="contained"
                 sx={{
                   py: 1.5,
-                  backgroundColor: 'purple',
-                  '&:hover': { backgroundColor: '#7b1fa2' }
+                  backgroundColor: "purple",
+                  "&:hover": { backgroundColor: "#7b1fa2" },
                 }}
                 fullWidth
-                onClick={() => navigate('/ritmica')}
+                onClick={() => navigate("/ritmica")}
               >
                 Comenzar Rítmica
               </Button>
@@ -326,32 +378,36 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/ritmica-alturas')}
+              onClick={() => navigate("/ritmica-alturas")}
             >
-              <AccessTime sx={{ fontSize: 64, color: '#9c27b0', mb: 2 }} />
+              <AccessTime sx={{ fontSize: 64, color: "#9c27b0", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Rítmica con Alturas
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Dictados rítmicos combinados con identificación de alturas de notas
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Dictados rítmicos combinados con identificación de alturas de
+                notas
               </Typography>
               <Button
                 variant="contained"
                 sx={{
                   py: 1.5,
-                  backgroundColor: '#9c27b0',
-                  '&:hover': { backgroundColor: '#7b1fa2' }
+                  backgroundColor: "#9c27b0",
+                  "&:hover": { backgroundColor: "#7b1fa2" },
                 }}
                 fullWidth
-                onClick={() => navigate('/ritmica-alturas')}
+                onClick={() => navigate("/ritmica-alturas")}
               >
                 Comenzar Rítmica con Alturas
               </Button>
@@ -362,28 +418,31 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/intervalos-piano')}
+              onClick={() => navigate("/intervalos-piano")}
             >
-              <Piano sx={{ fontSize: 64, color: 'info.main', mb: 2 }} />
+              <Piano sx={{ fontSize: 64, color: "info.main", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Intervalos Piano
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
                 Escalas en clave de sol con pentagrama y piano interactivo
               </Typography>
               <Button
                 variant="contained"
                 color="info"
                 fullWidth
-                onClick={() => navigate('/intervalos-piano')}
+                onClick={() => navigate("/intervalos-piano")}
                 sx={{ py: 1.5 }}
               >
                 Comenzar Intervalos Piano
@@ -395,28 +454,34 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/intervalos-trainer')}
+              onClick={() => navigate("/intervalos-trainer")}
             >
-              <GraphicEq sx={{ fontSize: 64, color: 'secondary.main', mb: 2 }} />
+              <GraphicEq
+                sx={{ fontSize: 64, color: "secondary.main", mb: 2 }}
+              />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Entrenador de Intervalos
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Practica todos los intervalos con tabla de referencia y notación musical
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Practica todos los intervalos con tabla de referencia y notación
+                musical
               </Typography>
               <Button
                 variant="contained"
                 color="secondary"
                 fullWidth
-                onClick={() => navigate('/intervalos-trainer')}
+                onClick={() => navigate("/intervalos-trainer")}
                 sx={{ py: 1.5 }}
               >
                 Comenzar Entrenador
@@ -428,32 +493,36 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/lectura-musical')}
+              onClick={() => navigate("/lectura-musical")}
             >
-              <MenuBook sx={{ fontSize: 64, color: '#4caf50', mb: 2 }} />
+              <MenuBook sx={{ fontSize: 64, color: "#4caf50", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Lectura Musical
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                Practica la lectura de notas estilo Dandelot con ejercicios progresivos en claves de Sol y Fa.
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Practica la lectura de notas estilo Dandelot con ejercicios
+                progresivos en claves de Sol y Fa.
               </Typography>
               <Button
                 variant="contained"
                 sx={{
                   py: 1.5,
-                  backgroundColor: '#4caf50',
-                  '&:hover': { backgroundColor: '#388e3c' }
+                  backgroundColor: "#4caf50",
+                  "&:hover": { backgroundColor: "#388e3c" },
                 }}
                 fullWidth
-                onClick={() => navigate('/lectura-musical')}
+                onClick={() => navigate("/lectura-musical")}
               >
                 Comenzar Lectura
               </Button>
@@ -464,32 +533,35 @@ export default function Dashboard() {
             <Paper
               sx={{
                 p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 3
-                }
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
               }}
-              onClick={() => navigate('/canciones')}
+              onClick={() => navigate("/canciones")}
             >
-              <QueueMusic sx={{ fontSize: 64, color: '#ff6b35', mb: 2 }} />
+              <QueueMusic sx={{ fontSize: 64, color: "#ff6b35", mb: 2 }} />
               <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
                 Canciones
               </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
                 Letras y acordes de canciones para práctica y adoración
               </Typography>
               <Button
                 variant="contained"
                 sx={{
                   py: 1.5,
-                  backgroundColor: '#ff6b35',
-                  '&:hover': { backgroundColor: '#ff5722' }
+                  backgroundColor: "#ff6b35",
+                  "&:hover": { backgroundColor: "#ff5722" },
                 }}
                 fullWidth
-                onClick={() => navigate('/canciones')}
+                onClick={() => navigate("/canciones")}
               >
                 Ver Canciones
               </Button>
@@ -498,5 +570,5 @@ export default function Dashboard() {
         </Grid>
       </Paper>
     </Container>
-  )
+  );
 }

@@ -13,8 +13,8 @@ npm run dev
 Abre el enlace local que imprime Vite.
 
 ## Tecnologías
+
 - React 18
 - Material UI 5
 - VexFlow 4 (Factory / EasyScore / Formatter)
 - Web Audio API (síntesis simple tipo piano)
-
