@@ -732,7 +732,7 @@ export default function BassScaleSuite() {
       container.innerHTML = "";
 
       const parentWidth = container.parentElement?.clientWidth ?? 560;
-      const width = Math.max(420, parentWidth - 16);
+      const width = Math.max(280, parentWidth - 16);
       const height = showNoteLabels ? 200 : 150;
       const factory = new Factory({
         renderer: { elementId: container.id, width, height },
@@ -872,7 +872,7 @@ export default function BassScaleSuite() {
       <Paper
         variant="outlined"
         sx={{
-          p: 3,
+          p: { xs: 1.5, sm: 3 },
           borderLeft: `6px solid ${pattern.color}`,
           height: "100%",
           display: "flex",
@@ -906,7 +906,8 @@ export default function BassScaleSuite() {
             borderRadius: 2,
             border: "1px solid #e0e0e0",
             bgcolor: "#fafafa",
-            overflow: "hidden",
+            overflowX: "auto",
+            overflowY: "hidden",
             px: 1,
             py: 1,
           }}
@@ -1166,7 +1167,11 @@ export default function BassScaleSuite() {
   return (
     <Box sx={{ width: "100%", px: { xs: 1, sm: 2, md: 4 }, py: 3 }}>
       <Stack spacing={3} sx={{ width: "100%", maxWidth: "100%", mx: "auto" }}>
-        <Stack direction="row" alignItems="center" spacing={2}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          spacing={2}
+        >
           <Button
             variant="outlined"
             startIcon={<ArrowBack />}
@@ -1174,7 +1179,14 @@ export default function BassScaleSuite() {
           >
             Volver al menú
           </Button>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: "#0b2a50" }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              color: "#0b2a50",
+              fontSize: { xs: "1.4rem", sm: "2.125rem" },
+            }}
+          >
             Suite de Bajo: Escala + Arpegios encadenados
           </Typography>
         </Stack>

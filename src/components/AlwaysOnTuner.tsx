@@ -606,6 +606,7 @@ export default function AlwaysOnTuner() {
           gap: 8,
           alignItems: "center",
           justifyContent: "space-between",
+          flexWrap: "wrap",
         }}
       >
         <button
@@ -649,6 +650,7 @@ export default function AlwaysOnTuner() {
           gap: 16,
           alignItems: "center",
           marginTop: 10,
+          flexWrap: "wrap",
         }}
       >
         {/* Radio en lugar de checkbox para no seleccionar ambos */}
