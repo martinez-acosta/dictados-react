@@ -13,6 +13,7 @@ import IntervalsTrainer from "./components/IntervalsTrainer.tsx";
 import RitmicaTrainer from "./components/RitmicaTrainer.tsx";
 import RitmicaConAlturas from "./components/RitmicaConAlturas.tsx";
 import LecturaMusical from "./components/LecturaMusical.tsx";
+import DictadosIntervalos from "./components/DictadosIntervalos.tsx";
 import TunerPage from "./components/TunerPage.tsx";
 import CancionesMenu from "./components/CancionesMenu.jsx";
 import BassArpeggiosPage from "./components/BassArpeggiosPage.tsx";
@@ -25,6 +26,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/" element={<Dashboard />} />
         <Route path="/afinador" element={<TunerPage />} />
         <Route path="/dictados" element={<DictadosMelodicos />} />
+        <Route path="/dictados-intervalos" element={<DictadosIntervalos />} />
         <Route path="/intervalos" element={<EjerciciosIntervalos />} />
         <Route path="/bajo" element={<BajoTrainer />} />
         <Route path="/bajo-suite" element={<BassScaleSuite />} />

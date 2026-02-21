@@ -161,6 +161,44 @@ export default function Dashboard() {
                   boxShadow: 3,
                 },
               }}
+              onClick={() => navigate("/dictados-intervalos")}
+            >
+              <GraphicEq
+                sx={{ fontSize: 64, color: "secondary.main", mb: 2 }}
+              />
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                Dictados de Intervalos
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{ color: "text.secondary", mb: 3 }}
+              >
+                Identifica de oído el intervalo que suena, en Arpegio o Acorde.
+              </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                fullWidth
+                onClick={() => navigate("/dictados-intervalos")}
+                sx={{ py: 1.5 }}
+              >
+                Comenzar Dictados
+              </Button>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper
+              sx={{
+                p: 3,
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 3,
+                },
+              }}
               onClick={() => navigate("/intervalos")}
             >
               <GraphicEq
