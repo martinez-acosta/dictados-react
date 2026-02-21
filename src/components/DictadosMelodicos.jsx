@@ -16,8 +16,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import FundamentalNotesTable from "./FundamentalNotesTable";
-import ChromaticIntervalsTable from "./ChromaticIntervalsTable";
+
 import {
   PlayArrow,
   Pause,
@@ -553,7 +552,7 @@ export default function DictadosMelodicos() {
   );
   const [mask, setMask] = useState(null);
   const [activeIdx, setActiveIdx] = useState(0);
-  const [showNoteReference, setShowNoteReference] = useState(true);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentPlayingNote, setCurrentPlayingNote] = useState(-1);
   const [currentNoteDisplay, setCurrentNoteDisplay] = useState({
@@ -1204,32 +1203,6 @@ export default function DictadosMelodicos() {
             {currentClefConfig.name} (4/4)
           </Typography>
         </Box>
-
-        {/* Información musical */}
-        <Paper sx={{ p: 2 }}>
-          <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold", color: "primary.main" }}
-            >
-              🎵 Información musical
-            </Typography>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setShowNoteReference(!showNoteReference)}
-            >
-              {showNoteReference ? "Ocultar" : "Mostrar"}
-            </Button>
-          </Stack>
-
-          {showNoteReference && (
-            <Grid container spacing={2}>
-              <FundamentalNotesTable />
-              <ChromaticIntervalsTable />
-            </Grid>
-          )}
-        </Paper>
 
         <Stack
           direction={{ xs: "column", md: "row" }}
