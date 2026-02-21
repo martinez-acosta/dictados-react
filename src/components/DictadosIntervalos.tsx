@@ -360,6 +360,7 @@ export default function DictadosIntervalos() {
   const [direction, setDirection] = useState<IntervalDirection>("ascending");
   const [currentRound, setCurrentRound] = useState<PairRound | null>(null);
   const [infiniteReference, setInfiniteReference] = useState(false);
+  const [infiniteQuestion, setInfiniteQuestion] = useState(false);
   const [selectedQuestionOptionIds, setSelectedQuestionOptionIds] = useState<
     QuestionOptionId[]
   >(["minor_chord", "major_chord"]);
@@ -677,7 +678,11 @@ export default function DictadosIntervalos() {
     setCurrentCorrectInterval(askedDef);
     setCurrentCorrectQuestion(askedOption);
     setHasGuessed(false);
-    setStatusMsg("Pregunta: identifica la combinación.");
+    if (infiniteQuestion) {
+      setStatusMsg("Pregunta en infinito. Pulsa Detener o responde.");
+    } else {
+      setStatusMsg("Pregunta: identifica la combinación.");
+    }
     setStatusColor("text.secondary");
     setIsPlaying(true);
 
@@ -686,17 +691,24 @@ export default function DictadosIntervalos() {
       const toneBase = noteToTone(currentRound.base.vfKey);
       const toneTarget = noteToTone(askedTarget.vfKey);
 
-      if (askedOption.playback === "chord") {
-        const step = askedOption.intervalKind === "minor" ? 4 : 5;
-        queueTimeout(() => {
-          setCurrentPlayingState(step);
-          sampler.triggerAttackRelease([toneBase, toneTarget], 1.2);
-        }, 0);
-        queueTimeout(() => {
-          setCurrentPlayingState(null);
-          setIsPlaying(false);
-        }, 1220);
-      } else {
+      const scheduleQuestionCycle = () => {
+        if (askedOption.playback === "chord") {
+          const step = askedOption.intervalKind === "minor" ? 4 : 5;
+          queueTimeout(() => {
+            setCurrentPlayingState(step);
+            sampler.triggerAttackRelease([toneBase, toneTarget], 1.2);
+          }, 0);
+          queueTimeout(() => {
+            setCurrentPlayingState(null);
+            if (infiniteQuestion) {
+              scheduleQuestionCycle();
+            } else {
+              setIsPlaying(false);
+            }
+          }, 1220);
+          return;
+        }
+
         const firstStep = askedOption.intervalKind === "minor" ? 0 : 2;
         const secondStep = askedOption.intervalKind === "minor" ? 1 : 3;
         queueTimeout(() => {
@@ -709,9 +721,15 @@ export default function DictadosIntervalos() {
         }, 760);
         queueTimeout(() => {
           setCurrentPlayingState(null);
-          setIsPlaying(false);
+          if (infiniteQuestion) {
+            scheduleQuestionCycle();
+          } else {
+            setIsPlaying(false);
+          }
         }, 1520);
-      }
+      };
+
+      scheduleQuestionCycle();
     } catch (err) {
       console.error(err);
       setIsPlaying(false);
@@ -763,8 +781,9 @@ export default function DictadosIntervalos() {
     stave.addClef(clef).setContext(ctx).draw();
 
     if (!currentBaseNote || !currentTargetNote) return;
-    const hideNotesInExam = mode === "exam" && !hasGuessed;
-    if (hideNotesInExam) {
+    const isQuestionActive = !!currentCorrectQuestion && !hasGuessed;
+    const hideNotes = (mode === "exam" && !hasGuessed) || isQuestionActive;
+    if (hideNotes) {
       const canvasCtx = (ctx as any).context as
         | CanvasRenderingContext2D
         | undefined;
@@ -773,7 +792,13 @@ export default function DictadosIntervalos() {
         canvasCtx.font = "bold 13px Arial";
         canvasCtx.fillStyle = "#546e7a";
         canvasCtx.textAlign = "center";
-        canvasCtx.fillText("Modo examen: notas ocultas", 200, 95);
+        canvasCtx.fillText(
+          isQuestionActive
+            ? "Pregunta activa: notas ocultas"
+            : "Modo examen: notas ocultas",
+          200,
+          95,
+        );
         canvasCtx.restore();
       }
       return;
@@ -863,8 +888,8 @@ export default function DictadosIntervalos() {
         </Box>
 
         <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 2, height: "100%" }}>
+          <Grid item xs={12} md={4} lg={3}>
+            <Paper sx={{ p: { xs: 1.5, sm: 2 }, height: "100%" }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
                 Ajustes
               </Typography>
@@ -980,33 +1005,47 @@ export default function DictadosIntervalos() {
                 }
                 label={<Typography variant="body2">Referencia infinita</Typography>}
               />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={infiniteQuestion}
+                    onChange={(e) => setInfiniteQuestion(e.target.checked)}
+                    size="small"
+                  />
+                }
+                label={<Typography variant="body2">Pregunta infinita</Typography>}
+              />
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={8} lg={9}>
             <Paper
               sx={{
-                p: 3,
+                p: { xs: 1.5, sm: 3 },
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                gap: 3,
+                gap: { xs: 1.5, sm: 3 },
               }}
             >
               <Box
                 sx={{
                   display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
                   justifyContent: "space-between",
-                  alignItems: "center",
+                  alignItems: { xs: "stretch", sm: "center" },
+                  gap: { xs: 1, sm: 0 }
                 }}
               >
-                <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={1} justifyContent="center" sx={{ flexWrap: 'wrap', gap: {xs: 1, sm: 0} }}>
                   <Chip
+                    size="small"
                     label={`Aciertos: ${score} / ${attempts}`}
                     color="primary"
                     variant="outlined"
                   />
                   <Chip
+                    size="small"
                     label={`Racha: ${streak}`}
                     color={streak > 2 ? "warning" : "default"}
                   />
@@ -1016,14 +1055,15 @@ export default function DictadosIntervalos() {
                   color="primary"
                   onClick={startNewRound}
                   startIcon={<SyncAlt />}
-                  size="large"
+                  size="small"
+                  sx={{ mt: { xs: 1, sm: 0 } }}
                 >
                   Nuevo Par
                 </Button>
               </Box>
 
               <Typography
-                variant="h6"
+                variant="subtitle1"
                 sx={{
                   color: statusColor,
                   textAlign: "center",
@@ -1038,8 +1078,9 @@ export default function DictadosIntervalos() {
                 sx={{
                   display: "flex",
                   justifyContent: "center",
-                  gap: 2,
-                  py: 2,
+                  gap: { xs: 1, sm: 2 },
+                  py: { xs: 1, sm: 2 },
+                  flexWrap: "wrap"
                 }}
               >
                 <Button
@@ -1048,7 +1089,7 @@ export default function DictadosIntervalos() {
                   startIcon={isPlaying ? <Pause /> : <PlayArrow />}
                   disabled={!currentRound}
                   onClick={() => playReferenceSequence()}
-                  sx={{ px: 4, py: 1.5, borderRadius: 8 }}
+                  sx={{ px: { xs: 2, sm: 4 }, py: 1, borderRadius: 8, fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
                 >
                   {isPlaying ? "Detener" : "Reproducir Referencia"}
                 </Button>
@@ -1057,7 +1098,7 @@ export default function DictadosIntervalos() {
                   color="info"
                   disabled={!currentRound}
                   onClick={playQuestion}
-                  sx={{ px: 4, py: 1.5, borderRadius: 8 }}
+                  sx={{ px: { xs: 2, sm: 4 }, py: 1, borderRadius: 8, fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
                 >
                   Pregunta
                 </Button>
@@ -1100,7 +1141,11 @@ export default function DictadosIntervalos() {
                           }
                           onClick={() => handleGuess(def)}
                           disabled={hasGuessed || !currentCorrectQuestion}
-                          sx={{ minWidth: "120px" }}
+                          sx={{
+                            minWidth: { xs: "100px", sm: "120px" },
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                            p: { xs: "6px", sm: "12px" }
+                          }}
                         >
                           {def.label}
                         </Button>
