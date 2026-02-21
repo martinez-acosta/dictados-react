@@ -159,6 +159,7 @@ const INTERVAL_GROUPS: {
 const MINOR_MAJOR_PAIR_GROUPS: PairGroup[] = [
   { id: "segundas", minorId: "m2", majorId: "M2" },
   { id: "terceras", minorId: "m3", majorId: "M3" },
+  { id: "cuartas_quintas", minorId: "P4", majorId: "P5" }, // Emparejamos P4 y P5 para simplificar
   { id: "sextas", minorId: "m6", majorId: "M6" },
   { id: "septimas", minorId: "m7", majorId: "M7" },
 ];
@@ -454,7 +455,7 @@ export default function DictadosIntervalos() {
   const startNewRound = async () => {
     if (selectedPairGroups.length === 0) {
       setStatusMsg(
-        "Selecciona al menos un grupo con menor/mayor: segundas, terceras, sextas o séptimas.",
+        "Selecciona al menos un grupo válido (segundas, terceras, 4as/5as, sextas o séptimas).",
       );
       setStatusColor("error.main");
       return;
@@ -529,12 +530,15 @@ export default function DictadosIntervalos() {
       const arpeggioDur = 0.75;
       const chordDur = 1.1;
       const gapMs = 180;
-      const activeOrder: QuestionOptionId[] = [
+      const baseOrder: QuestionOptionId[] = [
         "minor_arpeggio",
         "major_arpeggio",
         "minor_chord",
         "major_chord",
-      ].filter((id) => selectedQuestionOptionIds.includes(id));
+      ];
+      const activeOrder: QuestionOptionId[] = baseOrder.filter((id) =>
+        selectedQuestionOptionIds.includes(id),
+      );
       const events: Array<{
         delayMs: number;
         step: ReferenceStep;
@@ -942,8 +946,8 @@ export default function DictadosIntervalos() {
                 variant="caption"
                 sx={{ display: "block", color: "text.secondary", mb: 1 }}
               >
-                Para este ejercicio solo aplican segundas, terceras, sextas y
-                séptimas (menor/mayor).
+                Para este ejercicio solo aplican los grupos compatibles en pares
+                (ej. menor/mayor, cuartas/quintas).
               </Typography>
               <FormGroup>
                 <Grid container>
@@ -986,24 +990,35 @@ export default function DictadosIntervalos() {
                 variant="caption"
                 sx={{ display: "block", color: "text.secondary", mb: 1 }}
               >
-                Puedes practicar cualquier combinación (4 opciones base).
+                Puedes practicar cualquier combinación (activa arpegios o
+                acordes).
               </Typography>
               <FormGroup>
-                {QUESTION_OPTIONS.map((option) => (
-                  <FormControlLabel
-                    key={option.id}
-                    control={
-                      <Checkbox
-                        checked={selectedQuestionOptionIds.includes(option.id)}
-                        onChange={() => toggleQuestionOption(option.id)}
-                        size="small"
-                      />
-                    }
-                    label={
-                      <Typography variant="body2">{option.label}</Typography>
-                    }
-                  />
-                ))}
+                {QUESTION_OPTIONS.map((option) => {
+                  let dynamicLabel = option.label;
+                  if (option.intervalKind === "minor")
+                    dynamicLabel = `Opción 1 [m/P4] (${option.playback === "arpeggio" ? "arpegio" : "acorde"})`;
+                  if (option.intervalKind === "major")
+                    dynamicLabel = `Opción 2 [M/P5] (${option.playback === "arpeggio" ? "arpegio" : "acorde"})`;
+
+                  return (
+                    <FormControlLabel
+                      key={option.id}
+                      control={
+                        <Checkbox
+                          checked={selectedQuestionOptionIds.includes(
+                            option.id,
+                          )}
+                          onChange={() => toggleQuestionOption(option.id)}
+                          size="small"
+                        />
+                      }
+                      label={
+                        <Typography variant="body2">{dynamicLabel}</Typography>
+                      }
+                    />
+                  );
+                })}
               </FormGroup>
               <FormControlLabel
                 sx={{ mt: 1 }}
@@ -1154,6 +1169,11 @@ export default function DictadosIntervalos() {
                 </Typography>
                 <Grid container spacing={1} justifyContent="center">
                   {selectedQuestionOptions.map((def) => {
+                    const dynamicLabel =
+                      def.intervalKind === "minor"
+                        ? `${currentRound?.minor?.name || "Opción 1"} (${def.playback === "arpeggio" ? "arp." : "ac."})`
+                        : `${currentRound?.major?.name || "Opción 2"} (${def.playback === "arpeggio" ? "arp." : "ac."})`;
+
                     return (
                       <Grid item key={def.id}>
                         <Button
@@ -1177,7 +1197,7 @@ export default function DictadosIntervalos() {
                             p: { xs: "6px", sm: "12px" },
                           }}
                         >
-                          {def.label}
+                          {dynamicLabel}
                         </Button>
                       </Grid>
                     );
