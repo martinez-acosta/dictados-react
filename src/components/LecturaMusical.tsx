@@ -521,13 +521,13 @@ export default function LecturaMusical() {
   const navigate = useNavigate();
 
   const [selectedExercise, setSelectedExercise] =
-    useState<ExerciseKey>("dandelot-sol-la");
+    useState<ExerciseKey>("dandelot-sol-la-lineas");
   const [selectedClef, setSelectedClef] = useState<ClefType>("treble");
   const [bpm, setBpm] = useState(60);
   const [duration, setDuration] = useState<DurationSym>("q"); // por defecto NEGRA (walking bass)
   const [randomFigure, setRandomFigure] = useState(false);
   const [showNoteLabels, setShowNoteLabels] = useState(true);
-  const [jazzStyle, setJazzStyle] = useState(true); // metrónomo estilo jazz (2 y 4 fuertes)
+  const [jazzStyle, setJazzStyle] = useState(false); // metrónomo clásico por defecto (1 fuerte)
   const [reverseOrder, setReverseOrder] = useState(false); // invertir orden del ejercicio
   const [tunerEnabled, setTunerEnabled] = useState(false);
 
@@ -920,7 +920,7 @@ export default function LecturaMusical() {
                   onChange={(e) => setBpm(Number(e.target.value))}
                   label="BPM"
                 >
-                  {[40, 50, 60, 72, 80, 96, 100, 120].map((v) => (
+                  {[40, 45, 50, 55, 60, 65, 70, 72, 75, 80, 85, 90, 95, 96, 100, 105, 110, 115, 120].map((v) => (
                     <MenuItem key={v} value={v}>
                       {v} BPM
                     </MenuItem>
