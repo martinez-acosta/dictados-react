@@ -520,8 +520,9 @@ function randomDurations(len: number): DurationSym[] {
 export default function LecturaMusical() {
   const navigate = useNavigate();
 
-  const [selectedExercise, setSelectedExercise] =
-    useState<ExerciseKey>("dandelot-sol-la-lineas");
+  const [selectedExercise, setSelectedExercise] = useState<ExerciseKey>(
+    "dandelot-sol-la-lineas",
+  );
   const [selectedClef, setSelectedClef] = useState<ClefType>("treble");
   const [bpm, setBpm] = useState(60);
   const [duration, setDuration] = useState<DurationSym>("q"); // por defecto NEGRA (walking bass)
@@ -920,7 +921,10 @@ export default function LecturaMusical() {
                   onChange={(e) => setBpm(Number(e.target.value))}
                   label="BPM"
                 >
-                  {[40, 45, 50, 55, 60, 65, 70, 72, 75, 80, 85, 90, 95, 96, 100, 105, 110, 115, 120].map((v) => (
+                  {[
+                    40, 45, 50, 55, 60, 65, 70, 72, 75, 80, 85, 90, 95, 96, 100,
+                    105, 110, 115, 120,
+                  ].map((v) => (
                     <MenuItem key={v} value={v}>
                       {v} BPM
                     </MenuItem>

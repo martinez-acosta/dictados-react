@@ -478,8 +478,16 @@ export default function DictadosIntervalos() {
     const oct = Math.random() > 0.5 ? "3" : "4";
     const baseKey = `${baseNoteObj.step}/${oct}`;
 
-    const minorKey = calculateIntervalFromBase(baseKey, minorDef.semitones, direction);
-    const majorKey = calculateIntervalFromBase(baseKey, majorDef.semitones, direction);
+    const minorKey = calculateIntervalFromBase(
+      baseKey,
+      minorDef.semitones,
+      direction,
+    );
+    const majorKey = calculateIntervalFromBase(
+      baseKey,
+      majorDef.semitones,
+      direction,
+    );
     const nextRound: PairRound = {
       groupId: pairGroup.id,
       base: { step: baseNoteObj.step, vfKey: baseKey },
@@ -912,14 +920,17 @@ export default function DictadosIntervalos() {
                   <Switch
                     checked={direction === "descending"}
                     onChange={(e) =>
-                      setDirection(e.target.checked ? "descending" : "ascending")
+                      setDirection(
+                        e.target.checked ? "descending" : "ascending",
+                      )
                     }
                     size="small"
                   />
                 }
                 label={
                   <Typography variant="body2">
-                    Dirección: {direction === "ascending" ? "Ascendente" : "Descendente"}
+                    Dirección:{" "}
+                    {direction === "ascending" ? "Ascendente" : "Descendente"}
                   </Typography>
                 }
               />
@@ -1003,7 +1014,9 @@ export default function DictadosIntervalos() {
                     size="small"
                   />
                 }
-                label={<Typography variant="body2">Referencia infinita</Typography>}
+                label={
+                  <Typography variant="body2">Referencia infinita</Typography>
+                }
               />
               <FormControlLabel
                 control={
@@ -1013,7 +1026,9 @@ export default function DictadosIntervalos() {
                     size="small"
                   />
                 }
-                label={<Typography variant="body2">Pregunta infinita</Typography>}
+                label={
+                  <Typography variant="body2">Pregunta infinita</Typography>
+                }
               />
             </Paper>
           </Grid>
@@ -1034,10 +1049,15 @@ export default function DictadosIntervalos() {
                   flexDirection: { xs: "column", sm: "row" },
                   justifyContent: "space-between",
                   alignItems: { xs: "stretch", sm: "center" },
-                  gap: { xs: 1, sm: 0 }
+                  gap: { xs: 1, sm: 0 },
                 }}
               >
-                <Stack direction="row" spacing={1} justifyContent="center" sx={{ flexWrap: 'wrap', gap: {xs: 1, sm: 0} }}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  justifyContent="center"
+                  sx={{ flexWrap: "wrap", gap: { xs: 1, sm: 0 } }}
+                >
                   <Chip
                     size="small"
                     label={`Aciertos: ${score} / ${attempts}`}
@@ -1080,7 +1100,7 @@ export default function DictadosIntervalos() {
                   justifyContent: "center",
                   gap: { xs: 1, sm: 2 },
                   py: { xs: 1, sm: 2 },
-                  flexWrap: "wrap"
+                  flexWrap: "wrap",
                 }}
               >
                 <Button
@@ -1089,7 +1109,12 @@ export default function DictadosIntervalos() {
                   startIcon={isPlaying ? <Pause /> : <PlayArrow />}
                   disabled={!currentRound}
                   onClick={() => playReferenceSequence()}
-                  sx={{ px: { xs: 2, sm: 4 }, py: 1, borderRadius: 8, fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
+                  sx={{
+                    px: { xs: 2, sm: 4 },
+                    py: 1,
+                    borderRadius: 8,
+                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                  }}
                 >
                   {isPlaying ? "Detener" : "Reproducir Referencia"}
                 </Button>
@@ -1098,7 +1123,12 @@ export default function DictadosIntervalos() {
                   color="info"
                   disabled={!currentRound}
                   onClick={playQuestion}
-                  sx={{ px: { xs: 2, sm: 4 }, py: 1, borderRadius: 8, fontSize: { xs: "0.8rem", sm: "0.9rem" } }}
+                  sx={{
+                    px: { xs: 2, sm: 4 },
+                    py: 1,
+                    borderRadius: 8,
+                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                  }}
                 >
                   Pregunta
                 </Button>
@@ -1144,7 +1174,7 @@ export default function DictadosIntervalos() {
                           sx={{
                             minWidth: { xs: "100px", sm: "120px" },
                             fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                            p: { xs: "6px", sm: "12px" }
+                            p: { xs: "6px", sm: "12px" },
                           }}
                         >
                           {def.label}
