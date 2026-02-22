@@ -533,7 +533,7 @@ function clickMetronome(time) {
 // ---------------- App ----------------
 export default function DictadosMelodicos() {
   const navigate = useNavigate();
-  const [num, setNum] = useState(5);
+  const [num, setNum] = useState(10);
   const [bpm, setBpm] = useState(60);
   const [dur, setDur] = useState("h");
   const [mode, setMode] = useState("train"); // 'train' | 'exam'
@@ -1205,13 +1205,13 @@ export default function DictadosMelodicos() {
         </Box>
 
         <Stack
-          direction={{ xs: "column", md: "row" }}
+          direction="column"
           spacing={2}
           className="panel"
-          alignItems="center"
+          alignItems="stretch"
         >
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <TextField
                 fullWidth
                 label="# de notas (1–16)"
@@ -1221,7 +1221,7 @@ export default function DictadosMelodicos() {
                 onChange={(e) => setNum(Number(e.target.value))}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <TextField
                 fullWidth
                 label="BPM (40–180)"
@@ -1231,7 +1231,7 @@ export default function DictadosMelodicos() {
                 onChange={(e) => setBpm(Number(e.target.value))}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
                 <InputLabel id="dur-label">Duración</InputLabel>
                 <Select
@@ -1246,7 +1246,7 @@ export default function DictadosMelodicos() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
                 <InputLabel id="start-label">Nota inicial</InputLabel>
                 <Select
@@ -1274,7 +1274,7 @@ export default function DictadosMelodicos() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
                 <InputLabel id="end-label">Nota final</InputLabel>
                 <Select
@@ -1302,7 +1302,7 @@ export default function DictadosMelodicos() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
                 <InputLabel id="mode-label">Modo</InputLabel>
                 <Select
@@ -1316,7 +1316,7 @@ export default function DictadosMelodicos() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
                 <InputLabel id="clef-label">Clave</InputLabel>
                 <Select
@@ -1331,7 +1331,7 @@ export default function DictadosMelodicos() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
                 <InputLabel id="seq-mode-label">Tipo de secuencia</InputLabel>
                 <Select
@@ -1351,7 +1351,7 @@ export default function DictadosMelodicos() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               {sequentialMode === "random" && (
                 <FormControlLabel
                   control={
@@ -1366,7 +1366,7 @@ export default function DictadosMelodicos() {
                 />
               )}
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl fullWidth>
                 <InputLabel id="eng-label">Sonido</InputLabel>
                 <Select
@@ -1408,12 +1408,19 @@ export default function DictadosMelodicos() {
               </Stack>
             </Grid>
           </Grid>
-          <Stack direction="row" spacing={1}>
+          <Stack
+            direction="row"
+            spacing={1}
+            flexWrap="wrap"
+            useFlexGap
+            sx={{ mt: 1 }}
+          >
             <Chip
               label={`Rango: ${labelSPN(startNote)}–${labelSPN(endNote)}`}
+              size="small"
             />
-            <Chip label="Naturales (sin alteraciones)" />
-            <Chip label="Tiempo 4/4" />
+            <Chip label="Naturales (sin alteraciones)" size="small" />
+            <Chip label="Tiempo 4/4" size="small" />
           </Stack>
         </Stack>
 
@@ -1567,7 +1574,7 @@ export default function DictadosMelodicos() {
                       }
                   : {};
               return (
-                <Grid item xs={6} md={3} key={`in-${i}`}>
+                <Grid item xs={6} sm={4} md={3} key={`in-${i}`}>
                   <TextField
                     fullWidth
                     size="small"
@@ -1617,10 +1624,16 @@ export default function DictadosMelodicos() {
           spacing={1}
           alignItems={{ md: "center" }}
         >
-          <Box className="status" sx={{ flex: 1 }}>
+          <Box className="status" sx={{ flex: 1, mb: { xs: 2, md: 0 } }}>
             {status}
           </Box>
-          <Stack direction="row" spacing={1}>
+          <Stack
+            direction="row"
+            spacing={1}
+            flexWrap="wrap"
+            useFlexGap
+            sx={{ justifyContent: { xs: "center", md: "flex-end" } }}
+          >
             <Button
               variant="outlined"
               color="warning"
