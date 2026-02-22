@@ -92,7 +92,7 @@ const CLEF_CONFIGS = {
       "b/6",
     ],
     defaultStart: "c/4", // primera con 1 línea abajo
-    defaultEnd: "b/6", // última del rango
+    defaultEnd: "g/4", // última nota útil para empezar
     // Secuencias específicas para esta clave
     sequences: {
       ascending: ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4", "c/5"],
@@ -594,6 +594,10 @@ export default function DictadosMelodicos() {
   useEffect(() => {
     newDictation();
   }, []);
+
+  useEffect(() => {
+    grade();
+  }, [userNotes, dictation]);
 
   // Actualizar número de notas cuando cambia el tipo de secuencia
   useEffect(() => {
@@ -1647,14 +1651,6 @@ export default function DictadosMelodicos() {
               }}
             >
               Borrar respuesta
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<CheckCircle />}
-              onClick={grade}
-            >
-              Calificar
             </Button>
           </Stack>
         </Stack>
