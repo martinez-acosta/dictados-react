@@ -780,7 +780,7 @@ export default function BassCircleOfFifthsPage() {
   const [startRoot, setStartRoot] = useState<RootLabel>("C");
   const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
   const [direction, setDirection] = useState<Direction>("ascending");
-  const [steps, setSteps] = useState(12);
+  const [steps, setSteps] = useState(7);
   const [bpm, setBpm] = useState(80);
   const [figure, setFigure] = useState<FigureValue>("q");
   const [isPlaying, setIsPlaying] = useState(false);
