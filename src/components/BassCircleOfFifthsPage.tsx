@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Chip,
@@ -20,7 +23,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { ArrowBack, Pause, PlayArrow } from "@mui/icons-material";
+import { ArrowBack, ExpandMore, Pause, PlayArrow } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { getYamahaSampler, releaseYamahaVoices } from "../utils/yamahaSampler";
 import * as Tone from "tone";
@@ -336,6 +339,32 @@ function compactLabel(value: string) {
   return value.replaceAll(" / ", "/");
 }
 
+function tokenAccent(token: string) {
+  if (token.includes("#")) {
+    return {
+      color: "#1565c0",
+      bg: "rgba(21,101,192,0.12)",
+      border: "rgba(21,101,192,0.24)",
+    };
+  }
+  if (token.includes("b")) {
+    return {
+      color: "#8e24aa",
+      bg: "rgba(142,36,170,0.12)",
+      border: "rgba(142,36,170,0.24)",
+    };
+  }
+  return {
+    color: "#455a64",
+    bg: "rgba(69,90,100,0.10)",
+    border: "rgba(69,90,100,0.16)",
+  };
+}
+
+function splitSlashParts(value: string) {
+  return value.split(" / ");
+}
+
 function CircleOfFifthsClock({
   selectedRoot,
   compact = false,
@@ -353,7 +382,7 @@ function CircleOfFifthsClock({
           aspectRatio: "1 / 1",
           borderRadius: "50%",
           background:
-            "conic-gradient(from -90deg, rgba(21,101,192,0.10) 0deg 180deg, rgba(142,36,170,0.10) 180deg 360deg)",
+            "conic-gradient(from 0deg, rgba(21,101,192,0.10) 0deg 180deg, rgba(142,36,170,0.10) 180deg 360deg)",
           border: "2px solid #0b2a50",
           overflow: "hidden",
         }}
@@ -403,6 +432,7 @@ function CircleOfFifthsClock({
           const color = sideColor(slot.side);
           const majorText = compact ? compactLabel(slot.major) : slot.major;
           const minorText = compact ? compactLabel(slot.minor) : slot.minor;
+          const signatureParts = splitSlashParts(slot.signature);
 
           return (
             <React.Fragment key={slot.id}>
@@ -423,21 +453,89 @@ function CircleOfFifthsClock({
                     : "1px solid transparent",
                 }}
               >
-                <Typography
-                  sx={{
-                    fontSize: { xs: "0.7rem", sm: "0.85rem" },
-                    ...(compact && {
-                      fontSize: "0.56rem",
-                    }),
-                    fontWeight: isSelected ? 700 : 600,
-                    color: isSelected ? color : "#111",
-                    lineHeight: compact ? 1.0 : 1.1,
-                    whiteSpace: compact ? "normal" : "nowrap",
-                    overflowWrap: "anywhere",
-                  }}
-                >
-                  {majorText}
-                </Typography>
+                {slot.side === "mixed" ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 0.35,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {splitSlashParts(majorText).map((part, partIdx) => {
+                      const hintToken = signatureParts[partIdx] ?? part;
+                      const accent = tokenAccent(hintToken);
+                      return (
+                        <Box
+                          key={`${slot.id}-major-${part}`}
+                          sx={{
+                            px: compact ? 0.35 : 0.45,
+                            py: 0.05,
+                            borderRadius: 1,
+                            backgroundColor: accent.bg,
+                            border: `1px solid ${accent.border}`,
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              fontSize: compact
+                                ? "0.54rem"
+                                : { xs: "0.7rem", sm: "0.8rem" },
+                              fontWeight: 700,
+                              color: accent.color,
+                              lineHeight: 1,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {part}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                ) : (
+                  (() => {
+                    const accent = tokenAccent(slot.signature);
+                    const useTokenBg = slot.side !== "neutral";
+                    return (
+                      <Box
+                        sx={{
+                          display: "inline-flex",
+                          px: useTokenBg ? (compact ? 0.35 : 0.45) : 0,
+                          py: useTokenBg ? 0.05 : 0,
+                          borderRadius: useTokenBg ? 1 : 0,
+                          backgroundColor: useTokenBg
+                            ? accent.bg
+                            : "transparent",
+                          border: useTokenBg
+                            ? `1px solid ${accent.border}`
+                            : "1px solid transparent",
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: { xs: "0.7rem", sm: "0.85rem" },
+                            ...(compact && {
+                              fontSize: "0.56rem",
+                            }),
+                            fontWeight: isSelected ? 700 : 600,
+                            color: useTokenBg
+                              ? accent.color
+                              : isSelected
+                                ? color
+                                : "#111",
+                            lineHeight: compact ? 1.0 : 1.1,
+                            whiteSpace: compact ? "normal" : "nowrap",
+                            overflowWrap: "anywhere",
+                          }}
+                        >
+                          {majorText}
+                        </Typography>
+                      </Box>
+                    );
+                  })()
+                )}
               </Box>
 
               <Box
@@ -451,19 +549,46 @@ function CircleOfFifthsClock({
                   bgcolor: isSelected ? `${color}12` : "transparent",
                 }}
               >
-                <Typography
+                <Box
                   sx={{
-                    fontSize: { xs: "0.62rem", sm: "0.75rem" },
-                    ...(compact && {
-                      fontSize: "0.52rem",
-                    }),
-                    fontWeight: 700,
-                    color,
-                    whiteSpace: "nowrap",
+                    display: "flex",
+                    gap: 0.35,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexWrap: "nowrap",
                   }}
                 >
-                  {slot.signature}
-                </Typography>
+                  {signatureParts.map((part) => {
+                    const accent = tokenAccent(part);
+                    return (
+                      <Box
+                        key={`${slot.id}-sig-${part}`}
+                        sx={{
+                          px: compact ? 0.25 : 0.4,
+                          py: 0.05,
+                          borderRadius: 1,
+                          bgcolor: accent.bg,
+                          border: `1px solid ${accent.border}`,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontSize: { xs: "0.62rem", sm: "0.75rem" },
+                            ...(compact && {
+                              fontSize: "0.5rem",
+                            }),
+                            fontWeight: 700,
+                            color: accent.color,
+                            whiteSpace: "nowrap",
+                            lineHeight: 1,
+                          }}
+                        >
+                          {part}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
               </Box>
 
               {!compact && (
@@ -476,16 +601,57 @@ function CircleOfFifthsClock({
                     textAlign: "center",
                   }}
                 >
-                  <Typography
-                    sx={{
-                      fontSize: { xs: "0.58rem", sm: "0.72rem" },
-                      color: "#263238",
-                      lineHeight: 1.05,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {minorText}
-                  </Typography>
+                  {slot.side === "mixed" ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 0.35,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {splitSlashParts(minorText).map((part, partIdx) => {
+                        const hintToken = signatureParts[partIdx] ?? part;
+                        const accent = tokenAccent(hintToken);
+                        return (
+                          <Box
+                            key={`${slot.id}-minor-${part}`}
+                            sx={{
+                              px: 0.35,
+                              py: 0.02,
+                              borderRadius: 1,
+                              backgroundColor: accent.bg,
+                              border: `1px solid ${accent.border}`,
+                            }}
+                          >
+                            <Typography
+                              sx={{
+                                fontSize: "0.62rem",
+                                color: accent.color,
+                                lineHeight: 1,
+                                whiteSpace: "nowrap",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {part}
+                            </Typography>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontSize: { xs: "0.58rem", sm: "0.72rem" },
+                        color: "#263238",
+                        lineHeight: 1.05,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {minorText}
+                    </Typography>
+                  )}
                 </Box>
               )}
             </React.Fragment>
@@ -512,7 +678,7 @@ function CircleOfFifthsClock({
                 fontWeight: 700,
               }}
             >
-              Mayor
+              C (Do)
             </Typography>
           </Box>
         )}
@@ -711,6 +877,69 @@ export default function BassCircleOfFifthsPage() {
             Círculo de Quintas para Bajo
           </Typography>
         </Stack>
+
+        <Accordion
+          defaultExpanded
+          disableGutters
+          sx={{
+            borderRadius: 3,
+            overflow: "hidden",
+            border: "1px solid rgba(11,42,80,0.12)",
+            "&:before": { display: "none" },
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            sx={{
+              background:
+                "linear-gradient(135deg, rgba(64,126,255,0.08) 0%, rgba(0,137,123,0.08) 100%)",
+              minHeight: 56,
+            }}
+          >
+            <Typography sx={{ fontWeight: 700, color: "#0b2a50" }}>
+              Contexto (principiantes)
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: { xs: 2, sm: 3 } }}>
+            <Stack spacing={1.2}>
+              <Typography variant="body2" color="text.secondary">
+                El círculo de quintas es un mapa que te ayuda a entender cómo se
+                relacionan las tonalidades. Si avanzas hacia la derecha del
+                reloj, cada paso agrega un sostenido; si vas hacia la izquierda,
+                cada paso agrega un bemol.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Para bajo, esto sirve muchísimo porque muchas progresiones
+                comunes se mueven por cuartas/quintas (por ejemplo: II–V–I,
+                turnarounds, intros y finales). Practicar el ciclo te ayuda a
+                memorizar raíces y cambios de posición en el mástil.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                En esta vista:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                1) Arriba configuras dirección, tonalidad inicial, pasos, figura
+                y BPM.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                2) La secuencia muestra las raíces que vas a tocar.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                3) El reloj te enseña en qué lado están las tonalidades con
+                sostenidos (derecha) y con bemoles (izquierda).
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                4) La armadura de la tonalidad te dice exactamente qué notas se
+                alteran.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Consejo para empezar: usa 4 o 6 pasos, negras a 60-80 BPM, y
+                toca solo raíces con buen pulso. Luego aumenta a 12 pasos para
+                cerrar el círculo completo.
+              </Typography>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
 
         <Box
           sx={{
