@@ -226,6 +226,21 @@ const ROOT_SIGNATURE_INFO: Record<RootLabel, SignatureInfo> = {
   },
 };
 
+const MAJOR_SCALE_NOTES_BY_ROOT: Record<RootLabel, readonly string[]> = {
+  C: ["C", "D", "E", "F", "G", "A", "B", "C"],
+  Db: ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C", "Db"],
+  D: ["D", "E", "F#", "G", "A", "B", "C#", "D"],
+  Eb: ["Eb", "F", "G", "Ab", "Bb", "C", "D", "Eb"],
+  E: ["E", "F#", "G#", "A", "B", "C#", "D#", "E"],
+  F: ["F", "G", "A", "Bb", "C", "D", "E", "F"],
+  Gb: ["Gb", "Ab", "Bb", "Cb", "Db", "Eb", "F", "Gb"],
+  G: ["G", "A", "B", "C", "D", "E", "F#", "G"],
+  Ab: ["Ab", "Bb", "C", "Db", "Eb", "F", "G", "Ab"],
+  A: ["A", "B", "C#", "D", "E", "F#", "G#", "A"],
+  Bb: ["Bb", "C", "D", "Eb", "F", "G", "A", "Bb"],
+  B: ["B", "C#", "D#", "E", "F#", "G#", "A#", "B"],
+};
+
 const CIRCLE_WHEEL_SLOTS: readonly WheelSlot[] = [
   {
     id: "C",
@@ -870,6 +885,7 @@ export default function BassCircleOfFifthsPage() {
       ? "Ascendente (por quintas)"
       : "Descendente (por quintas)";
   const selectedSignature = ROOT_SIGNATURE_INFO[focusRoot];
+  const focusScaleNotes = MAJOR_SCALE_NOTES_BY_ROOT[focusRoot];
   const selectedSideLabel =
     selectedSignature.type === "sharp"
       ? "Lado derecho del reloj (sostenidos)"
@@ -1134,6 +1150,41 @@ export default function BassCircleOfFifthsPage() {
               Azul = tonalidad seleccionada para estudio. Verde = nota en
               reproducción.
             </Typography>
+
+            <Box
+              sx={{
+                mt: 2,
+                pt: 2,
+                borderTop: "1px dashed rgba(11,42,80,0.15)",
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                Notas que vas a tocar en {focusRoot} mayor (1–8)
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                {focusScaleNotes.map((note, idx) => {
+                  const accent = tokenAccent(note);
+                  return (
+                    <Chip
+                      key={`scale-note-${focusRoot}-${idx}-${note}`}
+                      label={`${idx + 1}. ${note}`}
+                      size="small"
+                      sx={{
+                        mb: 1,
+                        fontWeight: 700,
+                        color: accent.color,
+                        backgroundColor: accent.bg,
+                        border: `1px solid ${accent.border}`,
+                      }}
+                    />
+                  );
+                })}
+              </Stack>
+              <Typography variant="caption" color="text.secondary">
+                Tócalas en orden ascendente y luego descendente, manteniendo la
+                misma digitación base cuando sea posible.
+              </Typography>
+            </Box>
           </Paper>
         </Box>
 
