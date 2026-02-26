@@ -95,6 +95,11 @@ const FIGURE_TO_BEATS: Record<FigureValue, number> = {
   h: 2,
 };
 
+const DIRECTION_START_OPTIONS: Record<Direction, readonly RootLabel[]> = {
+  ascending: ["C", "G", "D", "A", "E", "B", "Gb"],
+  descending: ["C", "F", "Bb", "Eb", "Ab", "Db", "Gb"],
+};
+
 const ORDER_OF_SHARPS = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"] as const;
 const ORDER_OF_FLATS = ["Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fb"] as const;
 
@@ -758,6 +763,7 @@ export default function BassCircleOfFifthsPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [startRoot, setStartRoot] = useState<RootLabel>("C");
+  const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
   const [direction, setDirection] = useState<Direction>("ascending");
   const [steps, setSteps] = useState(12);
   const [bpm, setBpm] = useState(80);
@@ -771,6 +777,10 @@ export default function BassCircleOfFifthsPage() {
     () => buildCircleSequence(startRoot, direction, steps),
     [startRoot, direction, steps],
   );
+  const availableStartRoots = useMemo(
+    () => DIRECTION_START_OPTIONS[direction],
+    [direction],
+  );
 
   const playbackNotes = useMemo(
     () => sequence.map((root) => BASS_OCTAVE_NOTE_MAP[root]),
@@ -783,6 +793,22 @@ export default function BassCircleOfFifthsPage() {
       releaseYamahaVoices();
     };
   }, []);
+
+  useEffect(() => {
+    if (!availableStartRoots.includes(startRoot)) {
+      setStartRoot("C");
+    }
+  }, [availableStartRoots, startRoot]);
+
+  useEffect(() => {
+    setFocusRoot(startRoot);
+  }, [startRoot]);
+
+  useEffect(() => {
+    if (!sequence.includes(focusRoot)) {
+      setFocusRoot(sequence[0] ?? startRoot);
+    }
+  }, [sequence, focusRoot, startRoot]);
 
   const stopPlayback = () => {
     timerRefs.current.forEach((id) => window.clearTimeout(id));
@@ -843,7 +869,7 @@ export default function BassCircleOfFifthsPage() {
     direction === "ascending"
       ? "Ascendente (por quintas)"
       : "Descendente (por quintas)";
-  const selectedSignature = ROOT_SIGNATURE_INFO[startRoot];
+  const selectedSignature = ROOT_SIGNATURE_INFO[focusRoot];
   const selectedSideLabel =
     selectedSignature.type === "sharp"
       ? "Lado derecho del reloj (sostenidos)"
@@ -980,13 +1006,39 @@ export default function BassCircleOfFifthsPage() {
                   setStartRoot(e.target.value as RootLabel)
                 }
               >
-                {CHROMATIC_ROOTS.map((root) => (
+                {availableStartRoots.map((root) => (
                   <MenuItem key={root} value={root}>
                     {root}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
+            <Typography variant="caption" color="text.secondary">
+              {direction === "ascending"
+                ? "Ascendente: se muestran tonalidades del lado de sostenidos (derecha del reloj)."
+                : "Descendente: se muestran tonalidades del lado de bemoles (izquierda del reloj)."}
+            </Typography>
+
+            <FormControl fullWidth size="small">
+              <InputLabel>Escala a estudiar</InputLabel>
+              <Select
+                label="Escala a estudiar"
+                value={focusRoot}
+                onChange={(e: SelectChangeEvent<RootLabel>) =>
+                  setFocusRoot(e.target.value as RootLabel)
+                }
+              >
+                {sequence.map((root, idx) => (
+                  <MenuItem key={`focus-${root}-${idx}`} value={root}>
+                    {idx + 1}. {root}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Typography variant="caption" color="text.secondary">
+              Esta tonalidad se usa para el reloj y la armadura (sección
+              teórica).
+            </Typography>
 
             <TextField
               label="Pasos del ciclo"
@@ -1051,21 +1103,37 @@ export default function BassCircleOfFifthsPage() {
             <Stack direction="row" spacing={1} flexWrap="wrap">
               {sequence.map((root, idx) => {
                 const isActive = activeIndex === idx;
+                const isFocused = focusRoot === root;
                 return (
                   <Chip
                     key={`${root}-${idx}`}
                     label={`${idx + 1}. ${root}`}
-                    color={isActive ? "success" : "default"}
+                    color={
+                      isActive ? "success" : isFocused ? "primary" : "default"
+                    }
                     variant={isActive ? "filled" : "outlined"}
                     sx={{
                       mb: 1,
                       fontWeight: isActive ? 700 : 500,
                       borderWidth: isActive ? 2 : 1,
+                      ...(isFocused &&
+                        !isActive && {
+                          borderColor: "primary.main",
+                          backgroundColor: "rgba(25,118,210,0.06)",
+                        }),
                     }}
                   />
                 );
               })}
             </Stack>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 1, display: "block" }}
+            >
+              Azul = tonalidad seleccionada para estudio. Verde = nota en
+              reproducción.
+            </Typography>
           </Paper>
         </Box>
 
@@ -1086,7 +1154,7 @@ export default function BassCircleOfFifthsPage() {
               <strong>bemoles</strong>.
             </Typography>
 
-            <CircleOfFifthsClock selectedRoot={startRoot} compact={isMobile} />
+            <CircleOfFifthsClock selectedRoot={focusRoot} compact={isMobile} />
 
             <Stack
               direction={{ xs: "column", md: "row" }}
@@ -1125,7 +1193,7 @@ export default function BassCircleOfFifthsPage() {
               sx={{ p: 3, display: "flex", flexDirection: "column", gap: 1.25 }}
             >
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                Armadura de {startRoot}
+                Armadura de {focusRoot}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {selectedSignature.major} · relativo menor:{" "}
@@ -1158,7 +1226,7 @@ export default function BassCircleOfFifthsPage() {
                   <Stack direction="row" spacing={1} flexWrap="wrap">
                     {selectedSignature.accidentals.map((acc) => (
                       <Chip
-                        key={`sig-${startRoot}-${acc}`}
+                        key={`sig-${focusRoot}-${acc}`}
                         label={acc}
                         size="small"
                         sx={{
