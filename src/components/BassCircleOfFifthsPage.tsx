@@ -774,6 +774,139 @@ function buildCircleSequence(
   });
 }
 
+function ScalePyramidPanel({
+  title,
+  caption,
+  roots,
+  focusRoot,
+  noteOrder,
+  mirrorSteps = false,
+  isMobile = false,
+}: {
+  title: string;
+  caption: string;
+  roots: RootLabel[];
+  focusRoot: RootLabel;
+  noteOrder: "ascending" | "descending";
+  mirrorSteps?: boolean;
+  isMobile?: boolean;
+}) {
+  const orderedRoots = roots.slice(0, 7);
+  const indentStep = isMobile ? 6 : 10;
+  const maxIndent = Math.max(0, orderedRoots.length - 1) * indentStep;
+  const rowAccent =
+    noteOrder === "ascending" ? "rgba(21,101,192," : "rgba(142,36,170,";
+
+  return (
+    <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>
+        {title}
+      </Typography>
+      <Typography variant="caption" color="text.secondary" sx={{ mb: 1.25, display: "block" }}>
+        {caption}
+      </Typography>
+
+      <Stack spacing={0.75}>
+        {orderedRoots.map((root, rowIdx) => {
+          const rawNotes = [...MAJOR_SCALE_NOTES_BY_ROOT[root]];
+          const notes =
+            noteOrder === "ascending" ? rawNotes : rawNotes.slice().reverse();
+          const indent = mirrorSteps
+            ? maxIndent - rowIdx * indentStep
+            : rowIdx * indentStep;
+          const isFocusedRow = root === focusRoot;
+          const rowTintAlpha = 0.03 + rowIdx * 0.01;
+
+          return (
+            <Box
+              key={`${title}-${root}-${rowIdx}`}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "128px 1fr" },
+                gap: 0.75,
+                alignItems: "start",
+                p: 0.75,
+                borderRadius: 2,
+                border: isFocusedRow
+                  ? "1px solid rgba(25,118,210,0.35)"
+                  : "1px solid rgba(11,42,80,0.08)",
+                backgroundColor: isFocusedRow
+                  ? "rgba(25,118,210,0.05)"
+                  : "rgba(255,255,255,0.8)",
+              }}
+            >
+              <Box sx={{ minWidth: 0, pt: { sm: 0.1 } }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: "0.85rem" }}
+                >
+                  {rowIdx + 1}. {root} mayor
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.1 }}>
+                  {noteOrder === "ascending" ? "1 → 8" : "8 → 1"}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  minWidth: 0,
+                  overflowX: "auto",
+                  pl: `${indent}px`,
+                  pr: 0.25,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 0.5,
+                    width: "fit-content",
+                    maxWidth: "100%",
+                    p: 0.5,
+                    borderRadius: 1.5,
+                    border: "1px dashed rgba(11,42,80,0.12)",
+                    backgroundColor: `${rowAccent}${rowTintAlpha})`,
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {notes.map((note, noteIdx) => {
+                    const accent = tokenAccent(note);
+                    const degreeLabel =
+                      noteOrder === "ascending" ? noteIdx + 1 : notes.length - noteIdx;
+                    return (
+                      <Chip
+                        key={`pyramid-${title}-${root}-${noteIdx}-${note}`}
+                        label={`${degreeLabel}. ${note}`}
+                        size="small"
+                        sx={{
+                          fontWeight: 700,
+                          color: accent.color,
+                          backgroundColor: accent.bg,
+                          border: `1px solid ${accent.border}`,
+                          height: 28,
+                        }}
+                      />
+                    );
+                  })}
+                </Box>
+              </Box>
+            </Box>
+          );
+        })}
+      </Stack>
+
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mt: 1.25, display: "block" }}
+      >
+        Escalonado visual: cada fila se desplaza para que notes cómo cambian
+        las alteraciones al avanzar por el ciclo.
+      </Typography>
+    </Paper>
+  );
+}
+
 export default function BassCircleOfFifthsPage() {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -801,6 +934,14 @@ export default function BassCircleOfFifthsPage() {
   const playbackNotes = useMemo(
     () => sequence.map((root) => BASS_OCTAVE_NOTE_MAP[root]),
     [sequence],
+  );
+  const ascendingPyramidRoots = useMemo(
+    () => buildCircleSequence(startRoot, "ascending", 7),
+    [startRoot],
+  );
+  const descendingPyramidRoots = useMemo(
+    () => buildCircleSequence(startRoot, "descending", 7),
+    [startRoot],
   );
 
   useEffect(() => {
@@ -1458,6 +1599,26 @@ export default function BassCircleOfFifthsPage() {
             </Paper>
           </Stack>
         </Box>
+
+        <Stack spacing={2}>
+          <ScalePyramidPanel
+            title="Pirámide ascendente (quintas) · 7 pasos"
+            caption={`Desde ${startRoot}, lado derecho del reloj (cuando aplica): cada fila muestra la escala mayor correspondiente en orden ascendente.`}
+            roots={ascendingPyramidRoots}
+            focusRoot={focusRoot}
+            noteOrder="ascending"
+            isMobile={isMobile}
+          />
+
+          <ScalePyramidPanel
+            title="Pirámide descendente (quintas) · 7 pasos"
+            caption={`Desde ${startRoot}, lado izquierdo del reloj (cuando aplica): cada fila muestra la escala mayor correspondiente en orden descendente.`}
+            roots={descendingPyramidRoots}
+            focusRoot={focusRoot}
+            noteOrder="descending"
+            isMobile={isMobile}
+          />
+        </Stack>
       </Stack>
     </Box>
   );
