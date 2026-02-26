@@ -26,6 +26,7 @@ import {
 import { ArrowBack, ExpandMore, Pause, PlayArrow } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { getYamahaSampler, releaseYamahaVoices } from "../utils/yamahaSampler";
+import AlwaysOnTuner from "./AlwaysOnTuner";
 import * as Tone from "tone";
 
 const CHROMATIC_ROOTS = [
@@ -1184,6 +1185,27 @@ export default function BassCircleOfFifthsPage() {
                 Tócalas en orden ascendente y luego descendente, manteniendo la
                 misma digitación base cuando sea posible.
               </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                mt: 2,
+                pt: 2,
+                borderTop: "1px dashed rgba(11,42,80,0.15)",
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                Afinador de bajo (referencia rápida)
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 1.25 }}
+              >
+                Úsalo aquí mismo mientras practicas la secuencia y la escala
+                seleccionada.
+              </Typography>
+              <AlwaysOnTuner />
             </Box>
           </Paper>
         </Box>
