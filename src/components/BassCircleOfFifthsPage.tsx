@@ -791,7 +791,7 @@ function ScalePyramidPanel({
   mirrorSteps?: boolean;
   isMobile?: boolean;
 }) {
-  const orderedRoots = roots.slice(0, 7);
+  const orderedRoots = roots.slice(0, 12);
   const indentStep = isMobile ? 6 : 10;
   const maxIndent = Math.max(0, orderedRoots.length - 1) * indentStep;
   const rowAccent =
@@ -936,11 +936,11 @@ export default function BassCircleOfFifthsPage() {
     [sequence],
   );
   const ascendingPyramidRoots = useMemo(
-    () => buildCircleSequence(startRoot, "ascending", 7),
+    () => buildCircleSequence(startRoot, "ascending", 12),
     [startRoot],
   );
   const descendingPyramidRoots = useMemo(
-    () => buildCircleSequence(startRoot, "descending", 7),
+    () => buildCircleSequence(startRoot, "descending", 12),
     [startRoot],
   );
 
@@ -1602,7 +1602,7 @@ export default function BassCircleOfFifthsPage() {
 
         <Stack spacing={2}>
           <ScalePyramidPanel
-            title="Pirámide ascendente (quintas) · 7 pasos"
+            title="Pirámide ascendente (quintas) · 12 pasos"
             caption={`Desde ${startRoot}, lado derecho del reloj (cuando aplica): cada fila muestra la escala mayor correspondiente en orden ascendente.`}
             roots={ascendingPyramidRoots}
             focusRoot={focusRoot}
@@ -1611,7 +1611,7 @@ export default function BassCircleOfFifthsPage() {
           />
 
           <ScalePyramidPanel
-            title="Pirámide descendente (quintas) · 7 pasos"
+            title="Pirámide descendente (quintas) · 12 pasos"
             caption={`Desde ${startRoot}, lado izquierdo del reloj (cuando aplica): cada fila muestra la escala mayor correspondiente en orden descendente.`}
             roots={descendingPyramidRoots}
             focusRoot={focusRoot}
