@@ -386,6 +386,185 @@ function splitSlashParts(value: string) {
   return value.split(" / ");
 }
 
+type ExamType =
+  | "signatureCount"
+  | "signatureAccidentals"
+  | "relativeMinor"
+  | "nextFifth";
+
+type ExamQuestion = {
+  id: string;
+  type: ExamType;
+  prompt: string;
+  answer: string;
+  hint: string;
+  evaluate: (input: string) => boolean;
+};
+
+const EXAM_TYPES: readonly ExamType[] = [
+  "signatureCount",
+  "signatureAccidentals",
+  "relativeMinor",
+  "nextFifth",
+];
+
+const EXAM_TYPE_LABELS: Record<ExamType, string> = {
+  signatureCount: "Cantidad y tipo de alteraciones",
+  signatureAccidentals: "Alteraciones de la armadura",
+  relativeMinor: "Relativo menor",
+  nextFifth: "Siguiente por quintas",
+};
+
+const ROOT_ENHARMONIC_ALIASES: Record<RootLabel, readonly string[]> = {
+  C: ["B#"],
+  Db: ["C#"],
+  D: [],
+  Eb: ["D#"],
+  E: ["Fb"],
+  F: ["E#"],
+  Gb: ["F#"],
+  G: [],
+  Ab: ["G#"],
+  A: [],
+  Bb: ["A#"],
+  B: ["Cb"],
+};
+
+function pickRandom<T>(items: readonly T[]) {
+  if (!items.length) {
+    throw new Error("pickRandom recibió una lista vacía");
+  }
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function normalizeExamText(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/♯/g, "#")
+    .replace(/♭/g, "b")
+    .replace(/[^a-z0-9#b]/g, "");
+}
+
+function acceptedRootAnswers(root: RootLabel) {
+  return [root, ...ROOT_ENHARMONIC_ALIASES[root]].map(normalizeExamText);
+}
+
+function buildExamQuestion(allowedTypes: readonly ExamType[]) {
+  const types = allowedTypes.length ? allowedTypes : EXAM_TYPES;
+  const type = pickRandom(types);
+
+  if (type === "signatureCount") {
+    const root = pickRandom(CHROMATIC_ROOTS);
+    const info = ROOT_SIGNATURE_INFO[root];
+
+    return {
+      id: `signature-count-${root}-${Date.now()}`,
+      type,
+      prompt: `¿Cuántas alteraciones tiene ${root} mayor y de qué tipo?`,
+      answer: info.signatureLabel,
+      hint: "Responde con número + sostenidos/bemoles (ej. 3 sostenidos).",
+      evaluate: (input: string) => {
+        const normalized = normalizeExamText(input);
+        if (!normalized) return false;
+        if (info.count === 0) {
+          return (
+            normalized.includes("0") ||
+            normalized.includes("sinalteraciones") ||
+            normalized.includes("ninguna")
+          );
+        }
+        if (info.type === "sharp") {
+          return (
+            normalized.includes(`${info.count}#`) ||
+            normalized.includes(`${info.count}sostenido`) ||
+            normalized.includes(`${info.count}sostenidos`)
+          );
+        }
+        if (info.type === "flat") {
+          return (
+            normalized.includes(`${info.count}b`) ||
+            normalized.includes(`${info.count}bemol`) ||
+            normalized.includes(`${info.count}bemoles`)
+          );
+        }
+        return false;
+      },
+    } as ExamQuestion;
+  }
+
+  if (type === "signatureAccidentals") {
+    const rootsWithAlterations = CHROMATIC_ROOTS.filter(
+      (root) => ROOT_SIGNATURE_INFO[root].count > 0,
+    );
+    const root = pickRandom(rootsWithAlterations);
+    const info = ROOT_SIGNATURE_INFO[root];
+    const expectedCompact = info.accidentals.map(normalizeExamText).join("");
+
+    return {
+      id: `signature-accidentals-${root}-${Date.now()}`,
+      type,
+      prompt: `Di en orden las alteraciones de la armadura de ${root} mayor.`,
+      answer: info.accidentals.join(" · "),
+      hint: "Respeta el orden. Ejemplo: F# · C# · G# ...",
+      evaluate: (input: string) => {
+        const normalized = normalizeExamText(input);
+        if (!normalized) return false;
+        return normalized === expectedCompact;
+      },
+    } as ExamQuestion;
+  }
+
+  if (type === "relativeMinor") {
+    const root = pickRandom(CHROMATIC_ROOTS);
+    const info = ROOT_SIGNATURE_INFO[root];
+    const normalizedRelative = normalizeExamText(info.relativeMinor);
+    const normalizedRelativeRoot = normalizeExamText(
+      info.relativeMinor.replace(/m$/i, ""),
+    );
+
+    return {
+      id: `relative-minor-${root}-${Date.now()}`,
+      type,
+      prompt: `¿Cuál es el relativo menor de ${root} mayor?`,
+      answer: info.relativeMinor,
+      hint: "Ejemplo de formato: Em, F#m, Bbm...",
+      evaluate: (input: string) => {
+        const normalized = normalizeExamText(input);
+        if (!normalized) return false;
+        return (
+          normalized === normalizedRelative ||
+          normalized === `${normalizedRelativeRoot}m` ||
+          normalized === `${normalizedRelativeRoot}menor` ||
+          normalized === normalizedRelativeRoot
+        );
+      },
+    } as ExamQuestion;
+  }
+
+  const root = pickRandom(CHROMATIC_ROOTS);
+  const nextDirection = Math.random() >= 0.5 ? "ascending" : "descending";
+  const nextRoot = buildCircleSequence(root, nextDirection, 2)[1];
+  const acceptedAnswers = acceptedRootAnswers(nextRoot);
+
+  return {
+    id: `next-fifth-${root}-${nextDirection}-${Date.now()}`,
+    type: "nextFifth",
+    prompt:
+      nextDirection === "ascending"
+        ? `Desde ${root}, ¿cuál sigue al subir por quintas?`
+        : `Desde ${root}, ¿cuál sigue al bajar por quintas?`,
+    answer: nextRoot,
+    hint:
+      nextDirection === "ascending"
+        ? "Subir por quintas = moverte hacia el lado de sostenidos."
+        : "Bajar por quintas = moverte hacia el lado de bemoles.",
+    evaluate: (input: string) =>
+      acceptedAnswers.includes(normalizeExamText(input)),
+  };
+}
+
 function CircleOfFifthsClock({
   selectedRoot,
   compact = false,
@@ -931,6 +1110,29 @@ export default function BassCircleOfFifthsPage() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const timerRefs = useRef<number[]>([]);
   const isPlayingRef = useRef(false);
+  const [examTypeEnabled, setExamTypeEnabled] = useState<
+    Record<ExamType, boolean>
+  >({
+    signatureCount: true,
+    signatureAccidentals: true,
+    relativeMinor: true,
+    nextFifth: true,
+  });
+  const [examQuestion, setExamQuestion] = useState<ExamQuestion>(() =>
+    buildExamQuestion(EXAM_TYPES),
+  );
+  const [examAnswerInput, setExamAnswerInput] = useState("");
+  const [examAnswerVisible, setExamAnswerVisible] = useState(false);
+  const [examResolved, setExamResolved] = useState(false);
+  const [examAutoResult, setExamAutoResult] = useState<
+    "correct" | "incorrect" | null
+  >(null);
+  const [examStats, setExamStats] = useState({
+    answered: 0,
+    correct: 0,
+    streak: 0,
+    bestStreak: 0,
+  });
 
   const sequence = useMemo(
     () => buildCircleSequence(startRoot, direction, steps),
@@ -953,6 +1155,14 @@ export default function BassCircleOfFifthsPage() {
     () => buildCircleSequence(startRoot, "descending", 12),
     [startRoot],
   );
+  const enabledExamTypes = useMemo(
+    () => EXAM_TYPES.filter((type) => examTypeEnabled[type]),
+    [examTypeEnabled],
+  );
+  const examAccuracy = useMemo(() => {
+    if (!examStats.answered) return 0;
+    return Math.round((examStats.correct / examStats.answered) * 100);
+  }, [examStats.answered, examStats.correct]);
 
   useEffect(() => {
     return () => {
@@ -976,6 +1186,52 @@ export default function BassCircleOfFifthsPage() {
       setFocusRoot(sequence[0] ?? startRoot);
     }
   }, [sequence, focusRoot, startRoot]);
+
+  useEffect(() => {
+    setExamQuestion(buildExamQuestion(enabledExamTypes));
+    setExamAnswerInput("");
+    setExamAnswerVisible(false);
+    setExamResolved(false);
+    setExamAutoResult(null);
+  }, [enabledExamTypes]);
+
+  const handleToggleExamType = (type: ExamType) => {
+    setExamTypeEnabled((prev) => {
+      const nextValue = !prev[type];
+      const activeCount = EXAM_TYPES.filter((item) => prev[item]).length;
+      if (!nextValue && activeCount <= 1) return prev;
+      return { ...prev, [type]: nextValue };
+    });
+  };
+
+  const pushNewExamQuestion = () => {
+    setExamQuestion(buildExamQuestion(enabledExamTypes));
+    setExamAnswerInput("");
+    setExamAnswerVisible(false);
+    setExamResolved(false);
+    setExamAutoResult(null);
+  };
+
+  const resolveExamResult = (isCorrect: boolean) => {
+    if (examResolved) return;
+    setExamResolved(true);
+    setExamStats((prev) => {
+      const answered = prev.answered + 1;
+      const correct = prev.correct + (isCorrect ? 1 : 0);
+      const streak = isCorrect ? prev.streak + 1 : 0;
+      const bestStreak = Math.max(prev.bestStreak, streak);
+      return { answered, correct, streak, bestStreak };
+    });
+  };
+
+  const verifyTypedExamAnswer = () => {
+    const raw = examAnswerInput.trim();
+    if (!raw) return;
+    const ok = examQuestion.evaluate(raw);
+    setExamAnswerVisible(true);
+    setExamAutoResult(ok ? "correct" : "incorrect");
+    resolveExamResult(ok);
+  };
 
   const stopPlayback = () => {
     timerRefs.current.forEach((id) => window.clearTimeout(id));
@@ -1134,6 +1390,178 @@ export default function BassCircleOfFifthsPage() {
             </Stack>
           </AccordionDetails>
         </Accordion>
+
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 2, sm: 3 },
+            border: "1px dashed rgba(11,42,80,0.22)",
+            background:
+              "linear-gradient(180deg, rgba(241,247,255,0.8) 0%, rgba(255,255,255,1) 100%)",
+          }}
+        >
+          <Stack spacing={1.6}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#0b2a50" }}>
+              Modo examen verbal
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Práctica rápida para examen oral: responde en voz alta, luego
+              autoevalúate o escribe tu respuesta para validación inmediata.
+            </Typography>
+
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {EXAM_TYPES.map((type) => (
+                <Chip
+                  key={`exam-type-${type}`}
+                  clickable
+                  label={EXAM_TYPE_LABELS[type]}
+                  color={examTypeEnabled[type] ? "primary" : "default"}
+                  variant={examTypeEnabled[type] ? "filled" : "outlined"}
+                  onClick={() => handleToggleExamType(type)}
+                />
+              ))}
+            </Stack>
+
+            <Paper variant="outlined" sx={{ p: 1.5 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block" }}
+              >
+                Pregunta actual ({EXAM_TYPE_LABELS[examQuestion.type]})
+              </Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                {examQuestion.prompt}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Pista: {examQuestion.hint}
+              </Typography>
+            </Paper>
+
+            <TextField
+              fullWidth
+              size="small"
+              label="Tu respuesta (opcional para validación)"
+              value={examAnswerInput}
+              onChange={(event) => setExamAnswerInput(event.target.value)}
+              placeholder="Ejemplo: 3 sostenidos, Em, F# C# G# ..."
+            />
+
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <Button variant="contained" onClick={pushNewExamQuestion}>
+                Nueva pregunta
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setExamAnswerVisible(true);
+                  setExamAutoResult(null);
+                }}
+              >
+                Mostrar respuesta
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={verifyTypedExamAnswer}
+                disabled={examResolved || !examAnswerInput.trim()}
+              >
+                Verificar escrita
+              </Button>
+              <Button
+                variant="outlined"
+                color="success"
+                onClick={() => {
+                  setExamAnswerVisible(true);
+                  setExamAutoResult("correct");
+                  resolveExamResult(true);
+                }}
+                disabled={examResolved}
+              >
+                Me la supe
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => {
+                  setExamAnswerVisible(true);
+                  setExamAutoResult("incorrect");
+                  resolveExamResult(false);
+                }}
+                disabled={examResolved}
+              >
+                La fallé
+              </Button>
+              <Button
+                variant="text"
+                onClick={() =>
+                  setExamStats({
+                    answered: 0,
+                    correct: 0,
+                    streak: 0,
+                    bestStreak: 0,
+                  })
+                }
+              >
+                Reiniciar marcador
+              </Button>
+            </Stack>
+
+            {examAnswerVisible && (
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1.2,
+                  borderColor:
+                    examAutoResult === "correct"
+                      ? "success.main"
+                      : examAutoResult === "incorrect"
+                        ? "error.main"
+                        : "rgba(11,42,80,0.22)",
+                }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                  Respuesta esperada: {examQuestion.answer}
+                </Typography>
+                {examAutoResult && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color:
+                        examAutoResult === "correct"
+                          ? "success.main"
+                          : "error.main",
+                    }}
+                  >
+                    {examAutoResult === "correct"
+                      ? "Validación: correcta."
+                      : "Validación: incorrecta."}
+                  </Typography>
+                )}
+              </Paper>
+            )}
+
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <Chip
+                label={`Respondidas: ${examStats.answered}`}
+                variant="outlined"
+              />
+              <Chip
+                label={`Aciertos: ${examStats.correct}`}
+                color={examStats.correct > 0 ? "success" : "default"}
+                variant={examStats.correct > 0 ? "filled" : "outlined"}
+              />
+              <Chip label={`Precisión: ${examAccuracy}%`} variant="outlined" />
+              <Chip
+                label={`Racha actual: ${examStats.streak}`}
+                variant="outlined"
+              />
+              <Chip
+                label={`Mejor racha: ${examStats.bestStreak}`}
+                variant="outlined"
+              />
+            </Stack>
+          </Stack>
+        </Paper>
 
         <Box
           sx={{
