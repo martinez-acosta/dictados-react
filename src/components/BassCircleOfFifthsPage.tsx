@@ -802,7 +802,11 @@ function ScalePyramidPanel({
       <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 0.5 }}>
         {title}
       </Typography>
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 1.25, display: "block" }}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mb: 1.25, display: "block" }}
+      >
         {caption}
       </Typography>
 
@@ -842,7 +846,11 @@ function ScalePyramidPanel({
                 >
                   {rowIdx + 1}. {root} mayor
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ lineHeight: 1.1 }}
+                >
                   {noteOrder === "ascending" ? "1 → 8" : "8 → 1"}
                 </Typography>
               </Box>
@@ -872,7 +880,9 @@ function ScalePyramidPanel({
                   {notes.map((note, noteIdx) => {
                     const accent = tokenAccent(note);
                     const degreeLabel =
-                      noteOrder === "ascending" ? noteIdx + 1 : notes.length - noteIdx;
+                      noteOrder === "ascending"
+                        ? noteIdx + 1
+                        : notes.length - noteIdx;
                     return (
                       <Chip
                         key={`pyramid-${title}-${root}-${noteIdx}-${note}`}
@@ -900,8 +910,8 @@ function ScalePyramidPanel({
         color="text.secondary"
         sx={{ mt: 1.25, display: "block" }}
       >
-        Escalonado visual: cada fila se desplaza para que notes cómo cambian
-        las alteraciones al avanzar por el ciclo.
+        Escalonado visual: cada fila se desplaza para que notes cómo cambian las
+        alteraciones al avanzar por el ciclo.
       </Typography>
     </Paper>
   );

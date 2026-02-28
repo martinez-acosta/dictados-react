@@ -1,9 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Alert,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Paper,
   Typography,
   Grid,
   FormControl,
+  FormHelperText,
   InputLabel,
   Select,
   MenuItem,
@@ -12,8 +17,15 @@ import {
   Divider,
   Stack,
   Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
 } from "@mui/material";
-import { MusicNote, PlayArrow } from "@mui/icons-material";
+import { ExpandMore, MusicNote, PlayArrow, Stop } from "@mui/icons-material";
 import { getYamahaSampler, releaseYamahaVoices } from "../utils/yamahaSampler";
 
 const ROOT_OPTIONS = [
@@ -86,6 +98,28 @@ const NOTE_NAMES_FLAT = [
   "B",
 ] as const;
 const FLAT_PREFERENCE = new Set(["F", "Bb", "Eb", "Ab", "Db", "Gb", "Cb"]);
+const MAX_FRET_OPTIONS = [12, 16, 20, 24] as const;
+
+type BassStringId = "B" | "E" | "A" | "D" | "G";
+
+const BASS_STRING_TUNING: readonly {
+  id: BassStringId;
+  label: string;
+  semitone: number;
+}[] = [
+  { id: "B", label: "B (Si)", semitone: 11 },
+  { id: "E", label: "E (Mi)", semitone: 4 },
+  { id: "A", label: "A (La)", semitone: 9 },
+  { id: "D", label: "D (Re)", semitone: 2 },
+  { id: "G", label: "G (Sol)", semitone: 7 },
+];
+
+const INVERSION_LABELS = [
+  "Estado fundamental",
+  "1ª inversión",
+  "2ª inversión",
+  "3ª inversión",
+] as const;
 
 type Pattern = {
   id: string;
@@ -245,6 +279,71 @@ const ARPEGGIO_GROUPS: readonly ArpeggioGroup[] = [
       },
     ],
   },
+  {
+    id: "extended",
+    label: "Extendidos / alterados",
+    description:
+      "Colores de 4 notas útiles para repertorio moderno (nivel avanzado inicial).",
+    defaultQualityId: "dim7",
+    patterns: [
+      {
+        id: "extended-ascending",
+        label: "Ascendente lineal",
+        description: "1-3-5-7 para oír claramente el color del acorde.",
+        order: [0, 1, 2, 3],
+      },
+      {
+        id: "extended-descending",
+        label: "Descendente",
+        description: "7-5-3-1 para aterrizar en la fundamental.",
+        order: [3, 2, 1, 0],
+      },
+      {
+        id: "extended-pivot",
+        label: "Patrón de salto",
+        description: "1-5-7-3 para fraseo de walking con tensión.",
+        order: [0, 2, 3, 1],
+      },
+    ],
+    qualities: [
+      {
+        id: "dim7",
+        symbol: "dim7",
+        label: "Arpegio disminuido séptima",
+        englishLabel: "fully diminished 7 arpeggio",
+        intervals: [0, 3, 6, 9],
+        degrees: ["1", "b3", "b5", "bb7"],
+        description: "Simétrico por terceras menores; útil en dominantes.",
+      },
+      {
+        id: "minMaj7",
+        symbol: "m(maj7)",
+        label: "Arpegio menor mayor séptima",
+        englishLabel: "minor major 7 arpeggio",
+        intervals: [0, 3, 7, 11],
+        degrees: ["1", "b3", "5", "7"],
+        description: "Color del modo menor melódico.",
+      },
+      {
+        id: "augMaj7",
+        symbol: "aug(maj7)",
+        label: "Arpegio aumentado mayor séptima",
+        englishLabel: "augmented major 7 arpeggio",
+        intervals: [0, 4, 8, 11],
+        degrees: ["1", "3", "#5", "7"],
+        description: "Sonoridad brillante y abierta.",
+      },
+      {
+        id: "aug7",
+        symbol: "7#5",
+        label: "Arpegio dominante #5",
+        englishLabel: "dominant sharp five arpeggio",
+        intervals: [0, 4, 8, 10],
+        degrees: ["1", "3", "#5", "b7"],
+        description: "Color alterado para acordes dominantes.",
+      },
+    ],
+  },
 ];
 
 function noteNameFromSemitone(value: number, preferFlats: boolean) {
@@ -269,6 +368,50 @@ function buildPlaybackOctaves(length: number) {
   return Array.from({ length }, (_, idx) => (idx === length - 1 ? 3 : 2));
 }
 
+function normalizeShift(length: number, shift: number) {
+  if (length <= 0) return 0;
+  return ((shift % length) + length) % length;
+}
+
+function rotateArray<T>(items: readonly T[], shift: number) {
+  if (items.length <= 1) return [...items];
+  const normalized = normalizeShift(items.length, shift);
+  return [...items.slice(normalized), ...items.slice(0, normalized)];
+}
+
+function buildInvertedVoicing(
+  notes: readonly string[],
+  degrees: readonly string[],
+  inversion: number,
+) {
+  const normalizedInversion = normalizeShift(notes.length, inversion);
+  return {
+    notes: rotateArray(notes, normalizedInversion),
+    degrees: rotateArray(degrees, normalizedInversion),
+    label: INVERSION_LABELS[normalizedInversion] ?? INVERSION_LABELS[0],
+    index: normalizedInversion,
+  };
+}
+
+function buildRootPositions(root: RootNote, maxFret: number) {
+  const targetSemitone = NOTE_TO_SEMITONE[root] ?? 0;
+  const positions: { stringId: BassStringId; fret: number }[] = [];
+
+  BASS_STRING_TUNING.forEach((stringConfig) => {
+    for (let fret = 0; fret <= maxFret; fret += 1) {
+      if ((stringConfig.semitone + fret) % 12 === targetSemitone) {
+        positions.push({ stringId: stringConfig.id, fret });
+      }
+    }
+  });
+
+  return positions;
+}
+
+function positionLabel(position: { stringId: BassStringId; fret: number }) {
+  return `${position.stringId}-${position.fret}`;
+}
+
 export default function BassArpeggioExplorer() {
   const defaultGroup =
     ARPEGGIO_GROUPS.find((group) => group.id === "seventh") ??
@@ -278,6 +421,12 @@ export default function BassArpeggioExplorer() {
   const [groupId, setGroupId] = useState<ArpeggioGroup["id"]>(defaultGroup.id);
   const [root, setRoot] = useState<RootNote>("D");
   const [qualityId, setQualityId] = useState<string>(initialQualityId);
+  const [inversion, setInversion] = useState(0);
+  const [maxFret, setMaxFret] = useState<number>(16);
+  const [catalogGroupId, setCatalogGroupId] = useState<
+    ArpeggioGroup["id"] | "all"
+  >("all");
+  const [catalogFilter, setCatalogFilter] = useState("");
   const [playingPatternId, setPlayingPatternId] = useState<string | null>(null);
   const playbackTimeouts = useRef<number[]>([]);
   const [activeNoteIndex, setActiveNoteIndex] = useState<number | null>(null);
@@ -299,12 +448,76 @@ export default function BassArpeggioExplorer() {
     () => buildChordNotes(root, selectedQuality, preferFlats),
     [root, selectedQuality, preferFlats],
   );
+  const voiced = useMemo(
+    () => buildInvertedVoicing(notes, selectedQuality.degrees, inversion),
+    [inversion, notes, selectedQuality.degrees],
+  );
+  const voicedNotes = voiced.notes;
+  const voicedDegrees = voiced.degrees;
+  const inversionOptions = Math.max(1, selectedQuality.intervals.length);
+  const inversionLabel = voiced.label;
+  const safeInversion = voiced.index;
 
   const chordSymbol = `${root}${selectedQuality.symbol}`;
   const playbackOctaves = useMemo(
     () => buildPlaybackOctaves(selectedQuality.intervals.length),
     [selectedQuality],
   );
+  const rootPositions = useMemo(
+    () => buildRootPositions(root, maxFret),
+    [maxFret, root],
+  );
+  const recommendedRootPosition = useMemo(
+    () =>
+      rootPositions.find((position) => position.fret <= 7) ?? rootPositions[0],
+    [rootPositions],
+  );
+  const playableRangeText = useMemo(
+    () => `BEADG · hasta traste ${maxFret}`,
+    [maxFret],
+  );
+  const catalogRows = useMemo(() => {
+    const normalizedFilter = catalogFilter.trim().toLowerCase();
+    const sourceGroups =
+      catalogGroupId === "all"
+        ? ARPEGGIO_GROUPS
+        : ARPEGGIO_GROUPS.filter((group) => group.id === catalogGroupId);
+
+    return sourceGroups.flatMap((group) =>
+      ROOT_OPTIONS.flatMap((rootOption) =>
+        group.qualities
+          .map((quality) => {
+            const preferFlatsByRoot = FLAT_PREFERENCE.has(rootOption.value);
+            const qualityNotes = buildChordNotes(
+              rootOption.value,
+              quality,
+              preferFlatsByRoot,
+            );
+            const positions = buildRootPositions(rootOption.value, maxFret);
+            const recommended =
+              positions.find((position) => position.fret <= 7) ?? positions[0];
+            const chord = `${rootOption.value}${quality.symbol}`;
+            return {
+              id: `${group.id}-${quality.id}-${rootOption.value}`,
+              chord,
+              root: rootOption.value,
+              groupLabel: group.label,
+              qualityLabel: quality.label,
+              notesText: qualityNotes.join(" - "),
+              degreesText: quality.degrees.join(" - "),
+              recommendedText: recommended ? positionLabel(recommended) : "N/A",
+              positionsCount: positions.length,
+            };
+          })
+          .filter((row) => {
+            if (!normalizedFilter) return true;
+            const haystack =
+              `${row.chord} ${row.groupLabel} ${row.qualityLabel} ${row.notesText}`.toLowerCase();
+            return haystack.includes(normalizedFilter);
+          }),
+      ),
+    );
+  }, [catalogFilter, catalogGroupId, maxFret]);
 
   function clearPlaybackTimers() {
     playbackTimeouts.current.forEach((id) => window.clearTimeout(id));
@@ -324,6 +537,13 @@ export default function BassArpeggioExplorer() {
       if (fallback) setQualityId(fallback);
     }
   }, [activeGroup, qualityId, qualityOptions]);
+  useEffect(() => {
+    setInversion(0);
+  }, [qualityId, groupId]);
+  useEffect(() => {
+    const clamped = Math.min(safeInversion, Math.max(0, inversionOptions - 1));
+    if (clamped !== inversion) setInversion(clamped);
+  }, [inversion, inversionOptions, safeInversion]);
 
   useEffect(() => {
     return () => {
@@ -333,10 +553,10 @@ export default function BassArpeggioExplorer() {
 
   useEffect(() => {
     stopPlayback();
-  }, [root, groupId, qualityId]);
+  }, [root, groupId, qualityId, inversion]);
 
   async function handlePlayPattern(pattern: Pattern) {
-    if (notes.length === 0) return;
+    if (voicedNotes.length === 0) return;
     stopPlayback();
     const sampler = await getYamahaSampler();
     setPlayingPatternId(pattern.id);
@@ -346,7 +566,7 @@ export default function BassArpeggioExplorer() {
     pattern.order.forEach((index, pos) => {
       const timeout = window.setTimeout(() => {
         setActiveNoteIndex(index);
-        const toneNote = `${notes[index]}${playbackOctaves[index] ?? 2}`;
+        const toneNote = `${voicedNotes[index]}${playbackOctaves[index] ?? 2}`;
         sampler.triggerAttackRelease(toneNote, 0.5);
         if (pos === pattern.order.length - 1) {
           setTimeout(() => {
@@ -360,17 +580,17 @@ export default function BassArpeggioExplorer() {
   }
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Stack spacing={2}>
+    <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+      <Stack spacing={2.5}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <MusicNote sx={{ color: "success.main" }} />
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              Arpegios para Bajo
+              Arpegios para Bajo de 5 cuerdas (BEADG)
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Selecciona la familia (triadas o cuatríadas) y explora sus notas
-              con patrones reproducibles.
+              Modo práctico: elige un arpegio puntual y reprodúcelo con
+              diferentes patrones e inversiones.
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {activeGroup.label}: {activeGroup.description}
@@ -378,8 +598,13 @@ export default function BassArpeggioExplorer() {
           </Box>
         </Box>
 
+        <Alert severity="info" sx={{ py: 0.75 }}>
+          Cobertura completa incluida: catálogo de todas las tonalidades y
+          calidades disponibles para bajo de 5 cuerdas.
+        </Alert>
+
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} lg={3}>
             <FormControl fullWidth size="small">
               <InputLabel id="group-label">Familia</InputLabel>
               <Select
@@ -398,7 +623,7 @@ export default function BassArpeggioExplorer() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} lg={2}>
             <FormControl fullWidth size="small">
               <InputLabel id="root-label">Fundamental</InputLabel>
               <Select
@@ -415,7 +640,7 @@ export default function BassArpeggioExplorer() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} lg={3}>
             <FormControl fullWidth size="small">
               <InputLabel id="quality-label">Tipo de arpegio</InputLabel>
               <Select
@@ -433,6 +658,41 @@ export default function BassArpeggioExplorer() {
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={12} sm={6} lg={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="inversion-label">Inversión</InputLabel>
+              <Select
+                labelId="inversion-label"
+                label="Inversión"
+                value={safeInversion}
+                onChange={(e) => setInversion(Number(e.target.value))}
+              >
+                {Array.from({ length: inversionOptions }, (_, idx) => (
+                  <MenuItem key={`inversion-${idx}`} value={idx}>
+                    {INVERSION_LABELS[idx]}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{inversionLabel}</FormHelperText>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6} lg={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="fret-label">Cobertura</InputLabel>
+              <Select
+                labelId="fret-label"
+                label="Cobertura"
+                value={maxFret}
+                onChange={(e) => setMaxFret(Number(e.target.value))}
+              >
+                {MAX_FRET_OPTIONS.map((value) => (
+                  <MenuItem key={`fret-${value}`} value={value}>
+                    Traste 0-{value}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
 
         <Box>
@@ -443,6 +703,9 @@ export default function BassArpeggioExplorer() {
             {selectedQuality.label} / {selectedQuality.englishLabel}.{" "}
             {selectedQuality.description}
           </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {playableRangeText}. Inversión activa: {inversionLabel}.
+          </Typography>
         </Box>
 
         <Box>
@@ -450,16 +713,47 @@ export default function BassArpeggioExplorer() {
             Notas en cifrado americano
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
-            {notes.map((note, idx) => (
+            {voicedNotes.map((note, idx) => (
               <Chip
                 key={`${note}-${idx}`}
-                label={`${note} (${selectedQuality.degrees[idx]})`}
+                label={`${note} (${voicedDegrees[idx]})`}
                 color="default"
                 variant="outlined"
               />
             ))}
           </Stack>
         </Box>
+
+        <Paper variant="outlined" sx={{ p: 1.5 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.6 }}>
+            Raíces disponibles en diapasón BEADG
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            {root}: {rootPositions.length} posiciones hasta el traste {maxFret}.{" "}
+            Sugerida para iniciar:{" "}
+            {recommendedRootPosition
+              ? positionLabel(recommendedRootPosition)
+              : "N/A"}
+            .
+          </Typography>
+          <Stack direction="row" spacing={0.75} flexWrap="wrap">
+            {rootPositions.slice(0, 14).map((position, idx) => (
+              <Chip
+                key={`${position.stringId}-${position.fret}-${idx}`}
+                label={positionLabel(position)}
+                size="small"
+                variant="outlined"
+              />
+            ))}
+            {rootPositions.length > 14 && (
+              <Chip
+                size="small"
+                color="info"
+                label={`+${rootPositions.length - 14} más`}
+              />
+            )}
+          </Stack>
+        </Paper>
 
         <Divider />
 
@@ -501,7 +795,7 @@ export default function BassArpeggioExplorer() {
                         <Chip
                           key={`${pattern.id}-${pos}`}
                           size="small"
-                          label={`${notes[index]} (${selectedQuality.degrees[index]})`}
+                          label={`${voicedNotes[index]} (${voicedDegrees[index]})`}
                           color={isActiveNote ? "success" : "default"}
                           variant={isActiveNote ? "filled" : "outlined"}
                         />
@@ -524,6 +818,175 @@ export default function BassArpeggioExplorer() {
             ))}
           </Grid>
         </Box>
+
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+          <Button
+            variant="outlined"
+            startIcon={<Stop fontSize="small" />}
+            onClick={stopPlayback}
+            disabled={!playingPatternId}
+          >
+            Detener audio
+          </Button>
+        </Stack>
+
+        <Accordion defaultExpanded disableGutters>
+          <AccordionSummary expandIcon={<ExpandMore />}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              Catálogo completo de arpegios (5 cuerdas)
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={1.5}>
+              <Grid container spacing={1.5}>
+                <Grid item xs={12} sm={5} md={4}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="catalog-group-label">
+                      Alcance de catálogo
+                    </InputLabel>
+                    <Select
+                      labelId="catalog-group-label"
+                      label="Alcance de catálogo"
+                      value={catalogGroupId}
+                      onChange={(e) =>
+                        setCatalogGroupId(
+                          e.target.value as ArpeggioGroup["id"] | "all",
+                        )
+                      }
+                    >
+                      <MenuItem value="all">Todas las familias</MenuItem>
+                      {ARPEGGIO_GROUPS.map((group) => (
+                        <MenuItem key={`catalog-${group.id}`} value={group.id}>
+                          {group.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={7} md={5}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Filtro (ej: m7, Gb, disminuido)"
+                    value={catalogFilter}
+                    onChange={(e) => setCatalogFilter(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                <Chip
+                  color="primary"
+                  label={`Arpegios listados: ${catalogRows.length}`}
+                />
+                <Chip
+                  variant="outlined"
+                  label={`12 tonalidades × ${
+                    catalogGroupId === "all"
+                      ? "todas las calidades"
+                      : "calidades seleccionadas"
+                  }`}
+                />
+              </Stack>
+
+              <TableContainer
+                sx={{
+                  maxHeight: { xs: 320, md: 460 },
+                  overflowY: "auto",
+                  overflowX: "auto",
+                  border: "1px solid rgba(11,42,80,0.12)",
+                  borderRadius: 1.5,
+                }}
+              >
+                <Table size="small" stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        sx={{ fontWeight: 700, bgcolor: "background.paper" }}
+                      >
+                        Arpegio
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontWeight: 700, bgcolor: "background.paper" }}
+                      >
+                        Familia
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontWeight: 700, bgcolor: "background.paper" }}
+                      >
+                        Notas
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontWeight: 700, bgcolor: "background.paper" }}
+                      >
+                        Grados
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontWeight: 700, bgcolor: "background.paper" }}
+                      >
+                        Raíz sugerida
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontWeight: 700, bgcolor: "background.paper" }}
+                      >
+                        Posiciones
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {catalogRows.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell sx={{ fontWeight: 700 }}>
+                          {row.chord}
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {row.groupLabel}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {row.qualityLabel}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{row.notesText}</TableCell>
+                        <TableCell>{row.degreesText}</TableCell>
+                        <TableCell>{row.recommendedText}</TableCell>
+                        <TableCell>{row.positionsCount}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+
+        <Accordion disableGutters>
+          <AccordionSummary expandIcon={<ExpandMore />}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              Ruta recomendada para 1er año (completa)
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={1}>
+              <Typography variant="body2" color="text.secondary">
+                1. Semanas 1-4: triadas mayores/menores en 12 tonalidades con
+                estado fundamental.
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                2. Semanas 5-8: agrega disminuidas/aumentadas y todas las
+                cuatríadas básicas (maj7, 7, m7, m7b5).
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                3. Semanas 9-12: trabaja inversiones + alterados (dim7, mMaj7,
+                7#5, augMaj7) y aplica en progresiones II-V-I.
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Meta técnica: tocar cada arpegio en dos registros distintos del
+                diapasón (grave y medio) manteniendo pulso estable.
+              </Typography>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
       </Stack>
     </Paper>
   );
