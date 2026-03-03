@@ -37,6 +37,7 @@ import {
   LightbulbOutlined,
   PlayArrowRounded,
   DeleteOutline,
+  School,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import * as Tone from "tone";
@@ -1811,6 +1812,63 @@ export default function RelativeMinorScalesStudy() {
               la armadura de La Mayor.
             </Typography>
           </Box>
+        </Paper>
+
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            borderColor: "info.main",
+            borderWidth: 2,
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+          >
+            <School sx={{ color: "info.main" }} />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, color: "info.main" }}
+            >
+              Metodología de Estudio Sugerida
+            </Typography>
+          </Stack>
+
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            No intentes memorizar todo el primer día. Sigue este flujo para dominar las tonalidades y sus relativos menores:
+          </Typography>
+
+          <Stack spacing={2}>
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "info.dark" }}>
+                Fase 1: Entender la Lógica (Reglas y Trucos)
+              </Typography>
+              <Typography variant="body2">
+                Aprende a deducir usando los trucos del panel anterior (bajar 3 semitonos o leer la armadura). Esto te da independencia cognitiva si alguna vez olvidas una escala.
+              </Typography>
+            </Box>
+            <Divider />
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "info.dark" }}>
+                Fase 2: Relación Directa (Práctica con Flashcards)
+              </Typography>
+              <Typography variant="body2">
+                Usa las <strong>Flashcards Bidireccionales</strong>. El objetivo es que dejes de calcular manualmente y comiences a relacionar por instinto visual que "Re Mayor = Si menor = 2 sostenidos".
+              </Typography>
+            </Box>
+            <Divider />
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "info.dark" }}>
+                Fase 3: Memorización Total (Ejecución bajo presión)
+              </Typography>
+              <Typography variant="body2">
+                Usa el <strong>Reto Contra Reloj</strong> en las tablas o el <strong>Modo Examen Extendido</strong> inferior para poner a prueba tu memoria a largo plazo bajo estrés de tiempo. Este es el nivel profesional.
+              </Typography>
+            </Box>
+          </Stack>
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
