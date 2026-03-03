@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -92,7 +92,12 @@ type QuizQuestionType =
   | "identifySixth"
   | "identifyNthDegree"
   | "countAccidentals"
-  | "identifyKeyByAccidentals";
+  | "identifyKeyByAccidentals"
+  | "identifyAccidentalType"
+  | "writeMinorFromMajor"
+  | "identifyNthDegreeMinor"
+  | "orderOfAccidentals"
+  | "identifyKeyBySignatureType";
 
 const ALL_QUIZ_TYPES: QuizQuestionType[] = [
   "majorToMinor",
@@ -103,6 +108,11 @@ const ALL_QUIZ_TYPES: QuizQuestionType[] = [
   "identifyNthDegree",
   "countAccidentals",
   "identifyKeyByAccidentals",
+  "identifyAccidentalType",
+  "writeMinorFromMajor",
+  "identifyNthDegreeMinor",
+  "orderOfAccidentals",
+  "identifyKeyBySignatureType",
 ];
 
 type QuizQuestion = {
@@ -531,8 +541,7 @@ function createQuizQuestion(
       answer: count,
       options: shuffle([count, ...distractors]),
     };
-  } else {
-    // identifyKeyByAccidentals
+  } else if (pickedType === "identifyKeyByAccidentals") {
     const accidentals = target.keySignature;
     const desc =
       accidentals === "0"
@@ -553,6 +562,79 @@ function createQuizQuestion(
       answer: target.major,
       options: shuffle([target.major, ...distractors]),
     };
+  } else if (pickedType === "identifyAccidentalType") {
+    let ans = "Ninguna";
+    if (target.keySignature.includes("b")) ans = "Bemoles";
+    if (target.keySignature.includes("#")) ans = "Sostenidos";
+    return {
+      type: "identifyAccidentalType",
+      questionText: `¿La armadura de ${target.major} mayor usa sostenidos o bemoles?`,
+      answer: ans,
+      options: ["Sostenidos", "Bemoles", "Ninguna"],
+    };
+  } else if (pickedType === "writeMinorFromMajor") {
+    return {
+      type: "writeMinorFromMajor",
+      questionText: `Si estás en ${target.major}, escribe las 7 notas de su relativo menor:`,
+      answerArray: target.minorNotes.slice(0, 7),
+    };
+  } else if (pickedType === "identifyNthDegreeMinor") {
+    const degreeIndex = Math.floor(Math.random() * 6) + 1; // 2nd to 7th degree
+    const degreeNames = ["1º", "2º", "3º", "4º", "5º", "6º", "7º"];
+    return {
+      type: "identifyNthDegreeMinor",
+      questionText: `¿Cuál es el ${degreeNames[degreeIndex]} grado de ${target.relativeMinor} natural?`,
+      answer: target.minorNotes[degreeIndex],
+    };
+  } else if (pickedType === "orderOfAccidentals") {
+    const isFlats = Math.random() > 0.5;
+    const orderItems = isFlats
+      ? ["Si", "Mi", "La", "Re", "Sol", "Do", "Fa"]
+      : ["Fa", "Do", "Sol", "Re", "La", "Mi", "Si"];
+    const typeName = isFlats ? "bemol" : "sostenido";
+    const typeNamePlural = isFlats ? "bemoles" : "sostenidos";
+    const degreeIndex = Math.floor(Math.random() * 7);
+    const degreeNames = ["1er", "2do", "3er", "4to", "5to", "6to", "7mo"];
+
+    return {
+      type: "orderOfAccidentals",
+      questionText: `¿Cuál es el ${degreeNames[degreeIndex]} ${typeName} en el orden de ${typeNamePlural}?`,
+      answer: orderItems[degreeIndex],
+    };
+  } else {
+    // identifyKeyBySignatureType
+    const typesAvailable = ["Sostenidos", "Bemoles"];
+    const askedType =
+      typesAvailable[Math.floor(Math.random() * typesAvailable.length)];
+
+    // the user will type a key name. Let's make this an open text question that accepts any valid key
+    // Instead of free text, let's make it multiple choice to avoid complex regex checking (user could type C, Do, etc)
+    const correctTarget = shuffle(
+      SCALE_GUIDE.filter(
+        (row) =>
+          (askedType === "Sostenidos" && row.keySignature.includes("#")) ||
+          (askedType === "Bemoles" && row.keySignature.includes("b")),
+      ),
+    )[0];
+
+    const distractors = shuffle(
+      SCALE_GUIDE.filter(
+        (row) =>
+          row.major !== correctTarget.major &&
+          ((askedType === "Sostenidos" && !row.keySignature.includes("#")) ||
+            (askedType === "Bemoles" && !row.keySignature.includes("b"))),
+      ),
+    ).slice(0, 3);
+
+    return {
+      type: "identifyKeyBySignatureType",
+      questionText: `Selecciona una tonalidad mayor que use ${askedType.toLowerCase()} en su armadura:`,
+      answer: correctTarget.major,
+      options: shuffle([
+        correctTarget.major,
+        ...distractors.map((d) => d.major),
+      ]),
+    };
   }
 }
 
@@ -563,6 +645,7 @@ function getRowPracticeState(
 ) {
   return (
     tablePracticeAnswers[rowKey] || {
+      isActive: true,
       notes: Array(7).fill(""),
       relativeMinor: "",
       evaluated: false,
@@ -586,11 +669,20 @@ function handleRowGrade(
     (n: string, i: number) =>
       n.trim().toLowerCase() === expectedNotes[i].toLowerCase(),
   );
-  const normInput = currentState.relativeMinor.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const normExpected = expectedRelativeMinor.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normInput = currentState.relativeMinor
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const normExpected = expectedRelativeMinor
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
   // Extract core note name and english symbol (e.g., from "la menor (am)" extract "la" and "am")
-  const expectedParts = normExpected.match(/^([a-z#b]+)\s+menor\s+\(([a-z#bm]+)\)$/);
+  const expectedParts = normExpected.match(
+    /^([a-z#b]+)\s+menor\s+\(([a-z#bm]+)\)$/,
+  );
 
   let relativeMinorCorrect = false;
   if (expectedParts) {
@@ -603,12 +695,13 @@ function handleRowGrade(
       normInput === englishSymbol ||
       normInput === `${spanishNote} m` ||
       normInput === `${spanishNote} menor` ||
-      normExpected.includes(normInput) && normInput.length >= 2 // fallback
+      (normExpected.includes(normInput) && normInput.length >= 2) // fallback
     ) {
       relativeMinorCorrect = true;
     }
   } else {
-    relativeMinorCorrect = normInput === normExpected || normExpected.includes(normInput);
+    relativeMinorCorrect =
+      normInput === normExpected || normExpected.includes(normInput);
   }
 
   setTablePracticeAnswers((prev) => ({
@@ -656,6 +749,28 @@ function renderPracticeRow(
 
   return (
     <TableRow key={rowKey}>
+      {tablePracticeMode && (
+        <TableCell
+          align="center"
+          sx={{
+            py: 0.5,
+            backgroundColor: isDo ? "#fff8e1" : "inherit",
+            width: 40,
+          }}
+        >
+          <Switch
+            size="small"
+            checked={state.isActive}
+            onChange={(e) => {
+              setTablePracticeAnswers((prev) => ({
+                ...prev,
+                [rowKey]: { ...state, isActive: e.target.checked },
+              }));
+            }}
+            color="secondary"
+          />
+        </TableCell>
+      )}
       <TableCell
         align="center"
         sx={{
@@ -686,7 +801,7 @@ function renderPracticeRow(
               : { backgroundColor: isDo ? "#fff8e1" : "inherit" }
           }
         >
-          {tablePracticeMode ? (
+          {tablePracticeMode && state.isActive ? (
             <TextField
               variant="standard"
               size="small"
@@ -726,7 +841,7 @@ function renderPracticeRow(
           backgroundColor: isDo ? "#fff8e1" : "inherit",
         }}
       >
-        {tablePracticeMode ? (
+        {tablePracticeMode && state.isActive ? (
           <Box>
             <TextField
               variant="standard"
@@ -764,7 +879,7 @@ function renderPracticeRow(
       </TableCell>
 
       {/* Grade Action */}
-      {tablePracticeMode && (
+      {tablePracticeMode && state.isActive && (
         <TableCell
           align="center"
           sx={{ backgroundColor: isDo ? "#fff8e1" : "inherit" }}
@@ -1223,6 +1338,7 @@ export default function RelativeMinorScalesStudy() {
     Record<
       string,
       {
+        isActive: boolean;
         notes: string[];
         relativeMinor: string;
         evaluated: boolean;
@@ -1230,7 +1346,24 @@ export default function RelativeMinorScalesStudy() {
         relativeMinorCorrect: boolean;
       }
     >
-  >({});
+  >(() => {
+    const saved = localStorage.getItem("relativeMinorPracticeAnswers");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error parsing saved practice answers", e);
+      }
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "relativeMinorPracticeAnswers",
+      JSON.stringify(tablePracticeAnswers),
+    );
+  }, [tablePracticeAnswers]);
 
   const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
   const [enabledQuizTypes, setEnabledQuizTypes] =
@@ -1242,6 +1375,8 @@ export default function RelativeMinorScalesStudy() {
   const [scaleInputs, setScaleInputs] = useState<string[]>(Array(7).fill(""));
   const [textInput, setTextInput] = useState<string>("");
   const [isEvaluated, setIsEvaluated] = useState(false);
+  const [scoreCorrect, setScoreCorrect] = useState(0);
+  const [scoreTotal, setScoreTotal] = useState(0);
 
   const selectedScale = useMemo(
     () =>
@@ -1253,11 +1388,18 @@ export default function RelativeMinorScalesStudy() {
     question.type === "majorToMinor" ||
     question.type === "minorToMajor" ||
     question.type === "countAccidentals" ||
-    question.type === "identifyKeyByAccidentals";
+    question.type === "identifyKeyByAccidentals" ||
+    question.type === "identifyAccidentalType" ||
+    question.type === "orderOfAccidentals" ||
+    question.type === "identifyKeyBySignatureType";
   const isWriteScale =
-    question.type === "writeMajor" || question.type === "writeMinor";
+    question.type === "writeMajor" ||
+    question.type === "writeMinor" ||
+    question.type === "writeMinorFromMajor";
   const isIdentifyDegree =
-    question.type === "identifySixth" || question.type === "identifyNthDegree";
+    question.type === "identifySixth" ||
+    question.type === "identifyNthDegree" ||
+    question.type === "identifyNthDegreeMinor";
 
   const answered = isEvaluated;
   let isCorrect = false;
@@ -1733,26 +1875,27 @@ export default function RelativeMinorScalesStudy() {
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
           <Stack
-            direction="row"
+            direction={{ xs: "column", md: "row" }}
             justifyContent="space-between"
-            alignItems="center"
+            alignItems={{ xs: "flex-start", md: "center" }}
             sx={{ mb: 1.5 }}
           >
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Tabla de armaduras
+              Tablas de Tonalidades Mayores y sus Relativos
             </Typography>
             <Stack direction="row" spacing={2} alignItems="center">
-              {tablePracticeMode && Object.keys(tablePracticeAnswers).length > 0 && (
-                <Button
-                  size="small"
-                  variant="text"
-                  color="error"
-                  startIcon={<DeleteOutline />}
-                  onClick={() => setTablePracticeAnswers({})}
-                >
-                  Limpiar Práctica
-                </Button>
-              )}
+              {tablePracticeMode &&
+                Object.keys(tablePracticeAnswers).length > 0 && (
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="error"
+                    startIcon={<DeleteOutline />}
+                    onClick={() => setTablePracticeAnswers({})}
+                  >
+                    Limpiar Práctica
+                  </Button>
+                )}
               <FormControlLabel
                 control={
                   <Switch
@@ -1777,6 +1920,9 @@ export default function RelativeMinorScalesStudy() {
               <Table size="small">
                 <TableHead>
                   <TableRow>
+                    {tablePracticeMode && (
+                      <TableCell align="center" sx={{ width: 40 }}></TableCell>
+                    )}
                     <TableCell align="center">Tonalidad</TableCell>
                     <TableCell align="center"># de bemoles</TableCell>
                     {SCALE_COLUMNS.map((degree, index) => (
@@ -1806,7 +1952,7 @@ export default function RelativeMinorScalesStudy() {
                       Relativo Menor
                     </TableCell>
                     {tablePracticeMode && (
-                      <TableCell align="center" sx={{ width: 100 }}></TableCell>
+                      <TableCell align="center" sx={{ width: 60 }}></TableCell>
                     )}
                   </TableRow>
                 </TableHead>
@@ -1846,6 +1992,9 @@ export default function RelativeMinorScalesStudy() {
               <Table size="small">
                 <TableHead>
                   <TableRow>
+                    {tablePracticeMode && (
+                      <TableCell align="center" sx={{ width: 40 }}></TableCell>
+                    )}
                     <TableCell align="center">Tonalidad</TableCell>
                     <TableCell align="center"># de sostenidos</TableCell>
                     {SCALE_COLUMNS.map((degree, index) => (
@@ -1875,7 +2024,7 @@ export default function RelativeMinorScalesStudy() {
                       Relativo Menor
                     </TableCell>
                     {tablePracticeMode && (
-                      <TableCell align="center" sx={{ width: 100 }}></TableCell>
+                      <TableCell align="center" sx={{ width: 60 }}></TableCell>
                     )}
                   </TableRow>
                 </TableHead>
@@ -1922,9 +2071,23 @@ export default function RelativeMinorScalesStudy() {
             alignItems={{ xs: "flex-start", md: "center" }}
             sx={{ mb: 1.5 }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Práctica rápida (exam mode)
-            </Typography>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={2}
+              sx={{ mb: 1.5 }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Práctica rápida (exam mode)
+              </Typography>
+              {scoreTotal > 0 && (
+                <Chip
+                  color={scoreCorrect === scoreTotal ? "success" : "primary"}
+                  label={`Puntuación: ${scoreCorrect} / ${scoreTotal}`}
+                  sx={{ fontWeight: 700, borderRadius: 1 }}
+                />
+              )}
+            </Stack>
             <FormGroup row>
               <FormControlLabel
                 control={
@@ -1949,6 +2112,25 @@ export default function RelativeMinorScalesStudy() {
                 }
                 label={
                   <Typography variant="body2">Escribir escalas</Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={enabledQuizTypes.includes("writeMinorFromMajor")}
+                    onChange={(e) => {
+                      const tgts: QuizQuestionType[] = ["writeMinorFromMajor"];
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, ...tgts])]
+                          : prev.filter((t) => !tgts.includes(t)),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">De Mayor a Menor</Typography>
                 }
               />
               <FormControlLabel
@@ -2005,6 +2187,29 @@ export default function RelativeMinorScalesStudy() {
                 control={
                   <Checkbox
                     size="small"
+                    checked={enabledQuizTypes.includes(
+                      "identifyNthDegreeMinor",
+                    )}
+                    onChange={(e) => {
+                      const tgts: QuizQuestionType[] = [
+                        "identifyNthDegreeMinor",
+                      ];
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, ...tgts])]
+                          : prev.filter((t) => !tgts.includes(t)),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">Grados en menores</Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
                     checked={
                       enabledQuizTypes.includes("countAccidentals") ||
                       enabledQuizTypes.includes("identifyKeyByAccidentals")
@@ -2024,6 +2229,33 @@ export default function RelativeMinorScalesStudy() {
                 }
                 label={<Typography variant="body2">Armaduras</Typography>}
               />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={
+                      enabledQuizTypes.includes("identifyAccidentalType") ||
+                      enabledQuizTypes.includes("orderOfAccidentals") ||
+                      enabledQuizTypes.includes("identifyKeyBySignatureType")
+                    }
+                    onChange={(e) => {
+                      const tgts: QuizQuestionType[] = [
+                        "identifyAccidentalType",
+                        "orderOfAccidentals",
+                        "identifyKeyBySignatureType",
+                      ];
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, ...tgts])]
+                          : prev.filter((t) => !tgts.includes(t)),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">Armaduras avanzadas</Typography>
+                }
+              />
             </FormGroup>
           </Stack>
 
@@ -2040,6 +2272,11 @@ export default function RelativeMinorScalesStudy() {
                     if (isEvaluated) return;
                     setSelectedOption(option);
                     setIsEvaluated(true);
+
+                    // Evaluate immediately to update score
+                    const correct = option === question.answer;
+                    setScoreTotal((prev) => prev + 1);
+                    if (correct) setScoreCorrect((prev) => prev + 1);
                   }}
                 >
                   {option}
@@ -2081,7 +2318,16 @@ export default function RelativeMinorScalesStudy() {
               {!isEvaluated && (
                 <Button
                   variant="contained"
-                  onClick={() => setIsEvaluated(true)}
+                  onClick={() => {
+                    setIsEvaluated(true);
+                    const correct = scaleInputs.every(
+                      (val, i) =>
+                        val.trim().toLowerCase() ===
+                        (question.answerArray?.[i] || "").toLowerCase(),
+                    );
+                    setScoreTotal((prev) => prev + 1);
+                    if (correct) setScoreCorrect((prev) => prev + 1);
+                  }}
                   sx={{ alignSelf: "flex-start" }}
                 >
                   Calificar escala
@@ -2111,7 +2357,14 @@ export default function RelativeMinorScalesStudy() {
               {!isEvaluated && (
                 <Button
                   variant="contained"
-                  onClick={() => setIsEvaluated(true)}
+                  onClick={() => {
+                    setIsEvaluated(true);
+                    const correct =
+                      textInput.trim().toLowerCase() ===
+                      (question.answer || "").toLowerCase();
+                    setScoreTotal((prev) => prev + 1);
+                    if (correct) setScoreCorrect((prev) => prev + 1);
+                  }}
                 >
                   Calificar
                 </Button>
