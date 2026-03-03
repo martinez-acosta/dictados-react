@@ -19,6 +19,7 @@ import DictadosIntervalos from "./components/DictadosIntervalos.tsx";
 import TunerPage from "./components/TunerPage.tsx";
 import CancionesMenu from "./components/CancionesMenu.jsx";
 import BassArpeggiosPage from "./components/BassArpeggiosPage.tsx";
+import RelativeMinorScalesStudy from "./components/RelativeMinorScalesStudy.jsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
@@ -45,6 +46,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/ritmica-metrica" element={<RitmicaMetricaBaqueiro />} />
         <Route path="/intervalos-piano" element={<IntervalosPiano />} />
         <Route path="/lectura-musical" element={<LecturaMusical />} />
+        <Route
+          path="/escalas-relativas"
+          element={<RelativeMinorScalesStudy />}
+        />
         <Route path="/canciones" element={<CancionesMenu />} />
       </Routes>
     </BrowserRouter>

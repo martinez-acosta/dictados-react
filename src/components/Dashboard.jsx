@@ -185,6 +185,19 @@ const EXERCISE_SECTIONS = [
         icon: MenuBook,
         iconColor: "#4caf50",
       },
+      {
+        route: "/escalas-relativas",
+        title: "Escalas Relativas (6º grado)",
+        description:
+          "Estudia la relación mayor-menor relativa (6º grado), con explicación y mini quiz para examen.",
+        buttonLabel: "Estudiar Escalas",
+        buttonSx: {
+          backgroundColor: "#1565c0",
+          "&:hover": { backgroundColor: "#0d47a1" },
+        },
+        icon: LibraryMusic,
+        iconColor: "#1565c0",
+      },
     ],
   },
   {
