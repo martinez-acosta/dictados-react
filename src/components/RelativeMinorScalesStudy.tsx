@@ -544,9 +544,7 @@ function createQuizQuestion(
   } else if (pickedType === "identifyKeyByAccidentals") {
     const accidentals = target.keySignature;
     const desc =
-      accidentals === "0 alteraciones"
-        ? "0 alteraciones"
-        : accidentals;
+      accidentals === "0 alteraciones" ? "0 alteraciones" : accidentals;
 
     const distractors = shuffle(
       SCALE_GUIDE.filter((row) => row.major !== target.major).map(
@@ -1376,6 +1374,182 @@ export default function RelativeMinorScalesStudy() {
   const [scoreCorrect, setScoreCorrect] = useState(0);
   const [scoreTotal, setScoreTotal] = useState(0);
 
+  // Flashcards state
+  const [currentFlashcard, setCurrentFlashcard] = useState<ScaleGuideRow>(
+    () => {
+      const r = Math.floor(Math.random() * SCALE_GUIDE.length);
+      return SCALE_GUIDE[r];
+    },
+  );
+  const [isFlipped, setIsFlipped] = useState(false);
+  // 'majorToMinor' = front shows major key, back shows minor+armadura
+  // 'minorToMajor' = front shows minor+armadura, back shows major key
+  const [flashcardMode, setFlashcardMode] = useState<
+    "majorToMinor" | "minorToMajor"
+  >("majorToMinor");
+  const flashcardFlipTimeoutRef = React.useRef<number | null>(null);
+
+  const nextFlashcard = () => {
+    setIsFlipped(false);
+    if (flashcardFlipTimeoutRef.current)
+      clearTimeout(flashcardFlipTimeoutRef.current);
+    let r = Math.floor(Math.random() * SCALE_GUIDE.length);
+    while (SCALE_GUIDE[r].major === currentFlashcard.major) {
+      r = Math.floor(Math.random() * SCALE_GUIDE.length);
+    }
+    const newMode =
+      Math.random() < 0.5
+        ? ("majorToMinor" as const)
+        : ("minorToMajor" as const);
+    flashcardFlipTimeoutRef.current = window.setTimeout(() => {
+      setCurrentFlashcard(SCALE_GUIDE[r]);
+      setFlashcardMode(newMode);
+      flashcardFlipTimeoutRef.current = null;
+    }, 150);
+  };
+
+  // Table Challenge state
+  const [challengeActive, setChallengeActive] = useState(false);
+  const [challengeTimer, setChallengeTimer] = useState(0);
+  const [challengeResult, setChallengeResult] = useState<{
+    correct: number;
+    total: number;
+  } | null>(null);
+  const timerRef = React.useRef<number | null>(null);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  const startChallenge = () => {
+    // Force clean state with ALL rows active
+    const newAnswers: Record<string, any> = {};
+    const initRowState = {
+      isActive: true,
+      notes: Array(7).fill(""),
+      relativeMinor: "",
+      evaluated: false,
+      notesCorrect: Array(7).fill(false),
+      relativeMinorCorrect: false,
+    };
+
+    newAnswers["do-flat"] = { ...initRowState };
+    newAnswers["do-sharp"] = { ...initRowState };
+    FLAT_SUBTABLE.forEach((r) => {
+      newAnswers[`flat-${r.tonality}`] = { ...initRowState };
+    });
+    SHARP_SUBTABLE.forEach((r) => {
+      newAnswers[`sharp-${r.tonality}`] = { ...initRowState };
+    });
+
+    setTablePracticeAnswers(newAnswers);
+    setTablePracticeMode(true);
+    setChallengeTimer(0);
+    setChallengeResult(null);
+    setChallengeActive(true);
+
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = window.setInterval(() => {
+      setChallengeTimer((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const stopChallenge = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+    setChallengeActive(false);
+
+    // Grade ALL rows in a single atomic state update to avoid race conditions
+    setTablePracticeAnswers((prev) => {
+      const next = { ...prev };
+      let totalRows = 0;
+      let correctRows = 0;
+
+      const gradeRow = (
+        rowKey: string,
+        expectedNotes: string[],
+        expectedRelativeMinor: string,
+      ) => {
+        const state = next[rowKey] || {
+          isActive: true,
+          notes: Array(7).fill(""),
+          relativeMinor: "",
+          evaluated: false,
+          notesCorrect: Array(7).fill(false),
+          relativeMinorCorrect: false,
+        };
+        const notesCorrect = state.notes.map(
+          (n: string, i: number) =>
+            n.trim().toLowerCase() === expectedNotes[i].toLowerCase(),
+        );
+        const normInput = state.relativeMinor
+          .trim()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        const normExpected = expectedRelativeMinor
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        const parts = normExpected.match(
+          /^([a-z#b]+)\s+menor\s+\(([a-z#bm]+)\)$/,
+        );
+        let relativeMinorCorrect = false;
+        if (parts) {
+          relativeMinorCorrect =
+            [parts[1], parts[2], `${parts[1]} m`, `${parts[1]} menor`].includes(
+              normInput,
+            ) ||
+            (normExpected.includes(normInput) && normInput.length >= 2);
+        } else {
+          relativeMinorCorrect =
+            normInput === normExpected || normExpected.includes(normInput);
+        }
+        next[rowKey] = {
+          ...state,
+          evaluated: true,
+          notesCorrect,
+          relativeMinorCorrect,
+        };
+        totalRows++;
+        if (notesCorrect.every(Boolean) && relativeMinorCorrect) correctRows++;
+      };
+
+      gradeRow(
+        "do-flat",
+        ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
+        "La menor (Am)",
+      );
+      FLAT_SUBTABLE.forEach((r) =>
+        gradeRow(`flat-${r.tonality}`, r.majorScale, r.relativeMinor),
+      );
+      gradeRow(
+        "do-sharp",
+        ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
+        "La menor (Am)",
+      );
+      SHARP_SUBTABLE.forEach((r) =>
+        gradeRow(`sharp-${r.tonality}`, r.majorScale, r.relativeMinor),
+      );
+
+      setChallengeResult({ correct: correctRows, total: totalRows });
+      return next;
+    });
+  };
+
+  // Cleanup intervals and pending timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (flashcardFlipTimeoutRef.current)
+        clearTimeout(flashcardFlipTimeoutRef.current);
+    };
+  }, []);
+
   const selectedScale = useMemo(
     () =>
       SCALE_GUIDE.find((row) => row.major === selectedMajor) || SCALE_GUIDE[0],
@@ -1579,6 +1753,66 @@ export default function RelativeMinorScalesStudy() {
           </Box>
         </Paper>
 
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            borderColor: "secondary.main",
+            borderWidth: 2,
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+          >
+            <LightbulbOutlined sx={{ color: "secondary.main" }} />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, color: "secondary.main" }}
+            >
+              Trucos para NO memorizar
+            </Typography>
+          </Stack>
+
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+            1. ¿Cómo sacar el Relativo Menor rápido?
+          </Typography>
+          <Typography sx={{ mb: 1.5, pl: 2 }}>
+            Simplemente <strong>baja 3 semitonos</strong> (un tono y medio)
+            desde la nota tónica mayor.
+            <br />
+            <em>Ejemplo:</em> De Do mayor bajas a Si (1), Sib (2) y llegas a{" "}
+            <strong>La (3)</strong>. ¡El relativo menor de Do es La menor!
+          </Typography>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+            2. ¿Cómo deducir la Tonalidad desde la Armadura?
+          </Typography>
+          <Box
+            sx={{ pl: 2, display: "flex", flexDirection: "column", gap: 1.5 }}
+          >
+            <Typography>
+              <strong>Si tiene Bemoles (b):</strong> El nombre de la tonalidad
+              mayor es el <strong>penúltimo bemol</strong>.
+              <br />
+              <em>Ejemplo:</em> Si ves 3 bemoles (Sib, Mib, Lab), el penúltimo
+              es <strong>Mib</strong>. Esa es la armadura de Mib Mayor.
+            </Typography>
+            <Typography>
+              <strong>Si tiene Sostenidos (#):</strong> Súbele{" "}
+              <strong>medio tono</strong> al <strong>último sostenido</strong>.
+              <br />
+              <em>Ejemplo:</em> Si ves 3 sostenidos (Fa#, Do#, Sol#), el último
+              es Sol#. Súbele medio tono y llegas a <strong>La</strong>. Esa es
+              la armadura de La Mayor.
+            </Typography>
+          </Box>
+        </Paper>
+
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
@@ -1678,6 +1912,216 @@ export default function RelativeMinorScalesStudy() {
           <Typography color="text.secondary">
             Armadura: {selectedScale.keySignature}
           </Typography>
+        </Paper>
+
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            bgcolor: "#f5fdfb",
+            borderColor: "#80cbc4",
+            borderWidth: 2,
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            sx={{ mb: 2 }}
+            spacing={1}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700, color: "#00695c" }}>
+              Práctica Rápida: Flashcards
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  setIsFlipped(false);
+                  if (flashcardFlipTimeoutRef.current)
+                    clearTimeout(flashcardFlipTimeoutRef.current);
+                  flashcardFlipTimeoutRef.current = window.setTimeout(() => {
+                    setFlashcardMode((prev) =>
+                      prev === "majorToMinor" ? "minorToMajor" : "majorToMinor",
+                    );
+                    setIsFlipped(false);
+                    flashcardFlipTimeoutRef.current = null;
+                  }, 150);
+                }}
+                sx={{
+                  borderColor: "#00897b",
+                  color: "#00695c",
+                  fontWeight: 600,
+                  textTransform: "none",
+                }}
+              >
+                {flashcardMode === "majorToMinor"
+                  ? "↔ Voltear Modo"
+                  : "↔ Voltear Modo"}
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={nextFlashcard}
+                sx={{ bgcolor: "#00897b", textTransform: "none" }}
+              >
+                Siguiente Tarjeta
+              </Button>
+            </Stack>
+          </Stack>
+
+          <Box
+            sx={{
+              perspective: "1000px",
+              width: "100%",
+              maxWidth: "420px",
+              height: "240px",
+              mx: "auto",
+              cursor: "pointer",
+            }}
+            onClick={() => setIsFlipped(!isFlipped)}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                position: "relative",
+                transition: "transform 0.55s cubic-bezier(0.4,0,0.2,1)",
+                transformStyle: "preserve-3d",
+                transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+              }}
+            >
+              {/* FRENTE */}
+              <Paper
+                elevation={4}
+                sx={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  backfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor:
+                    flashcardMode === "majorToMinor" ? "#fff" : "#e0f2f1",
+                  borderRadius: 3,
+                  border:
+                    flashcardMode === "majorToMinor"
+                      ? "2px solid #b2dfdb"
+                      : "2px solid #4db6ac",
+                  gap: 1,
+                }}
+              >
+                {flashcardMode === "majorToMinor" ? (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      ¿Cuál es el Relativo Menor de...?
+                    </Typography>
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 800, color: "#004d40" }}
+                    >
+                      {currentFlashcard.major} Mayor
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      ¿A qué Mayor corresponde este Relativo?
+                    </Typography>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: 800, color: "#00695c" }}
+                    >
+                      {currentFlashcard.relativeMinor}
+                    </Typography>
+                    <Chip
+                      label={currentFlashcard.keySignature}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </>
+                )}
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 2, color: "text.disabled", fontSize: "0.75rem" }}
+                >
+                  Toca para voltear ↻
+                </Typography>
+              </Paper>
+
+              {/* REVERSO */}
+              <Paper
+                elevation={4}
+                sx={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  backfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor:
+                    flashcardMode === "majorToMinor" ? "#e0f2f1" : "#fff",
+                  borderRadius: 3,
+                  border:
+                    flashcardMode === "majorToMinor"
+                      ? "2px solid #4db6ac"
+                      : "2px solid #b2dfdb",
+                  gap: 1,
+                }}
+              >
+                {flashcardMode === "majorToMinor" ? (
+                  <>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: 800, color: "#00695c" }}
+                    >
+                      {currentFlashcard.relativeMinor}
+                    </Typography>
+                    <Chip
+                      label={`Armadura: ${currentFlashcard.keySignature}`}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ fontWeight: 700, fontSize: "0.95rem", py: 2.5 }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      Tonalidad Mayor:
+                    </Typography>
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 800, color: "#004d40" }}
+                    >
+                      {currentFlashcard.major} Mayor
+                    </Typography>
+                  </>
+                )}
+              </Paper>
+            </Box>
+          </Box>
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
@@ -1878,18 +2322,87 @@ export default function RelativeMinorScalesStudy() {
             alignItems={{ xs: "flex-start", md: "center" }}
             sx={{ mb: 1.5 }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Tablas de Tonalidades Mayores y sus Relativos
-            </Typography>
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Tablas de Tonalidades Mayores y sus Relativos
+              </Typography>
+              {challengeActive ? (
+                <Chip
+                  icon={<AccessTime />}
+                  label={formatTime(challengeTimer)}
+                  color="warning"
+                  sx={{
+                    fontWeight: "bold",
+                    px: 1,
+                    fontSize: "1.1rem",
+                    borderRadius: 1,
+                  }}
+                />
+              ) : challengeResult ? (
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Chip
+                    icon={<CheckCircleOutline />}
+                    label={`${formatTime(challengeTimer)} • ${challengeResult.correct} / ${challengeResult.total} correctas`}
+                    color={
+                      challengeResult.correct === challengeResult.total
+                        ? "success"
+                        : "primary"
+                    }
+                    sx={{ fontWeight: "bold", borderRadius: 1 }}
+                  />
+                </Stack>
+              ) : null}
+            </Stack>
+
+            <Stack
+              direction="row"
+              spacing={2}
+              alignItems="center"
+              sx={{ mt: { xs: 1.5, md: 0 } }}
+            >
+              {!challengeActive ? (
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="warning"
+                  startIcon={<AccessTime />}
+                  onClick={startChallenge}
+                  sx={{
+                    borderRadius: 6,
+                    textTransform: "none",
+                    fontWeight: 700,
+                  }}
+                >
+                  Reto Contra Reloj
+                </Button>
+              ) : (
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="success"
+                  onClick={stopChallenge}
+                  sx={{
+                    borderRadius: 6,
+                    textTransform: "none",
+                    fontWeight: 700,
+                  }}
+                >
+                  Calificar Reto Completo
+                </Button>
+              )}
+
               {tablePracticeMode &&
+                !challengeActive &&
                 Object.keys(tablePracticeAnswers).length > 0 && (
                   <Button
                     size="small"
                     variant="text"
                     color="error"
                     startIcon={<DeleteOutline />}
-                    onClick={() => setTablePracticeAnswers({})}
+                    onClick={() => {
+                      setTablePracticeAnswers({});
+                      setChallengeTimer(0);
+                    }}
                   >
                     Limpiar Práctica
                   </Button>
@@ -1900,6 +2413,7 @@ export default function RelativeMinorScalesStudy() {
                     checked={tablePracticeMode}
                     onChange={(e) => setTablePracticeMode(e.target.checked)}
                     color="primary"
+                    disabled={challengeActive}
                   />
                 }
                 label={
