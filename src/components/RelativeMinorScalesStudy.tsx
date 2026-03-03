@@ -21,6 +21,8 @@ import {
   useTheme,
   Switch,
   FormControlLabel,
+  Checkbox,
+  FormGroup,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -80,7 +82,21 @@ type QuizQuestionType =
   | "minorToMajor"
   | "writeMajor"
   | "writeMinor"
-  | "identifySixth";
+  | "identifySixth"
+  | "identifyNthDegree"
+  | "countAccidentals"
+  | "identifyKeyByAccidentals";
+
+const ALL_QUIZ_TYPES: QuizQuestionType[] = [
+  "majorToMinor",
+  "minorToMajor",
+  "writeMajor",
+  "writeMinor",
+  "identifySixth",
+  "identifyNthDegree",
+  "countAccidentals",
+  "identifyKeyByAccidentals",
+];
 
 type QuizQuestion = {
   type: QuizQuestionType;
@@ -426,29 +442,35 @@ function shuffle<T>(array: T[]): T[] {
   return copy;
 }
 
-function createQuizQuestion(): QuizQuestion {
+function createQuizQuestion(
+  enabledTypes: QuizQuestionType[] = ALL_QUIZ_TYPES,
+): QuizQuestion {
   const target = SCALE_GUIDE[Math.floor(Math.random() * SCALE_GUIDE.length)];
-  const modeRand = Math.random();
 
-  if (modeRand < 0.2) {
+  // If no types selected, fallback to all to prevent crash
+  if (enabledTypes.length === 0) enabledTypes = ALL_QUIZ_TYPES;
+  const pickedType =
+    enabledTypes[Math.floor(Math.random() * enabledTypes.length)];
+
+  if (pickedType === "writeMajor") {
     return {
       type: "writeMajor",
       questionText: `Escribe las 7 notas de la escala de ${target.major} en orden:`,
       answerArray: target.notes.slice(0, 7),
     };
-  } else if (modeRand < 0.4) {
+  } else if (pickedType === "writeMinor") {
     return {
       type: "writeMinor",
       questionText: `Escribe las 7 notas de la escala de ${target.relativeMinor} natural en orden:`,
       answerArray: target.minorNotes.slice(0, 7),
     };
-  } else if (modeRand < 0.6) {
+  } else if (pickedType === "identifySixth") {
     return {
       type: "identifySixth",
       questionText: `¿Cuál es el 6º grado de ${target.major}?`,
       answer: target.sixthDegree,
     };
-  } else if (modeRand < 0.8) {
+  } else if (pickedType === "majorToMinor") {
     const distractors = shuffle(
       SCALE_GUIDE.filter(
         (row) => row.relativeMinor !== target.relativeMinor,
@@ -461,7 +483,7 @@ function createQuizQuestion(): QuizQuestion {
       answer: target.relativeMinor,
       options: shuffle([target.relativeMinor, ...distractors]),
     };
-  } else {
+  } else if (pickedType === "minorToMajor") {
     const distractors = shuffle(
       SCALE_GUIDE.filter((row) => row.major !== target.major).map(
         (row) => row.major,
@@ -471,6 +493,56 @@ function createQuizQuestion(): QuizQuestion {
     return {
       type: "minorToMajor",
       questionText: `¿Cuál es la escala mayor relativa de ${target.relativeMinor}?`,
+      answer: target.major,
+      options: shuffle([target.major, ...distractors]),
+    };
+  } else if (pickedType === "identifyNthDegree") {
+    const degreeIndex = Math.floor(Math.random() * 6) + 1; // 1 to 6 (so 2nd to 7th degree)
+    const degreeNames = ["1º", "2º", "3º", "4º", "5º", "6º", "7º"];
+    return {
+      type: "identifyNthDegree",
+      questionText: `¿Cuál es el ${degreeNames[degreeIndex]} grado de ${target.major} mayor?`,
+      answer: target.notes[degreeIndex],
+    };
+  } else if (pickedType === "countAccidentals") {
+    const accidentals = target.keySignature;
+    const typeAcc = accidentals.includes("b")
+      ? "bemoles"
+      : accidentals.includes("#")
+        ? "sostenidos"
+        : "alteraciones";
+    const count = accidentals === "0" ? "0" : accidentals.replace(/b|#/, "");
+
+    const possibleCounts = ["0", "1", "2", "3", "4", "5", "6", "7"];
+    const distractors = shuffle(
+      possibleCounts.filter((c) => c !== count),
+    ).slice(0, 3);
+
+    return {
+      type: "countAccidentals",
+      questionText: `¿Cuántos ${typeAcc} tiene la armadura de ${target.major} mayor?`,
+      answer: count,
+      options: shuffle([count, ...distractors]),
+    };
+  } else {
+    // identifyKeyByAccidentals
+    const accidentals = target.keySignature;
+    const desc =
+      accidentals === "0"
+        ? "0 alteraciones"
+        : accidentals.includes("b")
+          ? `${accidentals.replace("b", "")} bemoles`
+          : `${accidentals.replace("#", "")} sostenidos`;
+
+    const distractors = shuffle(
+      SCALE_GUIDE.filter((row) => row.major !== target.major).map(
+        (row) => row.major,
+      ),
+    ).slice(0, 3);
+
+    return {
+      type: "identifyKeyByAccidentals",
+      questionText: `¿Qué escala mayor tiene ${desc} en su armadura?`,
       answer: target.major,
       options: shuffle([target.major, ...distractors]),
     };
@@ -914,8 +986,10 @@ export default function RelativeMinorScalesStudy() {
   );
   const [showArmadurasText, setShowArmadurasText] = useState<boolean>(true);
   const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
+  const [enabledQuizTypes, setEnabledQuizTypes] =
+    useState<QuizQuestionType[]>(ALL_QUIZ_TYPES);
   const [question, setQuestion] = useState<QuizQuestion>(() =>
-    createQuizQuestion(),
+    createQuizQuestion(ALL_QUIZ_TYPES),
   );
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [scaleInputs, setScaleInputs] = useState<string[]>(Array(7).fill(""));
@@ -929,10 +1003,14 @@ export default function RelativeMinorScalesStudy() {
   );
 
   const isMultipleChoice =
-    question.type === "majorToMinor" || question.type === "minorToMajor";
+    question.type === "majorToMinor" ||
+    question.type === "minorToMajor" ||
+    question.type === "countAccidentals" ||
+    question.type === "identifyKeyByAccidentals";
   const isWriteScale =
     question.type === "writeMajor" || question.type === "writeMinor";
-  const isIdentifySixth = question.type === "identifySixth";
+  const isIdentifyDegree =
+    question.type === "identifySixth" || question.type === "identifyNthDegree";
 
   const answered = isEvaluated;
   let isCorrect = false;
@@ -946,7 +1024,7 @@ export default function RelativeMinorScalesStudy() {
           val.trim().toLowerCase() ===
           (question.answerArray?.[i] || "").toLowerCase(),
       );
-    } else if (isIdentifySixth) {
+    } else if (isIdentifyDegree) {
       isCorrect =
         textInput.trim().toLowerCase() ===
         (question.answer || "").toLowerCase();
@@ -1044,7 +1122,7 @@ export default function RelativeMinorScalesStudy() {
   }, []);
 
   const handleNextQuestion = () => {
-    setQuestion(createQuizQuestion());
+    setQuestion(createQuizQuestion(enabledQuizTypes));
     setSelectedOption("");
     setScaleInputs(Array(7).fill(""));
     setTextInput("");
@@ -1555,9 +1633,117 @@ export default function RelativeMinorScalesStudy() {
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5 }}>
-            Práctica rápida (exam mode)
-          </Typography>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", md: "center" }}
+            sx={{ mb: 1.5 }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              Práctica rápida (exam mode)
+            </Typography>
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={
+                      enabledQuizTypes.includes("writeMajor") ||
+                      enabledQuizTypes.includes("writeMinor")
+                    }
+                    onChange={(e) => {
+                      const tgts: QuizQuestionType[] = [
+                        "writeMajor",
+                        "writeMinor",
+                      ];
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, ...tgts])]
+                          : prev.filter((t) => !tgts.includes(t)),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">Escribir escalas</Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={
+                      enabledQuizTypes.includes("majorToMinor") ||
+                      enabledQuizTypes.includes("minorToMajor")
+                    }
+                    onChange={(e) => {
+                      const tgts: QuizQuestionType[] = [
+                        "majorToMinor",
+                        "minorToMajor",
+                      ];
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, ...tgts])]
+                          : prev.filter((t) => !tgts.includes(t)),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">Relativos menores</Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={
+                      enabledQuizTypes.includes("identifySixth") ||
+                      enabledQuizTypes.includes("identifyNthDegree")
+                    }
+                    onChange={(e) => {
+                      const tgts: QuizQuestionType[] = [
+                        "identifySixth",
+                        "identifyNthDegree",
+                      ];
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, ...tgts])]
+                          : prev.filter((t) => !tgts.includes(t)),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">Grados (6º, N-º)</Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={
+                      enabledQuizTypes.includes("countAccidentals") ||
+                      enabledQuizTypes.includes("identifyKeyByAccidentals")
+                    }
+                    onChange={(e) => {
+                      const tgts: QuizQuestionType[] = [
+                        "countAccidentals",
+                        "identifyKeyByAccidentals",
+                      ];
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, ...tgts])]
+                          : prev.filter((t) => !tgts.includes(t)),
+                      );
+                    }}
+                  />
+                }
+                label={<Typography variant="body2">Armaduras</Typography>}
+              />
+            </FormGroup>
+          </Stack>
+
           <Typography sx={{ mb: 1.5 }}>{question.questionText}</Typography>
 
           {isMultipleChoice && (
@@ -1621,11 +1807,11 @@ export default function RelativeMinorScalesStudy() {
             </Stack>
           )}
 
-          {isIdentifySixth && (
+          {isIdentifyDegree && (
             <Stack spacing={2} direction="row" alignItems="center">
               <TextField
                 size="small"
-                label="6º grado"
+                label="Respuesta"
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 InputProps={{ readOnly: isEvaluated }}
@@ -1673,7 +1859,7 @@ export default function RelativeMinorScalesStudy() {
                           {question.answer}
                         </Typography>
                       )}
-                      {isIdentifySixth && (
+                      {isIdentifyDegree && (
                         <Typography variant="body2" sx={{ ml: 0.5 }}>
                           {question.answer}
                         </Typography>

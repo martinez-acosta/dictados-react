@@ -490,10 +490,10 @@ function generateExercise(
   if (notes.length === 0) return out;
 
   const uniqueCount = new Set(notes).size;
-  const historyLimit =
-    uniqueCount >= 4 ? 3 : uniqueCount === 3 ? 2 : uniqueCount === 2 ? 1 : 0;
+  // If we have 4 notes and historyLimit is 3, there's only 1 choice left (deterministic loop).
+  // A limit of 1 prevents immediate repetition. A limit of 2 prevents A-B-A.
+  const historyLimit = uniqueCount >= 6 ? 2 : uniqueCount >= 2 ? 1 : 0;
 
-  // Hacer más aleatorio evitando repeticiones consecutivas y patrones cortos
   for (let i = 0; i < length; i++) {
     let newNote = pick(notes);
     if (historyLimit > 0) {
