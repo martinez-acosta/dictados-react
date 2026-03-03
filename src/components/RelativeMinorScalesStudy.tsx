@@ -23,11 +23,17 @@ import {
   FormControlLabel,
   Checkbox,
   FormGroup,
+  IconButton,
 } from "@mui/material";
 import {
+  PlayArrow,
+  Pause,
   ArrowBack,
-  CancelOutlined,
+  Refresh,
+  AccessTime,
   CheckCircleOutline,
+  CancelOutlined,
+  Send as SendIcon,
   LightbulbOutlined,
   PlayArrowRounded,
 } from "@mui/icons-material";
@@ -549,16 +555,221 @@ function createQuizQuestion(
   }
 }
 
-function renderScaleDegreeCells(notes: string[], rowKeyPrefix: string) {
-  return notes.slice(0, 7).map((note, index) => (
-    <TableCell
-      key={`${rowKeyPrefix}-deg-${index}`}
-      align="center"
-      sx={index === 5 ? { backgroundColor: "#f1f8e9", fontWeight: 700 } : null}
-    >
-      {note}
-    </TableCell>
-  ));
+// Helper to initialize or get practice state for a row
+function getRowPracticeState(
+  tablePracticeAnswers: Record<string, any>,
+  rowKey: string,
+) {
+  return (
+    tablePracticeAnswers[rowKey] || {
+      notes: Array(7).fill(""),
+      relativeMinor: "",
+      evaluated: false,
+      notesCorrect: Array(7).fill(false),
+      relativeMinorCorrect: false,
+    }
+  );
+}
+
+function handleRowGrade(
+  rowKey: string,
+  expectedNotes: string[],
+  expectedRelativeMinor: string,
+  tablePracticeAnswers: Record<string, any>,
+  setTablePracticeAnswers: React.Dispatch<
+    React.SetStateAction<Record<string, any>>
+  >,
+) {
+  const currentState = getRowPracticeState(tablePracticeAnswers, rowKey);
+  const notesCorrect = currentState.notes.map(
+    (n: string, i: number) =>
+      n.trim().toLowerCase() === expectedNotes[i].toLowerCase(),
+  );
+  const relativeMinorCorrect =
+    currentState.relativeMinor.trim().toLowerCase() ===
+    expectedRelativeMinor.toLowerCase();
+
+  setTablePracticeAnswers((prev) => ({
+    ...prev,
+    [rowKey]: {
+      ...currentState,
+      evaluated: true,
+      notesCorrect,
+      relativeMinorCorrect,
+    },
+  }));
+}
+
+function renderPracticeRow(
+  rowKey: string,
+  tonality: string,
+  tonalityEn: string,
+  count: number | string,
+  expectedNotes: string[],
+  expectedRelativeMinor: string,
+  tablePracticeMode: boolean,
+  tablePracticeAnswers: Record<string, any>,
+  setTablePracticeAnswers: React.Dispatch<
+    React.SetStateAction<Record<string, any>>
+  >,
+) {
+  const isDo = rowKey === "do-flat" || rowKey === "do-sharp";
+  const state = getRowPracticeState(tablePracticeAnswers, rowKey);
+
+  const updateNote = (index: number, val: string) => {
+    const newNotes = [...state.notes];
+    newNotes[index] = val;
+    setTablePracticeAnswers((prev) => ({
+      ...prev,
+      [rowKey]: { ...state, notes: newNotes, evaluated: false },
+    }));
+  };
+
+  const updateRelative = (val: string) => {
+    setTablePracticeAnswers((prev) => ({
+      ...prev,
+      [rowKey]: { ...state, relativeMinor: val, evaluated: false },
+    }));
+  };
+
+  return (
+    <TableRow key={rowKey}>
+      <TableCell
+        align="center"
+        sx={{
+          fontWeight: 600,
+          backgroundColor: isDo ? "#fff8e1" : "inherit",
+        }}
+      >
+        {tonality} {tonalityEn ? `(${tonalityEn})` : ""}
+      </TableCell>
+      <TableCell
+        align="center"
+        sx={{ backgroundColor: isDo ? "#fff8e1" : "inherit" }}
+      >
+        {count}
+      </TableCell>
+
+      {/* 7 Notes */}
+      {expectedNotes.slice(0, 7).map((note, index) => (
+        <TableCell
+          key={`${rowKey}-deg-${index}`}
+          align="center"
+          sx={
+            index === 5
+              ? {
+                  backgroundColor: isDo ? "#fff8e1" : "#f1f8e9",
+                  fontWeight: 700,
+                }
+              : { backgroundColor: isDo ? "#fff8e1" : "inherit" }
+          }
+        >
+          {tablePracticeMode ? (
+            <TextField
+              variant="standard"
+              size="small"
+              value={state.notes[index]}
+              onChange={(e) => updateNote(index, e.target.value)}
+              inputProps={{
+                style: { textAlign: "center", padding: "4px 0" },
+              }}
+              sx={(theme) => ({
+                width: "100%",
+                minWidth: 40,
+                ...(state.evaluated && state.notesCorrect[index]
+                  ? {
+                      "& .MuiInput-underline:before": {
+                        borderBottomColor: `${theme.palette.success.main} !important`,
+                      },
+                      "& .MuiInputBase-input": {
+                        color: `${theme.palette.success.main} !important`,
+                        WebkitTextFillColor: `${theme.palette.success.main} !important`,
+                      },
+                    }
+                  : {}),
+              })}
+              error={state.evaluated && !state.notesCorrect[index]}
+            />
+          ) : (
+            note
+          )}
+        </TableCell>
+      ))}
+
+      {/* Relative Minor */}
+      <TableCell
+        align="center"
+        sx={{
+          fontWeight: 600,
+          backgroundColor: isDo ? "#fff8e1" : "inherit",
+        }}
+      >
+        {tablePracticeMode ? (
+          <Box>
+            <TextField
+              variant="standard"
+              size="small"
+              value={state.relativeMinor}
+              onChange={(e) => updateRelative(e.target.value)}
+              inputProps={{
+                style: {
+                  textAlign: "center",
+                  padding: "4px 0",
+                  fontWeight: 600,
+                },
+              }}
+              sx={(theme) => ({
+                width: "100%",
+                minWidth: 80,
+                ...(state.evaluated && state.relativeMinorCorrect
+                  ? {
+                      "& .MuiInput-underline:before": {
+                        borderBottomColor: `${theme.palette.success.main} !important`,
+                      },
+                      "& .MuiInputBase-input": {
+                        color: `${theme.palette.success.main} !important`,
+                        WebkitTextFillColor: `${theme.palette.success.main} !important`,
+                      },
+                    }
+                  : {}),
+              })}
+              error={state.evaluated && !state.relativeMinorCorrect}
+            />
+          </Box>
+        ) : (
+          expectedRelativeMinor
+        )}
+      </TableCell>
+
+      {/* Grade Action */}
+      {tablePracticeMode && (
+        <TableCell
+          align="center"
+          sx={{ backgroundColor: isDo ? "#fff8e1" : "inherit" }}
+        >
+          <IconButton
+            size="small"
+            color={state.evaluated ? "success" : "primary"}
+            onClick={() => {
+              handleRowGrade(
+                rowKey,
+                expectedNotes,
+                expectedRelativeMinor,
+                tablePracticeAnswers,
+                setTablePracticeAnswers,
+              );
+            }}
+          >
+            {state.evaluated ? (
+              <CheckCircleOutline fontSize="small" />
+            ) : (
+              <SendIcon fontSize="small" />
+            )}
+          </IconButton>
+        </TableCell>
+      )}
+    </TableRow>
+  );
 }
 
 function polarPosition(angleDeg: number, radiusPercent: number) {
@@ -985,6 +1196,20 @@ export default function RelativeMinorScalesStudy() {
     SCALE_GUIDE[0].major,
   );
   const [showArmadurasText, setShowArmadurasText] = useState<boolean>(true);
+  const [tablePracticeMode, setTablePracticeMode] = useState<boolean>(false);
+  const [tablePracticeAnswers, setTablePracticeAnswers] = useState<
+    Record<
+      string,
+      {
+        notes: string[];
+        relativeMinor: string;
+        evaluated: boolean;
+        notesCorrect: boolean[];
+        relativeMinorCorrect: boolean;
+      }
+    >
+  >({});
+
   const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
   const [enabledQuizTypes, setEnabledQuizTypes] =
     useState<QuizQuestionType[]>(ALL_QUIZ_TYPES);
@@ -1485,9 +1710,35 @@ export default function RelativeMinorScalesStudy() {
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5 }}>
-            Tabla de armaduras (como tu pizarrón)
-          </Typography>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              Tabla de armaduras
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={tablePracticeMode}
+                  onChange={(e) => {
+                    setTablePracticeMode(e.target.checked);
+                    if (!e.target.checked) {
+                      setTablePracticeAnswers({});
+                    }
+                  }}
+                  color="primary"
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  Modo Práctica
+                </Typography>
+              }
+            />
+          </Stack>
           <Stack spacing={2}>
             <Box sx={{ overflowX: "auto" }}>
               <Typography sx={{ fontWeight: 600, mb: 1 }}>
@@ -1504,55 +1755,56 @@ export default function RelativeMinorScalesStudy() {
                         align="center"
                         sx={
                           index === 5
-                            ? { backgroundColor: "#e8f5e9", fontWeight: 700 }
-                            : null
+                            ? {
+                                backgroundColor: "#e8f5e9",
+                                fontWeight: 700,
+                                width: tablePracticeMode ? 70 : "auto",
+                              }
+                            : { width: tablePracticeMode ? 70 : "auto" }
                         }
                       >
                         {degree}
                       </TableCell>
                     ))}
-                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        fontWeight: 600,
+                        width: tablePracticeMode ? 140 : "auto",
+                      }}
+                    >
                       Relativo Menor
                     </TableCell>
+                    {tablePracticeMode && (
+                      <TableCell align="center" sx={{ width: 100 }}></TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableRow>
-                    <TableCell
-                      align="center"
-                      sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
-                    >
-                      Do (C)
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{ backgroundColor: "#fff8e1" }}
-                    >
-                      0
-                    </TableCell>
-                    {renderScaleDegreeCells(
-                      ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
-                      "do-flat",
-                    )}
-                    <TableCell
-                      align="center"
-                      sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
-                    >
-                      La menor (Am)
-                    </TableCell>
-                  </TableRow>
-                  {FLAT_SUBTABLE.map((row) => (
-                    <TableRow key={row.tonality}>
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.tonality} ({row.tonalityEn})
-                      </TableCell>
-                      <TableCell align="center">{row.count}</TableCell>
-                      {renderScaleDegreeCells(row.majorScale, row.tonality)}
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.relativeMinor}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {renderPracticeRow(
+                    "do-flat",
+                    "Do",
+                    "C",
+                    0,
+                    ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
+                    "La menor (Am)",
+                    tablePracticeMode,
+                    tablePracticeAnswers,
+                    setTablePracticeAnswers,
+                  )}
+                  {FLAT_SUBTABLE.map((row) =>
+                    renderPracticeRow(
+                      `flat-${row.tonality}`,
+                      row.tonality,
+                      row.tonalityEn,
+                      row.count,
+                      row.majorScale,
+                      row.relativeMinor,
+                      tablePracticeMode,
+                      tablePracticeAnswers,
+                      setTablePracticeAnswers,
+                    ),
+                  )}
                 </TableBody>
               </Table>
             </Box>
@@ -1572,55 +1824,56 @@ export default function RelativeMinorScalesStudy() {
                         align="center"
                         sx={
                           index === 5
-                            ? { backgroundColor: "#e8f5e9", fontWeight: 700 }
-                            : null
+                            ? {
+                                backgroundColor: "#e8f5e9",
+                                fontWeight: 700,
+                                width: tablePracticeMode ? 70 : "auto",
+                              }
+                            : { width: tablePracticeMode ? 70 : "auto" }
                         }
                       >
                         {degree}
                       </TableCell>
                     ))}
-                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        fontWeight: 600,
+                        width: tablePracticeMode ? 140 : "auto",
+                      }}
+                    >
                       Relativo Menor
                     </TableCell>
+                    {tablePracticeMode && (
+                      <TableCell align="center" sx={{ width: 100 }}></TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableRow>
-                    <TableCell
-                      align="center"
-                      sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
-                    >
-                      Do (C)
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      sx={{ backgroundColor: "#fff8e1" }}
-                    >
-                      0
-                    </TableCell>
-                    {renderScaleDegreeCells(
-                      ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
-                      "do-sharp",
-                    )}
-                    <TableCell
-                      align="center"
-                      sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
-                    >
-                      La menor (Am)
-                    </TableCell>
-                  </TableRow>
-                  {SHARP_SUBTABLE.map((row) => (
-                    <TableRow key={row.tonality}>
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.tonality} ({row.tonalityEn})
-                      </TableCell>
-                      <TableCell align="center">{row.count}</TableCell>
-                      {renderScaleDegreeCells(row.majorScale, row.tonality)}
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.relativeMinor}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {renderPracticeRow(
+                    "do-sharp",
+                    "Do",
+                    "C",
+                    0,
+                    ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
+                    "La menor (Am)",
+                    tablePracticeMode,
+                    tablePracticeAnswers,
+                    setTablePracticeAnswers,
+                  )}
+                  {SHARP_SUBTABLE.map((row) =>
+                    renderPracticeRow(
+                      `sharp-${row.tonality}`,
+                      row.tonality,
+                      row.tonalityEn,
+                      row.count,
+                      row.majorScale,
+                      row.relativeMinor,
+                      tablePracticeMode,
+                      tablePracticeAnswers,
+                      setTablePracticeAnswers,
+                    ),
+                  )}
                 </TableBody>
               </Table>
             </Box>
