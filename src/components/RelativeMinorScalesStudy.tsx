@@ -19,6 +19,8 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -29,7 +31,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import * as Tone from "tone";
-import { Factory, Stave, StaveNote, Formatter } from "vexflow";
+import { Factory, Stave } from "vexflow";
 import { getYamahaSampler, releaseYamahaVoices } from "../utils/yamahaSampler";
 
 type RootLabel =
@@ -910,8 +912,11 @@ export default function RelativeMinorScalesStudy() {
   const [selectedMajor, setSelectedMajor] = useState<string>(
     SCALE_GUIDE[0].major,
   );
+  const [showArmadurasText, setShowArmadurasText] = useState<boolean>(true);
   const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
-  const [question, setQuestion] = useState<QuizQuestion>(() => createQuizQuestion());
+  const [question, setQuestion] = useState<QuizQuestion>(() =>
+    createQuizQuestion(),
+  );
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [scaleInputs, setScaleInputs] = useState<string[]>(Array(7).fill(""));
   const [textInput, setTextInput] = useState<string>("");
@@ -943,7 +948,8 @@ export default function RelativeMinorScalesStudy() {
       );
     } else if (isIdentifySixth) {
       isCorrect =
-        textInput.trim().toLowerCase() === (question.answer || "").toLowerCase();
+        textInput.trim().toLowerCase() ===
+        (question.answer || "").toLowerCase();
     }
   }
 
@@ -1016,93 +1022,25 @@ export default function RelativeMinorScalesStudy() {
       container: HTMLDivElement | null,
       clef: string,
       keySignature: string,
-      notesToRender: Array<{ keys: string[]; duration: string }>,
-      text: string,
     ) => {
       if (!container) return;
       container.innerHTML = "";
       const vf = new Factory({
-        renderer: { elementId: container.id, width: 350, height: 120 },
+        renderer: { elementId: container.id, width: 220, height: 90 },
       });
       const ctx = vf.getContext();
-      const stave = new Stave(10, 20, 320);
+      const stave = new Stave(10, 0, 200);
       stave.addClef(clef).addKeySignature(keySignature);
       stave.setContext(ctx).draw();
-
-      const notes = notesToRender.map(
-        (n) => new StaveNote({ clef, keys: n.keys, duration: n.duration }),
-      );
-
-      Formatter.FormatAndDraw(ctx, stave, notes);
-
-      ctx.font = "12px Arial";
-      ctx.fillStyle = "#666";
-      ctx.fillText(text, 10, 115);
     };
 
-    drawSignature(
-      vfTrebleFlatsRef.current,
-      "treble",
-      "Cb",
-      [
-        { keys: ["b/4"], duration: "q" },
-        { keys: ["e/5"], duration: "q" },
-        { keys: ["a/4"], duration: "q" },
-        { keys: ["d/5"], duration: "q" },
-        { keys: ["g/4"], duration: "q" },
-        { keys: ["c/5"], duration: "q" },
-        { keys: ["f/4"], duration: "q" },
-      ],
-      "Sib  Mib  Lab  Reb  Solb  Dob  Fab",
-    );
+    drawSignature(vfTrebleFlatsRef.current, "treble", "Cb");
 
-    drawSignature(
-      vfBassFlatsRef.current,
-      "bass",
-      "Cb",
-      [
-        { keys: ["b/2"], duration: "q" },
-        { keys: ["e/3"], duration: "q" },
-        { keys: ["a/2"], duration: "q" },
-        { keys: ["d/3"], duration: "q" },
-        { keys: ["g/2"], duration: "q" },
-        { keys: ["c/3"], duration: "q" },
-        { keys: ["f/2"], duration: "q" },
-      ],
-      "Sib  Mib  Lab  Reb  Solb  Dob  Fab",
-    );
+    drawSignature(vfBassFlatsRef.current, "bass", "Cb");
 
-    drawSignature(
-      vfTrebleSharpsRef.current,
-      "treble",
-      "C#",
-      [
-        { keys: ["f/5"], duration: "q" },
-        { keys: ["c/5"], duration: "q" },
-        { keys: ["g/5"], duration: "q" },
-        { keys: ["d/5"], duration: "q" },
-        { keys: ["a/4"], duration: "q" },
-        { keys: ["e/5"], duration: "q" },
-        { keys: ["b/4"], duration: "q" },
-      ],
-      "Fa#  Do#  Sol#  Re#  La#  Mi#  Si#",
-    );
+    drawSignature(vfTrebleSharpsRef.current, "treble", "C#");
 
-    drawSignature(
-      vfBassSharpsRef.current,
-      "bass",
-      "C#",
-      [
-        { keys: ["f/3"], duration: "q" },
-        { keys: ["c/3"], duration: "q" },
-        { keys: ["g/3"], duration: "q" },
-        { keys: ["d/3"], duration: "q" },
-        { keys: ["a/2"], duration: "q" },
-        { keys: ["e/3"], duration: "q" },
-        { keys: ["b/2"], duration: "q" },
-      ],
-      "Fa#  Do#  Sol#  Re#  La#  Mi#  Si#",
-    );
+    drawSignature(vfBassSharpsRef.current, "bass", "C#");
   }, []);
 
   const handleNextQuestion = () => {
@@ -1344,25 +1282,126 @@ export default function RelativeMinorScalesStudy() {
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5 }}>
-            Orden de aparición de armaduras
-          </Typography>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              Orden de aparición de armaduras
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showArmadurasText}
+                  onChange={(e) => setShowArmadurasText(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Mostrar notas"
+            />
+          </Stack>
 
-          <Stack spacing={4} direction={{ xs: "column", md: "row" }} justifyContent="space-around">
+          <Stack
+            spacing={4}
+            direction={{ xs: "column", md: "row" }}
+            justifyContent="space-around"
+          >
             <Box>
-              <Typography variant="subtitle1" color="primary.main" sx={{ fontWeight: 600, mb: 1, textAlign: 'center' }}>
+              <Typography
+                variant="subtitle1"
+                color="primary.main"
+                sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}
+              >
                 Orden de Bemoles (b)
               </Typography>
-              <div id="vf-treble-flats" ref={vfTrebleFlatsRef} style={{ display: "flex", justifyContent: "center" }} />
-              <div id="vf-bass-flats" ref={vfBassFlatsRef} style={{ display: "flex", justifyContent: "center", marginTop: -20 }} />
+              <div
+                id="vf-treble-flats"
+                ref={vfTrebleFlatsRef}
+                style={{ display: "flex", justifyContent: "center" }}
+              />
+              <div
+                id="vf-bass-flats"
+                ref={vfBassFlatsRef}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: -15,
+                }}
+              />
+              {showArmadurasText && (
+                <Stack
+                  direction="row"
+                  justifyContent="center"
+                  spacing={1.5}
+                  sx={{ mt: 1, ml: 3, opacity: 0.85 }}
+                >
+                  {["Sib", "Mib", "Lab", "Reb", "Solb", "Dob", "Fab"].map(
+                    (n) => (
+                      <Typography
+                        key={`f-${n}`}
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "0.85rem",
+                          letterSpacing: "-0.5px",
+                        }}
+                      >
+                        {n}
+                      </Typography>
+                    ),
+                  )}
+                </Stack>
+              )}
             </Box>
 
             <Box>
-              <Typography variant="subtitle1" color="error.main" sx={{ fontWeight: 600, mb: 1, textAlign: 'center' }}>
+              <Typography
+                variant="subtitle1"
+                color="error.main"
+                sx={{ fontWeight: 600, mb: 1, textAlign: "center" }}
+              >
                 Orden de Sostenidos (#)
               </Typography>
-              <div id="vf-treble-sharps" ref={vfTrebleSharpsRef} style={{ display: "flex", justifyContent: "center" }} />
-              <div id="vf-bass-sharps" ref={vfBassSharpsRef} style={{ display: "flex", justifyContent: "center", marginTop: -20 }} />
+              <div
+                id="vf-treble-sharps"
+                ref={vfTrebleSharpsRef}
+                style={{ display: "flex", justifyContent: "center" }}
+              />
+              <div
+                id="vf-bass-sharps"
+                ref={vfBassSharpsRef}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: -15,
+                }}
+              />
+              {showArmadurasText && (
+                <Stack
+                  direction="row"
+                  justifyContent="center"
+                  spacing={1.5}
+                  sx={{ mt: 1, ml: 3, opacity: 0.85 }}
+                >
+                  {["Fa#", "Do#", "Sol#", "Re#", "La#", "Mi#", "Si#"].map(
+                    (n) => (
+                      <Typography
+                        key={`s-${n}`}
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "0.85rem",
+                          letterSpacing: "-0.5px",
+                        }}
+                      >
+                        {n}
+                      </Typography>
+                    ),
+                  )}
+                </Stack>
+              )}
             </Box>
           </Stack>
         </Paper>
