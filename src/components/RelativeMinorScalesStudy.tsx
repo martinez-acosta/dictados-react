@@ -2136,6 +2136,13 @@ export default function RelativeMinorScalesStudy() {
                       ¿A qué Mayor corresponde este Relativo?
                     </Typography>
                     <Typography
+                      variant="caption"
+                      color="text.disabled"
+                      sx={{ fontWeight: 600, mt: -0.5 }}
+                    >
+                      (Sube 3 semitonos)
+                    </Typography>
+                    <Typography
                       variant="h5"
                       sx={{ fontWeight: 800, color: "#00695c" }}
                     >
