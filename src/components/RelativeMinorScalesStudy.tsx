@@ -36,6 +36,7 @@ import {
   Send as SendIcon,
   LightbulbOutlined,
   PlayArrowRounded,
+  DeleteOutline,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import * as Tone from "tone";
@@ -585,9 +586,30 @@ function handleRowGrade(
     (n: string, i: number) =>
       n.trim().toLowerCase() === expectedNotes[i].toLowerCase(),
   );
-  const relativeMinorCorrect =
-    currentState.relativeMinor.trim().toLowerCase() ===
-    expectedRelativeMinor.toLowerCase();
+  const normInput = currentState.relativeMinor.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normExpected = expectedRelativeMinor.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  // Extract core note name and english symbol (e.g., from "la menor (am)" extract "la" and "am")
+  const expectedParts = normExpected.match(/^([a-z#b]+)\s+menor\s+\(([a-z#bm]+)\)$/);
+
+  let relativeMinorCorrect = false;
+  if (expectedParts) {
+    const spanishNote = expectedParts[1];
+    const englishSymbol = expectedParts[2];
+
+    // Accept match if input is just "la", "am", "la menor", etc.
+    if (
+      normInput === spanishNote ||
+      normInput === englishSymbol ||
+      normInput === `${spanishNote} m` ||
+      normInput === `${spanishNote} menor` ||
+      normExpected.includes(normInput) && normInput.length >= 2 // fallback
+    ) {
+      relativeMinorCorrect = true;
+    }
+  } else {
+    relativeMinorCorrect = normInput === normExpected || normExpected.includes(normInput);
+  }
 
   setTablePracticeAnswers((prev) => ({
     ...prev,
@@ -1719,25 +1741,33 @@ export default function RelativeMinorScalesStudy() {
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
               Tabla de armaduras
             </Typography>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={tablePracticeMode}
-                  onChange={(e) => {
-                    setTablePracticeMode(e.target.checked);
-                    if (!e.target.checked) {
-                      setTablePracticeAnswers({});
-                    }
-                  }}
-                  color="primary"
-                />
-              }
-              label={
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  Modo Práctica
-                </Typography>
-              }
-            />
+            <Stack direction="row" spacing={2} alignItems="center">
+              {tablePracticeMode && Object.keys(tablePracticeAnswers).length > 0 && (
+                <Button
+                  size="small"
+                  variant="text"
+                  color="error"
+                  startIcon={<DeleteOutline />}
+                  onClick={() => setTablePracticeAnswers({})}
+                >
+                  Limpiar Práctica
+                </Button>
+              )}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={tablePracticeMode}
+                    onChange={(e) => setTablePracticeMode(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label={
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Modo Práctica
+                  </Typography>
+                }
+              />
+            </Stack>
           </Stack>
           <Stack spacing={2}>
             <Box sx={{ overflowX: "auto" }}>
