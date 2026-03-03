@@ -80,7 +80,6 @@ const SCALE_COLUMNS = [
   "V",
   "VI",
   "VII",
-  "VIII",
 ] as const;
 const CHROMATIC_ROOTS = [
   "C",
@@ -352,7 +351,7 @@ function createQuizQuestion(): QuizQuestion {
 }
 
 function renderScaleDegreeCells(notes: string[], rowKeyPrefix: string) {
-  return notes.slice(0, 8).map((note, index) => (
+  return notes.slice(0, 7).map((note, index) => (
     <TableCell
       key={`${rowKeyPrefix}-deg-${index}`}
       align="center"
@@ -1000,15 +999,6 @@ export default function RelativeMinorScalesStudy() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {FLAT_SUBTABLE.map((row) => (
-                    <TableRow key={row.tonality}>
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.tonality}
-                      </TableCell>
-                      <TableCell align="center">{row.count}</TableCell>
-                      {renderScaleDegreeCells(row.majorScale, row.tonality)}
-                    </TableRow>
-                  ))}
                   <TableRow>
                     <TableCell
                       align="center"
@@ -1027,6 +1017,15 @@ export default function RelativeMinorScalesStudy() {
                       "do-flat",
                     )}
                   </TableRow>
+                  {FLAT_SUBTABLE.map((row) => (
+                    <TableRow key={row.tonality}>
+                      <TableCell align="center" sx={{ fontWeight: 600 }}>
+                        {row.tonality}
+                      </TableCell>
+                      <TableCell align="center">{row.count}</TableCell>
+                      {renderScaleDegreeCells(row.majorScale, row.tonality)}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Box>
@@ -1056,15 +1055,6 @@ export default function RelativeMinorScalesStudy() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {SHARP_SUBTABLE.map((row) => (
-                    <TableRow key={row.tonality}>
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.tonality}
-                      </TableCell>
-                      <TableCell align="center">{row.count}</TableCell>
-                      {renderScaleDegreeCells(row.majorScale, row.tonality)}
-                    </TableRow>
-                  ))}
                   <TableRow>
                     <TableCell
                       align="center"
@@ -1083,6 +1073,15 @@ export default function RelativeMinorScalesStudy() {
                       "do-sharp",
                     )}
                   </TableRow>
+                  {SHARP_SUBTABLE.map((row) => (
+                    <TableRow key={row.tonality}>
+                      <TableCell align="center" sx={{ fontWeight: 600 }}>
+                        {row.tonality}
+                      </TableCell>
+                      <TableCell align="center">{row.count}</TableCell>
+                      {renderScaleDegreeCells(row.majorScale, row.tonality)}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </Box>
