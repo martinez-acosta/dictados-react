@@ -15,6 +15,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TextField,
   Typography,
   useMediaQuery,
   useTheme,
@@ -71,11 +72,19 @@ type WheelSlot = {
   matchRoots: RootLabel[];
 };
 
+type QuizQuestionType =
+  | "majorToMinor"
+  | "minorToMajor"
+  | "writeMajor"
+  | "writeMinor"
+  | "identifySixth";
+
 type QuizQuestion = {
-  type: "majorToMinor" | "minorToMajor";
+  type: QuizQuestionType;
   questionText: string;
-  answer: string;
-  options: string[];
+  answer?: string;
+  options?: string[];
+  answerArray?: string[];
 };
 
 const DEGREE_LABELS = ["I", "II", "III", "IV", "V", "VI", "VII"] as const;
@@ -416,9 +425,27 @@ function shuffle<T>(array: T[]): T[] {
 
 function createQuizQuestion(): QuizQuestion {
   const target = SCALE_GUIDE[Math.floor(Math.random() * SCALE_GUIDE.length)];
-  const isMajorToMinor = Math.random() > 0.5;
+  const modeRand = Math.random();
 
-  if (isMajorToMinor) {
+  if (modeRand < 0.2) {
+    return {
+      type: "writeMajor",
+      questionText: `Escribe las 7 notas de la escala de ${target.major} en orden:`,
+      answerArray: target.notes.slice(0, 7),
+    };
+  } else if (modeRand < 0.4) {
+    return {
+      type: "writeMinor",
+      questionText: `Escribe las 7 notas de la escala de ${target.relativeMinor} natural en orden:`,
+      answerArray: target.minorNotes.slice(0, 7),
+    };
+  } else if (modeRand < 0.6) {
+    return {
+      type: "identifySixth",
+      questionText: `¿Cuál es el 6º grado de ${target.major}?`,
+      answer: target.sixthDegree,
+    };
+  } else if (modeRand < 0.8) {
     const distractors = shuffle(
       SCALE_GUIDE.filter(
         (row) => row.relativeMinor !== target.relativeMinor,
@@ -883,8 +910,11 @@ export default function RelativeMinorScalesStudy() {
     SCALE_GUIDE[0].major,
   );
   const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
-  const [question, setQuestion] = useState(() => createQuizQuestion());
-  const [selectedOption, setSelectedOption] = useState("");
+  const [question, setQuestion] = useState<QuizQuestion>(() => createQuizQuestion());
+  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [scaleInputs, setScaleInputs] = useState<string[]>(Array(7).fill(""));
+  const [textInput, setTextInput] = useState<string>("");
+  const [isEvaluated, setIsEvaluated] = useState(false);
 
   const selectedScale = useMemo(
     () =>
@@ -892,8 +922,29 @@ export default function RelativeMinorScalesStudy() {
     [selectedMajor],
   );
 
-  const answered = selectedOption.length > 0;
-  const isCorrect = answered && selectedOption === question.answer;
+  const isMultipleChoice =
+    question.type === "majorToMinor" || question.type === "minorToMajor";
+  const isWriteScale =
+    question.type === "writeMajor" || question.type === "writeMinor";
+  const isIdentifySixth = question.type === "identifySixth";
+
+  const answered = isEvaluated;
+  let isCorrect = false;
+
+  if (isEvaluated) {
+    if (isMultipleChoice) {
+      isCorrect = selectedOption === question.answer;
+    } else if (isWriteScale) {
+      isCorrect = scaleInputs.every(
+        (val, i) =>
+          val.trim().toLowerCase() ===
+          (question.answerArray?.[i] || "").toLowerCase(),
+      );
+    } else if (isIdentifySixth) {
+      isCorrect =
+        textInput.trim().toLowerCase() === (question.answer || "").toLowerCase();
+    }
+  }
 
   const playScale = async (notesToPlay: string[]) => {
     // Basic mapping from notation to Tone.js friendly format
@@ -956,6 +1007,9 @@ export default function RelativeMinorScalesStudy() {
   const handleNextQuestion = () => {
     setQuestion(createQuizQuestion());
     setSelectedOption("");
+    setScaleInputs(Array(7).fill(""));
+    setTextInput("");
+    setIsEvaluated(false);
   };
 
   return (
@@ -1342,18 +1396,95 @@ export default function RelativeMinorScalesStudy() {
           </Typography>
           <Typography sx={{ mb: 1.5 }}>{question.questionText}</Typography>
 
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
-            {question.options.map((option) => (
-              <Button
-                key={`${question.questionText}-${option}`}
-                variant={selectedOption === option ? "contained" : "outlined"}
-                color={selectedOption === option ? "primary" : "inherit"}
-                onClick={() => setSelectedOption(option)}
-              >
-                {option}
-              </Button>
-            ))}
-          </Stack>
+          {isMultipleChoice && (
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
+              {(question.options || []).map((option) => (
+                <Button
+                  key={`${question.questionText}-${option}`}
+                  variant={selectedOption === option ? "contained" : "outlined"}
+                  color={selectedOption === option ? "primary" : "inherit"}
+                  onClick={() => {
+                    if (isEvaluated) return;
+                    setSelectedOption(option);
+                    setIsEvaluated(true);
+                  }}
+                >
+                  {option}
+                </Button>
+              ))}
+            </Stack>
+          )}
+
+          {isWriteScale && (
+            <Stack spacing={2}>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <TextField
+                    key={`scale-input-${i}`}
+                    label={DEGREE_LABELS[i]}
+                    size="small"
+                    value={scaleInputs[i]}
+                    onChange={(e) => {
+                      const newInputs = [...scaleInputs];
+                      newInputs[i] = e.target.value;
+                      setScaleInputs(newInputs);
+                    }}
+                    sx={{ width: { xs: "calc(33.33% - 8px)", sm: 80 } }}
+                    InputProps={{
+                      readOnly: isEvaluated,
+                    }}
+                    color={
+                      isEvaluated
+                        ? scaleInputs[i].trim().toLowerCase() ===
+                          (question.answerArray?.[i] || "").toLowerCase()
+                          ? "success"
+                          : "error"
+                        : "primary"
+                    }
+                    focused={isEvaluated}
+                  />
+                ))}
+              </Stack>
+              {!isEvaluated && (
+                <Button
+                  variant="contained"
+                  onClick={() => setIsEvaluated(true)}
+                  sx={{ alignSelf: "flex-start" }}
+                >
+                  Calificar escala
+                </Button>
+              )}
+            </Stack>
+          )}
+
+          {isIdentifySixth && (
+            <Stack spacing={2} direction="row" alignItems="center">
+              <TextField
+                size="small"
+                label="6º grado"
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                InputProps={{ readOnly: isEvaluated }}
+                color={
+                  isEvaluated
+                    ? textInput.trim().toLowerCase() ===
+                      (question.answer || "").toLowerCase()
+                      ? "success"
+                      : "error"
+                    : "primary"
+                }
+                focused={isEvaluated}
+              />
+              {!isEvaluated && (
+                <Button
+                  variant="contained"
+                  onClick={() => setIsEvaluated(true)}
+                >
+                  Calificar
+                </Button>
+              )}
+            </Stack>
+          )}
 
           {answered && (
             <>
@@ -1363,15 +1494,32 @@ export default function RelativeMinorScalesStudy() {
                   <>
                     <CheckCircleOutline color="success" />
                     <Typography color="success.main" sx={{ fontWeight: 600 }}>
-                      Correcto. La respuesta es {question.answer}
+                      ¡Correcto!
                     </Typography>
                   </>
                 ) : (
                   <>
                     <CancelOutlined color="error" />
-                    <Typography color="error.main" sx={{ fontWeight: 600 }}>
-                      Casi. La respuesta correcta es {question.answer}.
-                    </Typography>
+                    <Stack>
+                      <Typography color="error.main" sx={{ fontWeight: 600 }}>
+                        Casi. La respuesta correcta es:
+                      </Typography>
+                      {isMultipleChoice && (
+                        <Typography variant="body2" sx={{ ml: 0.5 }}>
+                          {question.answer}
+                        </Typography>
+                      )}
+                      {isIdentifySixth && (
+                        <Typography variant="body2" sx={{ ml: 0.5 }}>
+                          {question.answer}
+                        </Typography>
+                      )}
+                      {isWriteScale && (
+                        <Typography variant="body2" sx={{ ml: 0.5 }}>
+                          {question.answerArray?.join(" - ")}
+                        </Typography>
+                      )}
+                    </Stack>
                   </>
                 )}
               </Stack>
