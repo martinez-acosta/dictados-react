@@ -544,11 +544,9 @@ function createQuizQuestion(
   } else if (pickedType === "identifyKeyByAccidentals") {
     const accidentals = target.keySignature;
     const desc =
-      accidentals === "0"
+      accidentals === "0 alteraciones"
         ? "0 alteraciones"
-        : accidentals.includes("b")
-          ? `${accidentals.replace("b", "")} bemoles`
-          : `${accidentals.replace("#", "")} sostenidos`;
+        : accidentals;
 
     const distractors = shuffle(
       SCALE_GUIDE.filter((row) => row.major !== target.major).map(
