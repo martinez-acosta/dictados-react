@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import * as Tone from "tone";
+import { Factory, Stave, StaveNote, Formatter } from "vexflow";
 import { getYamahaSampler, releaseYamahaVoices } from "../utils/yamahaSampler";
 
 type RootLabel =
@@ -1004,6 +1005,106 @@ export default function RelativeMinorScalesStudy() {
     });
   };
 
+  // VexFlow references for key signature diagrams
+  const vfTrebleFlatsRef = React.useRef<HTMLDivElement>(null);
+  const vfBassFlatsRef = React.useRef<HTMLDivElement>(null);
+  const vfTrebleSharpsRef = React.useRef<HTMLDivElement>(null);
+  const vfBassSharpsRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const drawSignature = (
+      container: HTMLDivElement | null,
+      clef: string,
+      keySignature: string,
+      notesToRender: Array<{ keys: string[]; duration: string }>,
+      text: string,
+    ) => {
+      if (!container) return;
+      container.innerHTML = "";
+      const vf = new Factory({
+        renderer: { elementId: container.id, width: 350, height: 120 },
+      });
+      const ctx = vf.getContext();
+      const stave = new Stave(10, 20, 320);
+      stave.addClef(clef).addKeySignature(keySignature);
+      stave.setContext(ctx).draw();
+
+      const notes = notesToRender.map(
+        (n) => new StaveNote({ clef, keys: n.keys, duration: n.duration }),
+      );
+
+      Formatter.FormatAndDraw(ctx, stave, notes);
+
+      ctx.font = "12px Arial";
+      ctx.fillStyle = "#666";
+      ctx.fillText(text, 10, 115);
+    };
+
+    drawSignature(
+      vfTrebleFlatsRef.current,
+      "treble",
+      "Cb",
+      [
+        { keys: ["b/4"], duration: "q" },
+        { keys: ["e/5"], duration: "q" },
+        { keys: ["a/4"], duration: "q" },
+        { keys: ["d/5"], duration: "q" },
+        { keys: ["g/4"], duration: "q" },
+        { keys: ["c/5"], duration: "q" },
+        { keys: ["f/4"], duration: "q" },
+      ],
+      "Sib  Mib  Lab  Reb  Solb  Dob  Fab",
+    );
+
+    drawSignature(
+      vfBassFlatsRef.current,
+      "bass",
+      "Cb",
+      [
+        { keys: ["b/2"], duration: "q" },
+        { keys: ["e/3"], duration: "q" },
+        { keys: ["a/2"], duration: "q" },
+        { keys: ["d/3"], duration: "q" },
+        { keys: ["g/2"], duration: "q" },
+        { keys: ["c/3"], duration: "q" },
+        { keys: ["f/2"], duration: "q" },
+      ],
+      "Sib  Mib  Lab  Reb  Solb  Dob  Fab",
+    );
+
+    drawSignature(
+      vfTrebleSharpsRef.current,
+      "treble",
+      "C#",
+      [
+        { keys: ["f/5"], duration: "q" },
+        { keys: ["c/5"], duration: "q" },
+        { keys: ["g/5"], duration: "q" },
+        { keys: ["d/5"], duration: "q" },
+        { keys: ["a/4"], duration: "q" },
+        { keys: ["e/5"], duration: "q" },
+        { keys: ["b/4"], duration: "q" },
+      ],
+      "Fa#  Do#  Sol#  Re#  La#  Mi#  Si#",
+    );
+
+    drawSignature(
+      vfBassSharpsRef.current,
+      "bass",
+      "C#",
+      [
+        { keys: ["f/3"], duration: "q" },
+        { keys: ["c/3"], duration: "q" },
+        { keys: ["g/3"], duration: "q" },
+        { keys: ["d/3"], duration: "q" },
+        { keys: ["a/2"], duration: "q" },
+        { keys: ["e/3"], duration: "q" },
+        { keys: ["b/2"], duration: "q" },
+      ],
+      "Fa#  Do#  Sol#  Re#  La#  Mi#  Si#",
+    );
+  }, []);
+
   const handleNextQuestion = () => {
     setQuestion(createQuizQuestion());
     setSelectedOption("");
@@ -1240,6 +1341,30 @@ export default function RelativeMinorScalesStudy() {
               encimado de etiquetas.
             </Typography>
           )}
+        </Paper>
+
+        <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5 }}>
+            Orden de aparición de armaduras
+          </Typography>
+
+          <Stack spacing={4} direction={{ xs: "column", md: "row" }} justifyContent="space-around">
+            <Box>
+              <Typography variant="subtitle1" color="primary.main" sx={{ fontWeight: 600, mb: 1, textAlign: 'center' }}>
+                Orden de Bemoles (b)
+              </Typography>
+              <div id="vf-treble-flats" ref={vfTrebleFlatsRef} style={{ display: "flex", justifyContent: "center" }} />
+              <div id="vf-bass-flats" ref={vfBassFlatsRef} style={{ display: "flex", justifyContent: "center", marginTop: -20 }} />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle1" color="error.main" sx={{ fontWeight: 600, mb: 1, textAlign: 'center' }}>
+                Orden de Sostenidos (#)
+              </Typography>
+              <div id="vf-treble-sharps" ref={vfTrebleSharpsRef} style={{ display: "flex", justifyContent: "center" }} />
+              <div id="vf-bass-sharps" ref={vfBassSharpsRef} style={{ display: "flex", justifyContent: "center", marginTop: -20 }} />
+            </Box>
+          </Stack>
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
