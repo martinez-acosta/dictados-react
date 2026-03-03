@@ -24,8 +24,11 @@ import {
   CancelOutlined,
   CheckCircleOutline,
   LightbulbOutlined,
+  PlayArrowRounded,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import * as Tone from "tone";
+import { getYamahaSampler, releaseYamahaVoices } from "../utils/yamahaSampler";
 
 type RootLabel =
   | "C"
@@ -45,6 +48,7 @@ type WheelSide = "neutral" | "sharp" | "flat" | "mixed";
 type ScaleGuideRow = {
   major: string;
   notes: string[];
+  minorNotes: string[];
   sixthDegree: string;
   relativeMinor: string;
   keySignature: string;
@@ -52,8 +56,10 @@ type ScaleGuideRow = {
 
 type SubtableRow = {
   tonality: string;
+  tonalityEn: string;
   count: number;
   majorScale: string[];
+  relativeMinor: string;
 };
 
 type WheelSlot = {
@@ -66,21 +72,14 @@ type WheelSlot = {
 };
 
 type QuizQuestion = {
-  major: string;
+  type: "majorToMinor" | "minorToMajor";
+  questionText: string;
   answer: string;
   options: string[];
 };
 
 const DEGREE_LABELS = ["I", "II", "III", "IV", "V", "VI", "VII"] as const;
-const SCALE_COLUMNS = [
-  "I",
-  "II",
-  "III",
-  "IV",
-  "V",
-  "VI",
-  "VII",
-] as const;
+const SCALE_COLUMNS = ["I", "II", "III", "IV", "V", "VI", "VII"] as const;
 const CHROMATIC_ROOTS = [
   "C",
   "Db",
@@ -213,116 +212,196 @@ const CIRCLE_WHEEL_SLOTS: WheelSlot[] = [
 const FLAT_SUBTABLE: SubtableRow[] = [
   {
     tonality: "Fa",
+    tonalityEn: "F",
     count: 1,
     majorScale: ["Fa", "Sol", "La", "Sib", "Do", "Re", "Mi", "Fa"],
+    relativeMinor: "Re menor (Dm)",
   },
   {
     tonality: "Sib",
+    tonalityEn: "Bb",
     count: 2,
     majorScale: ["Sib", "Do", "Re", "Mib", "Fa", "Sol", "La", "Sib"],
+    relativeMinor: "Sol menor (Gm)",
   },
   {
     tonality: "Mib",
+    tonalityEn: "Eb",
     count: 3,
     majorScale: ["Mib", "Fa", "Sol", "Lab", "Sib", "Do", "Re", "Mib"],
+    relativeMinor: "Do menor (Cm)",
   },
   {
     tonality: "Lab",
+    tonalityEn: "Ab",
     count: 4,
     majorScale: ["Lab", "Sib", "Do", "Reb", "Mib", "Fa", "Sol", "Lab"],
+    relativeMinor: "Fa menor (Fm)",
   },
   {
     tonality: "Reb",
+    tonalityEn: "Db",
     count: 5,
     majorScale: ["Reb", "Mib", "Fa", "Solb", "Lab", "Sib", "Do", "Reb"],
+    relativeMinor: "Sib menor (Bbm)",
   },
   {
     tonality: "Solb",
+    tonalityEn: "Gb",
     count: 6,
     majorScale: ["Solb", "Lab", "Sib", "Dob", "Reb", "Mib", "Fa", "Solb"],
+    relativeMinor: "Mib menor (Ebm)",
   },
 ];
 
 const SHARP_SUBTABLE: SubtableRow[] = [
   {
     tonality: "Sol",
+    tonalityEn: "G",
     count: 1,
     majorScale: ["Sol", "La", "Si", "Do", "Re", "Mi", "Fa#", "Sol"],
+    relativeMinor: "Mi menor (Em)",
   },
   {
     tonality: "Re",
+    tonalityEn: "D",
     count: 2,
     majorScale: ["Re", "Mi", "Fa#", "Sol", "La", "Si", "Do#", "Re"],
+    relativeMinor: "Si menor (Bm)",
   },
   {
     tonality: "La",
+    tonalityEn: "A",
     count: 3,
     majorScale: ["La", "Si", "Do#", "Re", "Mi", "Fa#", "Sol#", "La"],
+    relativeMinor: "Fa# menor (F#m)",
   },
   {
     tonality: "Mi",
+    tonalityEn: "E",
     count: 4,
     majorScale: ["Mi", "Fa#", "Sol#", "La", "Si", "Do#", "Re#", "Mi"],
+    relativeMinor: "Do# menor (C#m)",
   },
   {
     tonality: "Si",
+    tonalityEn: "B",
     count: 5,
     majorScale: ["Si", "Do#", "Re#", "Mi", "Fa#", "Sol#", "La#", "Si"],
+    relativeMinor: "Sol# menor (G#m)",
   },
   {
     tonality: "Fa#",
+    tonalityEn: "F#",
     count: 6,
     majorScale: ["Fa#", "Sol#", "La#", "Si", "Do#", "Re#", "Mi#", "Fa#"],
+    relativeMinor: "Re# menor (D#m)",
   },
   {
     tonality: "Do#",
+    tonalityEn: "C#",
     count: 7,
     majorScale: ["Do#", "Re#", "Mi#", "Fa#", "Sol#", "La#", "Si#", "Do#"],
+    relativeMinor: "La# menor (A#m)",
   },
 ];
 
 const SCALE_GUIDE: ScaleGuideRow[] = [
   {
-    major: "Fa mayor",
+    major: "Do mayor (C)",
+    notes: ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
+    minorNotes: ["La", "Si", "Do", "Re", "Mi", "Fa", "Sol", "La"],
+    sixthDegree: "La",
+    relativeMinor: "La menor (Am)",
+    keySignature: "0 alteraciones",
+  },
+  {
+    major: "Fa mayor (F)",
     notes: ["Fa", "Sol", "La", "Sib", "Do", "Re", "Mi", "Fa"],
+    minorNotes: ["Re", "Mi", "Fa", "Sol", "La", "Sib", "Do", "Re"],
     sixthDegree: "Re",
-    relativeMinor: "Re menor",
+    relativeMinor: "Re menor (Dm)",
     keySignature: "1 bemol (Sib)",
   },
   {
-    major: "Sib mayor",
+    major: "Sib mayor (Bb)",
     notes: ["Sib", "Do", "Re", "Mib", "Fa", "Sol", "La", "Sib"],
+    minorNotes: ["Sol", "La", "Sib", "Do", "Re", "Mib", "Fa", "Sol"],
     sixthDegree: "Sol",
-    relativeMinor: "Sol menor",
+    relativeMinor: "Sol menor (Gm)",
     keySignature: "2 bemoles (Sib, Mib)",
   },
   {
-    major: "Mib mayor",
+    major: "Mib mayor (Eb)",
     notes: ["Mib", "Fa", "Sol", "Lab", "Sib", "Do", "Re", "Mib"],
+    minorNotes: ["Do", "Re", "Mib", "Fa", "Sol", "Lab", "Sib", "Do"],
     sixthDegree: "Do",
-    relativeMinor: "Do menor",
+    relativeMinor: "Do menor (Cm)",
     keySignature: "3 bemoles (Sib, Mib, Lab)",
   },
   {
-    major: "Sol mayor",
+    major: "Lab mayor (Ab)",
+    notes: ["Lab", "Sib", "Do", "Reb", "Mib", "Fa", "Sol", "Lab"],
+    minorNotes: ["Fa", "Sol", "Lab", "Sib", "Do", "Reb", "Mib", "Fa"],
+    sixthDegree: "Fa",
+    relativeMinor: "Fa menor (Fm)",
+    keySignature: "4 bemoles (Sib, Mib, Lab, Reb)",
+  },
+  {
+    major: "Reb mayor (Db)",
+    notes: ["Reb", "Mib", "Fa", "Solb", "Lab", "Sib", "Do", "Reb"],
+    minorNotes: ["Sib", "Do", "Reb", "Mib", "Fa", "Solb", "Lab", "Sib"],
+    sixthDegree: "Sib",
+    relativeMinor: "Sib menor (Bbm)",
+    keySignature: "5 bemoles",
+  },
+  {
+    major: "Solb mayor (Gb)",
+    notes: ["Solb", "Lab", "Sib", "Dob", "Reb", "Mib", "Fa", "Solb"],
+    minorNotes: ["Mib", "Fa", "Solb", "Lab", "Sib", "Dob", "Reb", "Mib"],
+    sixthDegree: "Mib",
+    relativeMinor: "Mib menor (Ebm)",
+    keySignature: "6 bemoles",
+  },
+  {
+    major: "Sol mayor (G)",
     notes: ["Sol", "La", "Si", "Do", "Re", "Mi", "Fa#", "Sol"],
+    minorNotes: ["Mi", "Fa#", "Sol", "La", "Si", "Do", "Re", "Mi"],
     sixthDegree: "Mi",
-    relativeMinor: "Mi menor",
+    relativeMinor: "Mi menor (Em)",
     keySignature: "1 sostenido (Fa#)",
   },
   {
-    major: "Re mayor",
+    major: "Re mayor (D)",
     notes: ["Re", "Mi", "Fa#", "Sol", "La", "Si", "Do#", "Re"],
+    minorNotes: ["Si", "Do#", "Re", "Mi", "Fa#", "Sol", "La", "Si"],
     sixthDegree: "Si",
-    relativeMinor: "Si menor",
+    relativeMinor: "Si menor (Bm)",
     keySignature: "2 sostenidos (Fa#, Do#)",
   },
   {
-    major: "La mayor",
+    major: "La mayor (A)",
     notes: ["La", "Si", "Do#", "Re", "Mi", "Fa#", "Sol#", "La"],
+    minorNotes: ["Fa#", "Sol#", "La", "Si", "Do#", "Re", "Mi", "Fa#"],
     sixthDegree: "Fa#",
-    relativeMinor: "Fa# menor",
+    relativeMinor: "Fa# menor (F#m)",
     keySignature: "3 sostenidos (Fa#, Do#, Sol#)",
+  },
+  {
+    major: "Mi mayor (E)",
+    notes: ["Mi", "Fa#", "Sol#", "La", "Si", "Do#", "Re#", "Mi"],
+    minorNotes: ["Do#", "Re#", "Mi", "Fa#", "Sol#", "La", "Si", "Do#"],
+    sixthDegree: "Do#",
+    relativeMinor: "Do# menor (C#m)",
+    keySignature: "4 sostenidos",
+  },
+  {
+    major: "Si mayor (B)",
+    notes: ["Si", "Do#", "Re#", "Mi", "Fa#", "Sol#", "La#", "Si"],
+    minorNotes: ["Sol#", "La#", "Si", "Do#", "Re#", "Mi", "Fa#", "Sol#"],
+    sixthDegree: "Sol#",
+    relativeMinor: "Sol# menor (G#m)",
+    keySignature: "5 sostenidos",
   },
 ];
 
@@ -337,17 +416,35 @@ function shuffle<T>(array: T[]): T[] {
 
 function createQuizQuestion(): QuizQuestion {
   const target = SCALE_GUIDE[Math.floor(Math.random() * SCALE_GUIDE.length)];
-  const distractors = shuffle(
-    SCALE_GUIDE.filter((row) => row.relativeMinor !== target.relativeMinor).map(
-      (row) => row.relativeMinor,
-    ),
-  ).slice(0, 3);
+  const isMajorToMinor = Math.random() > 0.5;
 
-  return {
-    major: target.major,
-    answer: target.relativeMinor,
-    options: shuffle([target.relativeMinor, ...distractors]),
-  };
+  if (isMajorToMinor) {
+    const distractors = shuffle(
+      SCALE_GUIDE.filter(
+        (row) => row.relativeMinor !== target.relativeMinor,
+      ).map((row) => row.relativeMinor),
+    ).slice(0, 3);
+
+    return {
+      type: "majorToMinor",
+      questionText: `¿Cuál es el relativo menor de ${target.major}?`,
+      answer: target.relativeMinor,
+      options: shuffle([target.relativeMinor, ...distractors]),
+    };
+  } else {
+    const distractors = shuffle(
+      SCALE_GUIDE.filter((row) => row.major !== target.major).map(
+        (row) => row.major,
+      ),
+    ).slice(0, 3);
+
+    return {
+      type: "minorToMajor",
+      questionText: `¿Cuál es la escala mayor relativa de ${target.relativeMinor}?`,
+      answer: target.major,
+      options: shuffle([target.major, ...distractors]),
+    };
+  }
 }
 
 function renderScaleDegreeCells(notes: string[], rowKeyPrefix: string) {
@@ -798,6 +895,64 @@ export default function RelativeMinorScalesStudy() {
   const answered = selectedOption.length > 0;
   const isCorrect = answered && selectedOption === question.answer;
 
+  const playScale = async (notesToPlay: string[]) => {
+    // Basic mapping from notation to Tone.js friendly format
+    // Assumes C4 as starting octave for simplicity
+    // Doing a naive mapping just to demonstrate the sound
+    releaseYamahaVoices();
+    const sampler = await getYamahaSampler();
+    if (!sampler) return;
+    await Tone.start();
+
+    // We need to map syllables to pitch+octave (e.g. Do -> C4, Re -> D4)
+    // For a robust app this needs a better mapping, but for quick play we approximate:
+    const noteMap: Record<string, string> = {
+      Do: "C",
+      "Do#": "C#",
+      Reb: "Db",
+      Re: "D",
+      "Re#": "D#",
+      Mib: "Eb",
+      Mi: "E",
+      Fa: "F",
+      "Fa#": "F#",
+      Solb: "Gb",
+      Sol: "G",
+      "Sol#": "G#",
+      Lab: "Ab",
+      La: "A",
+      "La#": "A#",
+      Sib: "Bb",
+      Si: "B",
+      Dob: "B",
+      "Mi#": "F",
+      Fab: "E",
+    };
+
+    let currentOctave = 4;
+    let baseNotes = ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si"];
+    let lastNoteIndex = -1;
+
+    let time = Tone.now() + 0.1;
+    notesToPlay.forEach((noteStr) => {
+      // clean up basic note name
+      const cleanNote = noteStr;
+      const baseNoteMatch = baseNotes.find((bn) => cleanNote.startsWith(bn));
+      if (baseNoteMatch) {
+        let nIndex = baseNotes.indexOf(baseNoteMatch);
+        if (lastNoteIndex !== -1 && nIndex < lastNoteIndex) {
+          currentOctave++;
+        }
+        lastNoteIndex = nIndex;
+      }
+
+      const pitch = noteMap[noteStr] || noteStr;
+
+      sampler.triggerAttackRelease(`${pitch}${currentOctave}`, "4n", time);
+      time += 0.5; // half second per note
+    });
+  };
+
   const handleNextQuestion = () => {
     setQuestion(createQuizQuestion());
     setSelectedOption("");
@@ -841,10 +996,29 @@ export default function RelativeMinorScalesStudy() {
             <strong>6º grado</strong>. En <strong>Do mayor</strong>,{" "}
             <strong>Fa</strong> es el <strong>4º grado</strong>.
           </Typography>
-          <Typography color="text.secondary">
+          <Typography sx={{ mb: 1 }}>
             Mayor y relativo menor comparten la misma armadura (mismos
-            sostenidos o bemoles), solo cambia el centro tonal.
+            sostenidos o bemoles), solo cambia el centro tonal, por lo que los
+            semitonos caen en lugares distintos dando ese sonido alegre (mayor)
+            vs melancólico (menor).
           </Typography>
+          <Box
+            sx={{
+              pl: 2,
+              borderLeft: "3px solid #ef6c00",
+              bgcolor: "rgba(239, 108, 0, 0.04)",
+              p: 1.5,
+              borderRadius: "0 8px 8px 0",
+              mt: 1.5,
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              Estructura Mayor: T - T - st - T - T - T - st
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 600 }}>
+              Estructura Menor N.: T - st - T - T - st - T - T
+            </Typography>
+          </Box>
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
@@ -879,10 +1053,25 @@ export default function RelativeMinorScalesStudy() {
             </FormControl>
           </Stack>
 
+          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+            <Typography variant="subtitle2" sx={{ color: "primary.main" }}>
+              Escala {selectedScale.major}
+            </Typography>
+            <Button
+              variant="outlined"
+              size="small"
+              color="primary"
+              startIcon={<PlayArrowRounded />}
+              onClick={() => playScale(selectedScale.notes)}
+              sx={{ borderRadius: 6, textTransform: "none" }}
+            >
+              Escuchar
+            </Button>
+          </Stack>
           <Stack
             direction="row"
             spacing={1}
-            sx={{ mb: 1.5, flexWrap: "wrap", gap: 1 }}
+            sx={{ mb: 2, flexWrap: "wrap", gap: 1 }}
           >
             {selectedScale.notes.slice(0, 7).map((note, index) => (
               <Chip
@@ -894,9 +1083,39 @@ export default function RelativeMinorScalesStudy() {
             ))}
           </Stack>
 
+          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+            <Typography variant="subtitle2" sx={{ color: "secondary.main" }}>
+              Escala {selectedScale.relativeMinor} (Menor Natural)
+            </Typography>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="small"
+              startIcon={<PlayArrowRounded />}
+              onClick={() => playScale(selectedScale.minorNotes)}
+              sx={{ borderRadius: 6, textTransform: "none" }}
+            >
+              Escuchar
+            </Button>
+          </Stack>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ mb: 2, flexWrap: "wrap", gap: 1 }}
+          >
+            {selectedScale.minorNotes.slice(0, 7).map((note, index) => (
+              <Chip
+                key={`minor-${selectedScale.relativeMinor}-${note}-${index}`}
+                label={`${DEGREE_LABELS[index]} (${index + 1}). ${note}`}
+                color={index === 0 ? "success" : "default"}
+                variant={index === 0 ? "filled" : "outlined"}
+              />
+            ))}
+          </Stack>
+
           <Typography>
-            6º grado: <strong>{selectedScale.sixthDegree}</strong> | Relativo
-            menor: <strong>{selectedScale.relativeMinor}</strong>
+            La tónica menor es el <strong>6º grado</strong> de la mayor (
+            <strong>{selectedScale.sixthDegree}</strong>).
           </Typography>
           <Typography color="text.secondary">
             Armadura: {selectedScale.keySignature}
@@ -996,6 +1215,9 @@ export default function RelativeMinorScalesStudy() {
                         {degree}
                       </TableCell>
                     ))}
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Relativo Menor
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1004,7 +1226,7 @@ export default function RelativeMinorScalesStudy() {
                       align="center"
                       sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
                     >
-                      Do
+                      Do (C)
                     </TableCell>
                     <TableCell
                       align="center"
@@ -1016,14 +1238,23 @@ export default function RelativeMinorScalesStudy() {
                       ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
                       "do-flat",
                     )}
+                    <TableCell
+                      align="center"
+                      sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
+                    >
+                      La menor (Am)
+                    </TableCell>
                   </TableRow>
                   {FLAT_SUBTABLE.map((row) => (
                     <TableRow key={row.tonality}>
                       <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.tonality}
+                        {row.tonality} ({row.tonalityEn})
                       </TableCell>
                       <TableCell align="center">{row.count}</TableCell>
                       {renderScaleDegreeCells(row.majorScale, row.tonality)}
+                      <TableCell align="center" sx={{ fontWeight: 600 }}>
+                        {row.relativeMinor}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -1052,6 +1283,9 @@ export default function RelativeMinorScalesStudy() {
                         {degree}
                       </TableCell>
                     ))}
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      Relativo Menor
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1060,7 +1294,7 @@ export default function RelativeMinorScalesStudy() {
                       align="center"
                       sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
                     >
-                      Do
+                      Do (C)
                     </TableCell>
                     <TableCell
                       align="center"
@@ -1072,14 +1306,23 @@ export default function RelativeMinorScalesStudy() {
                       ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
                       "do-sharp",
                     )}
+                    <TableCell
+                      align="center"
+                      sx={{ backgroundColor: "#fff8e1", fontWeight: 600 }}
+                    >
+                      La menor (Am)
+                    </TableCell>
                   </TableRow>
                   {SHARP_SUBTABLE.map((row) => (
                     <TableRow key={row.tonality}>
                       <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        {row.tonality}
+                        {row.tonality} ({row.tonalityEn})
                       </TableCell>
                       <TableCell align="center">{row.count}</TableCell>
                       {renderScaleDegreeCells(row.majorScale, row.tonality)}
+                      <TableCell align="center" sx={{ fontWeight: 600 }}>
+                        {row.relativeMinor}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -1097,14 +1340,12 @@ export default function RelativeMinorScalesStudy() {
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5 }}>
             Práctica rápida (exam mode)
           </Typography>
-          <Typography sx={{ mb: 1.5 }}>
-            ¿Cuál es el relativo menor de <strong>{question.major}</strong>?
-          </Typography>
+          <Typography sx={{ mb: 1.5 }}>{question.questionText}</Typography>
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
             {question.options.map((option) => (
               <Button
-                key={`${question.major}-${option}`}
+                key={`${question.questionText}-${option}`}
                 variant={selectedOption === option ? "contained" : "outlined"}
                 color={selectedOption === option ? "primary" : "inherit"}
                 onClick={() => setSelectedOption(option)}
@@ -1122,7 +1363,7 @@ export default function RelativeMinorScalesStudy() {
                   <>
                     <CheckCircleOutline color="success" />
                     <Typography color="success.main" sx={{ fontWeight: 600 }}>
-                      Correcto. {question.major} → {question.answer}
+                      Correcto. La respuesta es {question.answer}
                     </Typography>
                   </>
                 ) : (
