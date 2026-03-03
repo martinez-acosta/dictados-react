@@ -27,8 +27,61 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-const DEGREE_LABELS = ["I", "II", "III", "IV", "V", "VI", "VII"];
-const SCALE_COLUMNS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+type RootLabel =
+  | "C"
+  | "Db"
+  | "D"
+  | "Eb"
+  | "E"
+  | "F"
+  | "Gb"
+  | "G"
+  | "Ab"
+  | "A"
+  | "Bb"
+  | "B";
+type WheelSide = "neutral" | "sharp" | "flat" | "mixed";
+
+type ScaleGuideRow = {
+  major: string;
+  notes: string[];
+  sixthDegree: string;
+  relativeMinor: string;
+  keySignature: string;
+};
+
+type SubtableRow = {
+  tonality: string;
+  count: number;
+  majorScale: string[];
+};
+
+type WheelSlot = {
+  id: string;
+  major: string;
+  minor: string;
+  signature: string;
+  side: WheelSide;
+  matchRoots: RootLabel[];
+};
+
+type QuizQuestion = {
+  major: string;
+  answer: string;
+  options: string[];
+};
+
+const DEGREE_LABELS = ["I", "II", "III", "IV", "V", "VI", "VII"] as const;
+const SCALE_COLUMNS = [
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII",
+] as const;
 const CHROMATIC_ROOTS = [
   "C",
   "Db",
@@ -42,9 +95,9 @@ const CHROMATIC_ROOTS = [
   "A",
   "Bb",
   "B",
-];
+] as const;
 
-const ROOT_SIGNATURE_INFO = {
+const ROOT_SIGNATURE_INFO: Record<RootLabel, { relativeMinor: string }> = {
   C: { relativeMinor: "Am" },
   Db: { relativeMinor: "Bbm" },
   D: { relativeMinor: "Bm" },
@@ -59,7 +112,7 @@ const ROOT_SIGNATURE_INFO = {
   B: { relativeMinor: "G#m" },
 };
 
-const CIRCLE_WHEEL_SLOTS = [
+const CIRCLE_WHEEL_SLOTS: WheelSlot[] = [
   {
     id: "C",
     major: "C",
@@ -158,7 +211,7 @@ const CIRCLE_WHEEL_SLOTS = [
   },
 ];
 
-const FLAT_SUBTABLE = [
+const FLAT_SUBTABLE: SubtableRow[] = [
   {
     tonality: "Fa",
     count: 1,
@@ -191,7 +244,7 @@ const FLAT_SUBTABLE = [
   },
 ];
 
-const SHARP_SUBTABLE = [
+const SHARP_SUBTABLE: SubtableRow[] = [
   {
     tonality: "Sol",
     count: 1,
@@ -229,7 +282,7 @@ const SHARP_SUBTABLE = [
   },
 ];
 
-const SCALE_GUIDE = [
+const SCALE_GUIDE: ScaleGuideRow[] = [
   {
     major: "Fa mayor",
     notes: ["Fa", "Sol", "La", "Sib", "Do", "Re", "Mi", "Fa"],
@@ -274,7 +327,7 @@ const SCALE_GUIDE = [
   },
 ];
 
-function shuffle(array) {
+function shuffle<T>(array: T[]): T[] {
   const copy = [...array];
   for (let idx = copy.length - 1; idx > 0; idx -= 1) {
     const j = Math.floor(Math.random() * (idx + 1));
@@ -283,7 +336,7 @@ function shuffle(array) {
   return copy;
 }
 
-function createQuizQuestion() {
+function createQuizQuestion(): QuizQuestion {
   const target = SCALE_GUIDE[Math.floor(Math.random() * SCALE_GUIDE.length)];
   const distractors = shuffle(
     SCALE_GUIDE.filter((row) => row.relativeMinor !== target.relativeMinor).map(
@@ -298,7 +351,7 @@ function createQuizQuestion() {
   };
 }
 
-function renderScaleDegreeCells(notes, rowKeyPrefix) {
+function renderScaleDegreeCells(notes: string[], rowKeyPrefix: string) {
   return notes.slice(0, 8).map((note, index) => (
     <TableCell
       key={`${rowKeyPrefix}-deg-${index}`}
@@ -310,7 +363,7 @@ function renderScaleDegreeCells(notes, rowKeyPrefix) {
   ));
 }
 
-function polarPosition(angleDeg, radiusPercent) {
+function polarPosition(angleDeg: number, radiusPercent: number) {
   const radians = (angleDeg * Math.PI) / 180;
   return {
     left: `${50 + Math.cos(radians) * radiusPercent}%`,
@@ -318,18 +371,18 @@ function polarPosition(angleDeg, radiusPercent) {
   };
 }
 
-function sideColor(side) {
+function sideColor(side: WheelSide) {
   if (side === "sharp") return "#1565c0";
   if (side === "flat") return "#8e24aa";
   if (side === "mixed") return "#ef6c00";
   return "#455a64";
 }
 
-function compactLabel(value) {
+function compactLabel(value: string) {
   return value.replaceAll(" / ", "/");
 }
 
-function tokenAccent(token) {
+function tokenAccent(token: string) {
   if (token.includes("#")) {
     return {
       color: "#1565c0",
@@ -351,11 +404,17 @@ function tokenAccent(token) {
   };
 }
 
-function splitSlashParts(value) {
+function splitSlashParts(value: string) {
   return value.split(" / ");
 }
 
-function CircleOfFifthsClock({ selectedRoot, compact = false }) {
+function CircleOfFifthsClock({
+  selectedRoot,
+  compact = false,
+}: {
+  selectedRoot: RootLabel;
+  compact?: boolean;
+}) {
   const selectedInfo = ROOT_SIGNATURE_INFO[selectedRoot];
   return (
     <Box sx={{ width: "100%", maxWidth: compact ? 360 : 520, mx: "auto" }}>
@@ -724,8 +783,10 @@ export default function RelativeMinorScalesStudy() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [selectedMajor, setSelectedMajor] = useState(SCALE_GUIDE[0].major);
-  const [focusRoot, setFocusRoot] = useState("C");
+  const [selectedMajor, setSelectedMajor] = useState<string>(
+    SCALE_GUIDE[0].major,
+  );
+  const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
   const [question, setQuestion] = useState(() => createQuizQuestion());
   const [selectedOption, setSelectedOption] = useState("");
 
@@ -864,7 +925,9 @@ export default function RelativeMinorScalesStudy() {
               labelId="focus-root-select-label"
               value={focusRoot}
               label="Tonalidad foco (reloj)"
-              onChange={(event) => setFocusRoot(event.target.value)}
+              onChange={(event) =>
+                setFocusRoot(event.target.value as RootLabel)
+              }
             >
               {CHROMATIC_ROOTS.map((root) => (
                 <MenuItem key={root} value={root}>

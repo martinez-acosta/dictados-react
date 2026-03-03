@@ -19,7 +19,7 @@ import DictadosIntervalos from "./components/DictadosIntervalos.tsx";
 import TunerPage from "./components/TunerPage.tsx";
 import CancionesMenu from "./components/CancionesMenu.jsx";
 import BassArpeggiosPage from "./components/BassArpeggiosPage.tsx";
-import RelativeMinorScalesStudy from "./components/RelativeMinorScalesStudy.jsx";
+import RelativeMinorScalesStudy from "./components/RelativeMinorScalesStudy.tsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
