@@ -1385,9 +1385,14 @@ export default function RelativeMinorScalesStudy() {
   const [isFlipped, setIsFlipped] = useState(false);
   // 'majorToMinor' = front shows major key, back shows minor+armadura
   // 'minorToMajor' = front shows minor+armadura, back shows major key
-  const [flashcardMode, setFlashcardMode] = useState<
-    "majorToMinor" | "minorToMajor"
-  >("majorToMinor");
+  type FlashcardMode =
+    | "majorToMinor"
+    | "minorToMajor"
+    | "signatureToKeys"
+    | "sixthDegreeToKey"
+    | "notesToMinorKey";
+  const [flashcardMode, setFlashcardMode] =
+    useState<FlashcardMode>("majorToMinor");
   const flashcardFlipTimeoutRef = React.useRef<number | null>(null);
 
   const nextFlashcard = () => {
@@ -1398,10 +1403,14 @@ export default function RelativeMinorScalesStudy() {
     while (SCALE_GUIDE[r].major === currentFlashcard.major) {
       r = Math.floor(Math.random() * SCALE_GUIDE.length);
     }
-    const newMode =
-      Math.random() < 0.5
-        ? ("majorToMinor" as const)
-        : ("minorToMajor" as const);
+    const modes: FlashcardMode[] = [
+      "majorToMinor",
+      "minorToMajor",
+      "signatureToKeys",
+      "sixthDegreeToKey",
+      "notesToMinorKey",
+    ];
+    const newMode = modes[Math.floor(Math.random() * modes.length)];
     flashcardFlipTimeoutRef.current = window.setTimeout(() => {
       setCurrentFlashcard(SCALE_GUIDE[r]);
       setFlashcardMode(newMode);
@@ -1838,34 +1847,51 @@ export default function RelativeMinorScalesStudy() {
           </Stack>
 
           <Typography variant="body2" sx={{ mb: 2 }}>
-            No intentes memorizar todo el primer día. Sigue este flujo para dominar las tonalidades y sus relativos menores:
+            No intentes memorizar todo el primer día. Sigue este flujo para
+            dominar las tonalidades y sus relativos menores:
           </Typography>
 
           <Stack spacing={2}>
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "info.dark" }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 700, color: "info.dark" }}
+              >
                 Fase 1: Entender la Lógica (Reglas y Trucos)
               </Typography>
               <Typography variant="body2">
-                Aprende a deducir usando los trucos del panel anterior (bajar 3 semitonos o leer la armadura). Esto te da independencia cognitiva si alguna vez olvidas una escala.
+                Aprende a deducir usando los trucos del panel anterior (bajar 3
+                semitonos o leer la armadura). Esto te da independencia
+                cognitiva si alguna vez olvidas una escala.
               </Typography>
             </Box>
             <Divider />
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "info.dark" }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 700, color: "info.dark" }}
+              >
                 Fase 2: Relación Directa (Práctica con Flashcards)
               </Typography>
               <Typography variant="body2">
-                Usa las <strong>Flashcards Bidireccionales</strong>. El objetivo es que dejes de calcular manualmente y comiences a relacionar por instinto visual que "Re Mayor = Si menor = 2 sostenidos".
+                Usa las <strong>Flashcards Bidireccionales</strong>. El objetivo
+                es que dejes de calcular manualmente y comiences a relacionar
+                por instinto visual que "Re Mayor = Si menor = 2 sostenidos".
               </Typography>
             </Box>
             <Divider />
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "info.dark" }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 700, color: "info.dark" }}
+              >
                 Fase 3: Memorización Total (Ejecución bajo presión)
               </Typography>
               <Typography variant="body2">
-                Usa el <strong>Reto Contra Reloj</strong> en las tablas o el <strong>Modo Examen Extendido</strong> inferior para poner a prueba tu memoria a largo plazo bajo estrés de tiempo. Este es el nivel profesional.
+                Usa el <strong>Reto Contra Reloj</strong> en las tablas o el{" "}
+                <strong>Modo Examen Extendido</strong> inferior para poner a
+                prueba tu memoria a largo plazo bajo estrés de tiempo. Este es
+                el nivel profesional.
               </Typography>
             </Box>
           </Stack>
@@ -1996,13 +2022,20 @@ export default function RelativeMinorScalesStudy() {
                 variant="outlined"
                 size="small"
                 onClick={() => {
-                  setIsFlipped(false);
                   if (flashcardFlipTimeoutRef.current)
                     clearTimeout(flashcardFlipTimeoutRef.current);
                   flashcardFlipTimeoutRef.current = window.setTimeout(() => {
-                    setFlashcardMode((prev) =>
-                      prev === "majorToMinor" ? "minorToMajor" : "majorToMinor",
-                    );
+                    const modes: FlashcardMode[] = [
+                      "majorToMinor",
+                      "minorToMajor",
+                      "signatureToKeys",
+                      "sixthDegreeToKey",
+                      "notesToMinorKey",
+                    ];
+                    const otherModes = modes.filter((m) => m !== flashcardMode);
+                    const newMode =
+                      otherModes[Math.floor(Math.random() * otherModes.length)];
+                    setFlashcardMode(newMode);
                     setIsFlipped(false);
                     flashcardFlipTimeoutRef.current = null;
                   }, 150);
@@ -2014,9 +2047,7 @@ export default function RelativeMinorScalesStudy() {
                   textTransform: "none",
                 }}
               >
-                {flashcardMode === "majorToMinor"
-                  ? "↔ Voltear Modo"
-                  : "↔ Voltear Modo"}
+                ↔ Cambiar Modo Mágico
               </Button>
               <Button
                 variant="contained"
@@ -2064,10 +2095,16 @@ export default function RelativeMinorScalesStudy() {
                   alignItems: "center",
                   justifyContent: "center",
                   bgcolor:
-                    flashcardMode === "majorToMinor" ? "#fff" : "#e0f2f1",
+                    flashcardMode === "majorToMinor" ||
+                    flashcardMode === "signatureToKeys" ||
+                    flashcardMode === "notesToMinorKey"
+                      ? "#fff"
+                      : "#e0f2f1",
                   borderRadius: 3,
                   border:
-                    flashcardMode === "majorToMinor"
+                    flashcardMode === "majorToMinor" ||
+                    flashcardMode === "signatureToKeys" ||
+                    flashcardMode === "notesToMinorKey"
                       ? "2px solid #b2dfdb"
                       : "2px solid #4db6ac",
                   gap: 1,
@@ -2089,7 +2126,7 @@ export default function RelativeMinorScalesStudy() {
                       {currentFlashcard.major} Mayor
                     </Typography>
                   </>
-                ) : (
+                ) : flashcardMode === "minorToMajor" ? (
                   <>
                     <Typography
                       variant="body2"
@@ -2111,6 +2148,67 @@ export default function RelativeMinorScalesStudy() {
                       variant="outlined"
                       sx={{ fontWeight: 600 }}
                     />
+                  </>
+                ) : flashcardMode === "signatureToKeys" ? (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600, mb: 1 }}
+                    >
+                      ¿A qué escalas pertenece esta armadura?
+                    </Typography>
+                    <Chip
+                      label={currentFlashcard.keySignature}
+                      color="secondary"
+                      sx={{ fontWeight: 800, fontSize: "1.2rem", py: 2.5 }}
+                    />
+                  </>
+                ) : flashcardMode === "sixthDegreeToKey" ? (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      El 6º grado de esta escala es:
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      sx={{ fontWeight: 800, color: "#00695c" }}
+                    >
+                      {currentFlashcard.sixthDegree}
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600, mb: 1 }}
+                    >
+                      ¿Qué escala menor natural es esta?
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      spacing={0.5}
+                      flexWrap="wrap"
+                      justifyContent="center"
+                      px={2}
+                    >
+                      {currentFlashcard.minorNotes.map((note, idx) => (
+                        <Chip
+                          key={idx}
+                          label={note}
+                          size="small"
+                          sx={{
+                            fontWeight: 600,
+                            bgcolor: "#e0f2f1",
+                            color: "#004d40",
+                          }}
+                        />
+                      ))}
+                    </Stack>
                   </>
                 )}
                 <Typography
@@ -2136,10 +2234,16 @@ export default function RelativeMinorScalesStudy() {
                   alignItems: "center",
                   justifyContent: "center",
                   bgcolor:
-                    flashcardMode === "majorToMinor" ? "#e0f2f1" : "#fff",
+                    flashcardMode === "majorToMinor" ||
+                    flashcardMode === "signatureToKeys" ||
+                    flashcardMode === "notesToMinorKey"
+                      ? "#e0f2f1"
+                      : "#fff",
                   borderRadius: 3,
                   border:
-                    flashcardMode === "majorToMinor"
+                    flashcardMode === "majorToMinor" ||
+                    flashcardMode === "signatureToKeys" ||
+                    flashcardMode === "notesToMinorKey"
                       ? "2px solid #4db6ac"
                       : "2px solid #b2dfdb",
                   gap: 1,
@@ -2160,7 +2264,7 @@ export default function RelativeMinorScalesStudy() {
                       sx={{ fontWeight: 700, fontSize: "0.95rem", py: 2.5 }}
                     />
                   </>
-                ) : (
+                ) : flashcardMode === "minorToMajor" ? (
                   <>
                     <Typography
                       variant="body2"
@@ -2174,6 +2278,60 @@ export default function RelativeMinorScalesStudy() {
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
                       {currentFlashcard.major} Mayor
+                    </Typography>
+                  </>
+                ) : flashcardMode === "signatureToKeys" ? (
+                  <>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: 800, color: "#004d40" }}
+                    >
+                      {currentFlashcard.major} Mayor
+                    </Typography>
+                    <Divider sx={{ width: "60%", my: 0.5 }} />
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, color: "#00695c" }}
+                    >
+                      {currentFlashcard.relativeMinor}
+                    </Typography>
+                  </>
+                ) : flashcardMode === "sixthDegreeToKey" ? (
+                  <>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: 800, color: "#004d40", mb: 1 }}
+                    >
+                      {currentFlashcard.major} Mayor
+                    </Typography>
+                    <Chip
+                      label={`Relativo Menor: ${currentFlashcard.relativeMinor}`}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ fontWeight: 700 }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      Es la escala relativa de:
+                    </Typography>
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 800, color: "#00695c" }}
+                    >
+                      {currentFlashcard.relativeMinor}
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      color="text.disabled"
+                      sx={{ mt: 1 }}
+                    >
+                      ({currentFlashcard.major} Mayor)
                     </Typography>
                   </>
                 )}
