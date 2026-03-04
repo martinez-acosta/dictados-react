@@ -2151,7 +2151,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h4"
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
-                      {currentFlashcard.major} Mayor
+                      {currentFlashcard.major}
                     </Typography>
                   </>
                 ) : flashcardMode === "minorToMajor" ? (
@@ -2211,22 +2211,29 @@ export default function RelativeMinorScalesStudy() {
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      sx={{ fontWeight: 600 }}
+                      sx={{ fontWeight: 600, px: 2, textAlign: "center" }}
                     >
-                      El 6º grado de esta escala es:
+                      Si esta nota es el 6º grado de una Escala Mayor...
                     </Typography>
                     <Typography
                       variant="caption"
                       color="text.disabled"
-                      sx={{ fontWeight: 600, mt: -0.5 }}
+                      sx={{ fontWeight: 600, mt: -0.5, mb: 1 }}
                     >
-                      (Este es el Relativo Menor)
+                      (Recuerda, el 6º grado es el Relativo Menor)
                     </Typography>
                     <Typography
                       variant="h3"
                       sx={{ fontWeight: 800, color: "#00695c" }}
                     >
                       {currentFlashcard.sixthDegree}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600, mt: 1 }}
+                    >
+                      ¿De qué Escala Mayor se trata?
                     </Typography>
                   </>
                 ) : (
@@ -2333,7 +2340,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h4"
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
-                      {currentFlashcard.major} Mayor
+                      {currentFlashcard.major}
                     </Typography>
                   </>
                 ) : flashcardMode === "signatureToKeys" ? (
@@ -2342,7 +2349,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h5"
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
-                      {currentFlashcard.major} Mayor
+                      {currentFlashcard.major}
                     </Typography>
                     <Divider sx={{ width: "60%", my: 0.5 }} />
                     <Typography
@@ -2358,7 +2365,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h5"
                       sx={{ fontWeight: 800, color: "#004d40", mb: 1 }}
                     >
-                      {currentFlashcard.major} Mayor
+                      {currentFlashcard.major}
                     </Typography>
                     <Chip
                       label={`Relativo Menor: ${currentFlashcard.relativeMinor}`}
@@ -2387,7 +2394,7 @@ export default function RelativeMinorScalesStudy() {
                       color="text.disabled"
                       sx={{ mt: 1 }}
                     >
-                      ({currentFlashcard.major} Mayor)
+                      ({currentFlashcard.major})
                     </Typography>
                   </>
                 )}
