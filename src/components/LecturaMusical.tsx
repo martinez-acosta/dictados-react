@@ -24,7 +24,7 @@ import {
 import { Factory, StaveNote, Stave, TickContext, Formatter } from "vexflow";
 import * as Tone from "tone";
 import { useNavigate } from "react-router-dom";
-import AlwaysOnTuner from "./AlwaysOnTuner";
+
 
 // ---------------- Audio globals (persistentes) ----------------
 let samplerRef: Tone.Sampler | null = null;
@@ -332,63 +332,29 @@ const TREBLE_EXERCISES = {
   },
 } as const;
 const BASS_EXERCISES = {
-  "fa-solo-lineas": {
-    name: "🎼 Fa: Solo líneas (Sol2-Si2-Re3-Fa3-La3) [suena 8vb]",
-    notes: ["g/2", "b/2", "d/3", "f/3", "a/3"],
+  // ========== DANDELOT (LECTURA DIRIGIDA) ==========
+  "fa-dandelot-sol-la": {
+    name: "📖 Dandelot: Sol-La-Sol-Do-Re-Fa-Si (Equivalente)",
+    notes: ["g/2", "a/2", "g/2", "c/3", "d/3", "f/3", "b/2", "g/3"],
     description:
-      "Ejercicio enfocado únicamente en las cinco líneas del pentagrama de fa: Sol2, Si2, Re3, Fa3 y La3 (suenan Sol1, Si1, Re2, Fa2, La2). Practica la lectura de las líneas sin espacios.",
+      "Motivo fijo inspirado en Dandelot. Equivalente a Sol-La-Sol-Do-Re-Fa-Si de clave de sol.",
   },
-  "fa-lineas-c2-c3": {
-    name: "🎼 Fa 1: Líneas Do2-Do3 (Mi2-Sol2-Si2-Re3-Fa3) [suena 8vb]",
-    notes: ["e/2", "g/2", "b/2", "d/3", "f/3"],
+  "fa-dandelot-sol-do": {
+    name: "📖 Dandelot: Do2-Do3-Sol2-Sol3 (Equivalente)",
+    notes: ["c/2", "c/3", "g/2", "g/3"],
     description:
-      "Líneas del pentagrama escritas en Do2-Do3 (suenan Do1-Do2). Notación estándar del bajo eléctrico con 8vb implícita.",
+      "Intervalos de quinta justa. Equivalente al ejercicio de Do-Do-Sol-Sol de clave de sol.",
   },
-  "fa-espacios-c2-c3": {
-    name: "🎼 Fa 2: Espacios Do2-Do3 (Fa2-La2-Do3-Mi3) [suena 8vb]",
-    notes: ["f/2", "a/2", "c/3", "e/3"],
+  "fa-dandelot-sol-la-lineas": {
+    name: "📖 Dandelot: Sol-La-Sol-Do... (con líneas adicionales)",
+    notes: ["g/2", "a/3", "g/2", "c/2", "d/2", "e/2", "f/3", "b/1"],
     description:
-      "Espacios del pentagrama escritos en Do2-Do3 (suenan Do1-Do2). Registro grave del bajo eléctrico.",
+      "Motivo Dandelot con líneas adicionales. Equivalente al ejercicio de líneas adicionales en clave de sol.",
   },
-  "fa-escala-do-c2-c3": {
-    name: "🎼 Fa 3: Escala Do mayor (C2-C3) [suena C1-C2]",
-    notes: ["c/2", "d/2", "e/2", "f/2", "g/2", "a/2", "b/2", "c/3"],
-    description:
-      "Escala de Do mayor escrita C2-C3 (suena C1-C2): notación estándar del bajo, una octava completa.",
-  },
-  "fa-walking-bass-c2-c3": {
-    name: "🎼 Fa 4: Walking bass Do2-Do3 [suena C1-C2]",
-    notes: ["c/2", "d/2", "e/2", "f/2", "g/2", "a/2", "b/2", "c/3"],
-    description:
-      "Walking bass escrito C2-C3 (suena C1-C2): notación estándar del bajo eléctrico, una octava completa.",
-  },
-  "fa-arpegios-c2-c3": {
-    name: "🎼 Fa 5: Arpegios Do mayor (C2-C3) [suena C1-C2]",
-    notes: ["c/2", "e/2", "g/2", "c/3", "g/2", "e/2"],
-    description:
-      "Arpegio de Do mayor escrito C2-C3 (suena C1-C2): notación estándar del bajo eléctrico.",
-  },
-  "fa-quintas-c2-c3": {
-    name: "🎼 Fa 6: Quintas Do2-Do3 [suena C1-C2]",
-    notes: ["c/2", "g/2", "f/2", "c/3", "d/2", "a/2", "e/2", "b/2"],
-    description:
-      "Saltos de quinta escritos C2-C3 (suenan C1-C2): patrón típico de líneas de bajo eléctrico.",
-  },
-  "fa-dandelot-do-c2-c3": {
-    name: "🎼 Fa Dandelot: Do-Re-Mi-Fa-Sol (C2-G2) [suena C1-G1]",
-    notes: ["c/2", "d/2", "e/2", "f/2", "g/2", "f/2", "e/2", "d/2", "c/2"],
-    description:
-      "Motivo Dandelot escrito en C2-G2 (suena C1-G1): notación estándar del bajo, escala de 5 notas.",
-  },
-  "fa-dandelot-sol-c2-c3": {
-    name: "🎼 Fa Dandelot: Sol-La-Si-Do (G2-C3) [suena G1-C2]",
-    notes: ["g/2", "a/2", "b/2", "c/3", "b/2", "a/2", "g/2"],
-    description:
-      "Motivo Dandelot escrito G2-C3 (suena G1-C2): notación estándar del bajo, completa el rango Do1-Do2.",
-  },
-  "fa-escala-do-c2-c4": {
-    name: "🎼 Fa 9: Escala Do mayor (C2-C4) [suena C1-C3]",
+  "fa-dandelot-sol-completo": {
+    name: "📖 Dandelot Completo: Si1–Si3 (2 líneas adicionales)",
     notes: [
+      "b/1",
       "c/2",
       "d/2",
       "e/2",
@@ -403,51 +369,9 @@ const BASS_EXERCISES = {
       "g/3",
       "a/3",
       "b/3",
-      "c/4",
     ],
     description:
-      "Escala de Do mayor escrita C2-C4 (suena C1-C3): dos octavas completas del bajo eléctrico, registro grave a medio.",
-  },
-  // ========== DANDELOT CLAVE DE FA (progresión pedagógica específica) ==========
-  "fa-dandelot-fa-do": {
-    name: "🎼 Fa Dandelot: Fa2-Fa3-Do3-Do4 (quintas)",
-    notes: ["f/2", "f/3", "c/3", "c/4"],
-    description:
-      "Intervalos de quinta justa (Fa-Do) en dos octavas: Fa2, Fa3, Do3, Do4 (suenan Fa1, Fa2, Do2, Do3). Base visual para orientación en el pentagrama de fa.",
-  },
-  "fa-dandelot-fa-basico": {
-    name: "🎼 Fa Dandelot: Fa-Sol-Fa-La-Si-Re-Mi (motivo básico)",
-    notes: ["f/3", "g/2", "f/3", "a/2", "b/2", "d/3", "e/2", "f/2"],
-    description:
-      "Motivo Dandelot escrito Fa3-Sol2-Fa3-La2-Si2-Re3-Mi2-Fa2 (suena Fa2-Sol1-Fa2-La1-Si1-Re2-Mi1-Fa1). Trabajo melódico dentro del pentagrama de fa.",
-  },
-  "fa-dandelot-fa-lineas": {
-    name: "🎼 Fa Dandelot: Con líneas adicionales (Re2-Do4)",
-    notes: ["f/3", "c/4", "f/3", "d/2", "e/2", "f/2", "b/3", "c/2"],
-    description:
-      "Motivo Dandelot con líneas adicionales: Do4, Si3 (arriba del pentagrama), Re2 y Do2 (debajo). Practica lectura fuera del pentagrama de fa. Suena Re1-Do3.",
-  },
-  "fa-dandelot-fa-completo": {
-    name: "🎼 Fa Dandelot Completo: Mi2-Mi4 (2 octavas completas)",
-    notes: [
-      "e/2",
-      "f/2",
-      "g/2",
-      "a/2",
-      "b/2",
-      "c/3",
-      "d/3",
-      "e/3",
-      "f/3",
-      "g/3",
-      "a/3",
-      "b/3",
-      "c/4",
-      "d/4",
-      "e/4",
-    ],
-    description:
-      "Lectura integral en clave de Fa escrita Mi2-Mi4 (suena Mi1-Mi3): todas las notas naturales con líneas adicionales. Dos octavas completas para dominio total de la clave de fa.",
+      "Lectura integral en clave de Fa con todas las notas naturales equivalentes al rango Si3-Si5 de la clave de sol.",
   },
 } as const;
 
@@ -530,7 +454,6 @@ export default function LecturaMusical() {
   const [showNoteLabels, setShowNoteLabels] = useState(true);
   const [jazzStyle, setJazzStyle] = useState(false); // metrónomo clásico por defecto (1 fuerte)
   const [reverseOrder, setReverseOrder] = useState(false); // invertir orden del ejercicio
-  const [tunerEnabled, setTunerEnabled] = useState(false);
 
   const [currentExercise, setCurrentExercise] = useState<string[]>([]);
   const [durSeq, setDurSeq] = useState<DurationSym[]>([]);
@@ -544,9 +467,7 @@ export default function LecturaMusical() {
 
   const clef = selectedClef;
   const currentExerciseMap = EXERCISES_BY_CLEF[clef];
-  useEffect(() => {
-    setTunerEnabled(clef === "bass");
-  }, [clef]);
+
   useEffect(() => {
     if (
       !Object.prototype.hasOwnProperty.call(
@@ -1008,15 +929,6 @@ export default function LecturaMusical() {
                 label="🔄 Invertir orden (fin → inicio)"
                 sx={{ mb: 1 }}
               />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={tunerEnabled}
-                    onChange={(e) => setTunerEnabled(e.target.checked)}
-                  />
-                }
-                label="🎯 Mostrar afinador"
-              />
             </Grid>
 
             <Grid item xs={12} sm={6} md={3}>
@@ -1089,22 +1001,6 @@ export default function LecturaMusical() {
             </Grid>
           </Grid>
         </Paper>
-
-        {tunerEnabled && (
-          <Paper sx={{ p: 2, borderLeft: "4px solid #4caf50" }}>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, mb: 1, color: "primary.dark" }}
-            >
-              🎯 Afinador en tiempo real
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 2, color: "text.secondary" }}>
-              Afina antes de leer: mantén tu instrumento cerca y verifica la
-              afinación mientras practicas la clave seleccionada.
-            </Typography>
-            <AlwaysOnTuner />
-          </Paper>
-        )}
 
         {/* Descripción del ejercicio */}
         <Paper sx={{ p: 2, bgcolor: "rgba(25, 118, 210, 0.05)" }}>
