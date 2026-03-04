@@ -2403,7 +2403,55 @@ export default function RelativeMinorScalesStudy() {
           </Box>
         </Paper>
 
-        <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
+        <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 }, mb: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+            Tabla de Memorización Rápida
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Esta tabla resume el número de alteraciones exactas para cada
+            tonalidad Mayor y su Relativa Menor correspondiente. Úsala para
+            memorizar.
+          </Typography>
+          <Box sx={{ overflowX: "auto" }}>
+            <Table size="small" sx={{ minWidth: 400 }}>
+              <TableHead sx={{ bgcolor: "rgba(0,0,0,0.04)" }}>
+                <TableRow>
+                  <TableCell align="center">
+                    <strong>Nº Alteraciones</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Sostenidos (#)</strong>
+                  </TableCell>
+                  <TableCell align="center">
+                    <strong>Bemoles (b)</strong>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {[
+                  { count: 0, sharps: "C (Am)", flats: "C (Am)" },
+                  { count: 1, sharps: "G (Em)", flats: "F (Dm)" },
+                  { count: 2, sharps: "D (Bm)", flats: "Bb (Gm)" },
+                  { count: 3, sharps: "A (F#m)", flats: "Eb (Cm)" },
+                  { count: 4, sharps: "E (C#m)", flats: "Ab (Fm)" },
+                  { count: 5, sharps: "B (G#m)", flats: "Db (Bbm)" },
+                  { count: 6, sharps: "F# (D#m)", flats: "Gb (Ebm)" },
+                  { count: 7, sharps: "C# (A#m)", flats: "Cb (Abm)" },
+                ].map((row, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell align="center" sx={{ fontWeight: 600 }}>
+                      {row.count}
+                    </TableCell>
+                    <TableCell align="center">{row.sharps}</TableCell>
+                    <TableCell align="center">{row.flats}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        </Paper>
+
+        <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 }, mb: 4 }}>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
             Reloj del círculo de quintas (armaduras)
           </Typography>
