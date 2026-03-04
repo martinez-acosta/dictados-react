@@ -25,7 +25,6 @@ import { Factory, StaveNote, Stave, TickContext, Formatter } from "vexflow";
 import * as Tone from "tone";
 import { useNavigate } from "react-router-dom";
 
-
 // ---------------- Audio globals (persistentes) ----------------
 let samplerRef: Tone.Sampler | null = null;
 let clickSynthRef: Tone.Synth | null = null;
