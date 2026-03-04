@@ -1391,6 +1391,24 @@ export default function RelativeMinorScalesStudy() {
     | "signatureToKeys"
     | "sixthDegreeToKey"
     | "notesToMinorKey";
+
+  const FLASHCARD_MODE_LABELS: Record<FlashcardMode, string> = {
+    majorToMinor: "Mayor a Menor",
+    minorToMajor: "Menor a Mayor",
+    signatureToKeys: "Adivinar Armadura",
+    sixthDegreeToKey: "Adivinar 6º Grado",
+    notesToMinorKey: "Adivinar Notas",
+  };
+  const ALL_FLASHCARD_MODES: FlashcardMode[] = [
+    "majorToMinor",
+    "minorToMajor",
+    "signatureToKeys",
+    "sixthDegreeToKey",
+    "notesToMinorKey",
+  ];
+
+  const [activeFlashcardModes, setActiveFlashcardModes] =
+    useState<FlashcardMode[]>(ALL_FLASHCARD_MODES);
   const [flashcardMode, setFlashcardMode] =
     useState<FlashcardMode>("majorToMinor");
   const flashcardFlipTimeoutRef = React.useRef<number | null>(null);
@@ -1403,13 +1421,10 @@ export default function RelativeMinorScalesStudy() {
     while (SCALE_GUIDE[r].major === currentFlashcard.major) {
       r = Math.floor(Math.random() * SCALE_GUIDE.length);
     }
-    const modes: FlashcardMode[] = [
-      "majorToMinor",
-      "minorToMajor",
-      "signatureToKeys",
-      "sixthDegreeToKey",
-      "notesToMinorKey",
-    ];
+    const modes =
+      activeFlashcardModes.length > 0
+        ? activeFlashcardModes
+        : (["majorToMinor"] as FlashcardMode[]);
     const newMode = modes[Math.floor(Math.random() * modes.length)];
     flashcardFlipTimeoutRef.current = window.setTimeout(() => {
       setCurrentFlashcard(SCALE_GUIDE[r]);
@@ -2019,37 +2034,6 @@ export default function RelativeMinorScalesStudy() {
             </Typography>
             <Stack direction="row" spacing={1}>
               <Button
-                variant="outlined"
-                size="small"
-                onClick={() => {
-                  if (flashcardFlipTimeoutRef.current)
-                    clearTimeout(flashcardFlipTimeoutRef.current);
-                  flashcardFlipTimeoutRef.current = window.setTimeout(() => {
-                    const modes: FlashcardMode[] = [
-                      "majorToMinor",
-                      "minorToMajor",
-                      "signatureToKeys",
-                      "sixthDegreeToKey",
-                      "notesToMinorKey",
-                    ];
-                    const otherModes = modes.filter((m) => m !== flashcardMode);
-                    const newMode =
-                      otherModes[Math.floor(Math.random() * otherModes.length)];
-                    setFlashcardMode(newMode);
-                    setIsFlipped(false);
-                    flashcardFlipTimeoutRef.current = null;
-                  }, 150);
-                }}
-                sx={{
-                  borderColor: "#00897b",
-                  color: "#00695c",
-                  fontWeight: 600,
-                  textTransform: "none",
-                }}
-              >
-                ↔ Cambiar Modo Mágico
-              </Button>
-              <Button
                 variant="contained"
                 size="small"
                 onClick={nextFlashcard}
@@ -2059,6 +2043,43 @@ export default function RelativeMinorScalesStudy() {
               </Button>
             </Stack>
           </Stack>
+
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 1, fontWeight: 600 }}
+            >
+              Tipos de pregunta a incluir:
+            </Typography>
+            <FormGroup row>
+              {ALL_FLASHCARD_MODES.map((mode) => (
+                <FormControlLabel
+                  key={mode}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={activeFlashcardModes.includes(mode)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setActiveFlashcardModes((prev) => [...prev, mode]);
+                        } else {
+                          setActiveFlashcardModes((prev) =>
+                            prev.filter((m) => m !== mode),
+                          );
+                        }
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">
+                      {FLASHCARD_MODE_LABELS[mode]}
+                    </Typography>
+                  }
+                />
+              ))}
+            </FormGroup>
+          </Box>
 
           <Box
             sx={{
