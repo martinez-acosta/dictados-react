@@ -906,6 +906,212 @@ function renderPracticeRow(
   );
 }
 
+function getMemoPracticeState(
+  tablePracticeAnswers: Record<string, any>,
+  rowKey: string,
+) {
+  return (
+    tablePracticeAnswers[rowKey] || {
+      isActive: true,
+      sharpsMajorInput: "",
+      sharpsMinorInput: "",
+      flatsMajorInput: "",
+      flatsMinorInput: "",
+      evaluated: false,
+      sharpsMajorCorrect: false,
+      sharpsMinorCorrect: false,
+      flatsMajorCorrect: false,
+      flatsMinorCorrect: false,
+    }
+  );
+}
+
+function handleMemorizationRowGrade(
+  rowKey: string,
+  expectedSharps: string,
+  expectedFlats: string,
+  tablePracticeAnswers: Record<string, any>,
+  setTablePracticeAnswers: React.Dispatch<
+    React.SetStateAction<Record<string, any>>
+  >,
+) {
+  const currentState = getMemoPracticeState(tablePracticeAnswers, rowKey);
+
+  const normalize = (str: string = "") =>
+    (str || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  const parseExpected = (str: string) => {
+    const match = str.match(/(.*?)\s*\((.*?)\)/);
+    if (match) {
+      return { major: match[1].trim(), minor: match[2].trim() };
+    }
+    return { major: str, minor: "" };
+  };
+
+  const expectedSharpsParsed = parseExpected(expectedSharps);
+  const expectedFlatsParsed = parseExpected(expectedFlats);
+
+  const sharpsMajorCorrect = normalize(currentState.sharpsMajorInput) === normalize(expectedSharpsParsed.major);
+  const sharpsMinorCorrect = normalize(currentState.sharpsMinorInput) === normalize(expectedSharpsParsed.minor);
+  const flatsMajorCorrect = normalize(currentState.flatsMajorInput) === normalize(expectedFlatsParsed.major);
+  const flatsMinorCorrect = normalize(currentState.flatsMinorInput) === normalize(expectedFlatsParsed.minor);
+
+  setTablePracticeAnswers((prev) => ({
+    ...prev,
+    [rowKey]: {
+      ...currentState,
+      evaluated: true,
+      sharpsMajorCorrect,
+      sharpsMinorCorrect,
+      flatsMajorCorrect,
+      flatsMinorCorrect,
+    },
+  }));
+}
+
+function renderMemorizationRow(
+  rowKey: string,
+  count: number,
+  expectedSharps: string,
+  expectedFlats: string,
+  tablePracticeMode: boolean,
+  tablePracticeAnswers: Record<string, any>,
+  setTablePracticeAnswers: React.Dispatch<
+    React.SetStateAction<Record<string, any>>
+  >,
+) {
+  const state = getMemoPracticeState(tablePracticeAnswers, rowKey);
+
+  const updateField = (
+    field: "sharpsMajorInput" | "sharpsMinorInput" | "flatsMajorInput" | "flatsMinorInput",
+    val: string,
+  ) => {
+    setTablePracticeAnswers((prev) => ({
+      ...prev,
+      [rowKey]: { ...state, [field]: val, evaluated: false },
+    }));
+  };
+
+  const getTextFieldColors = (isCorrect: boolean) =>
+    state.evaluated
+      ? isCorrect
+        ? {
+            "& .MuiInput-underline:before": { borderBottomColor: "#4caf50 !important" },
+            "& .MuiInputBase-input": { color: "#4caf50 !important", WebkitTextFillColor: "#4caf50 !important" },
+          }
+        : {
+            "& .MuiInput-underline:before": { borderBottomColor: "#f44336 !important" },
+            "& .MuiInputBase-input": { color: "#f44336 !important", WebkitTextFillColor: "#f44336 !important" },
+          }
+      : ({} as any);
+
+  return (
+    <TableRow key={rowKey}>
+      {tablePracticeMode && (
+        <TableCell align="center" sx={{ py: 0.5, width: 40 }}>
+          <Switch
+            size="small"
+            checked={state.isActive}
+            onChange={(e) => {
+               setTablePracticeAnswers((prev) => ({
+                  ...prev,
+                  [rowKey]: { ...state, isActive: e.target.checked },
+               }));
+            }}
+            color="secondary"
+          />
+        </TableCell>
+      )}
+      <TableCell align="center" sx={{ fontWeight: 600 }}>
+        {count}
+      </TableCell>
+      <TableCell align="center">
+        {tablePracticeMode && state.isActive ? (
+          <Stack direction="row" alignItems="center" justifyContent="center" gap={0.5}>
+            <TextField
+              variant="standard"
+              size="small"
+              value={state.sharpsMajorInput}
+              onChange={(e) => updateField("sharpsMajorInput", e.target.value)}
+              inputProps={{ style: { textAlign: "center", width: "30px" } }}
+              sx={getTextFieldColors(state.sharpsMajorCorrect)}
+              error={state.evaluated && !state.sharpsMajorCorrect}
+            />
+            <Typography color="text.secondary">(</Typography>
+            <TextField
+              variant="standard"
+              size="small"
+              value={state.sharpsMinorInput}
+              onChange={(e) => updateField("sharpsMinorInput", e.target.value)}
+              inputProps={{ style: { textAlign: "center", width: "30px" } }}
+              sx={getTextFieldColors(state.sharpsMinorCorrect)}
+              error={state.evaluated && !state.sharpsMinorCorrect}
+            />
+            <Typography color="text.secondary">)</Typography>
+          </Stack>
+        ) : (
+          expectedSharps
+        )}
+      </TableCell>
+      <TableCell align="center">
+        {tablePracticeMode && state.isActive ? (
+          <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
+            <Stack direction="row" alignItems="center" justifyContent="center" gap={0.5}>
+              <TextField
+                variant="standard"
+                size="small"
+                value={state.flatsMajorInput}
+                onChange={(e) => updateField("flatsMajorInput", e.target.value)}
+                inputProps={{ style: { textAlign: "center", width: "40px" } }}
+                sx={getTextFieldColors(state.flatsMajorCorrect)}
+                error={state.evaluated && !state.flatsMajorCorrect}
+              />
+              <Typography color="text.secondary">(</Typography>
+              <TextField
+                variant="standard"
+                size="small"
+                value={state.flatsMinorInput}
+                onChange={(e) => updateField("flatsMinorInput", e.target.value)}
+                inputProps={{ style: { textAlign: "center", width: "40px" } }}
+                sx={getTextFieldColors(state.flatsMinorCorrect)}
+                error={state.evaluated && !state.flatsMinorCorrect}
+              />
+              <Typography color="text.secondary">)</Typography>
+            </Stack>
+            <IconButton
+              size="small"
+              color={state.evaluated ? (state.sharpsMajorCorrect && state.sharpsMinorCorrect && state.flatsMajorCorrect && state.flatsMinorCorrect ? "success" : "error") : "primary"}
+              onClick={() =>
+                handleMemorizationRowGrade(
+                  rowKey,
+                  expectedSharps,
+                  expectedFlats,
+                  tablePracticeAnswers,
+                  setTablePracticeAnswers,
+                )
+              }
+            >
+               {state.evaluated && state.sharpsMajorCorrect && state.sharpsMinorCorrect && state.flatsMajorCorrect && state.flatsMinorCorrect ? (
+                <CheckCircleOutline fontSize="small" />
+              ) : state.evaluated ? (
+                <CancelOutlined fontSize="small" />
+              ) : (
+                <SendIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Stack>
+        ) : (
+          expectedFlats
+        )}
+      </TableCell>
+    </TableRow>
+  );
+}
+
 function polarPosition(angleDeg: number, radiusPercent: number) {
   const radians = (angleDeg * Math.PI) / 180;
   return {
@@ -2404,18 +2610,40 @@ export default function RelativeMinorScalesStudy() {
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 }, mb: 4 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-            Tabla de Memorización Rápida
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Esta tabla resume el número de alteraciones exactas para cada
-            tonalidad Mayor y su Relativa Menor correspondiente. Úsala para
-            memorizar.
-          </Typography>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            sx={{ mb: 1 }}
+          >
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                Tabla de Memorización Rápida
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Esta tabla resume el número de alteraciones exactas para cada
+                tonalidad Mayor y su Relativa Menor correspondiente. Úsala para
+                memorizar.
+              </Typography>
+            </Box>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={tablePracticeMode}
+                  onChange={(e) => setTablePracticeMode(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Modo Práctica"
+              sx={{ m: 0 }}
+            />
+          </Stack>
+
           <Box sx={{ overflowX: "auto" }}>
             <Table size="small" sx={{ minWidth: 400 }}>
               <TableHead sx={{ bgcolor: "rgba(0,0,0,0.04)" }}>
                 <TableRow>
+                  {tablePracticeMode && <TableCell width={40} />}
                   <TableCell align="center">
                     <strong>Nº Alteraciones</strong>
                   </TableCell>
@@ -2428,24 +2656,28 @@ export default function RelativeMinorScalesStudy() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {[
-                  { count: 0, sharps: "C (Am)", flats: "C (Am)" },
-                  { count: 1, sharps: "G (Em)", flats: "F (Dm)" },
-                  { count: 2, sharps: "D (Bm)", flats: "Bb (Gm)" },
-                  { count: 3, sharps: "A (F#m)", flats: "Eb (Cm)" },
-                  { count: 4, sharps: "E (C#m)", flats: "Ab (Fm)" },
-                  { count: 5, sharps: "B (G#m)", flats: "Db (Bbm)" },
-                  { count: 6, sharps: "F# (D#m)", flats: "Gb (Ebm)" },
-                  { count: 7, sharps: "C# (A#m)", flats: "Cb (Abm)" },
-                ].map((row, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell align="center" sx={{ fontWeight: 600 }}>
-                      {row.count}
-                    </TableCell>
-                    <TableCell align="center">{row.sharps}</TableCell>
-                    <TableCell align="center">{row.flats}</TableCell>
-                  </TableRow>
-                ))}
+                {(
+                  [
+                    { count: 0, sharps: "C (Am)", flats: "C (Am)" },
+                    { count: 1, sharps: "G (Em)", flats: "F (Dm)" },
+                    { count: 2, sharps: "D (Bm)", flats: "Bb (Gm)" },
+                    { count: 3, sharps: "A (F#m)", flats: "Eb (Cm)" },
+                    { count: 4, sharps: "E (C#m)", flats: "Ab (Fm)" },
+                    { count: 5, sharps: "B (G#m)", flats: "Db (Bbm)" },
+                    { count: 6, sharps: "F# (D#m)", flats: "Gb (Ebm)" },
+                    { count: 7, sharps: "C# (A#m)", flats: "Cb (Abm)" },
+                  ] as const
+                ).map((row, idx) =>
+                  renderMemorizationRow(
+                    `memo-${idx}`,
+                    row.count,
+                    row.sharps,
+                    row.flats,
+                    tablePracticeMode,
+                    tablePracticeAnswers,
+                    setTablePracticeAnswers,
+                  ),
+                )}
               </TableBody>
             </Table>
           </Box>
