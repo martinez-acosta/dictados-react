@@ -2120,6 +2120,13 @@ export default function RelativeMinorScalesStudy() {
                       ¿Cuál es el Relativo Menor de...?
                     </Typography>
                     <Typography
+                      variant="caption"
+                      color="text.disabled"
+                      sx={{ fontWeight: 600, mt: -0.5 }}
+                    >
+                      (Baja 3 semitonos)
+                    </Typography>
+                    <Typography
                       variant="h4"
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
@@ -2165,6 +2172,13 @@ export default function RelativeMinorScalesStudy() {
                     >
                       ¿A qué escalas pertenece esta armadura?
                     </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.disabled"
+                      sx={{ fontWeight: 600, mt: -1.5, mb: 0.5 }}
+                    >
+                      (Último # + 1/2 tono / Penúltimo b)
+                    </Typography>
                     <Chip
                       label={currentFlashcard.keySignature}
                       color="secondary"
@@ -2181,6 +2195,13 @@ export default function RelativeMinorScalesStudy() {
                       El 6º grado de esta escala es:
                     </Typography>
                     <Typography
+                      variant="caption"
+                      color="text.disabled"
+                      sx={{ fontWeight: 600, mt: -0.5 }}
+                    >
+                      (Este es el Relativo Menor)
+                    </Typography>
+                    <Typography
                       variant="h3"
                       sx={{ fontWeight: 800, color: "#00695c" }}
                     >
@@ -2195,6 +2216,13 @@ export default function RelativeMinorScalesStudy() {
                       sx={{ fontWeight: 600, mb: 1 }}
                     >
                       ¿Qué escala menor natural es esta?
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.disabled"
+                      sx={{ fontWeight: 600, mt: -1.5, mb: 0.5 }}
+                    >
+                      (Fíjate en las alteraciones o distancias T-st)
                     </Typography>
                     <Stack
                       direction="row"
