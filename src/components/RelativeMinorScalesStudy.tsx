@@ -662,10 +662,36 @@ function handleRowGrade(
   >,
 ) {
   const currentState = getRowPracticeState(tablePracticeAnswers, rowKey);
-  const notesCorrect = currentState.notes.map(
-    (n: string, i: number) =>
-      n.trim().toLowerCase() === expectedNotes[i].toLowerCase(),
-  );
+
+  const EN_TO_ES: Record<string, string> = {
+    c: "do",
+    d: "re",
+    e: "mi",
+    f: "fa",
+    g: "sol",
+    a: "la",
+    b: "si",
+  };
+
+  const mapToSolfege = (str: string) => {
+    const lower = str.trim().toLowerCase();
+    const match = lower.match(/^([cdefgab])([#b]?)$/);
+    if (match) {
+      return EN_TO_ES[match[1]] + match[2];
+    }
+    return lower;
+  };
+
+  const notesCorrect = currentState.notes.map((n: string, i: number) => {
+    const inputVal = mapToSolfege(n)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    const expVal = expectedNotes[i]
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    return inputVal === expVal;
+  });
   const normInput = currentState.relativeMinor
     .trim()
     .toLowerCase()
@@ -686,9 +712,14 @@ function handleRowGrade(
     const spanishNote = expectedParts[1];
     const englishSymbol = expectedParts[2];
 
+    const stripedInput = normInput.replace(/\s*(m|minor|menor)\s*$/, "");
+    const mappedNote = mapToSolfege(stripedInput)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
     // Accept match if input is just "la", "am", "la menor", etc.
     if (
-      normInput === spanishNote ||
+      mappedNote === spanishNote ||
       normInput === englishSymbol ||
       normInput === `${spanishNote} m` ||
       normInput === `${spanishNote} menor` ||
@@ -1000,7 +1031,7 @@ function renderMemorizationRow(
   expectedFlats: string,
   expectedSharpsAcc: string,
   expectedFlatsAcc: string,
-  tablePracticeMode: boolean,
+  memoTablePracticeMode: boolean,
   tablePracticeAnswers: Record<string, any>,
   setTablePracticeAnswers: React.Dispatch<
     React.SetStateAction<Record<string, any>>
@@ -1049,7 +1080,7 @@ function renderMemorizationRow(
 
   return (
     <TableRow key={rowKey}>
-      {tablePracticeMode && (
+      {memoTablePracticeMode && (
         <TableCell align="center" sx={{ py: 0.5, width: 40 }}>
           <Switch
             size="small"
@@ -1068,7 +1099,7 @@ function renderMemorizationRow(
         {count}
       </TableCell>
       <TableCell align="center">
-        {tablePracticeMode && state.isActive ? (
+        {memoTablePracticeMode && state.isActive ? (
           <Stack direction="column" alignItems="center" gap={1}>
             <Stack
               direction="row"
@@ -1116,7 +1147,7 @@ function renderMemorizationRow(
         )}
       </TableCell>
       <TableCell align="center">
-        {tablePracticeMode && state.isActive ? (
+        {memoTablePracticeMode && state.isActive ? (
           <Stack
             direction="row"
             alignItems="center"
@@ -1639,6 +1670,7 @@ export default function RelativeMinorScalesStudy() {
   );
   const [showArmadurasText, setShowArmadurasText] = useState<boolean>(true);
   const [tablePracticeMode, setTablePracticeMode] = useState<boolean>(false);
+  const [memoTablePracticeMode, setMemoTablePracticeMode] = useState<boolean>(false);
   const [tablePracticeAnswers, setTablePracticeAnswers] = useState<
     Record<
       string,
@@ -2729,7 +2761,7 @@ export default function RelativeMinorScalesStudy() {
               </Typography>
             </Box>
             <Stack direction="row" alignItems="center" gap={2}>
-              {tablePracticeMode && (
+              {memoTablePracticeMode && (
                 <Button
                   variant="outlined"
                   color="warning"
@@ -2750,8 +2782,8 @@ export default function RelativeMinorScalesStudy() {
               <FormControlLabel
                 control={
                   <Switch
-                    checked={tablePracticeMode}
-                    onChange={(e) => setTablePracticeMode(e.target.checked)}
+                    checked={memoTablePracticeMode}
+                    onChange={(e) => setMemoTablePracticeMode(e.target.checked)}
                     color="primary"
                   />
                 }
@@ -2765,7 +2797,7 @@ export default function RelativeMinorScalesStudy() {
             <Table size="small" sx={{ minWidth: 400 }}>
               <TableHead sx={{ bgcolor: "rgba(0,0,0,0.04)" }}>
                 <TableRow>
-                  {tablePracticeMode && <TableCell width={40} />}
+                  {memoTablePracticeMode && <TableCell width={40} />}
                   <TableCell align="center">
                     <strong>Nº Alteraciones</strong>
                   </TableCell>
@@ -2797,7 +2829,7 @@ export default function RelativeMinorScalesStudy() {
                     row.flats,
                     row.sharpsAcc,
                     row.flatsAcc,
-                    tablePracticeMode,
+                    memoTablePracticeMode,
                     tablePracticeAnswers,
                     setTablePracticeAnswers,
                   ),
