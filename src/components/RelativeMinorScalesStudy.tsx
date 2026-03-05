@@ -1236,7 +1236,9 @@ function renderMemorizationRow(
                 variant="standard"
                 size="small"
                 value={state.sharpsMajorInput}
-                onChange={(e) => updateField("sharpsMajorInput", e.target.value)}
+                onChange={(e) =>
+                  updateField("sharpsMajorInput", e.target.value)
+                }
                 inputProps={{ style: { textAlign: "center", width: "30px" } }}
                 sx={getTextFieldColors(state.sharpsMajorCorrect)}
                 error={state.evaluated && !state.sharpsMajorCorrect}
@@ -1246,7 +1248,9 @@ function renderMemorizationRow(
                 variant="standard"
                 size="small"
                 value={state.sharpsMinorInput}
-                onChange={(e) => updateField("sharpsMinorInput", e.target.value)}
+                onChange={(e) =>
+                  updateField("sharpsMinorInput", e.target.value)
+                }
                 inputProps={{ style: { textAlign: "center", width: "30px" } }}
                 sx={getTextFieldColors(state.sharpsMinorCorrect)}
                 error={state.evaluated && !state.sharpsMinorCorrect}
@@ -1259,7 +1263,13 @@ function renderMemorizationRow(
               placeholder={count > 0 ? "Ej. F# C#" : "-"}
               value={state.sharpsAccInput}
               onChange={(e) => updateField("sharpsAccInput", e.target.value)}
-              inputProps={{ style: { textAlign: "center", width: "110px", fontSize: "0.85rem" } }}
+              inputProps={{
+                style: {
+                  textAlign: "center",
+                  width: "110px",
+                  fontSize: "0.85rem",
+                },
+              }}
               sx={getTextFieldColors(state.sharpsAccCorrect)}
               error={state.evaluated && !state.sharpsAccCorrect}
             />
@@ -1267,7 +1277,9 @@ function renderMemorizationRow(
         ) : (
           <Stack direction="column" alignItems="center">
             <Typography>{expectedSharps}</Typography>
-            <Typography variant="caption" color="text.secondary">{expectedSharpsAcc}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {expectedSharpsAcc}
+            </Typography>
           </Stack>
         )}
       </TableCell>
@@ -1290,7 +1302,9 @@ function renderMemorizationRow(
                   variant="standard"
                   size="small"
                   value={state.flatsMajorInput}
-                  onChange={(e) => updateField("flatsMajorInput", e.target.value)}
+                  onChange={(e) =>
+                    updateField("flatsMajorInput", e.target.value)
+                  }
                   inputProps={{ style: { textAlign: "center", width: "40px" } }}
                   sx={getTextFieldColors(state.flatsMajorCorrect)}
                   error={state.evaluated && !state.flatsMajorCorrect}
@@ -1300,7 +1314,9 @@ function renderMemorizationRow(
                   variant="standard"
                   size="small"
                   value={state.flatsMinorInput}
-                  onChange={(e) => updateField("flatsMinorInput", e.target.value)}
+                  onChange={(e) =>
+                    updateField("flatsMinorInput", e.target.value)
+                  }
                   inputProps={{ style: { textAlign: "center", width: "40px" } }}
                   sx={getTextFieldColors(state.flatsMinorCorrect)}
                   error={state.evaluated && !state.flatsMinorCorrect}
@@ -1313,7 +1329,13 @@ function renderMemorizationRow(
                 placeholder={count > 0 ? "Ej. Bb Eb" : "-"}
                 value={state.flatsAccInput}
                 onChange={(e) => updateField("flatsAccInput", e.target.value)}
-                inputProps={{ style: { textAlign: "center", width: "110px", fontSize: "0.85rem" } }}
+                inputProps={{
+                  style: {
+                    textAlign: "center",
+                    width: "110px",
+                    fontSize: "0.85rem",
+                  },
+                }}
                 sx={getTextFieldColors(state.flatsAccCorrect)}
                 error={state.evaluated && !state.flatsAccCorrect}
               />
@@ -1362,7 +1384,9 @@ function renderMemorizationRow(
         ) : (
           <Stack direction="column" alignItems="center">
             <Typography>{expectedFlats}</Typography>
-            <Typography variant="caption" color="text.secondary">{expectedFlatsAcc}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {expectedFlatsAcc}
+            </Typography>
           </Stack>
         )}
       </TableCell>
@@ -1795,7 +1819,8 @@ export default function RelativeMinorScalesStudy() {
   );
   const [showArmadurasText, setShowArmadurasText] = useState<boolean>(true);
   const [tablePracticeMode, setTablePracticeMode] = useState<boolean>(false);
-  const [memoTablePracticeMode, setMemoTablePracticeMode] = useState<boolean>(false);
+  const [memoTablePracticeMode, setMemoTablePracticeMode] =
+    useState<boolean>(false);
   const [tablePracticeAnswers, setTablePracticeAnswers] = useState<
     Record<
       string,
@@ -2643,23 +2668,44 @@ export default function RelativeMinorScalesStudy() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  bgcolor:
-                    flashcardMode === "majorToMinor" ||
-                    flashcardMode === "signatureToKeys" ||
-                    flashcardMode === "notesToMinorKey"
+                  bgcolor: majorOnlyMode
+                    ? "#fff8e1"
+                    : flashcardMode === "majorToMinor" ||
+                        flashcardMode === "signatureToKeys" ||
+                        flashcardMode === "notesToMinorKey"
                       ? "#fff"
                       : "#e0f2f1",
                   borderRadius: 3,
-                  border:
-                    flashcardMode === "majorToMinor" ||
-                    flashcardMode === "signatureToKeys" ||
-                    flashcardMode === "notesToMinorKey"
+                  border: majorOnlyMode
+                    ? "2px solid #ffe082"
+                    : flashcardMode === "majorToMinor" ||
+                        flashcardMode === "signatureToKeys" ||
+                        flashcardMode === "notesToMinorKey"
                       ? "2px solid #b2dfdb"
                       : "2px solid #4db6ac",
                   gap: 1,
                 }}
               >
-                {flashcardMode === "majorToMinor" ? (
+                {majorOnlyMode ? (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      ¿Cuáles son las notas de...?
+                    </Typography>
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 800, color: "#e65100" }}
+                    >
+                      {currentFlashcard.major}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Armadura: {currentFlashcard.keySignature}
+                    </Typography>
+                  </>
+                ) : flashcardMode === "majorToMinor" ? (
                   <>
                     <Typography
                       variant="body2"
@@ -2824,23 +2870,62 @@ export default function RelativeMinorScalesStudy() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  bgcolor:
-                    flashcardMode === "majorToMinor" ||
-                    flashcardMode === "signatureToKeys" ||
-                    flashcardMode === "notesToMinorKey"
+                  bgcolor: majorOnlyMode
+                    ? "#fff3e0"
+                    : flashcardMode === "majorToMinor" ||
+                        flashcardMode === "signatureToKeys" ||
+                        flashcardMode === "notesToMinorKey"
                       ? "#e0f2f1"
                       : "#fff",
                   borderRadius: 3,
-                  border:
-                    flashcardMode === "majorToMinor" ||
-                    flashcardMode === "signatureToKeys" ||
-                    flashcardMode === "notesToMinorKey"
+                  border: majorOnlyMode
+                    ? "2px solid #ffb74d"
+                    : flashcardMode === "majorToMinor" ||
+                        flashcardMode === "signatureToKeys" ||
+                        flashcardMode === "notesToMinorKey"
                       ? "2px solid #4db6ac"
                       : "2px solid #b2dfdb",
                   gap: 1,
                 }}
               >
-                {flashcardMode === "majorToMinor" ? (
+                {majorOnlyMode ? (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontWeight: 600, mb: 0.5 }}
+                    >
+                      Notas de {currentFlashcard.major}:
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      spacing={0.3}
+                      flexWrap="wrap"
+                      justifyContent="center"
+                      px={1}
+                    >
+                      {currentFlashcard.notes.slice(0, 7).map((note, idx) => (
+                        <Chip
+                          key={idx}
+                          label={note}
+                          size="small"
+                          sx={{
+                            fontWeight: 700,
+                            bgcolor: "#fff8e1",
+                            color: "#e65100",
+                            border: "1px solid #ffcc80",
+                          }}
+                        />
+                      ))}
+                    </Stack>
+                    <Chip
+                      label={`Armadura: ${currentFlashcard.keySignature}`}
+                      color="warning"
+                      variant="outlined"
+                      sx={{ fontWeight: 700, mt: 1, fontSize: "0.9rem" }}
+                    />
+                  </>
+                ) : flashcardMode === "majorToMinor" ? (
                   <>
                     <Typography
                       variant="h5"
@@ -3000,14 +3085,62 @@ export default function RelativeMinorScalesStudy() {
               <TableBody>
                 {(
                   [
-                    { count: 0, sharps: "C (Am)", flats: "C (Am)", sharpsAcc: "-", flatsAcc: "-" },
-                    { count: 1, sharps: "G (Em)", flats: "F (Dm)", sharpsAcc: "F#", flatsAcc: "Bb" },
-                    { count: 2, sharps: "D (Bm)", flats: "Bb (Gm)", sharpsAcc: "F# C#", flatsAcc: "Bb Eb" },
-                    { count: 3, sharps: "A (F#m)", flats: "Eb (Cm)", sharpsAcc: "F# C# G#", flatsAcc: "Bb Eb Ab" },
-                    { count: 4, sharps: "E (C#m)", flats: "Ab (Fm)", sharpsAcc: "F# C# G# D#", flatsAcc: "Bb Eb Ab Db" },
-                    { count: 5, sharps: "B (G#m)", flats: "Db (Bbm)", sharpsAcc: "F# C# G# D# A#", flatsAcc: "Bb Eb Ab Db Gb" },
-                    { count: 6, sharps: "F# (D#m)", flats: "Gb (Ebm)", sharpsAcc: "F# C# G# D# A# E#", flatsAcc: "Bb Eb Ab Db Gb Cb" },
-                    { count: 7, sharps: "C# (A#m)", flats: "Cb (Abm)", sharpsAcc: "F# C# G# D# A# E# B#", flatsAcc: "Bb Eb Ab Db Gb Cb Fb" },
+                    {
+                      count: 0,
+                      sharps: "C (Am)",
+                      flats: "C (Am)",
+                      sharpsAcc: "-",
+                      flatsAcc: "-",
+                    },
+                    {
+                      count: 1,
+                      sharps: "G (Em)",
+                      flats: "F (Dm)",
+                      sharpsAcc: "F#",
+                      flatsAcc: "Bb",
+                    },
+                    {
+                      count: 2,
+                      sharps: "D (Bm)",
+                      flats: "Bb (Gm)",
+                      sharpsAcc: "F# C#",
+                      flatsAcc: "Bb Eb",
+                    },
+                    {
+                      count: 3,
+                      sharps: "A (F#m)",
+                      flats: "Eb (Cm)",
+                      sharpsAcc: "F# C# G#",
+                      flatsAcc: "Bb Eb Ab",
+                    },
+                    {
+                      count: 4,
+                      sharps: "E (C#m)",
+                      flats: "Ab (Fm)",
+                      sharpsAcc: "F# C# G# D#",
+                      flatsAcc: "Bb Eb Ab Db",
+                    },
+                    {
+                      count: 5,
+                      sharps: "B (G#m)",
+                      flats: "Db (Bbm)",
+                      sharpsAcc: "F# C# G# D# A#",
+                      flatsAcc: "Bb Eb Ab Db Gb",
+                    },
+                    {
+                      count: 6,
+                      sharps: "F# (D#m)",
+                      flats: "Gb (Ebm)",
+                      sharpsAcc: "F# C# G# D# A# E#",
+                      flatsAcc: "Bb Eb Ab Db Gb Cb",
+                    },
+                    {
+                      count: 7,
+                      sharps: "C# (A#m)",
+                      flats: "Cb (Abm)",
+                      sharpsAcc: "F# C# G# D# A# E# B#",
+                      flatsAcc: "Bb Eb Ab Db Gb Cb Fb",
+                    },
                   ] as const
                 ).map((row, idx) =>
                   renderMemorizationRow(
