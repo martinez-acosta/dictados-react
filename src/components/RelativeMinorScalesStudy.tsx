@@ -2626,17 +2626,37 @@ export default function RelativeMinorScalesStudy() {
                 memorizar.
               </Typography>
             </Box>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={tablePracticeMode}
-                  onChange={(e) => setTablePracticeMode(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label="Modo Práctica"
-              sx={{ m: 0 }}
-            />
+            <Stack direction="row" alignItems="center" gap={2}>
+              {tablePracticeMode && (
+                <Button
+                  variant="outlined"
+                  color="warning"
+                  size="small"
+                  onClick={() => {
+                    const newAnswers = { ...tablePracticeAnswers };
+                    Object.keys(newAnswers).forEach((key) => {
+                      if (key.startsWith("memo-")) {
+                        delete newAnswers[key];
+                      }
+                    });
+                    setTablePracticeAnswers(newAnswers);
+                  }}
+                >
+                  Limpiar Práctica
+                </Button>
+              )}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={tablePracticeMode}
+                    onChange={(e) => setTablePracticeMode(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="Modo Práctica"
+                sx={{ m: 0 }}
+              />
+            </Stack>
           </Stack>
 
           <Box sx={{ overflowX: "auto" }}>
