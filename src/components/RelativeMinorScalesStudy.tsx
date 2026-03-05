@@ -955,10 +955,18 @@ function handleMemorizationRowGrade(
   const expectedSharpsParsed = parseExpected(expectedSharps);
   const expectedFlatsParsed = parseExpected(expectedFlats);
 
-  const sharpsMajorCorrect = normalize(currentState.sharpsMajorInput) === normalize(expectedSharpsParsed.major);
-  const sharpsMinorCorrect = normalize(currentState.sharpsMinorInput) === normalize(expectedSharpsParsed.minor);
-  const flatsMajorCorrect = normalize(currentState.flatsMajorInput) === normalize(expectedFlatsParsed.major);
-  const flatsMinorCorrect = normalize(currentState.flatsMinorInput) === normalize(expectedFlatsParsed.minor);
+  const sharpsMajorCorrect =
+    normalize(currentState.sharpsMajorInput) ===
+    normalize(expectedSharpsParsed.major);
+  const sharpsMinorCorrect =
+    normalize(currentState.sharpsMinorInput) ===
+    normalize(expectedSharpsParsed.minor);
+  const flatsMajorCorrect =
+    normalize(currentState.flatsMajorInput) ===
+    normalize(expectedFlatsParsed.major);
+  const flatsMinorCorrect =
+    normalize(currentState.flatsMinorInput) ===
+    normalize(expectedFlatsParsed.minor);
 
   setTablePracticeAnswers((prev) => ({
     ...prev,
@@ -987,7 +995,11 @@ function renderMemorizationRow(
   const state = getMemoPracticeState(tablePracticeAnswers, rowKey);
 
   const updateField = (
-    field: "sharpsMajorInput" | "sharpsMinorInput" | "flatsMajorInput" | "flatsMinorInput",
+    field:
+      | "sharpsMajorInput"
+      | "sharpsMinorInput"
+      | "flatsMajorInput"
+      | "flatsMinorInput",
     val: string,
   ) => {
     setTablePracticeAnswers((prev) => ({
@@ -1000,12 +1012,22 @@ function renderMemorizationRow(
     state.evaluated
       ? isCorrect
         ? {
-            "& .MuiInput-underline:before": { borderBottomColor: "#4caf50 !important" },
-            "& .MuiInputBase-input": { color: "#4caf50 !important", WebkitTextFillColor: "#4caf50 !important" },
+            "& .MuiInput-underline:before": {
+              borderBottomColor: "#4caf50 !important",
+            },
+            "& .MuiInputBase-input": {
+              color: "#4caf50 !important",
+              WebkitTextFillColor: "#4caf50 !important",
+            },
           }
         : {
-            "& .MuiInput-underline:before": { borderBottomColor: "#f44336 !important" },
-            "& .MuiInputBase-input": { color: "#f44336 !important", WebkitTextFillColor: "#f44336 !important" },
+            "& .MuiInput-underline:before": {
+              borderBottomColor: "#f44336 !important",
+            },
+            "& .MuiInputBase-input": {
+              color: "#f44336 !important",
+              WebkitTextFillColor: "#f44336 !important",
+            },
           }
       : ({} as any);
 
@@ -1017,10 +1039,10 @@ function renderMemorizationRow(
             size="small"
             checked={state.isActive}
             onChange={(e) => {
-               setTablePracticeAnswers((prev) => ({
-                  ...prev,
-                  [rowKey]: { ...state, isActive: e.target.checked },
-               }));
+              setTablePracticeAnswers((prev) => ({
+                ...prev,
+                [rowKey]: { ...state, isActive: e.target.checked },
+              }));
             }}
             color="secondary"
           />
@@ -1031,7 +1053,12 @@ function renderMemorizationRow(
       </TableCell>
       <TableCell align="center">
         {tablePracticeMode && state.isActive ? (
-          <Stack direction="row" alignItems="center" justifyContent="center" gap={0.5}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            gap={0.5}
+          >
             <TextField
               variant="standard"
               size="small"
@@ -1059,8 +1086,18 @@ function renderMemorizationRow(
       </TableCell>
       <TableCell align="center">
         {tablePracticeMode && state.isActive ? (
-          <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
-            <Stack direction="row" alignItems="center" justifyContent="center" gap={0.5}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            gap={1}
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="center"
+              gap={0.5}
+            >
               <TextField
                 variant="standard"
                 size="small"
@@ -1084,7 +1121,16 @@ function renderMemorizationRow(
             </Stack>
             <IconButton
               size="small"
-              color={state.evaluated ? (state.sharpsMajorCorrect && state.sharpsMinorCorrect && state.flatsMajorCorrect && state.flatsMinorCorrect ? "success" : "error") : "primary"}
+              color={
+                state.evaluated
+                  ? state.sharpsMajorCorrect &&
+                    state.sharpsMinorCorrect &&
+                    state.flatsMajorCorrect &&
+                    state.flatsMinorCorrect
+                    ? "success"
+                    : "error"
+                  : "primary"
+              }
               onClick={() =>
                 handleMemorizationRowGrade(
                   rowKey,
@@ -1095,7 +1141,11 @@ function renderMemorizationRow(
                 )
               }
             >
-               {state.evaluated && state.sharpsMajorCorrect && state.sharpsMinorCorrect && state.flatsMajorCorrect && state.flatsMinorCorrect ? (
+              {state.evaluated &&
+              state.sharpsMajorCorrect &&
+              state.sharpsMinorCorrect &&
+              state.flatsMajorCorrect &&
+              state.flatsMinorCorrect ? (
                 <CheckCircleOutline fontSize="small" />
               ) : state.evaluated ? (
                 <CancelOutlined fontSize="small" />
