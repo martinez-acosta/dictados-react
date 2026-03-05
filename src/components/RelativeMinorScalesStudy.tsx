@@ -917,11 +917,15 @@ function getMemoPracticeState(
       sharpsMinorInput: "",
       flatsMajorInput: "",
       flatsMinorInput: "",
+      sharpsAccInput: "",
+      flatsAccInput: "",
       evaluated: false,
       sharpsMajorCorrect: false,
       sharpsMinorCorrect: false,
       flatsMajorCorrect: false,
       flatsMinorCorrect: false,
+      sharpsAccCorrect: false,
+      flatsAccCorrect: false,
     }
   );
 }
@@ -930,6 +934,8 @@ function handleMemorizationRowGrade(
   rowKey: string,
   expectedSharps: string,
   expectedFlats: string,
+  expectedSharpsAcc: string,
+  expectedFlatsAcc: string,
   tablePracticeAnswers: Record<string, any>,
   setTablePracticeAnswers: React.Dispatch<
     React.SetStateAction<Record<string, any>>
@@ -967,6 +973,10 @@ function handleMemorizationRowGrade(
   const flatsMinorCorrect =
     normalize(currentState.flatsMinorInput) ===
     normalize(expectedFlatsParsed.minor);
+  const sharpsAccCorrect =
+    normalize(currentState.sharpsAccInput) === normalize(expectedSharpsAcc);
+  const flatsAccCorrect =
+    normalize(currentState.flatsAccInput) === normalize(expectedFlatsAcc);
 
   setTablePracticeAnswers((prev) => ({
     ...prev,
@@ -977,6 +987,8 @@ function handleMemorizationRowGrade(
       sharpsMinorCorrect,
       flatsMajorCorrect,
       flatsMinorCorrect,
+      sharpsAccCorrect,
+      flatsAccCorrect,
     },
   }));
 }
@@ -986,6 +998,8 @@ function renderMemorizationRow(
   count: number,
   expectedSharps: string,
   expectedFlats: string,
+  expectedSharpsAcc: string,
+  expectedFlatsAcc: string,
   tablePracticeMode: boolean,
   tablePracticeAnswers: Record<string, any>,
   setTablePracticeAnswers: React.Dispatch<
@@ -999,7 +1013,9 @@ function renderMemorizationRow(
       | "sharpsMajorInput"
       | "sharpsMinorInput"
       | "flatsMajorInput"
-      | "flatsMinorInput",
+      | "flatsMinorInput"
+      | "sharpsAccInput"
+      | "flatsAccInput",
     val: string,
   ) => {
     setTablePracticeAnswers((prev) => ({
@@ -1053,35 +1069,50 @@ function renderMemorizationRow(
       </TableCell>
       <TableCell align="center">
         {tablePracticeMode && state.isActive ? (
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-            gap={0.5}
-          >
+          <Stack direction="column" alignItems="center" gap={1}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="center"
+              gap={0.5}
+            >
+              <TextField
+                variant="standard"
+                size="small"
+                value={state.sharpsMajorInput}
+                onChange={(e) => updateField("sharpsMajorInput", e.target.value)}
+                inputProps={{ style: { textAlign: "center", width: "30px" } }}
+                sx={getTextFieldColors(state.sharpsMajorCorrect)}
+                error={state.evaluated && !state.sharpsMajorCorrect}
+              />
+              <Typography color="text.secondary">(</Typography>
+              <TextField
+                variant="standard"
+                size="small"
+                value={state.sharpsMinorInput}
+                onChange={(e) => updateField("sharpsMinorInput", e.target.value)}
+                inputProps={{ style: { textAlign: "center", width: "30px" } }}
+                sx={getTextFieldColors(state.sharpsMinorCorrect)}
+                error={state.evaluated && !state.sharpsMinorCorrect}
+              />
+              <Typography color="text.secondary">)</Typography>
+            </Stack>
             <TextField
               variant="standard"
               size="small"
-              value={state.sharpsMajorInput}
-              onChange={(e) => updateField("sharpsMajorInput", e.target.value)}
-              inputProps={{ style: { textAlign: "center", width: "30px" } }}
-              sx={getTextFieldColors(state.sharpsMajorCorrect)}
-              error={state.evaluated && !state.sharpsMajorCorrect}
+              placeholder={count > 0 ? "Ej. F# C#" : "-"}
+              value={state.sharpsAccInput}
+              onChange={(e) => updateField("sharpsAccInput", e.target.value)}
+              inputProps={{ style: { textAlign: "center", width: "110px", fontSize: "0.85rem" } }}
+              sx={getTextFieldColors(state.sharpsAccCorrect)}
+              error={state.evaluated && !state.sharpsAccCorrect}
             />
-            <Typography color="text.secondary">(</Typography>
-            <TextField
-              variant="standard"
-              size="small"
-              value={state.sharpsMinorInput}
-              onChange={(e) => updateField("sharpsMinorInput", e.target.value)}
-              inputProps={{ style: { textAlign: "center", width: "30px" } }}
-              sx={getTextFieldColors(state.sharpsMinorCorrect)}
-              error={state.evaluated && !state.sharpsMinorCorrect}
-            />
-            <Typography color="text.secondary">)</Typography>
           </Stack>
         ) : (
-          expectedSharps
+          <Stack direction="column" alignItems="center">
+            <Typography>{expectedSharps}</Typography>
+            <Typography variant="caption" color="text.secondary">{expectedSharpsAcc}</Typography>
+          </Stack>
         )}
       </TableCell>
       <TableCell align="center">
@@ -1092,32 +1123,44 @@ function renderMemorizationRow(
             justifyContent="center"
             gap={1}
           >
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="center"
-              gap={0.5}
-            >
+            <Stack direction="column" alignItems="center" gap={1}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="center"
+                gap={0.5}
+              >
+                <TextField
+                  variant="standard"
+                  size="small"
+                  value={state.flatsMajorInput}
+                  onChange={(e) => updateField("flatsMajorInput", e.target.value)}
+                  inputProps={{ style: { textAlign: "center", width: "40px" } }}
+                  sx={getTextFieldColors(state.flatsMajorCorrect)}
+                  error={state.evaluated && !state.flatsMajorCorrect}
+                />
+                <Typography color="text.secondary">(</Typography>
+                <TextField
+                  variant="standard"
+                  size="small"
+                  value={state.flatsMinorInput}
+                  onChange={(e) => updateField("flatsMinorInput", e.target.value)}
+                  inputProps={{ style: { textAlign: "center", width: "40px" } }}
+                  sx={getTextFieldColors(state.flatsMinorCorrect)}
+                  error={state.evaluated && !state.flatsMinorCorrect}
+                />
+                <Typography color="text.secondary">)</Typography>
+              </Stack>
               <TextField
                 variant="standard"
                 size="small"
-                value={state.flatsMajorInput}
-                onChange={(e) => updateField("flatsMajorInput", e.target.value)}
-                inputProps={{ style: { textAlign: "center", width: "40px" } }}
-                sx={getTextFieldColors(state.flatsMajorCorrect)}
-                error={state.evaluated && !state.flatsMajorCorrect}
+                placeholder={count > 0 ? "Ej. Bb Eb" : "-"}
+                value={state.flatsAccInput}
+                onChange={(e) => updateField("flatsAccInput", e.target.value)}
+                inputProps={{ style: { textAlign: "center", width: "110px", fontSize: "0.85rem" } }}
+                sx={getTextFieldColors(state.flatsAccCorrect)}
+                error={state.evaluated && !state.flatsAccCorrect}
               />
-              <Typography color="text.secondary">(</Typography>
-              <TextField
-                variant="standard"
-                size="small"
-                value={state.flatsMinorInput}
-                onChange={(e) => updateField("flatsMinorInput", e.target.value)}
-                inputProps={{ style: { textAlign: "center", width: "40px" } }}
-                sx={getTextFieldColors(state.flatsMinorCorrect)}
-                error={state.evaluated && !state.flatsMinorCorrect}
-              />
-              <Typography color="text.secondary">)</Typography>
             </Stack>
             <IconButton
               size="small"
@@ -1126,7 +1169,9 @@ function renderMemorizationRow(
                   ? state.sharpsMajorCorrect &&
                     state.sharpsMinorCorrect &&
                     state.flatsMajorCorrect &&
-                    state.flatsMinorCorrect
+                    state.flatsMinorCorrect &&
+                    state.sharpsAccCorrect &&
+                    state.flatsAccCorrect
                     ? "success"
                     : "error"
                   : "primary"
@@ -1136,6 +1181,8 @@ function renderMemorizationRow(
                   rowKey,
                   expectedSharps,
                   expectedFlats,
+                  expectedSharpsAcc,
+                  expectedFlatsAcc,
                   tablePracticeAnswers,
                   setTablePracticeAnswers,
                 )
@@ -1145,7 +1192,9 @@ function renderMemorizationRow(
               state.sharpsMajorCorrect &&
               state.sharpsMinorCorrect &&
               state.flatsMajorCorrect &&
-              state.flatsMinorCorrect ? (
+              state.flatsMinorCorrect &&
+              state.sharpsAccCorrect &&
+              state.flatsAccCorrect ? (
                 <CheckCircleOutline fontSize="small" />
               ) : state.evaluated ? (
                 <CancelOutlined fontSize="small" />
@@ -1155,7 +1204,10 @@ function renderMemorizationRow(
             </IconButton>
           </Stack>
         ) : (
-          expectedFlats
+          <Stack direction="column" alignItems="center">
+            <Typography>{expectedFlats}</Typography>
+            <Typography variant="caption" color="text.secondary">{expectedFlatsAcc}</Typography>
+          </Stack>
         )}
       </TableCell>
     </TableRow>
@@ -2728,14 +2780,14 @@ export default function RelativeMinorScalesStudy() {
               <TableBody>
                 {(
                   [
-                    { count: 0, sharps: "C (Am)", flats: "C (Am)" },
-                    { count: 1, sharps: "G (Em)", flats: "F (Dm)" },
-                    { count: 2, sharps: "D (Bm)", flats: "Bb (Gm)" },
-                    { count: 3, sharps: "A (F#m)", flats: "Eb (Cm)" },
-                    { count: 4, sharps: "E (C#m)", flats: "Ab (Fm)" },
-                    { count: 5, sharps: "B (G#m)", flats: "Db (Bbm)" },
-                    { count: 6, sharps: "F# (D#m)", flats: "Gb (Ebm)" },
-                    { count: 7, sharps: "C# (A#m)", flats: "Cb (Abm)" },
+                    { count: 0, sharps: "C (Am)", flats: "C (Am)", sharpsAcc: "-", flatsAcc: "-" },
+                    { count: 1, sharps: "G (Em)", flats: "F (Dm)", sharpsAcc: "F#", flatsAcc: "Bb" },
+                    { count: 2, sharps: "D (Bm)", flats: "Bb (Gm)", sharpsAcc: "F# C#", flatsAcc: "Bb Eb" },
+                    { count: 3, sharps: "A (F#m)", flats: "Eb (Cm)", sharpsAcc: "F# C# G#", flatsAcc: "Bb Eb Ab" },
+                    { count: 4, sharps: "E (C#m)", flats: "Ab (Fm)", sharpsAcc: "F# C# G# D#", flatsAcc: "Bb Eb Ab Db" },
+                    { count: 5, sharps: "B (G#m)", flats: "Db (Bbm)", sharpsAcc: "F# C# G# D# A#", flatsAcc: "Bb Eb Ab Db Gb" },
+                    { count: 6, sharps: "F# (D#m)", flats: "Gb (Ebm)", sharpsAcc: "F# C# G# D# A# E#", flatsAcc: "Bb Eb Ab Db Gb Cb" },
+                    { count: 7, sharps: "C# (A#m)", flats: "Cb (Abm)", sharpsAcc: "F# C# G# D# A# E# B#", flatsAcc: "Bb Eb Ab Db Gb Cb Fb" },
                   ] as const
                 ).map((row, idx) =>
                   renderMemorizationRow(
@@ -2743,6 +2795,8 @@ export default function RelativeMinorScalesStudy() {
                     row.count,
                     row.sharps,
                     row.flats,
+                    row.sharpsAcc,
+                    row.flatsAcc,
                     tablePracticeMode,
                     tablePracticeAnswers,
                     setTablePracticeAnswers,
