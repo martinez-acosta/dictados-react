@@ -635,6 +635,131 @@ function createQuizQuestion(
   }
 }
 
+type MajorOnlyQuestionType =
+  | "majorNotes"
+  | "majorKeyByAccidentals"
+  | "countMajorAccidentals"
+  | "accidentalType"
+  | "nthDegreeOfMajor"
+  | "majorByNthDegree"
+  | "orderOfSharps"
+  | "orderOfFlats";
+
+const ALL_MAJOR_ONLY_TYPES: MajorOnlyQuestionType[] = [
+  "majorNotes",
+  "majorKeyByAccidentals",
+  "countMajorAccidentals",
+  "accidentalType",
+  "nthDegreeOfMajor",
+  "majorByNthDegree",
+  "orderOfSharps",
+  "orderOfFlats",
+];
+
+const MAJOR_ONLY_MODE_LABELS: Record<MajorOnlyQuestionType, string> = {
+  majorNotes: "Escribe las notas de la escala",
+  majorKeyByAccidentals: "¿Qué escala tiene N alteraciones?",
+  countMajorAccidentals: "¿Cuántas alteraciones tiene?",
+  accidentalType: "¿Sostenidos o bemoles?",
+  nthDegreeOfMajor: "¿Cuál es el N-ésimo grado?",
+  majorByNthDegree: "¿Qué escala mayor tiene este grado?",
+  orderOfSharps: "Orden de sostenidos",
+  orderOfFlats: "Orden de bemoles",
+};
+
+function generateMajorOnlyQuestion(
+  enabledTypes: MajorOnlyQuestionType[] = ALL_MAJOR_ONLY_TYPES,
+): QuizQuestion {
+  const target = SCALE_GUIDE[Math.floor(Math.random() * SCALE_GUIDE.length)];
+  if (enabledTypes.length === 0) enabledTypes = ALL_MAJOR_ONLY_TYPES;
+  const pickedType =
+    enabledTypes[Math.floor(Math.random() * enabledTypes.length)];
+
+  if (pickedType === "majorNotes") {
+    return {
+      type: "writeMajor",
+      questionText: `Escribe las 7 notas de ${target.major} en orden:`,
+      answerArray: target.notes.slice(0, 7),
+    };
+  } else if (pickedType === "majorKeyByAccidentals") {
+    const desc = target.keySignature;
+    const distractors = shuffle(
+      SCALE_GUIDE.filter((r) => r.major !== target.major).map((r) => r.major),
+    ).slice(0, 3);
+    return {
+      type: "identifyKeyByAccidentals",
+      questionText: `¿Qué escala mayor tiene ${desc} en su armadura?`,
+      answer: target.major,
+      options: shuffle([target.major, ...distractors]),
+    };
+  } else if (pickedType === "countMajorAccidentals") {
+    const acc = target.keySignature;
+    const typeAcc = acc.includes("b")
+      ? "bemoles"
+      : acc.includes("#")
+        ? "sostenidos"
+        : "alteraciones";
+    const count = acc === "0 alteraciones" ? "0" : acc.replace(/[^0-9]/g, "");
+    const distractors = shuffle(
+      ["0", "1", "2", "3", "4", "5", "6", "7"].filter((c) => c !== count),
+    ).slice(0, 3);
+    return {
+      type: "countAccidentals",
+      questionText: `¿Cuántos ${typeAcc} tiene la armadura de ${target.major}?`,
+      answer: count,
+      options: shuffle([count, ...distractors]),
+    };
+  } else if (pickedType === "accidentalType") {
+    let ans = "Ninguna";
+    if (target.keySignature.includes("b")) ans = "Bemoles";
+    if (target.keySignature.includes("#")) ans = "Sostenidos";
+    return {
+      type: "identifyAccidentalType",
+      questionText: `¿La armadura de ${target.major} usa sostenidos o bemoles?`,
+      answer: ans,
+      options: ["Sostenidos", "Bemoles", "Ninguna"],
+    };
+  } else if (pickedType === "nthDegreeOfMajor") {
+    const degreeIndex = Math.floor(Math.random() * 6) + 1;
+    const degreeNames = ["1º", "2º", "3º", "4º", "5º", "6º", "7º"];
+    return {
+      type: "identifyNthDegree",
+      questionText: `¿Cuál es el ${degreeNames[degreeIndex]} grado de ${target.major}?`,
+      answer: target.notes[degreeIndex],
+    };
+  } else if (pickedType === "majorByNthDegree") {
+    const degreeIndex = Math.floor(Math.random() * 5) + 1;
+    const degreeNames = ["1º", "2º", "3º", "4º", "5º", "6º", "7º"];
+    const distractors = shuffle(
+      SCALE_GUIDE.filter((r) => r.major !== target.major).map((r) => r.major),
+    ).slice(0, 3);
+    return {
+      type: "identifyKeyByAccidentals",
+      questionText: `¿Qué escala mayor tiene "${target.notes[degreeIndex]}" como ${degreeNames[degreeIndex]} grado?`,
+      answer: target.major,
+      options: shuffle([target.major, ...distractors]),
+    };
+  } else if (pickedType === "orderOfSharps") {
+    const orderItems = ["Fa#", "Do#", "Sol#", "Re#", "La#", "Mi#", "Si#"];
+    const idx = Math.floor(Math.random() * 7);
+    const degreeNames = ["1er", "2do", "3er", "4to", "5to", "6to", "7mo"];
+    return {
+      type: "orderOfAccidentals",
+      questionText: `¿Cuál es el ${degreeNames[idx]} sostenido en el orden de sostenidos?`,
+      answer: orderItems[idx],
+    };
+  } else {
+    const orderItems = ["Sib", "Mib", "Lab", "Reb", "Solb", "Dob", "Fab"];
+    const idx = Math.floor(Math.random() * 7);
+    const degreeNames = ["1er", "2do", "3er", "4to", "5to", "6to", "7mo"];
+    return {
+      type: "orderOfAccidentals",
+      questionText: `¿Cuál es el ${degreeNames[idx]} bemol en el orden de bemoles?`,
+      answer: orderItems[idx],
+    };
+  }
+}
+
 // Helper to initialize or get practice state for a row
 function getRowPracticeState(
   tablePracticeAnswers: Record<string, any>,
@@ -1749,6 +1874,9 @@ export default function RelativeMinorScalesStudy() {
 
   const [activeFlashcardModes, setActiveFlashcardModes] =
     useState<FlashcardMode[]>(ALL_FLASHCARD_MODES);
+  const [majorOnlyMode, setMajorOnlyMode] = useState<boolean>(false);
+  const [activeMajorOnlyTypes, setActiveMajorOnlyTypes] =
+    useState<MajorOnlyQuestionType[]>(ALL_MAJOR_ONLY_TYPES);
   const [flashcardMode, setFlashcardMode] =
     useState<FlashcardMode>("majorToMinor");
   const flashcardFlipTimeoutRef = React.useRef<number | null>(null);
@@ -1761,8 +1889,10 @@ export default function RelativeMinorScalesStudy() {
     while (SCALE_GUIDE[r].major === currentFlashcard.major) {
       r = Math.floor(Math.random() * SCALE_GUIDE.length);
     }
-    const modes =
-      activeFlashcardModes.length > 0
+    // When majorOnlyMode, only show majorToMinor mode (key name card, no minor)
+    const modes = majorOnlyMode
+      ? (["majorToMinor"] as FlashcardMode[])
+      : activeFlashcardModes.length > 0
         ? activeFlashcardModes
         : (["majorToMinor"] as FlashcardMode[]);
     const newMode = modes[Math.floor(Math.random() * modes.length)];
@@ -2048,7 +2178,11 @@ export default function RelativeMinorScalesStudy() {
   }, []);
 
   const handleNextQuestion = () => {
-    setQuestion(createQuizQuestion(enabledQuizTypes));
+    setQuestion(
+      majorOnlyMode
+        ? generateMajorOnlyQuestion(activeMajorOnlyTypes)
+        : createQuizQuestion(enabledQuizTypes),
+    );
     setSelectedOption("");
     setScaleInputs(Array(7).fill(""));
     setTextInput("");
@@ -2372,7 +2506,22 @@ export default function RelativeMinorScalesStudy() {
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#00695c" }}>
               Práctica Rápida: Flashcards
             </Typography>
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={majorOnlyMode}
+                    onChange={(e) => setMajorOnlyMode(e.target.checked)}
+                    color="warning"
+                  />
+                }
+                label={
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Solo Escalas Mayores
+                  </Typography>
+                }
+              />
               <Button
                 variant="contained"
                 size="small"
@@ -2384,42 +2533,81 @@ export default function RelativeMinorScalesStudy() {
             </Stack>
           </Stack>
 
-          <Box sx={{ mb: 3 }}>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mb: 1, fontWeight: 600 }}
-            >
-              Tipos de pregunta a incluir:
-            </Typography>
-            <FormGroup row>
-              {ALL_FLASHCARD_MODES.map((mode) => (
-                <FormControlLabel
-                  key={mode}
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={activeFlashcardModes.includes(mode)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setActiveFlashcardModes((prev) => [...prev, mode]);
-                        } else {
-                          setActiveFlashcardModes((prev) =>
-                            prev.filter((m) => m !== mode),
-                          );
-                        }
-                      }}
-                    />
-                  }
-                  label={
-                    <Typography variant="body2">
-                      {FLASHCARD_MODE_LABELS[mode]}
-                    </Typography>
-                  }
-                />
-              ))}
-            </FormGroup>
-          </Box>
+          {majorOnlyMode ? (
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 1, fontWeight: 600 }}
+              >
+                Tipos de pregunta (Solo Escalas Mayores):
+              </Typography>
+              <FormGroup row>
+                {ALL_MAJOR_ONLY_TYPES.map((t) => (
+                  <FormControlLabel
+                    key={t}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={activeMajorOnlyTypes.includes(t)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setActiveMajorOnlyTypes((prev) => [...prev, t]);
+                          } else {
+                            setActiveMajorOnlyTypes((prev) =>
+                              prev.filter((x) => x !== t),
+                            );
+                          }
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        {MAJOR_ONLY_MODE_LABELS[t]}
+                      </Typography>
+                    }
+                  />
+                ))}
+              </FormGroup>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 1, fontWeight: 600 }}
+              >
+                Tipos de pregunta a incluir:
+              </Typography>
+              <FormGroup row>
+                {ALL_FLASHCARD_MODES.map((mode) => (
+                  <FormControlLabel
+                    key={mode}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={activeFlashcardModes.includes(mode)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setActiveFlashcardModes((prev) => [...prev, mode]);
+                          } else {
+                            setActiveFlashcardModes((prev) =>
+                              prev.filter((m) => m !== mode),
+                            );
+                          }
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        {FLASHCARD_MODE_LABELS[mode]}
+                      </Typography>
+                    }
+                  />
+                ))}
+              </FormGroup>
+            </Box>
+          )}
 
           <Box
             sx={{
