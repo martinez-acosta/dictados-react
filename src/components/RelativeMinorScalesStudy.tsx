@@ -627,8 +627,8 @@ function createQuizQuestion(
     };
   } else if (pickedType === "identifyAccidentalType") {
     let ans = "Ninguna";
-    if (target.keySignature.includes("b")) ans = "Bemoles";
-    if (target.keySignature.includes("#")) ans = "Sostenidos";
+    if (target.keySignature.toLowerCase().includes("bemol")) ans = "Bemoles";
+    if (target.keySignature.toLowerCase().includes("sostenido")) ans = "Sostenidos";
     return {
       type: "identifyAccidentalType",
       questionText: `¿La armadura de ${target.major} mayor usa sostenidos o bemoles?`,
@@ -788,8 +788,8 @@ function generateMajorOnlyQuestion(
     };
   } else if (pickedType === "accidentalType") {
     let ans = "Ninguna";
-    if (target.keySignature.includes("b")) ans = "Bemoles";
-    if (target.keySignature.includes("#")) ans = "Sostenidos";
+    if (target.keySignature.toLowerCase().includes("bemol")) ans = "Bemoles";
+    if (target.keySignature.toLowerCase().includes("sostenido")) ans = "Sostenidos";
     return {
       type: "identifyAccidentalType",
       questionText: `¿La armadura de ${target.major} usa sostenidos o bemoles?`,
@@ -954,8 +954,8 @@ function createMajorOnlyFlashcard(
 
   if (pickedType === "accidentalType") {
     let answer = "Ninguna";
-    if (target.keySignature.includes("b")) answer = "Bemoles";
-    if (target.keySignature.includes("#")) answer = "Sostenidos";
+    if (target.keySignature.toLowerCase().includes("bemol")) answer = "Bemoles";
+    if (target.keySignature.toLowerCase().includes("sostenido")) answer = "Sostenidos";
 
     return {
       type: pickedType,
