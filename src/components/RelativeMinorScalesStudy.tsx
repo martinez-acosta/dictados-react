@@ -887,7 +887,7 @@ function renderPracticeRow(
     React.SetStateAction<Record<string, any>>
   >,
 ) {
-  const isDo = rowKey === "do-flat" || rowKey === "do-sharp";
+  const isDo = rowKey === "c-flat" || rowKey === "c-sharp";
   const state = getRowPracticeState(tablePracticeAnswers, rowKey);
 
   const updateNote = (index: number, val: string) => {
@@ -937,7 +937,7 @@ function renderPracticeRow(
           backgroundColor: isDo ? "#fff8e1" : "inherit",
         }}
       >
-        {tonality} {tonalityEn ? `(${tonalityEn})` : ""}
+        {tonalityEn || extractAmericanNotation(tonality)}
       </TableCell>
       <TableCell
         align="center"
@@ -1754,7 +1754,7 @@ function CircleOfFifthsClock({
                 fontWeight: 700,
               }}
             >
-              C (Do)
+              C
             </Typography>
           </Box>
         )}
@@ -1963,8 +1963,8 @@ export default function RelativeMinorScalesStudy() {
       relativeMinorCorrect: false,
     };
 
-    newAnswers["do-flat"] = { ...initRowState };
-    newAnswers["do-sharp"] = { ...initRowState };
+    newAnswers["c-flat"] = { ...initRowState };
+    newAnswers["c-sharp"] = { ...initRowState };
     FLAT_SUBTABLE.forEach((r) => {
       newAnswers[`flat-${r.tonality}`] = { ...initRowState };
     });
@@ -2046,17 +2046,17 @@ export default function RelativeMinorScalesStudy() {
       };
 
       gradeRow(
-        "do-flat",
-        ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
-        "La menor (Am)",
+        "c-flat",
+        ["C", "D", "E", "F", "G", "A", "B", "C"],
+        "Am",
       );
       FLAT_SUBTABLE.forEach((r) =>
         gradeRow(`flat-${r.tonality}`, r.majorScale, r.relativeMinor),
       );
       gradeRow(
-        "do-sharp",
-        ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
-        "La menor (Am)",
+        "c-sharp",
+        ["C", "D", "E", "F", "G", "A", "B", "C"],
+        "Am",
       );
       SHARP_SUBTABLE.forEach((r) =>
         gradeRow(`sharp-${r.tonality}`, r.majorScale, r.relativeMinor),
@@ -3519,12 +3519,12 @@ export default function RelativeMinorScalesStudy() {
                 </TableHead>
                 <TableBody>
                   {renderPracticeRow(
-                    "do-flat",
-                    "Do",
+                    "c-flat",
+                    "C",
                     "C",
                     0,
-                    ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
-                    "La menor (Am)",
+                    ["C", "D", "E", "F", "G", "A", "B", "C"],
+                    "Am",
                     tablePracticeMode,
                     tablePracticeAnswers,
                     setTablePracticeAnswers,
@@ -3591,12 +3591,12 @@ export default function RelativeMinorScalesStudy() {
                 </TableHead>
                 <TableBody>
                   {renderPracticeRow(
-                    "do-sharp",
-                    "Do",
+                    "c-sharp",
+                    "C",
                     "C",
                     0,
-                    ["Do", "Re", "Mi", "Fa", "Sol", "La", "Si", "Do"],
-                    "La menor (Am)",
+                    ["C", "D", "E", "F", "G", "A", "B", "C"],
+                    "Am",
                     tablePracticeMode,
                     tablePracticeAnswers,
                     setTablePracticeAnswers,
@@ -3620,7 +3620,7 @@ export default function RelativeMinorScalesStudy() {
           </Stack>
           <Box sx={{ mt: 1.25 }}>
             <Typography variant="body2" color="text.secondary">
-              Nota: Do mayor tiene 0 alteraciones.
+              Nota: C mayor tiene 0 alteraciones.
             </Typography>
           </Box>
         </Paper>
