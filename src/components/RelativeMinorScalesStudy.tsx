@@ -65,6 +65,52 @@ function extractAmericanNotation(text: string) {
   return match ? match[1] : text;
 }
 
+function normalizeAccidentals(text: string) {
+  return (text || "")
+    .replace(/♭/g, "b")
+    .replace(/♯/g, "#")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeAmericanScaleNote(note: string) {
+  return normalizeAccidentals(note).replace(/\s+/g, "").toLowerCase();
+}
+
+function normalizeAmericanMinorKey(key: string) {
+  const compact = normalizeAccidentals(key).replace(/\s+/g, "");
+  const match = compact.match(/^([a-g])(b|#)?(m|minor)$/i);
+  if (!match) return compact.toLowerCase();
+  return `${match[1].toUpperCase()}${match[2] || ""}m`;
+}
+
+function gradePracticeRowState(
+  state: { notes: string[]; relativeMinor: string },
+  expectedNotes: string[],
+  expectedRelativeMinor: string,
+) {
+  const notesCorrect = state.notes.map(
+    (note, index) =>
+      normalizeAmericanScaleNote(note) ===
+      normalizeAmericanScaleNote(expectedNotes[index]),
+  );
+
+  const relativeMinorCorrect =
+    normalizeAmericanMinorKey(state.relativeMinor) ===
+    normalizeAmericanMinorKey(expectedRelativeMinor);
+
+  return { notesCorrect, relativeMinorCorrect };
+}
+
+function parseMajorMinorPair(text: string) {
+  const normalized = normalizeAccidentals(text);
+  const match = normalized.match(/^(.*?)\s*\((.*?)\)\s*$/);
+  if (match) {
+    return { major: match[1].trim(), minor: match[2].trim() };
+  }
+  return { major: normalized, minor: "" };
+}
+
 type ScaleGuideRow = {
   major: string;
   notes: string[];
@@ -793,75 +839,11 @@ function handleRowGrade(
   >,
 ) {
   const currentState = getRowPracticeState(tablePracticeAnswers, rowKey);
-
-  const EN_TO_ES: Record<string, string> = {
-    c: "do",
-    d: "re",
-    e: "mi",
-    f: "fa",
-    g: "sol",
-    a: "la",
-    b: "si",
-  };
-
-  const mapToSolfege = (str: string) => {
-    const lower = str.trim().toLowerCase();
-    const match = lower.match(/^([cdefgab])([#b]?)$/);
-    if (match) {
-      return EN_TO_ES[match[1]] + match[2];
-    }
-    return lower;
-  };
-
-  const notesCorrect = currentState.notes.map((n: string, i: number) => {
-    const inputVal = mapToSolfege(n)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-    const expVal = expectedNotes[i]
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-    return inputVal === expVal;
-  });
-  const normInput = currentState.relativeMinor
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-  const normExpected = expectedRelativeMinor
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  // Extract core note name and english symbol (e.g., from "la menor (am)" extract "la" and "am")
-  const expectedParts = normExpected.match(
-    /^([a-z#b]+)\s+menor\s+\(([a-z#bm]+)\)$/,
+  const { notesCorrect, relativeMinorCorrect } = gradePracticeRowState(
+    currentState,
+    expectedNotes,
+    expectedRelativeMinor,
   );
-
-  let relativeMinorCorrect = false;
-  if (expectedParts) {
-    const spanishNote = expectedParts[1];
-    const englishSymbol = expectedParts[2];
-
-    const stripedInput = normInput.replace(/\s*(m|minor|menor)\s*$/, "");
-    const mappedNote = mapToSolfege(stripedInput)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-
-    // Accept match if input is just "la", "am", "la menor", etc.
-    if (
-      mappedNote === spanishNote ||
-      normInput === englishSymbol ||
-      normInput === `${spanishNote} m` ||
-      normInput === `${spanishNote} menor` ||
-      (normExpected.includes(normInput) && normInput.length >= 2) // fallback
-    ) {
-      relativeMinorCorrect = true;
-    }
-  } else {
-    relativeMinorCorrect =
-      normInput === normExpected || normExpected.includes(normInput);
-  }
 
   setTablePracticeAnswers((prev) => ({
     ...prev,
@@ -1005,6 +987,7 @@ function renderPracticeRow(
             <TextField
               variant="standard"
               size="small"
+              placeholder="Ej. Am"
               value={state.relativeMinor}
               onChange={(e) => updateRelative(e.target.value)}
               inputProps={{
@@ -1112,16 +1095,8 @@ function handleMemorizationRowGrade(
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-  const parseExpected = (str: string) => {
-    const match = str.match(/(.*?)\s*\((.*?)\)/);
-    if (match) {
-      return { major: match[1].trim(), minor: match[2].trim() };
-    }
-    return { major: str, minor: "" };
-  };
-
-  const expectedSharpsParsed = parseExpected(expectedSharps);
-  const expectedFlatsParsed = parseExpected(expectedFlats);
+  const expectedSharpsParsed = parseMajorMinorPair(expectedSharps);
+  const expectedFlatsParsed = parseMajorMinorPair(expectedFlats);
 
   const sharpsMajorCorrect =
     normalize(currentState.sharpsMajorInput) ===
@@ -1282,7 +1257,7 @@ function renderMemorizationRow(
           </Stack>
         ) : (
           <Stack direction="column" alignItems="center">
-            <Typography>{extractAmericanNotation(expectedSharps)}</Typography>
+            <Typography>{expectedSharps}</Typography>
             <Typography variant="caption" color="text.secondary">
               {expectedSharpsAcc}
             </Typography>
@@ -1389,7 +1364,7 @@ function renderMemorizationRow(
           </Stack>
         ) : (
           <Stack direction="column" alignItems="center">
-            <Typography>{extractAmericanNotation(expectedFlats)}</Typography>
+            <Typography>{expectedFlats}</Typography>
             <Typography variant="caption" color="text.secondary">
               {expectedFlatsAcc}
             </Typography>
@@ -2008,33 +1983,12 @@ export default function RelativeMinorScalesStudy() {
           notesCorrect: Array(7).fill(false),
           relativeMinorCorrect: false,
         };
-        const notesCorrect = state.notes.map(
-          (n: string, i: number) =>
-            n.trim().toLowerCase() === expectedNotes[i].toLowerCase(),
+        const { notesCorrect, relativeMinorCorrect } = gradePracticeRowState(
+          state,
+          expectedNotes,
+          expectedRelativeMinor,
         );
-        const normInput = state.relativeMinor
-          .trim()
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "");
-        const normExpected = expectedRelativeMinor
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "");
-        const parts = normExpected.match(
-          /^([a-z#b]+)\s+menor\s+\(([a-z#bm]+)\)$/,
-        );
-        let relativeMinorCorrect = false;
-        if (parts) {
-          relativeMinorCorrect =
-            [parts[1], parts[2], `${parts[1]} m`, `${parts[1]} menor`].includes(
-              normInput,
-            ) ||
-            (normExpected.includes(normInput) && normInput.length >= 2);
-        } else {
-          relativeMinorCorrect =
-            normInput === normExpected || normExpected.includes(normInput);
-        }
+
         next[rowKey] = {
           ...state,
           evaluated: true,
@@ -2045,19 +1999,11 @@ export default function RelativeMinorScalesStudy() {
         if (notesCorrect.every(Boolean) && relativeMinorCorrect) correctRows++;
       };
 
-      gradeRow(
-        "c-flat",
-        ["C", "D", "E", "F", "G", "A", "B", "C"],
-        "Am",
-      );
+      gradeRow("c-flat", ["C", "D", "E", "F", "G", "A", "B", "C"], "Am");
       FLAT_SUBTABLE.forEach((r) =>
         gradeRow(`flat-${r.tonality}`, r.majorScale, r.relativeMinor),
       );
-      gradeRow(
-        "c-sharp",
-        ["C", "D", "E", "F", "G", "A", "B", "C"],
-        "Am",
-      );
+      gradeRow("c-sharp", ["C", "D", "E", "F", "G", "A", "B", "C"], "Am");
       SHARP_SUBTABLE.forEach((r) =>
         gradeRow(`sharp-${r.tonality}`, r.majorScale, r.relativeMinor),
       );
@@ -2908,7 +2854,8 @@ export default function RelativeMinorScalesStudy() {
                       color="text.secondary"
                       sx={{ fontWeight: 600, mb: 0.5 }}
                     >
-                      Notas de {extractAmericanNotation(currentFlashcard.major)}:
+                      Notas de {extractAmericanNotation(currentFlashcard.major)}
+                      :
                     </Typography>
                     <Stack
                       direction="row"
@@ -3159,8 +3106,8 @@ export default function RelativeMinorScalesStudy() {
                   renderMemorizationRow(
                     `memo-${idx}`,
                     row.count,
-                    extractAmericanNotation(row.sharps),
-                    extractAmericanNotation(row.flats),
+                    row.sharps,
+                    row.flats,
                     row.sharpsAcc,
                     row.flatsAcc,
                     memoTablePracticeMode,
