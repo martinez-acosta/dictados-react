@@ -176,6 +176,20 @@ type QuizQuestion = {
   answerArray?: string[];
 };
 
+type FlashcardMode =
+  | "majorToMinor"
+  | "minorToMajor"
+  | "signatureToKeys"
+  | "sixthDegreeToKey"
+  | "notesToMinorKey";
+
+type FlashcardAssessment = "again" | "hard" | "easy";
+
+type FlashcardCheckResult = {
+  isCorrect: boolean;
+  parts?: boolean[];
+};
+
 const DEGREE_LABELS = ["I", "II", "III", "IV", "V", "VI", "VII"] as const;
 const SCALE_COLUMNS = ["I", "II", "III", "IV", "V", "VI", "VII"] as const;
 const CHROMATIC_ROOTS = [
@@ -719,6 +733,17 @@ const MAJOR_ONLY_MODE_LABELS: Record<MajorOnlyQuestionType, string> = {
   orderOfFlats: "Orden de bemoles",
 };
 
+type MajorOnlyFlashcard = {
+  type: MajorOnlyQuestionType;
+  target: ScaleGuideRow;
+  question: QuizQuestion;
+  hintSteps: string[];
+};
+
+type FlashcardReviewItem =
+  | { kind: "relative"; major: string; mode: FlashcardMode }
+  | { kind: "majorOnly"; card: MajorOnlyFlashcard };
+
 function generateMajorOnlyQuestion(
   enabledTypes: MajorOnlyQuestionType[] = ALL_MAJOR_ONLY_TYPES,
 ): QuizQuestion {
@@ -810,6 +835,226 @@ function generateMajorOnlyQuestion(
       answer: orderItems[idx],
     };
   }
+}
+
+function randomFromArray<T>(items: T[]) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function getScaleGuideByMajor(major: string) {
+  return SCALE_GUIDE.find((row) => row.major === major) || SCALE_GUIDE[0];
+}
+
+function keySignatureCount(keySignature: string) {
+  return keySignature === "0 alteraciones"
+    ? "0"
+    : keySignature.replace(/[^0-9]/g, "");
+}
+
+function normalizeBasicAnswer(value: string) {
+  return normalizeAccidentals(value).toLowerCase();
+}
+
+function normalizeAmericanMajorKey(value: string) {
+  return normalizeAccidentals(value).replace(/\s+/g, "").toUpperCase();
+}
+
+function normalizeAccidentalFamily(value: string) {
+  const normalized = normalizeBasicAnswer(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (normalized.includes("#") || normalized.includes("sosten")) {
+    return "sostenidos";
+  }
+  if (normalized.includes("b") || normalized.includes("bemol")) {
+    return "bemoles";
+  }
+  if (normalized.includes("ning")) {
+    return "ninguna";
+  }
+  return normalized;
+}
+
+function createMajorOnlyFlashcard(
+  enabledTypes: MajorOnlyQuestionType[] = ALL_MAJOR_ONLY_TYPES,
+): MajorOnlyFlashcard {
+  const target = randomFromArray(SCALE_GUIDE);
+  const availableTypes =
+    enabledTypes.length > 0 ? enabledTypes : ALL_MAJOR_ONLY_TYPES;
+  const pickedType = randomFromArray(availableTypes);
+
+  if (pickedType === "majorNotes") {
+    return {
+      type: pickedType,
+      target,
+      question: {
+        type: "writeMajor",
+        questionText: `Escribe las 7 notas de ${target.major} en orden:`,
+        answerArray: target.notes.slice(0, 7),
+      },
+      hintSteps: [
+        `Armadura: ${target.keySignature}.`,
+        `La escala empieza en ${target.notes[0]} y termina en ${target.notes[6]}.`,
+        `Patrón mayor: T-T-st-T-T-T-st.`,
+      ],
+    };
+  }
+
+  if (pickedType === "majorKeyByAccidentals") {
+    const desc = target.keySignature;
+    const distractors = shuffle(
+      SCALE_GUIDE.filter((r) => r.major !== target.major).map((r) => r.major),
+    ).slice(0, 3);
+    return {
+      type: pickedType,
+      target,
+      question: {
+        type: "identifyKeyByAccidentals",
+        questionText: `¿Qué escala mayor tiene ${desc} en su armadura?`,
+        answer: target.major,
+        options: shuffle([target.major, ...distractors]),
+      },
+      hintSteps: [
+        `Piensa en el círculo de quintas para ${desc}.`,
+        `Comparte armadura con ${target.relativeMinor}.`,
+        `La respuesta correcta es ${target.major}.`,
+      ],
+    };
+  }
+
+  if (pickedType === "countMajorAccidentals") {
+    const acc = target.keySignature;
+    const typeAcc = acc.includes("b")
+      ? "bemoles"
+      : acc.includes("#")
+        ? "sostenidos"
+        : "alteraciones";
+    const count = keySignatureCount(acc);
+    const distractors = shuffle(
+      ["0", "1", "2", "3", "4", "5", "6", "7"].filter((c) => c !== count),
+    ).slice(0, 3);
+
+    return {
+      type: pickedType,
+      target,
+      question: {
+        type: "countAccidentals",
+        questionText: `¿Cuántos ${typeAcc} tiene la armadura de ${target.major}?`,
+        answer: count,
+        options: shuffle([count, ...distractors]),
+      },
+      hintSteps: [
+        `La armadura de ${target.major} es ${target.keySignature}.`,
+        `Cuenta solo el número inicial de la armadura.`,
+        `La respuesta correcta es ${count}.`,
+      ],
+    };
+  }
+
+  if (pickedType === "accidentalType") {
+    let answer = "Ninguna";
+    if (target.keySignature.includes("b")) answer = "Bemoles";
+    if (target.keySignature.includes("#")) answer = "Sostenidos";
+
+    return {
+      type: pickedType,
+      target,
+      question: {
+        type: "identifyAccidentalType",
+        questionText: `¿La armadura de ${target.major} usa sostenidos o bemoles?`,
+        answer,
+        options: ["Sostenidos", "Bemoles", "Ninguna"],
+      },
+      hintSteps: [
+        `La armadura de ${target.major} es ${target.keySignature}.`,
+        `Si ves "#", son sostenidos; si ves "b", son bemoles.`,
+        `La respuesta correcta es ${answer}.`,
+      ],
+    };
+  }
+
+  if (pickedType === "nthDegreeOfMajor") {
+    const degreeIndex = Math.floor(Math.random() * 6) + 1;
+    const degreeNames = ["1º", "2º", "3º", "4º", "5º", "6º", "7º"];
+    const degreeLabel = degreeNames[degreeIndex];
+
+    return {
+      type: pickedType,
+      target,
+      question: {
+        type: "identifyNthDegree",
+        questionText: `¿Cuál es el ${degreeLabel} grado de ${target.major}?`,
+        answer: target.notes[degreeIndex],
+      },
+      hintSteps: [
+        `Escribe mentalmente la escala de ${target.major}.`,
+        `Cuenta desde ${target.notes[0]} hasta el ${degreeLabel}.`,
+        `La respuesta correcta es ${target.notes[degreeIndex]}.`,
+      ],
+    };
+  }
+
+  if (pickedType === "majorByNthDegree") {
+    const degreeIndex = Math.floor(Math.random() * 6) + 1;
+    const degreeNames = ["1º", "2º", "3º", "4º", "5º", "6º", "7º"];
+    const degreeLabel = degreeNames[degreeIndex];
+
+    return {
+      type: pickedType,
+      target,
+      question: {
+        type: "writeMajor",
+        questionText: `¿Qué escala mayor tiene ${target.notes[degreeIndex]} como ${degreeLabel} grado?`,
+        answer: target.major,
+      },
+      hintSteps: [
+        `Piensa en la escala donde ${target.notes[degreeIndex]} cae como ${degreeLabel}.`,
+        `La armadura correspondiente es ${target.keySignature}.`,
+        `La respuesta correcta es ${target.major}.`,
+      ],
+    };
+  }
+
+  if (pickedType === "orderOfSharps") {
+    const orderItems = ["Fa#", "Do#", "Sol#", "Re#", "La#", "Mi#", "Si#"];
+    const idx = Math.floor(Math.random() * 7);
+    const degreeNames = ["1er", "2do", "3er", "4to", "5to", "6to", "7mo"];
+
+    return {
+      type: pickedType,
+      target,
+      question: {
+        type: "orderOfAccidentals",
+        questionText: `¿Cuál es el ${degreeNames[idx]} sostenido en el orden de sostenidos?`,
+        answer: orderItems[idx],
+      },
+      hintSteps: [
+        `Recuerda: Fa#, Do#, Sol#, Re#, La#, Mi#, Si#.`,
+        `Cuenta la posición ${degreeNames[idx]}.`,
+        `La respuesta correcta es ${orderItems[idx]}.`,
+      ],
+    };
+  }
+
+  const orderItems = ["Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fb"];
+  const idx = Math.floor(Math.random() * 7);
+  const degreeNames = ["1er", "2do", "3er", "4to", "5to", "6to", "7mo"];
+
+  return {
+    type: "orderOfFlats",
+    target,
+    question: {
+      type: "orderOfAccidentals",
+      questionText: `¿Cuál es el ${degreeNames[idx]} bemol en el orden de bemoles?`,
+      answer: orderItems[idx],
+    },
+    hintSteps: [
+      `Recuerda: Bb, Eb, Ab, Db, Gb, Cb, Fb.`,
+      `Cuenta la posición ${degreeNames[idx]}.`,
+      `La respuesta correcta es ${orderItems[idx]}.`,
+    ],
+  };
 }
 
 // Helper to initialize or get practice state for a row
@@ -1853,16 +2098,9 @@ export default function RelativeMinorScalesStudy() {
       return SCALE_GUIDE[r];
     },
   );
+  const [currentMajorOnlyFlashcard, setCurrentMajorOnlyFlashcard] =
+    useState<MajorOnlyFlashcard>(() => createMajorOnlyFlashcard());
   const [isFlipped, setIsFlipped] = useState(false);
-  // 'majorToMinor' = front shows major key, back shows minor+armadura
-  // 'minorToMajor' = front shows minor+armadura, back shows major key
-  type FlashcardMode =
-    | "majorToMinor"
-    | "minorToMajor"
-    | "signatureToKeys"
-    | "sixthDegreeToKey"
-    | "notesToMinorKey";
-
   const FLASHCARD_MODE_LABELS: Record<FlashcardMode, string> = {
     majorToMinor: "Mayor a Menor",
     minorToMajor: "Menor a Mayor",
@@ -1885,26 +2123,105 @@ export default function RelativeMinorScalesStudy() {
     useState<MajorOnlyQuestionType[]>(ALL_MAJOR_ONLY_TYPES);
   const [flashcardMode, setFlashcardMode] =
     useState<FlashcardMode>("majorToMinor");
+  const [flashcardTextAnswer, setFlashcardTextAnswer] = useState("");
+  const [flashcardChoiceAnswer, setFlashcardChoiceAnswer] = useState("");
+  const [flashcardPairAnswer, setFlashcardPairAnswer] = useState({
+    left: "",
+    right: "",
+  });
+  const [flashcardNoteAnswers, setFlashcardNoteAnswers] = useState<string[]>(
+    Array(7).fill(""),
+  );
+  const [flashcardHintLevel, setFlashcardHintLevel] = useState(0);
+  const [flashcardChecked, setFlashcardChecked] = useState(false);
+  const [flashcardCheckResult, setFlashcardCheckResult] =
+    useState<FlashcardCheckResult | null>(null);
+  const [flashcardReviewQueue, setFlashcardReviewQueue] = useState<
+    FlashcardReviewItem[]
+  >([]);
+  const [flashcardReviewOnlyMode, setFlashcardReviewOnlyMode] = useState(false);
+  const [flashcardAudioOnlyMode, setFlashcardAudioOnlyMode] = useState(false);
+  const [flashcardSessionStats, setFlashcardSessionStats] = useState({
+    reviewed: 0,
+    correct: 0,
+    streak: 0,
+    bestStreak: 0,
+  });
+  const [flashcardSprintActive, setFlashcardSprintActive] = useState(false);
+  const [flashcardSprintRemaining, setFlashcardSprintRemaining] = useState(90);
+  const [flashcardSprintStats, setFlashcardSprintStats] = useState({
+    reviewed: 0,
+    correct: 0,
+    streak: 0,
+    bestStreak: 0,
+  });
   const flashcardFlipTimeoutRef = React.useRef<number | null>(null);
+  const flashcardSprintRef = React.useRef<number | null>(null);
+
+  const clearFlashcardCheck = () => {
+    setFlashcardChecked(false);
+    setFlashcardCheckResult(null);
+  };
+
+  const resetFlashcardAttempt = () => {
+    setIsFlipped(false);
+    setFlashcardTextAnswer("");
+    setFlashcardChoiceAnswer("");
+    setFlashcardPairAnswer({ left: "", right: "" });
+    setFlashcardNoteAnswers(Array(7).fill(""));
+    setFlashcardHintLevel(0);
+    clearFlashcardCheck();
+  };
 
   const nextFlashcard = () => {
-    setIsFlipped(false);
+    resetFlashcardAttempt();
     if (flashcardFlipTimeoutRef.current)
       clearTimeout(flashcardFlipTimeoutRef.current);
+
+    const shouldUseReviewCard =
+      flashcardReviewQueue.length > 0 &&
+      (flashcardReviewOnlyMode || Math.random() < 0.6);
+
+    if (shouldUseReviewCard) {
+      const [reviewItem, ...rest] = flashcardReviewQueue;
+      setFlashcardReviewQueue(rest);
+      flashcardFlipTimeoutRef.current = window.setTimeout(() => {
+        if (reviewItem.kind === "majorOnly") {
+          setMajorOnlyMode(true);
+          setCurrentMajorOnlyFlashcard(reviewItem.card);
+        } else {
+          setMajorOnlyMode(false);
+          setCurrentFlashcard(getScaleGuideByMajor(reviewItem.major));
+          setFlashcardMode(reviewItem.mode);
+        }
+        flashcardFlipTimeoutRef.current = null;
+      }, 150);
+      return;
+    }
+
+    if (flashcardReviewOnlyMode && flashcardReviewQueue.length === 0) {
+      setFlashcardReviewOnlyMode(false);
+    }
+
     let r = Math.floor(Math.random() * SCALE_GUIDE.length);
     while (SCALE_GUIDE[r].major === currentFlashcard.major) {
       r = Math.floor(Math.random() * SCALE_GUIDE.length);
     }
-    // When majorOnlyMode, only show majorToMinor mode (key name card, no minor)
-    const modes = majorOnlyMode
-      ? (["majorToMinor"] as FlashcardMode[])
-      : activeFlashcardModes.length > 0
+
+    const modes =
+      activeFlashcardModes.length > 0
         ? activeFlashcardModes
         : (["majorToMinor"] as FlashcardMode[]);
     const newMode = modes[Math.floor(Math.random() * modes.length)];
     flashcardFlipTimeoutRef.current = window.setTimeout(() => {
-      setCurrentFlashcard(SCALE_GUIDE[r]);
-      setFlashcardMode(newMode);
+      if (majorOnlyMode) {
+        setCurrentMajorOnlyFlashcard(
+          createMajorOnlyFlashcard(activeMajorOnlyTypes),
+        );
+      } else {
+        setCurrentFlashcard(SCALE_GUIDE[r]);
+        setFlashcardMode(newMode);
+      }
       flashcardFlipTimeoutRef.current = null;
     }, 150);
   };
@@ -2019,6 +2336,7 @@ export default function RelativeMinorScalesStudy() {
       if (timerRef.current) clearInterval(timerRef.current);
       if (flashcardFlipTimeoutRef.current)
         clearTimeout(flashcardFlipTimeoutRef.current);
+      if (flashcardSprintRef.current) clearInterval(flashcardSprintRef.current);
     };
   }, []);
 
@@ -2027,6 +2345,388 @@ export default function RelativeMinorScalesStudy() {
       SCALE_GUIDE.find((row) => row.major === selectedMajor) || SCALE_GUIDE[0],
     [selectedMajor],
   );
+
+  const currentReviewItem = useMemo<FlashcardReviewItem>(
+    () =>
+      majorOnlyMode
+        ? { kind: "majorOnly", card: currentMajorOnlyFlashcard }
+        : {
+            kind: "relative",
+            major: currentFlashcard.major,
+            mode: flashcardMode,
+          },
+    [
+      currentFlashcard.major,
+      currentMajorOnlyFlashcard,
+      flashcardMode,
+      majorOnlyMode,
+    ],
+  );
+
+  const flashcardPromptMeta = useMemo(() => {
+    if (majorOnlyMode) {
+      const card = currentMajorOnlyFlashcard;
+
+      switch (card.type) {
+        case "majorNotes":
+          return {
+            kind: "notes" as const,
+            hintSteps: card.hintSteps,
+            audioNotes: card.target.notes.slice(0, 7),
+            audioLabel: `Escuchar ${extractAmericanNotation(card.target.major)}`,
+            evaluate: (input: {
+              text: string;
+              choice: string;
+              notes: string[];
+              pair: { left: string; right: string };
+            }) => {
+              const parts = input.notes.map(
+                (note, index) =>
+                  normalizeAmericanScaleNote(note) ===
+                  normalizeAmericanScaleNote(card.target.notes[index]),
+              );
+              return { isCorrect: parts.every(Boolean), parts };
+            },
+          };
+        case "majorKeyByAccidentals":
+          return {
+            kind: "choice" as const,
+            hintSteps: card.hintSteps,
+            options: card.question.options || [],
+            audioNotes: card.target.notes.slice(0, 7),
+            audioLabel: `Escuchar ${extractAmericanNotation(card.target.major)}`,
+            evaluate: (input: {
+              text: string;
+              choice: string;
+              notes: string[];
+              pair: { left: string; right: string };
+            }) => ({
+              isCorrect:
+                normalizeAmericanMajorKey(input.choice) ===
+                normalizeAmericanMajorKey(card.target.major),
+            }),
+          };
+        case "countMajorAccidentals":
+          return {
+            kind: "choice" as const,
+            hintSteps: card.hintSteps,
+            options: card.question.options || [],
+            audioNotes: card.target.notes.slice(0, 7),
+            audioLabel: `Escuchar ${extractAmericanNotation(card.target.major)}`,
+            evaluate: (input: {
+              text: string;
+              choice: string;
+              notes: string[];
+              pair: { left: string; right: string };
+            }) => ({
+              isCorrect:
+                normalizeBasicAnswer(input.choice) ===
+                normalizeBasicAnswer(
+                  keySignatureCount(card.target.keySignature),
+                ),
+            }),
+          };
+        case "accidentalType":
+          return {
+            kind: "choice" as const,
+            hintSteps: card.hintSteps,
+            options: card.question.options || [],
+            audioNotes: card.target.notes.slice(0, 7),
+            audioLabel: `Escuchar ${extractAmericanNotation(card.target.major)}`,
+            evaluate: (input: {
+              text: string;
+              choice: string;
+              notes: string[];
+              pair: { left: string; right: string };
+            }) => ({
+              isCorrect:
+                normalizeAccidentalFamily(input.choice) ===
+                normalizeAccidentalFamily(card.question.answer || ""),
+            }),
+          };
+        case "nthDegreeOfMajor":
+        case "orderOfSharps":
+        case "orderOfFlats":
+          return {
+            kind: "text" as const,
+            hintSteps: card.hintSteps,
+            placeholder: "Tu respuesta",
+            audioNotes:
+              card.type === "nthDegreeOfMajor"
+                ? card.target.notes.slice(0, 7)
+                : card.target.notes.slice(0, 7),
+            audioLabel:
+              card.type === "nthDegreeOfMajor"
+                ? `Escuchar ${extractAmericanNotation(card.target.major)}`
+                : "Escuchar referencia",
+            evaluate: (input: {
+              text: string;
+              choice: string;
+              notes: string[];
+              pair: { left: string; right: string };
+            }) => ({
+              isCorrect:
+                normalizeAmericanScaleNote(input.text) ===
+                normalizeAmericanScaleNote(card.question.answer || ""),
+            }),
+          };
+        case "majorByNthDegree":
+          return {
+            kind: "text" as const,
+            hintSteps: card.hintSteps,
+            placeholder: "Ej. Bb",
+            audioNotes: card.target.notes.slice(0, 7),
+            audioLabel: `Escuchar ${extractAmericanNotation(card.target.major)}`,
+            evaluate: (input: {
+              text: string;
+              choice: string;
+              notes: string[];
+              pair: { left: string; right: string };
+            }) => ({
+              isCorrect:
+                normalizeAmericanMajorKey(input.text) ===
+                normalizeAmericanMajorKey(card.target.major),
+            }),
+          };
+      }
+    }
+
+    switch (flashcardMode) {
+      case "majorToMinor":
+        return {
+          kind: "text" as const,
+          hintSteps: [
+            `Armadura: ${currentFlashcard.keySignature}.`,
+            `El 6º grado es ${currentFlashcard.sixthDegree}.`,
+            `Respuesta: ${extractAmericanNotation(currentFlashcard.relativeMinor)}.`,
+          ],
+          placeholder: "Ej. F#m",
+          audioNotes: currentFlashcard.notes.slice(0, 7),
+          audioLabel: `Escuchar ${extractAmericanNotation(currentFlashcard.major)}`,
+          evaluate: (input: {
+            text: string;
+            choice: string;
+            notes: string[];
+            pair: { left: string; right: string };
+          }) => ({
+            isCorrect:
+              normalizeAmericanMinorKey(input.text) ===
+              normalizeAmericanMinorKey(currentFlashcard.relativeMinor),
+          }),
+        };
+      case "minorToMajor":
+        return {
+          kind: "text" as const,
+          hintSteps: [
+            `Comparte armadura con ${extractAmericanNotation(currentFlashcard.major)}.`,
+            `Sube 3 semitonos desde ${extractAmericanNotation(currentFlashcard.relativeMinor)}.`,
+            `Respuesta: ${extractAmericanNotation(currentFlashcard.major)}.`,
+          ],
+          placeholder: "Ej. E",
+          audioNotes: currentFlashcard.minorNotes.slice(0, 7),
+          audioLabel: `Escuchar ${extractAmericanNotation(currentFlashcard.relativeMinor)}`,
+          evaluate: (input: {
+            text: string;
+            choice: string;
+            notes: string[];
+            pair: { left: string; right: string };
+          }) => ({
+            isCorrect:
+              normalizeAmericanMajorKey(input.text) ===
+              normalizeAmericanMajorKey(currentFlashcard.major),
+          }),
+        };
+      case "signatureToKeys":
+        return {
+          kind: "pair" as const,
+          hintSteps: [
+            `Comparten armadura: ${currentFlashcard.keySignature}.`,
+            `Mayor: ${extractAmericanNotation(currentFlashcard.major)}.`,
+            `Menor relativo: ${extractAmericanNotation(currentFlashcard.relativeMinor)}.`,
+          ],
+          pairLabels: ["Mayor", "Menor rel."],
+          audioNotes: currentFlashcard.notes.slice(0, 7),
+          audioLabel: `Escuchar ${extractAmericanNotation(currentFlashcard.major)}`,
+          evaluate: (input: {
+            text: string;
+            choice: string;
+            notes: string[];
+            pair: { left: string; right: string };
+          }) => {
+            const parts = [
+              normalizeAmericanMajorKey(input.pair.left) ===
+                normalizeAmericanMajorKey(currentFlashcard.major),
+              normalizeAmericanMinorKey(input.pair.right) ===
+                normalizeAmericanMinorKey(currentFlashcard.relativeMinor),
+            ];
+            return { isCorrect: parts.every(Boolean), parts };
+          },
+        };
+      case "sixthDegreeToKey":
+        return {
+          kind: "text" as const,
+          hintSteps: [
+            `Ese 6º grado apunta al relativo menor ${extractAmericanNotation(currentFlashcard.relativeMinor)}.`,
+            `Comparte armadura: ${currentFlashcard.keySignature}.`,
+            `Respuesta: ${extractAmericanNotation(currentFlashcard.major)}.`,
+          ],
+          placeholder: "Ej. Db",
+          audioNotes: currentFlashcard.notes.slice(0, 7),
+          audioLabel: `Escuchar ${extractAmericanNotation(currentFlashcard.major)}`,
+          evaluate: (input: {
+            text: string;
+            choice: string;
+            notes: string[];
+            pair: { left: string; right: string };
+          }) => ({
+            isCorrect:
+              normalizeAmericanMajorKey(input.text) ===
+              normalizeAmericanMajorKey(currentFlashcard.major),
+          }),
+        };
+      case "notesToMinorKey":
+      default:
+        return {
+          kind: "text" as const,
+          hintSteps: [
+            `La escala empieza en ${currentFlashcard.minorNotes[0]}.`,
+            `Comparte armadura con ${extractAmericanNotation(currentFlashcard.major)}.`,
+            `Respuesta: ${extractAmericanNotation(currentFlashcard.relativeMinor)}.`,
+          ],
+          placeholder: "Ej. Bbm",
+          audioNotes: currentFlashcard.minorNotes.slice(0, 7),
+          audioLabel: `Escuchar ${extractAmericanNotation(currentFlashcard.relativeMinor)}`,
+          evaluate: (input: {
+            text: string;
+            choice: string;
+            notes: string[];
+            pair: { left: string; right: string };
+          }) => ({
+            isCorrect:
+              normalizeAmericanMinorKey(input.text) ===
+              normalizeAmericanMinorKey(currentFlashcard.relativeMinor),
+          }),
+        };
+    }
+  }, [
+    currentFlashcard,
+    currentMajorOnlyFlashcard,
+    flashcardMode,
+    majorOnlyMode,
+  ]);
+
+  const runFlashcardCheck = (flipAfter = false) => {
+    const result = flashcardPromptMeta.evaluate({
+      text: flashcardTextAnswer,
+      choice: flashcardChoiceAnswer,
+      notes: flashcardNoteAnswers,
+      pair: flashcardPairAnswer,
+    });
+
+    setFlashcardChecked(true);
+    setFlashcardCheckResult(result);
+    if (flipAfter) setIsFlipped(true);
+    return result;
+  };
+
+  const pushReviewItems = (
+    assessment: FlashcardAssessment,
+    result: FlashcardCheckResult,
+  ) => {
+    if (result.isCorrect && assessment === "easy") return;
+
+    const copies =
+      !result.isCorrect || assessment === "again"
+        ? 2
+        : assessment === "hard"
+          ? 1
+          : 0;
+
+    if (copies === 0) return;
+
+    setFlashcardReviewQueue((prev) => [
+      ...prev,
+      ...Array.from({ length: copies }, () => currentReviewItem),
+    ]);
+  };
+
+  const updateFlashcardStats = (
+    result: FlashcardCheckResult,
+    assessment: FlashcardAssessment,
+  ) => {
+    const countsAsCorrect = result.isCorrect && assessment !== "again";
+
+    const updateStats = (prev: {
+      reviewed: number;
+      correct: number;
+      streak: number;
+      bestStreak: number;
+    }) => {
+      const streak = countsAsCorrect ? prev.streak + 1 : 0;
+      return {
+        reviewed: prev.reviewed + 1,
+        correct: prev.correct + (countsAsCorrect ? 1 : 0),
+        streak,
+        bestStreak: Math.max(prev.bestStreak, streak),
+      };
+    };
+
+    setFlashcardSessionStats(updateStats);
+    if (flashcardSprintActive) {
+      setFlashcardSprintStats(updateStats);
+    }
+  };
+
+  const revealFlashcardAnswer = () => {
+    if (isFlipped) return;
+    runFlashcardCheck(true);
+  };
+
+  const submitFlashcardAssessment = (assessment: FlashcardAssessment) => {
+    const result =
+      flashcardChecked && flashcardCheckResult
+        ? flashcardCheckResult
+        : runFlashcardCheck(true);
+
+    updateFlashcardStats(result, assessment);
+    pushReviewItems(assessment, result);
+    nextFlashcard();
+  };
+
+  const playFlashcardPromptAudio = async () => {
+    await playScale(flashcardPromptMeta.audioNotes);
+  };
+
+  useEffect(() => {
+    if (!flashcardSprintActive) {
+      if (flashcardSprintRef.current) clearInterval(flashcardSprintRef.current);
+      flashcardSprintRef.current = null;
+      return;
+    }
+
+    if (flashcardSprintRef.current) clearInterval(flashcardSprintRef.current);
+    flashcardSprintRef.current = window.setInterval(() => {
+      setFlashcardSprintRemaining((prev) => {
+        if (prev <= 1) {
+          if (flashcardSprintRef.current)
+            clearInterval(flashcardSprintRef.current);
+          flashcardSprintRef.current = null;
+          setFlashcardSprintActive(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (flashcardSprintRef.current) clearInterval(flashcardSprintRef.current);
+      flashcardSprintRef.current = null;
+    };
+  }, [flashcardSprintActive]);
+
+  useEffect(() => {
+    resetFlashcardAttempt();
+  }, [majorOnlyMode]);
 
   const isMultipleChoice =
     question.type === "majorToMinor" ||
@@ -2164,6 +2864,259 @@ export default function RelativeMinorScalesStudy() {
     setScaleInputs(Array(7).fill(""));
     setTextInput("");
     setIsEvaluated(false);
+  };
+
+  const flashcardVisualMasked = flashcardAudioOnlyMode && !isFlipped;
+
+  const renderMajorOnlyFlashcardFront = () => {
+    if (currentMajorOnlyFlashcard.type === "majorNotes") {
+      return (
+        <>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontWeight: 600 }}
+          >
+            ¿Cuáles son las notas de...?
+          </Typography>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 800, color: "#e65100", textAlign: "center" }}
+          >
+            {flashcardVisualMasked
+              ? "Escucha la pista"
+              : extractAmericanNotation(currentMajorOnlyFlashcard.target.major)}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {flashcardVisualMasked
+              ? "Pista visual oculta"
+              : `Armadura: ${currentMajorOnlyFlashcard.target.keySignature}`}
+          </Typography>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontWeight: 600, px: 2, textAlign: "center" }}
+        >
+          {currentMajorOnlyFlashcard.question.questionText}
+        </Typography>
+        {flashcardVisualMasked ? (
+          <Chip
+            label="Usa audio o pistas"
+            color="warning"
+            variant="outlined"
+            sx={{ fontWeight: 700, mt: 1 }}
+          />
+        ) : (
+          <Chip
+            label={`Armadura: ${currentMajorOnlyFlashcard.target.keySignature}`}
+            color="warning"
+            variant="outlined"
+            sx={{ fontWeight: 700, mt: 1 }}
+          />
+        )}
+      </>
+    );
+  };
+
+  const renderMajorOnlyFlashcardBack = () => {
+    const answerArray = currentMajorOnlyFlashcard.question.answerArray;
+    const answer = currentMajorOnlyFlashcard.question.answer;
+
+    if (answerArray) {
+      return (
+        <>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontWeight: 600, mb: 0.5 }}
+          >
+            Notas de{" "}
+            {extractAmericanNotation(currentMajorOnlyFlashcard.target.major)}:
+          </Typography>
+          <Stack
+            direction="row"
+            spacing={0.3}
+            flexWrap="wrap"
+            justifyContent="center"
+            px={1}
+          >
+            {answerArray.map((note, idx) => (
+              <Chip
+                key={idx}
+                label={note}
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  bgcolor: "#fff8e1",
+                  color: "#e65100",
+                  border: "1px solid #ffcc80",
+                }}
+              />
+            ))}
+          </Stack>
+          <Chip
+            label={`Armadura: ${currentMajorOnlyFlashcard.target.keySignature}`}
+            color="warning"
+            variant="outlined"
+            sx={{ fontWeight: 700, mt: 1, fontSize: "0.9rem" }}
+          />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontWeight: 600 }}
+        >
+          Respuesta:
+        </Typography>
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 800, color: "#004d40", textAlign: "center" }}
+        >
+          {answer}
+        </Typography>
+        <Chip
+          label={`Armadura: ${currentMajorOnlyFlashcard.target.keySignature}`}
+          color="warning"
+          variant="outlined"
+          sx={{ fontWeight: 700, mt: 1 }}
+        />
+      </>
+    );
+  };
+
+  const renderFlashcardAnswerInputs = () => {
+    if (flashcardPromptMeta.kind === "notes") {
+      return (
+        <Stack
+          direction="row"
+          spacing={1}
+          flexWrap="wrap"
+          justifyContent="center"
+          sx={{ mt: 1 }}
+        >
+          {flashcardNoteAnswers.map((note, index) => (
+            <TextField
+              key={`flash-note-${index}`}
+              variant="outlined"
+              size="small"
+              value={note}
+              onChange={(e) => {
+                const next = [...flashcardNoteAnswers];
+                next[index] = e.target.value;
+                setFlashcardNoteAnswers(next);
+                clearFlashcardCheck();
+              }}
+              inputProps={{ style: { textAlign: "center", width: 26 } }}
+              error={
+                flashcardChecked &&
+                !!flashcardCheckResult?.parts &&
+                !flashcardCheckResult.parts[index]
+              }
+            />
+          ))}
+        </Stack>
+      );
+    }
+
+    if (flashcardPromptMeta.kind === "choice") {
+      return (
+        <Stack
+          direction="row"
+          spacing={1}
+          flexWrap="wrap"
+          justifyContent="center"
+          sx={{ mt: 1 }}
+        >
+          {(flashcardPromptMeta.options || []).map((option) => (
+            <Button
+              key={option}
+              variant={
+                flashcardChoiceAnswer === option ? "contained" : "outlined"
+              }
+              size="small"
+              onClick={() => {
+                setFlashcardChoiceAnswer(option);
+                clearFlashcardCheck();
+              }}
+              sx={{ textTransform: "none" }}
+            >
+              {option}
+            </Button>
+          ))}
+        </Stack>
+      );
+    }
+
+    if (flashcardPromptMeta.kind === "pair") {
+      return (
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={1}
+          sx={{ mt: 1 }}
+        >
+          <TextField
+            label={flashcardPromptMeta.pairLabels?.[0] || "Mayor"}
+            size="small"
+            value={flashcardPairAnswer.left}
+            onChange={(e) => {
+              setFlashcardPairAnswer((prev) => ({
+                ...prev,
+                left: e.target.value,
+              }));
+              clearFlashcardCheck();
+            }}
+            error={
+              flashcardChecked &&
+              !!flashcardCheckResult?.parts &&
+              !flashcardCheckResult.parts[0]
+            }
+          />
+          <TextField
+            label={flashcardPromptMeta.pairLabels?.[1] || "Menor"}
+            size="small"
+            value={flashcardPairAnswer.right}
+            onChange={(e) => {
+              setFlashcardPairAnswer((prev) => ({
+                ...prev,
+                right: e.target.value,
+              }));
+              clearFlashcardCheck();
+            }}
+            error={
+              flashcardChecked &&
+              !!flashcardCheckResult?.parts &&
+              !flashcardCheckResult.parts[1]
+            }
+          />
+        </Stack>
+      );
+    }
+
+    return (
+      <TextField
+        fullWidth
+        size="small"
+        placeholder={flashcardPromptMeta.placeholder}
+        value={flashcardTextAnswer}
+        onChange={(e) => {
+          setFlashcardTextAnswer(e.target.value);
+          clearFlashcardCheck();
+        }}
+        sx={{ mt: 1, maxWidth: 320 }}
+        error={flashcardChecked && flashcardCheckResult?.isCorrect === false}
+      />
+    );
   };
 
   return (
@@ -2490,19 +3443,44 @@ export default function RelativeMinorScalesStudy() {
             <Typography variant="h6" sx={{ fontWeight: 700, color: "#00695c" }}>
               Práctica Rápida: Flashcards
             </Typography>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              flexWrap="wrap"
+            >
               <FormControlLabel
                 control={
                   <Switch
                     size="small"
                     checked={majorOnlyMode}
-                    onChange={(e) => setMajorOnlyMode(e.target.checked)}
+                    onChange={(e) => {
+                      setMajorOnlyMode(e.target.checked);
+                      clearFlashcardCheck();
+                    }}
                     color="warning"
                   />
                 }
                 label={
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     Solo Escalas Mayores
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={flashcardAudioOnlyMode}
+                    onChange={(e) =>
+                      setFlashcardAudioOnlyMode(e.target.checked)
+                    }
+                    color="info"
+                  />
+                }
+                label={
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Audio primero
                   </Typography>
                 }
               />
@@ -2514,7 +3492,84 @@ export default function RelativeMinorScalesStudy() {
               >
                 Siguiente Tarjeta
               </Button>
+              <Button
+                variant={flashcardSprintActive ? "contained" : "outlined"}
+                color={flashcardSprintActive ? "warning" : "primary"}
+                size="small"
+                startIcon={<AccessTime />}
+                onClick={() => {
+                  if (flashcardSprintActive) {
+                    setFlashcardSprintActive(false);
+                    return;
+                  }
+                  setFlashcardSprintRemaining(90);
+                  setFlashcardSprintStats({
+                    reviewed: 0,
+                    correct: 0,
+                    streak: 0,
+                    bestStreak: 0,
+                  });
+                  setFlashcardSprintActive(true);
+                  nextFlashcard();
+                }}
+                sx={{ textTransform: "none" }}
+              >
+                {flashcardSprintActive ? "Detener Sprint" : "Sprint 90s"}
+              </Button>
             </Stack>
+          </Stack>
+
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={1}
+            sx={{ mb: 2 }}
+            alignItems={{ xs: "flex-start", md: "center" }}
+            justifyContent="space-between"
+          >
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              <Chip
+                label={`Sesion: ${flashcardSessionStats.correct}/${flashcardSessionStats.reviewed}`}
+                color="primary"
+                variant="outlined"
+                sx={{ fontWeight: 700 }}
+              />
+              <Chip
+                label={`Racha: ${flashcardSessionStats.streak}`}
+                color="success"
+                variant="outlined"
+                sx={{ fontWeight: 700 }}
+              />
+              <Chip
+                label={`Errores pendientes: ${flashcardReviewQueue.length}`}
+                color={flashcardReviewQueue.length > 0 ? "error" : "default"}
+                variant="outlined"
+                sx={{ fontWeight: 700 }}
+              />
+              {flashcardSprintActive && (
+                <Chip
+                  icon={<AccessTime />}
+                  label={`Sprint ${formatTime(flashcardSprintRemaining)}`}
+                  color="warning"
+                  sx={{ fontWeight: 700 }}
+                />
+              )}
+            </Stack>
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={flashcardReviewOnlyMode}
+                  onChange={(e) => setFlashcardReviewOnlyMode(e.target.checked)}
+                  color="error"
+                  disabled={flashcardReviewQueue.length === 0}
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  Repasar solo errores
+                </Typography>
+              }
+            />
           </Stack>
 
           {majorOnlyMode ? (
@@ -2593,16 +3648,29 @@ export default function RelativeMinorScalesStudy() {
             </Box>
           )}
 
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            alignItems={{ xs: "center", md: "flex-start" }}
+            justifyContent="center"
+          >
+          {/* Flashcard Card */}
           <Box
             sx={{
               perspective: "1000px",
               width: "100%",
               maxWidth: "420px",
               height: "240px",
-              mx: "auto",
               cursor: "pointer",
+              flexShrink: 0,
             }}
-            onClick={() => setIsFlipped(!isFlipped)}
+            onClick={() => {
+              if (isFlipped) {
+                setIsFlipped(false);
+              } else {
+                revealFlashcardAnswer();
+              }
+            }}
           >
             <Box
               sx={{
@@ -2646,24 +3714,7 @@ export default function RelativeMinorScalesStudy() {
                 }}
               >
                 {majorOnlyMode ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600 }}
-                    >
-                      ¿Cuáles son las notas de...?
-                    </Typography>
-                    <Typography
-                      variant="h4"
-                      sx={{ fontWeight: 800, color: "#e65100" }}
-                    >
-                      {extractAmericanNotation(currentFlashcard.major)}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Armadura: {currentFlashcard.keySignature}
-                    </Typography>
-                  </>
+                  renderMajorOnlyFlashcardFront()
                 ) : flashcardMode === "majorToMinor" ? (
                   <>
                     <Typography
@@ -2682,9 +3733,15 @@ export default function RelativeMinorScalesStudy() {
                     </Typography>
                     <Typography
                       variant="h4"
-                      sx={{ fontWeight: 800, color: "#004d40" }}
+                      sx={{
+                        fontWeight: 800,
+                        color: "#004d40",
+                        textAlign: "center",
+                      }}
                     >
-                      {extractAmericanNotation(currentFlashcard.major)}
+                      {flashcardVisualMasked
+                        ? "Escucha la pista"
+                        : extractAmericanNotation(currentFlashcard.major)}
                     </Typography>
                   </>
                 ) : flashcardMode === "minorToMajor" ? (
@@ -2705,12 +3762,24 @@ export default function RelativeMinorScalesStudy() {
                     </Typography>
                     <Typography
                       variant="h5"
-                      sx={{ fontWeight: 800, color: "#00695c" }}
+                      sx={{
+                        fontWeight: 800,
+                        color: "#00695c",
+                        textAlign: "center",
+                      }}
                     >
-                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
+                      {flashcardVisualMasked
+                        ? "Escucha la pista"
+                        : extractAmericanNotation(
+                            currentFlashcard.relativeMinor,
+                          )}
                     </Typography>
                     <Chip
-                      label={currentFlashcard.keySignature}
+                      label={
+                        flashcardVisualMasked
+                          ? "Pista visual oculta"
+                          : currentFlashcard.keySignature
+                      }
                       size="small"
                       color="primary"
                       variant="outlined"
@@ -2734,7 +3803,11 @@ export default function RelativeMinorScalesStudy() {
                       (Último # + 1/2 tono / Penúltimo b)
                     </Typography>
                     <Chip
-                      label={currentFlashcard.keySignature}
+                      label={
+                        flashcardVisualMasked
+                          ? "Usa audio o pistas"
+                          : currentFlashcard.keySignature
+                      }
                       color="secondary"
                       sx={{ fontWeight: 800, fontSize: "1.2rem", py: 2.5 }}
                     />
@@ -2757,9 +3830,15 @@ export default function RelativeMinorScalesStudy() {
                     </Typography>
                     <Typography
                       variant="h3"
-                      sx={{ fontWeight: 800, color: "#00695c" }}
+                      sx={{
+                        fontWeight: 800,
+                        color: "#00695c",
+                        textAlign: "center",
+                      }}
                     >
-                      {extractAmericanNotation(currentFlashcard.sixthDegree)}
+                      {flashcardVisualMasked
+                        ? "Escucha la pista"
+                        : extractAmericanNotation(currentFlashcard.sixthDegree)}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -2792,18 +3871,30 @@ export default function RelativeMinorScalesStudy() {
                       justifyContent="center"
                       px={2}
                     >
-                      {currentFlashcard.minorNotes.map((note, idx) => (
+                      {flashcardVisualMasked ? (
                         <Chip
-                          key={idx}
-                          label={note}
+                          label="Notas ocultas"
                           size="small"
                           sx={{
                             fontWeight: 600,
-                            bgcolor: "#e0f2f1",
-                            color: "#004d40",
+                            bgcolor: "#fff3e0",
+                            color: "#e65100",
                           }}
                         />
-                      ))}
+                      ) : (
+                        currentFlashcard.minorNotes.map((note, idx) => (
+                          <Chip
+                            key={idx}
+                            label={note}
+                            size="small"
+                            sx={{
+                              fontWeight: 600,
+                              bgcolor: "#e0f2f1",
+                              color: "#004d40",
+                            }}
+                          />
+                        ))
+                      )}
                     </Stack>
                   </>
                 )}
@@ -2848,43 +3939,7 @@ export default function RelativeMinorScalesStudy() {
                 }}
               >
                 {majorOnlyMode ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600, mb: 0.5 }}
-                    >
-                      Notas de {extractAmericanNotation(currentFlashcard.major)}
-                      :
-                    </Typography>
-                    <Stack
-                      direction="row"
-                      spacing={0.3}
-                      flexWrap="wrap"
-                      justifyContent="center"
-                      px={1}
-                    >
-                      {currentFlashcard.notes.slice(0, 7).map((note, idx) => (
-                        <Chip
-                          key={idx}
-                          label={note}
-                          size="small"
-                          sx={{
-                            fontWeight: 700,
-                            bgcolor: "#fff8e1",
-                            color: "#e65100",
-                            border: "1px solid #ffcc80",
-                          }}
-                        />
-                      ))}
-                    </Stack>
-                    <Chip
-                      label={`Armadura: ${currentFlashcard.keySignature}`}
-                      color="warning"
-                      variant="outlined"
-                      sx={{ fontWeight: 700, mt: 1, fontSize: "0.9rem" }}
-                    />
-                  </>
+                  renderMajorOnlyFlashcardBack()
                 ) : flashcardMode === "majorToMinor" ? (
                   <>
                     <Typography
@@ -2974,6 +4029,278 @@ export default function RelativeMinorScalesStudy() {
               </Paper>
             </Box>
           </Box>
+
+          {/* Quick Access: Quintas Diatónicas + Escala */}
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 1.5,
+              borderColor: "#ffcc80",
+              bgcolor: "#fffde7",
+              borderRadius: 2,
+              minWidth: 200,
+              flexShrink: 0,
+              display: { xs: "none", md: "block" },
+            }}
+          >
+            <Stack direction="row" spacing={2.5}>
+              {/* Fifths pairs column */}
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 700, color: "#e65100", mb: 0.5, display: "block" }}
+                >
+                  Quintas ↓
+                </Typography>
+                {[
+                  ["C", "G"],
+                  ["B", "F"],
+                  ["A", "E"],
+                  ["G", "D"],
+                  ["F", "C"],
+                  ["E", "B"],
+                  ["D", "A"],
+                  ["C", "G"],
+                ].map(([left, right], idx) => (
+                  <Stack
+                    key={`fifth-${idx}`}
+                    direction="row"
+                    spacing={0.5}
+                    alignItems="center"
+                    sx={{
+                      py: 0.15,
+                      borderBottom: idx < 7 ? "1px solid #fff3e0" : "none",
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 700, color: "#bf360c", minWidth: 24, textAlign: "right" }}
+                    >
+                      {left}
+                    </Typography>
+                    <Typography variant="body2" color="text.disabled">—</Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 600, color: "#4e342e", minWidth: 24 }}
+                    >
+                      {right}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Box>
+
+              {/* Divider */}
+              <Divider orientation="vertical" flexItem />
+
+              {/* Thirds pairs column */}
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 700, color: "#1565c0", mb: 0.5, display: "block" }}
+                >
+                  Terceras ↓
+                </Typography>
+                {[
+                  ["C", "E"],
+                  ["B", "D"],
+                  ["A", "C"],
+                  ["G", "B"],
+                  ["F", "A"],
+                  ["E", "G"],
+                  ["D", "F"],
+                  ["C", "E"],
+                ].map(([left, right], idx) => (
+                  <Stack
+                    key={`third-${idx}`}
+                    direction="row"
+                    spacing={0.5}
+                    alignItems="center"
+                    sx={{
+                      py: 0.15,
+                      borderBottom: idx < 7 ? "1px solid #e3f2fd" : "none",
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 700, color: "#1565c0", minWidth: 24, textAlign: "right" }}
+                    >
+                      {left}
+                    </Typography>
+                    <Typography variant="body2" color="text.disabled">—</Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 600, color: "#37474f", minWidth: 24 }}
+                    >
+                      {right}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Box>
+
+              {/* Divider */}
+              <Divider orientation="vertical" flexItem />
+
+              {/* Scale column */}
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 700, color: "#00695c", mb: 0.5, display: "block" }}
+                >
+                  Escala
+                </Typography>
+                {["C", "D", "E", "F", "G", "A", "B", "C"].map(
+                  (note, idx) => (
+                    <Typography
+                      key={`scale-col-${idx}`}
+                      variant="body2"
+                      sx={{
+                        fontWeight: idx === 0 || idx === 7 ? 800 : 600,
+                        color: idx === 0 || idx === 7 ? "#00695c" : "#37474f",
+                        py: 0.15,
+                        borderBottom: idx < 7 ? "1px solid #e0f2f1" : "none",
+                      }}
+                    >
+                      {note}
+                    </Typography>
+                  ),
+                )}
+              </Box>
+            </Stack>
+          </Paper>
+          </Stack>
+
+          <Stack spacing={1.5} sx={{ mt: 2, alignItems: "center" }}>
+            {renderFlashcardAnswerInputs()}
+
+            {flashcardHintLevel > 0 && (
+              <Stack spacing={0.5} sx={{ width: "100%", maxWidth: 520 }}>
+                {flashcardPromptMeta.hintSteps
+                  .slice(0, flashcardHintLevel)
+                  .map((hint, idx) => (
+                    <Typography
+                      key={`flash-hint-${idx}`}
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        px: 1.5,
+                        py: 0.75,
+                        borderRadius: 2,
+                        bgcolor: "rgba(255, 193, 7, 0.08)",
+                      }}
+                    >
+                      Pista {idx + 1}: {hint}
+                    </Typography>
+                  ))}
+              </Stack>
+            )}
+
+            {flashcardChecked && (
+              <Chip
+                color={flashcardCheckResult?.isCorrect ? "success" : "error"}
+                label={
+                  flashcardCheckResult?.isCorrect
+                    ? "Respuesta correcta"
+                    : "Respuesta incorrecta"
+                }
+                sx={{ fontWeight: 700 }}
+              />
+            )}
+
+            <Stack
+              direction="row"
+              spacing={1}
+              flexWrap="wrap"
+              justifyContent="center"
+            >
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<PlayArrowRounded />}
+                onClick={playFlashcardPromptAudio}
+                sx={{ textTransform: "none" }}
+              >
+                {flashcardPromptMeta.audioLabel}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                color="warning"
+                onClick={() =>
+                  setFlashcardHintLevel((prev) =>
+                    Math.min(prev + 1, flashcardPromptMeta.hintSteps.length),
+                  )
+                }
+                disabled={
+                  flashcardHintLevel >= flashcardPromptMeta.hintSteps.length
+                }
+                sx={{ textTransform: "none" }}
+              >
+                Pista {flashcardHintLevel}/
+                {flashcardPromptMeta.hintSteps.length}
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => runFlashcardCheck(false)}
+                sx={{ textTransform: "none", bgcolor: "#00796b" }}
+              >
+                Comprobar
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={revealFlashcardAnswer}
+                sx={{ textTransform: "none" }}
+              >
+                Mostrar respuesta
+              </Button>
+            </Stack>
+
+            {isFlipped && (
+              <Stack
+                direction="row"
+                spacing={1}
+                flexWrap="wrap"
+                justifyContent="center"
+              >
+                <Button
+                  size="small"
+                  color="error"
+                  variant="contained"
+                  onClick={() => submitFlashcardAssessment("again")}
+                  sx={{ textTransform: "none" }}
+                >
+                  Again
+                </Button>
+                <Button
+                  size="small"
+                  color="warning"
+                  variant="contained"
+                  onClick={() => submitFlashcardAssessment("hard")}
+                  sx={{ textTransform: "none" }}
+                >
+                  Hard
+                </Button>
+                <Button
+                  size="small"
+                  color="success"
+                  variant="contained"
+                  onClick={() => submitFlashcardAssessment("easy")}
+                  sx={{ textTransform: "none" }}
+                >
+                  Easy
+                </Button>
+              </Stack>
+            )}
+
+            {flashcardSprintActive && (
+              <Typography variant="caption" color="text.secondary">
+                Sprint: {flashcardSprintStats.correct}/
+                {flashcardSprintStats.reviewed} correctas, mejor racha{" "}
+                {flashcardSprintStats.bestStreak}.
+              </Typography>
+            )}
+          </Stack>
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 }, mb: 4 }}>
