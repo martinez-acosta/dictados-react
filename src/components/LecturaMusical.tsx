@@ -333,22 +333,22 @@ const TREBLE_EXERCISES = {
 const BASS_EXERCISES = {
   // ========== DANDELOT (LECTURA DIRIGIDA) ==========
   "fa-dandelot-sol-la": {
-    name: "📖 Dandelot: Sol-La-Sol-Do-Re-Fa-Si (Equivalente)",
-    notes: ["g/2", "a/2", "g/2", "c/3", "d/3", "f/3", "b/2", "g/3"],
+    name: "📖 Dandelot: Fa (línea) y Do (cuarta descendente)",
+    notes: ["f/3", "c/3", "f/3", "f/2", "f/3"],
     description:
-      "Motivo fijo inspirado en Dandelot. Equivalente a Sol-La-Sol-Do-Re-Fa-Si de clave de sol.",
+      "Empieza en Fa (línea central) y baja a Do, su cuarta descendente; equivalente al Sol/Do en clave de sol.",
   },
   "fa-dandelot-sol-do": {
-    name: "📖 Dandelot: Do2-Do3-Sol2-Sol3 (Equivalente)",
-    notes: ["c/2", "c/3", "g/2", "g/3"],
+    name: "📖 Dandelot: Pares Fa/Do ascendentes y descendentes",
+    notes: ["f/2", "f/3", "c/3"],
     description:
-      "Intervalos de quinta justa. Equivalente al ejercicio de Do-Do-Sol-Sol de clave de sol.",
+      "Intervalos de cuarta a Fa y Do saltando entre registros, como el ejercicio de Do/Sol en clave de sol.",
   },
   "fa-dandelot-sol-la-lineas": {
-    name: "📖 Dandelot: Sol-La-Sol-Do... (con líneas adicionales)",
-    notes: ["g/2", "a/3", "g/2", "c/2", "d/2", "e/2", "f/3", "b/1"],
+    name: "📖 Dandelot: Fa–Do con líneas adicionales",
+    notes: ["f/2", "c/3", "f/2", "c/2", "d/2", "e/2", "f/3", "b/1"],
     description:
-      "Motivo Dandelot con líneas adicionales. Equivalente al ejercicio de líneas adicionales en clave de sol.",
+      "Incluye líneas adicionales con Fa y su cuarta descendente Do, para reforzar el dibujo completo del intervalo.",
   },
   "fa-dandelot-sol-completo": {
     name: "📖 Dandelot Completo: Si1–Si3 (2 líneas adicionales)",

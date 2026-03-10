@@ -1101,6 +1101,51 @@ function getRowPracticeState(
   );
 }
 
+function getVisualMemoState(
+  visualMemoAnswers: Record<string, any>,
+  rowKey: string,
+  length: number,
+) {
+  return (
+    visualMemoAnswers[rowKey] || {
+      inputs: Array(length).fill(""),
+      evaluated: false,
+      correctness: Array(length).fill(false),
+    }
+  );
+}
+
+function handleVisualMemoGrade(
+  rowKey: string,
+  expected: readonly string[],
+  visualMemoAnswers: Record<string, any>,
+  setVisualMemoAnswers: React.Dispatch<
+    React.SetStateAction<Record<string, any>>
+  >,
+) {
+  const state = visualMemoAnswers[rowKey] || {
+    inputs: Array(expected.length).fill(""),
+    evaluated: false,
+    correctness: Array(expected.length).fill(false),
+  };
+
+  const results = state.inputs.map((input: string, idx: number) => {
+    return (
+      normalizeAmericanScaleNote(input) ===
+      normalizeAmericanScaleNote(expected[idx])
+    );
+  });
+
+  setVisualMemoAnswers((prev: any) => ({
+    ...prev,
+    [rowKey]: {
+      ...state,
+      evaluated: true,
+      correctness: results,
+    },
+  }));
+}
+
 function handleRowGrade(
   rowKey: string,
   expectedNotes: string[],
@@ -2104,6 +2149,35 @@ export default function RelativeMinorScalesStudy() {
       JSON.stringify(tablePracticeAnswers),
     );
   }, [tablePracticeAnswers]);
+
+  const [visualMemoPracMode, setVisualMemoPracMode] = useState<boolean>(false);
+  const [visualMemoAnswers, setVisualMemoAnswers] = useState<
+    Record<
+      string,
+      {
+        inputs: string[];
+        evaluated: boolean;
+        correctness: boolean[];
+      }
+    >
+  >(() => {
+    const saved = localStorage.getItem("visualMemoPracticeAnswers");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error parsing saved visual memo answers", e);
+      }
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "visualMemoPracticeAnswers",
+      JSON.stringify(visualMemoAnswers),
+    );
+  }, [visualMemoAnswers]);
 
   const [focusRoot, setFocusRoot] = useState<RootLabel>("C");
   const [enabledQuizTypes, setEnabledQuizTypes] =
@@ -4510,9 +4584,46 @@ export default function RelativeMinorScalesStudy() {
 
           <Divider sx={{ my: 2 }} />
 
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.25 }}>
-            Apoyo visual para memorizar
-          </Typography>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mb: 1.25 }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              Apoyo visual para memorizar
+            </Typography>
+            <Stack direction="row" spacing={2} alignItems="center">
+              {visualMemoPracMode &&
+                Object.keys(visualMemoAnswers).length > 0 && (
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="error"
+                    startIcon={<DeleteOutline />}
+                    onClick={() => setVisualMemoAnswers({})}
+                    sx={{ textTransform: "none", fontWeight: 600 }}
+                  >
+                    Limpiar Práctica
+                  </Button>
+                )}
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={visualMemoPracMode}
+                    onChange={(e) => setVisualMemoPracMode(e.target.checked)}
+                    color="warning"
+                  />
+                }
+                label={
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Modo Práctica
+                  </Typography>
+                }
+              />
+            </Stack>
+          </Stack>
 
           <Stack spacing={2}>
             <Stack direction={{ xs: "column", lg: "row" }} spacing={2}>
@@ -4525,34 +4636,111 @@ export default function RelativeMinorScalesStudy() {
                   flex: 1,
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700, color: "#e65100", mb: 1 }}
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 1 }}
                 >
-                  Tabla de Quintas
-                </Typography>
-                <Stack spacing={0.35}>
-                  {MEMO_FIFTH_PAIRS.map(([left, right], idx) => (
-                    <Stack
-                      key={`memo-fifth-${idx}`}
-                      direction="row"
-                      spacing={0.75}
-                      alignItems="center"
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "#e65100" }}
+                  >
+                    Tabla de Quintas
+                  </Typography>
+                  {visualMemoPracMode && (
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        handleVisualMemoGrade(
+                          "memo-fifths",
+                          MEMO_FIFTH_PAIRS.map((p) => p[1]),
+                          visualMemoAnswers,
+                          setVisualMemoAnswers,
+                        )
+                      }
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 700, color: "#bf360c", minWidth: 20 }}
+                      <SendIcon fontSize="small" sx={{ color: "#e65100" }} />
+                    </IconButton>
+                  )}
+                </Stack>
+                <Stack spacing={0.35}>
+                  {MEMO_FIFTH_PAIRS.map(([left, right], idx) => {
+                    const state = getVisualMemoState(
+                      visualMemoAnswers,
+                      "memo-fifths",
+                      7,
+                    );
+                    return (
+                      <Stack
+                        key={`memo-fifth-${idx}`}
+                        direction="row"
+                        spacing={0.75}
+                        alignItems="center"
                       >
-                        {left}
-                      </Typography>
-                      <Typography variant="body2" color="text.disabled">
-                        -
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {right}
-                      </Typography>
-                    </Stack>
-                  ))}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 700,
+                            color: "#bf360c",
+                            minWidth: 20,
+                          }}
+                        >
+                          {left}
+                        </Typography>
+                        <Typography variant="body2" color="text.disabled">
+                          -
+                        </Typography>
+                        {visualMemoPracMode ? (
+                          <TextField
+                            variant="standard"
+                            size="small"
+                            value={state.inputs[idx]}
+                            onChange={(e) => {
+                              const newInputs = [...state.inputs];
+                              newInputs[idx] = e.target.value;
+                              setVisualMemoAnswers((prev) => ({
+                                ...prev,
+                                "memo-fifths": {
+                                  ...state,
+                                  inputs: newInputs,
+                                  evaluated: false,
+                                },
+                              }));
+                            }}
+                            inputProps={{
+                              style: {
+                                textAlign: "left",
+                                width: "40px",
+                                fontSize: "0.85rem",
+                                fontWeight: 600,
+                              },
+                            }}
+                            sx={
+                              state.evaluated
+                                ? {
+                                    "& .MuiInput-underline:before": {
+                                      borderBottomColor: state.correctness[idx]
+                                        ? "#4caf50 !important"
+                                        : "#f44336 !important",
+                                    },
+                                    "& .MuiInputBase-input": {
+                                      color: state.correctness[idx]
+                                        ? "#2e7d32 !important"
+                                        : "#d32f2f !important",
+                                    },
+                                  }
+                                : {}
+                            }
+                          />
+                        ) : (
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {right}
+                          </Typography>
+                        )}
+                      </Stack>
+                    );
+                  })}
                 </Stack>
               </Paper>
 
@@ -4565,34 +4753,111 @@ export default function RelativeMinorScalesStudy() {
                   flex: 1,
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700, color: "#1565c0", mb: 1 }}
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 1 }}
                 >
-                  Tabla de Terceras
-                </Typography>
-                <Stack spacing={0.35}>
-                  {MEMO_THIRD_PAIRS.map(([left, right], idx) => (
-                    <Stack
-                      key={`memo-third-${idx}`}
-                      direction="row"
-                      spacing={0.75}
-                      alignItems="center"
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "#1565c0" }}
+                  >
+                    Tabla de Terceras
+                  </Typography>
+                  {visualMemoPracMode && (
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        handleVisualMemoGrade(
+                          "memo-thirds",
+                          MEMO_THIRD_PAIRS.map((p) => p[1]),
+                          visualMemoAnswers,
+                          setVisualMemoAnswers,
+                        )
+                      }
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 700, color: "#1565c0", minWidth: 20 }}
+                      <SendIcon fontSize="small" sx={{ color: "#1565c0" }} />
+                    </IconButton>
+                  )}
+                </Stack>
+                <Stack spacing={0.35}>
+                  {MEMO_THIRD_PAIRS.map(([left, right], idx) => {
+                    const state = getVisualMemoState(
+                      visualMemoAnswers,
+                      "memo-thirds",
+                      7,
+                    );
+                    return (
+                      <Stack
+                        key={`memo-third-${idx}`}
+                        direction="row"
+                        spacing={0.75}
+                        alignItems="center"
                       >
-                        {left}
-                      </Typography>
-                      <Typography variant="body2" color="text.disabled">
-                        -
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {right}
-                      </Typography>
-                    </Stack>
-                  ))}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 700,
+                            color: "#1565c0",
+                            minWidth: 20,
+                          }}
+                        >
+                          {left}
+                        </Typography>
+                        <Typography variant="body2" color="text.disabled">
+                          -
+                        </Typography>
+                        {visualMemoPracMode ? (
+                          <TextField
+                            variant="standard"
+                            size="small"
+                            value={state.inputs[idx]}
+                            onChange={(e) => {
+                              const newInputs = [...state.inputs];
+                              newInputs[idx] = e.target.value;
+                              setVisualMemoAnswers((prev) => ({
+                                ...prev,
+                                "memo-thirds": {
+                                  ...state,
+                                  inputs: newInputs,
+                                  evaluated: false,
+                                },
+                              }));
+                            }}
+                            inputProps={{
+                              style: {
+                                textAlign: "left",
+                                width: "40px",
+                                fontSize: "0.85rem",
+                                fontWeight: 600,
+                              },
+                            }}
+                            sx={
+                              state.evaluated
+                                ? {
+                                    "& .MuiInput-underline:before": {
+                                      borderBottomColor: state.correctness[idx]
+                                        ? "#4caf50 !important"
+                                        : "#f44336 !important",
+                                    },
+                                    "& .MuiInputBase-input": {
+                                      color: state.correctness[idx]
+                                        ? "#2e7d32 !important"
+                                        : "#d32f2f !important",
+                                    },
+                                  }
+                                : {}
+                            }
+                          />
+                        ) : (
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {right}
+                          </Typography>
+                        )}
+                      </Stack>
+                    );
+                  })}
                 </Stack>
               </Paper>
 
@@ -4605,25 +4870,99 @@ export default function RelativeMinorScalesStudy() {
                   flex: 1,
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700, color: "#00695c", mb: 1 }}
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 1 }}
                 >
-                  Tabla de Escala
-                </Typography>
-                <Stack spacing={0.35}>
-                  {MEMO_SCALE_COLUMN.map((note, idx) => (
-                    <Typography
-                      key={`memo-scale-${idx}`}
-                      variant="body2"
-                      sx={{
-                        fontWeight: idx === 0 ? 800 : 600,
-                        color: idx === 0 ? "#00695c" : "#37474f",
-                      }}
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "#00695c" }}
+                  >
+                    Tabla de Escala
+                  </Typography>
+                  {visualMemoPracMode && (
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        handleVisualMemoGrade(
+                          "memo-scale",
+                          MEMO_SCALE_COLUMN,
+                          visualMemoAnswers,
+                          setVisualMemoAnswers,
+                        )
+                      }
                     >
-                      {note}
-                    </Typography>
-                  ))}
+                      <SendIcon fontSize="small" sx={{ color: "#00695c" }} />
+                    </IconButton>
+                  )}
+                </Stack>
+                <Stack spacing={0.35}>
+                  {MEMO_SCALE_COLUMN.map((note, idx) => {
+                    const state = getVisualMemoState(
+                      visualMemoAnswers,
+                      "memo-scale",
+                      7,
+                    );
+                    return (
+                      <Box key={`memo-scale-${idx}`}>
+                        {visualMemoPracMode ? (
+                          <TextField
+                            variant="standard"
+                            size="small"
+                            value={state.inputs[idx]}
+                            onChange={(e) => {
+                              const newInputs = [...state.inputs];
+                              newInputs[idx] = e.target.value;
+                              setVisualMemoAnswers((prev) => ({
+                                ...prev,
+                                "memo-scale": {
+                                  ...state,
+                                  inputs: newInputs,
+                                  evaluated: false,
+                                },
+                              }));
+                            }}
+                            inputProps={{
+                              style: {
+                                textAlign: "left",
+                                width: "40px",
+                                fontSize: "0.85rem",
+                                fontWeight: 700,
+                              },
+                            }}
+                            sx={
+                              state.evaluated
+                                ? {
+                                    "& .MuiInput-underline:before": {
+                                      borderBottomColor: state.correctness[idx]
+                                        ? "#4caf50 !important"
+                                        : "#f44336 !important",
+                                    },
+                                    "& .MuiInputBase-input": {
+                                      color: state.correctness[idx]
+                                        ? "#2e7d32 !important"
+                                        : "#d32f2f !important",
+                                    },
+                                  }
+                                : {}
+                            }
+                          />
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: idx === 0 ? 800 : 600,
+                              color: idx === 0 ? "#00695c" : "#37474f",
+                            }}
+                          >
+                            {note}
+                          </Typography>
+                        )}
+                      </Box>
+                    );
+                  })}
                 </Stack>
               </Paper>
             </Stack>
@@ -4638,21 +4977,96 @@ export default function RelativeMinorScalesStudy() {
                   flex: 1,
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700, color: "#8e24aa", mb: 1 }}
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 1 }}
                 >
-                  Tabla de Orden de Bemoles (b)
-                </Typography>
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                  {MEMO_FLAT_ORDER.map((note, idx) => (
-                    <Chip
-                      key={`memo-flat-order-${note}`}
-                      label={`${idx + 1}. ${note}`}
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "#8e24aa" }}
+                  >
+                    Tabla de Orden de Bemoles (b)
+                  </Typography>
+                  {visualMemoPracMode && (
+                    <IconButton
                       size="small"
-                      sx={{ fontWeight: 700 }}
-                    />
-                  ))}
+                      onClick={() =>
+                        handleVisualMemoGrade(
+                          "memo-flats",
+                          MEMO_FLAT_ORDER,
+                          visualMemoAnswers,
+                          setVisualMemoAnswers,
+                        )
+                      }
+                    >
+                      <SendIcon fontSize="small" sx={{ color: "#8e24aa" }} />
+                    </IconButton>
+                  )}
+                </Stack>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  {MEMO_FLAT_ORDER.map((note, idx) => {
+                    const state = getVisualMemoState(
+                      visualMemoAnswers,
+                      "memo-flats",
+                      7,
+                    );
+                    return visualMemoPracMode ? (
+                      <TextField
+                        key={`memo-flat-order-${idx}`}
+                        variant="standard"
+                        size="small"
+                        placeholder={`${idx + 1}`}
+                        value={state.inputs[idx]}
+                        onChange={(e) => {
+                          const newInputs = [...state.inputs];
+                          newInputs[idx] = e.target.value;
+                          setVisualMemoAnswers((prev) => ({
+                            ...prev,
+                            "memo-flats": {
+                              ...state,
+                              inputs: newInputs,
+                              evaluated: false,
+                            },
+                          }));
+                        }}
+                        inputProps={{
+                          style: {
+                            textAlign: "center",
+                            width: "35px",
+                            fontSize: "0.85rem",
+                            fontWeight: 700,
+                          },
+                        }}
+                        sx={
+                          state.evaluated
+                            ? {
+                                "& .MuiInput-underline:before": {
+                                  borderBottomColor: state.correctness[idx]
+                                    ? "#4caf50 !important"
+                                    : "#f44336 !important",
+                                },
+                                "& .MuiInputBase-input": {
+                                  color: state.correctness[idx]
+                                    ? "#2e7d32 !important"
+                                    : "#d32f2f !important",
+                                },
+                              }
+                            : {
+                                width: "35px",
+                              }
+                        }
+                      />
+                    ) : (
+                      <Chip
+                        key={`memo-flat-order-${note}`}
+                        label={`${idx + 1}. ${note}`}
+                        size="small"
+                        sx={{ fontWeight: 700 }}
+                      />
+                    );
+                  })}
                 </Stack>
               </Paper>
 
@@ -4665,21 +5079,96 @@ export default function RelativeMinorScalesStudy() {
                   flex: 1,
                 }}
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700, color: "#c62828", mb: 1 }}
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 1 }}
                 >
-                  Tabla de Orden de Sostenidos (#)
-                </Typography>
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                  {MEMO_SHARP_ORDER.map((note, idx) => (
-                    <Chip
-                      key={`memo-sharp-order-${note}`}
-                      label={`${idx + 1}. ${note}`}
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, color: "#c62828" }}
+                  >
+                    Tabla de Orden de Sostenidos (#)
+                  </Typography>
+                  {visualMemoPracMode && (
+                    <IconButton
                       size="small"
-                      sx={{ fontWeight: 700 }}
-                    />
-                  ))}
+                      onClick={() =>
+                        handleVisualMemoGrade(
+                          "memo-sharps",
+                          MEMO_SHARP_ORDER,
+                          visualMemoAnswers,
+                          setVisualMemoAnswers,
+                        )
+                      }
+                    >
+                      <SendIcon fontSize="small" sx={{ color: "#c62828" }} />
+                    </IconButton>
+                  )}
+                </Stack>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  {MEMO_SHARP_ORDER.map((note, idx) => {
+                    const state = getVisualMemoState(
+                      visualMemoAnswers,
+                      "memo-sharps",
+                      7,
+                    );
+                    return visualMemoPracMode ? (
+                      <TextField
+                        key={`memo-sharp-order-${idx}`}
+                        variant="standard"
+                        size="small"
+                        placeholder={`${idx + 1}`}
+                        value={state.inputs[idx]}
+                        onChange={(e) => {
+                          const newInputs = [...state.inputs];
+                          newInputs[idx] = e.target.value;
+                          setVisualMemoAnswers((prev) => ({
+                            ...prev,
+                            "memo-sharps": {
+                              ...state,
+                              inputs: newInputs,
+                              evaluated: false,
+                            },
+                          }));
+                        }}
+                        inputProps={{
+                          style: {
+                            textAlign: "center",
+                            width: "35px",
+                            fontSize: "0.85rem",
+                            fontWeight: 700,
+                          },
+                        }}
+                        sx={
+                          state.evaluated
+                            ? {
+                                "& .MuiInput-underline:before": {
+                                  borderBottomColor: state.correctness[idx]
+                                    ? "#4caf50 !important"
+                                    : "#f44336 !important",
+                                },
+                                "& .MuiInputBase-input": {
+                                  color: state.correctness[idx]
+                                    ? "#2e7d32 !important"
+                                    : "#d32f2f !important",
+                                },
+                              }
+                            : {
+                                width: "35px",
+                              }
+                        }
+                      />
+                    ) : (
+                      <Chip
+                        key={`memo-sharp-order-${note}`}
+                        label={`${idx + 1}. ${note}`}
+                        size="small"
+                        sx={{ fontWeight: 700 }}
+                      />
+                    );
+                  })}
                 </Stack>
               </Paper>
             </Stack>
