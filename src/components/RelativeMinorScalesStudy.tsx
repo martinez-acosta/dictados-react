@@ -266,43 +266,43 @@ const FLAT_SUBTABLE: SubtableRow[] = [
     tonality: "Fa",
     tonalityEn: "F",
     count: 1,
-    majorScale: ["Fa", "Sol", "La", "Sib", "Do", "Re", "Mi", "Fa"],
-    relativeMinor: "Re menor (Dm)",
+    majorScale: ["F", "G", "A", "Bb", "C", "D", "E", "F"],
+    relativeMinor: "Dm",
   },
   {
     tonality: "Sib",
     tonalityEn: "Bb",
     count: 2,
-    majorScale: ["Sib", "Do", "Re", "Mib", "Fa", "Sol", "La", "Sib"],
-    relativeMinor: "Sol menor (Gm)",
+    majorScale: ["Bb", "C", "D", "Eb", "F", "G", "A", "Bb"],
+    relativeMinor: "Gm",
   },
   {
     tonality: "Mib",
     tonalityEn: "Eb",
     count: 3,
-    majorScale: ["Mib", "Fa", "Sol", "Lab", "Sib", "Do", "Re", "Mib"],
-    relativeMinor: "Do menor (Cm)",
+    majorScale: ["Eb", "F", "G", "Ab", "Bb", "C", "D", "Eb"],
+    relativeMinor: "Cm",
   },
   {
     tonality: "Lab",
     tonalityEn: "Ab",
     count: 4,
-    majorScale: ["Lab", "Sib", "Do", "Reb", "Mib", "Fa", "Sol", "Lab"],
-    relativeMinor: "Fa menor (Fm)",
+    majorScale: ["Ab", "Bb", "C", "Db", "Eb", "F", "G", "Ab"],
+    relativeMinor: "Fm",
   },
   {
     tonality: "Reb",
     tonalityEn: "Db",
     count: 5,
-    majorScale: ["Reb", "Mib", "Fa", "Solb", "Lab", "Sib", "Do", "Reb"],
-    relativeMinor: "Sib menor (Bbm)",
+    majorScale: ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C", "Db"],
+    relativeMinor: "Bbm",
   },
   {
     tonality: "Solb",
     tonalityEn: "Gb",
     count: 6,
-    majorScale: ["Solb", "Lab", "Sib", "Dob", "Reb", "Mib", "Fa", "Solb"],
-    relativeMinor: "Mib menor (Ebm)",
+    majorScale: ["Gb", "Ab", "Bb", "Cb", "Db", "Eb", "F", "Gb"],
+    relativeMinor: "Ebm",
   },
 ];
 
@@ -311,50 +311,50 @@ const SHARP_SUBTABLE: SubtableRow[] = [
     tonality: "Sol",
     tonalityEn: "G",
     count: 1,
-    majorScale: ["Sol", "La", "Si", "Do", "Re", "Mi", "Fa#", "Sol"],
-    relativeMinor: "Mi menor (Em)",
+    majorScale: ["G", "A", "B", "C", "D", "E", "F#", "G"],
+    relativeMinor: "Em",
   },
   {
     tonality: "Re",
     tonalityEn: "D",
     count: 2,
-    majorScale: ["Re", "Mi", "Fa#", "Sol", "La", "Si", "Do#", "Re"],
-    relativeMinor: "Si menor (Bm)",
+    majorScale: ["D", "E", "F#", "G", "A", "B", "C#", "D"],
+    relativeMinor: "Bm",
   },
   {
     tonality: "La",
     tonalityEn: "A",
     count: 3,
-    majorScale: ["La", "Si", "Do#", "Re", "Mi", "Fa#", "Sol#", "La"],
-    relativeMinor: "Fa# menor (F#m)",
+    majorScale: ["A", "B", "C#", "D", "E", "F#", "G#", "A"],
+    relativeMinor: "F#m",
   },
   {
     tonality: "Mi",
     tonalityEn: "E",
     count: 4,
-    majorScale: ["Mi", "Fa#", "Sol#", "La", "Si", "Do#", "Re#", "Mi"],
-    relativeMinor: "Do# menor (C#m)",
+    majorScale: ["E", "F#", "G#", "A", "B", "C#", "D#", "E"],
+    relativeMinor: "C#m",
   },
   {
     tonality: "Si",
     tonalityEn: "B",
     count: 5,
-    majorScale: ["Si", "Do#", "Re#", "Mi", "Fa#", "Sol#", "La#", "Si"],
-    relativeMinor: "Sol# menor (G#m)",
+    majorScale: ["B", "C#", "D#", "E", "F#", "G#", "A#", "B"],
+    relativeMinor: "G#m",
   },
   {
     tonality: "Fa#",
     tonalityEn: "F#",
     count: 6,
-    majorScale: ["Fa#", "Sol#", "La#", "Si", "Do#", "Re#", "Mi#", "Fa#"],
-    relativeMinor: "Re# menor (D#m)",
+    majorScale: ["F#", "G#", "A#", "B", "C#", "D#", "E#", "F#"],
+    relativeMinor: "D#m",
   },
   {
     tonality: "Do#",
     tonalityEn: "C#",
     count: 7,
-    majorScale: ["Do#", "Re#", "Mi#", "Fa#", "Sol#", "La#", "Si#", "Do#"],
-    relativeMinor: "La# menor (A#m)",
+    majorScale: ["C#", "D#", "E#", "F#", "G#", "A#", "B#", "C#"],
+    relativeMinor: "A#m",
   },
 ];
 
@@ -1282,7 +1282,7 @@ function renderMemorizationRow(
           </Stack>
         ) : (
           <Stack direction="column" alignItems="center">
-            <Typography>{expectedSharps}</Typography>
+            <Typography>{extractAmericanNotation(expectedSharps)}</Typography>
             <Typography variant="caption" color="text.secondary">
               {expectedSharpsAcc}
             </Typography>
@@ -1389,7 +1389,7 @@ function renderMemorizationRow(
           </Stack>
         ) : (
           <Stack direction="column" alignItems="center">
-            <Typography>{expectedFlats}</Typography>
+            <Typography>{extractAmericanNotation(expectedFlats)}</Typography>
             <Typography variant="caption" color="text.secondary">
               {expectedFlatsAcc}
             </Typography>
@@ -2417,7 +2417,14 @@ export default function RelativeMinorScalesStudy() {
           </Stack>
         </Paper>
 
-        <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 } }}>
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 2, sm: 2.5 },
+            borderColor: "primary.main",
+            borderWidth: 2,
+          }}
+        >
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={2}
@@ -3152,8 +3159,8 @@ export default function RelativeMinorScalesStudy() {
                   renderMemorizationRow(
                     `memo-${idx}`,
                     row.count,
-                    row.sharps,
-                    row.flats,
+                    extractAmericanNotation(row.sharps),
+                    extractAmericanNotation(row.flats),
                     row.sharpsAcc,
                     row.flatsAcc,
                     memoTablePracticeMode,
