@@ -4148,7 +4148,7 @@ export default function RelativeMinorScalesStudy() {
                 >
                   Escala
                 </Typography>
-                {["C", "B", "A", "G", "F", "E", "D", "C"].map(
+                {["B", "A", "G", "F", "E", "D", "C"].map(
                   (note, idx) => (
                     <Typography
                       key={`scale-col-${idx}`}
