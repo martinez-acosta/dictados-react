@@ -59,6 +59,12 @@ type RootLabel =
   | "B";
 type WheelSide = "neutral" | "sharp" | "flat" | "mixed";
 
+function extractAmericanNotation(text: string) {
+  if (!text) return text;
+  const match = text.match(/\(([^)]+)\)/);
+  return match ? match[1] : text;
+}
+
 type ScaleGuideRow = {
   major: string;
   notes: string[];
@@ -2699,7 +2705,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h4"
                       sx={{ fontWeight: 800, color: "#e65100" }}
                     >
-                      {currentFlashcard.major}
+                      {extractAmericanNotation(currentFlashcard.major)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Armadura: {currentFlashcard.keySignature}
@@ -2725,7 +2731,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h4"
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
-                      {currentFlashcard.major}
+                      {extractAmericanNotation(currentFlashcard.major)}
                     </Typography>
                   </>
                 ) : flashcardMode === "minorToMajor" ? (
@@ -2748,7 +2754,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h5"
                       sx={{ fontWeight: 800, color: "#00695c" }}
                     >
-                      {currentFlashcard.relativeMinor}
+                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
                     </Typography>
                     <Chip
                       label={currentFlashcard.keySignature}
@@ -2800,7 +2806,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h3"
                       sx={{ fontWeight: 800, color: "#00695c" }}
                     >
-                      {currentFlashcard.sixthDegree}
+                      {extractAmericanNotation(currentFlashcard.sixthDegree)}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -2895,7 +2901,7 @@ export default function RelativeMinorScalesStudy() {
                       color="text.secondary"
                       sx={{ fontWeight: 600, mb: 0.5 }}
                     >
-                      Notas de {currentFlashcard.major}:
+                      Notas de {extractAmericanNotation(currentFlashcard.major)}:
                     </Typography>
                     <Stack
                       direction="row"
@@ -2931,7 +2937,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h5"
                       sx={{ fontWeight: 800, color: "#00695c" }}
                     >
-                      {currentFlashcard.relativeMinor}
+                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
                     </Typography>
                     <Chip
                       label={`Armadura: ${currentFlashcard.keySignature}`}
@@ -2953,7 +2959,7 @@ export default function RelativeMinorScalesStudy() {
                       variant="h4"
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
-                      {currentFlashcard.major}
+                      {extractAmericanNotation(currentFlashcard.major)}
                     </Typography>
                   </>
                 ) : flashcardMode === "signatureToKeys" ? (
@@ -2962,14 +2968,14 @@ export default function RelativeMinorScalesStudy() {
                       variant="h5"
                       sx={{ fontWeight: 800, color: "#004d40" }}
                     >
-                      {currentFlashcard.major}
+                      {extractAmericanNotation(currentFlashcard.major)}
                     </Typography>
                     <Divider sx={{ width: "60%", my: 0.5 }} />
                     <Typography
                       variant="h6"
                       sx={{ fontWeight: 700, color: "#00695c" }}
                     >
-                      {currentFlashcard.relativeMinor}
+                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
                     </Typography>
                   </>
                 ) : flashcardMode === "sixthDegreeToKey" ? (
@@ -2978,10 +2984,10 @@ export default function RelativeMinorScalesStudy() {
                       variant="h5"
                       sx={{ fontWeight: 800, color: "#004d40", mb: 1 }}
                     >
-                      {currentFlashcard.major}
+                      {extractAmericanNotation(currentFlashcard.major)}
                     </Typography>
                     <Chip
-                      label={`Relativo Menor: ${currentFlashcard.relativeMinor}`}
+                      label={`Relativo Menor: ${extractAmericanNotation(currentFlashcard.relativeMinor)}`}
                       color="primary"
                       variant="outlined"
                       sx={{ fontWeight: 700 }}
@@ -3000,14 +3006,14 @@ export default function RelativeMinorScalesStudy() {
                       variant="h4"
                       sx={{ fontWeight: 800, color: "#00695c" }}
                     >
-                      {currentFlashcard.relativeMinor}
+                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
                     </Typography>
                     <Typography
                       variant="subtitle2"
                       color="text.disabled"
                       sx={{ mt: 1 }}
                     >
-                      ({currentFlashcard.major})
+                      ({extractAmericanNotation(currentFlashcard.major)})
                     </Typography>
                   </>
                 )}
