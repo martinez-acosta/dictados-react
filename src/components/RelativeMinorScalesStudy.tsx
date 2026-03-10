@@ -817,7 +817,7 @@ function generateMajorOnlyQuestion(
       options: shuffle([target.major, ...distractors]),
     };
   } else if (pickedType === "orderOfSharps") {
-    const orderItems = ["Fa#", "Do#", "Sol#", "Re#", "La#", "Mi#", "Si#"];
+    const orderItems = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"];
     const idx = Math.floor(Math.random() * 7);
     const degreeNames = ["1er", "2do", "3er", "4to", "5to", "6to", "7mo"];
     return {
@@ -1017,7 +1017,7 @@ function createMajorOnlyFlashcard(
   }
 
   if (pickedType === "orderOfSharps") {
-    const orderItems = ["Fa#", "Do#", "Sol#", "Re#", "La#", "Mi#", "Si#"];
+    const orderItems = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"];
     const idx = Math.floor(Math.random() * 7);
     const degreeNames = ["1er", "2do", "3er", "4to", "5to", "6to", "7mo"];
 
@@ -1030,7 +1030,7 @@ function createMajorOnlyFlashcard(
         answer: orderItems[idx],
       },
       hintSteps: [
-        `Recuerda: Fa#, Do#, Sol#, Re#, La#, Mi#, Si#.`,
+        `Recuerda: F#, C#, G#, D#, A#, E#, B#.`,
         `Cuenta la posición ${degreeNames[idx]}.`,
         `La respuesta correcta es ${orderItems[idx]}.`,
       ],
