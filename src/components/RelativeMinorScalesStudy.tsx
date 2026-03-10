@@ -207,6 +207,32 @@ const CHROMATIC_ROOTS = [
   "B",
 ] as const;
 
+const MEMO_FIFTH_PAIRS = [
+  ["C", "G"],
+  ["B", "F"],
+  ["A", "E"],
+  ["G", "D"],
+  ["F", "C"],
+  ["E", "B"],
+  ["D", "A"],
+  ["C", "G"],
+] as const;
+
+const MEMO_THIRD_PAIRS = [
+  ["C", "E"],
+  ["B", "D"],
+  ["A", "C"],
+  ["G", "B"],
+  ["F", "A"],
+  ["E", "G"],
+  ["D", "F"],
+  ["C", "E"],
+] as const;
+
+const MEMO_SCALE_COLUMN = ["B", "A", "G", "F", "E", "D", "C"] as const;
+const MEMO_FLAT_ORDER = ["Bb", "Eb", "Ab", "Db", "Gb", "Cb", "Fb"] as const;
+const MEMO_SHARP_ORDER = ["F#", "C#", "G#", "D#", "A#", "E#", "B#"] as const;
+
 const ROOT_SIGNATURE_INFO: Record<RootLabel, { relativeMinor: string }> = {
   C: { relativeMinor: "Am" },
   Db: { relativeMinor: "Bbm" },
@@ -628,7 +654,8 @@ function createQuizQuestion(
   } else if (pickedType === "identifyAccidentalType") {
     let ans = "Ninguna";
     if (target.keySignature.toLowerCase().includes("bemol")) ans = "Bemoles";
-    if (target.keySignature.toLowerCase().includes("sostenido")) ans = "Sostenidos";
+    if (target.keySignature.toLowerCase().includes("sostenido"))
+      ans = "Sostenidos";
     return {
       type: "identifyAccidentalType",
       questionText: `¿La armadura de ${target.major} mayor usa sostenidos o bemoles?`,
@@ -789,7 +816,8 @@ function generateMajorOnlyQuestion(
   } else if (pickedType === "accidentalType") {
     let ans = "Ninguna";
     if (target.keySignature.toLowerCase().includes("bemol")) ans = "Bemoles";
-    if (target.keySignature.toLowerCase().includes("sostenido")) ans = "Sostenidos";
+    if (target.keySignature.toLowerCase().includes("sostenido"))
+      ans = "Sostenidos";
     return {
       type: "identifyAccidentalType",
       questionText: `¿La armadura de ${target.major} usa sostenidos o bemoles?`,
@@ -955,7 +983,8 @@ function createMajorOnlyFlashcard(
   if (pickedType === "accidentalType") {
     let answer = "Ninguna";
     if (target.keySignature.toLowerCase().includes("bemol")) answer = "Bemoles";
-    if (target.keySignature.toLowerCase().includes("sostenido")) answer = "Sostenidos";
+    if (target.keySignature.toLowerCase().includes("sostenido"))
+      answer = "Sostenidos";
 
     return {
       type: pickedType,
@@ -3654,502 +3683,538 @@ export default function RelativeMinorScalesStudy() {
             alignItems={{ xs: "center", md: "flex-start" }}
             justifyContent="center"
           >
-          {/* Flashcard Card */}
-          <Box
-            sx={{
-              perspective: "1000px",
-              width: "100%",
-              maxWidth: "420px",
-              height: "240px",
-              cursor: "pointer",
-              flexShrink: 0,
-            }}
-            onClick={() => {
-              if (isFlipped) {
-                setIsFlipped(false);
-              } else {
-                revealFlashcardAnswer();
-              }
-            }}
-          >
+            {/* Flashcard Card */}
             <Box
               sx={{
+                perspective: "1000px",
                 width: "100%",
-                height: "100%",
-                position: "relative",
-                transition: "transform 0.55s cubic-bezier(0.4,0,0.2,1)",
-                transformStyle: "preserve-3d",
-                transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                maxWidth: "420px",
+                height: "240px",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+              onClick={() => {
+                if (isFlipped) {
+                  setIsFlipped(false);
+                } else {
+                  revealFlashcardAnswer();
+                }
               }}
             >
-              {/* FRENTE */}
-              <Paper
-                elevation={4}
+              <Box
                 sx={{
-                  position: "absolute",
                   width: "100%",
                   height: "100%",
-                  backfaceVisibility: "hidden",
-                  WebkitBackfaceVisibility: "hidden",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  bgcolor: majorOnlyMode
-                    ? "#fff8e1"
-                    : flashcardMode === "majorToMinor" ||
-                        flashcardMode === "signatureToKeys" ||
-                        flashcardMode === "notesToMinorKey"
-                      ? "#fff"
-                      : "#e0f2f1",
-                  borderRadius: 3,
-                  border: majorOnlyMode
-                    ? "2px solid #ffe082"
-                    : flashcardMode === "majorToMinor" ||
-                        flashcardMode === "signatureToKeys" ||
-                        flashcardMode === "notesToMinorKey"
-                      ? "2px solid #b2dfdb"
-                      : "2px solid #4db6ac",
-                  gap: 1,
+                  position: "relative",
+                  transition: "transform 0.55s cubic-bezier(0.4,0,0.2,1)",
+                  transformStyle: "preserve-3d",
+                  transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
                 }}
               >
-                {majorOnlyMode ? (
-                  renderMajorOnlyFlashcardFront()
-                ) : flashcardMode === "majorToMinor" ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600 }}
-                    >
-                      ¿Cuál es el Relativo Menor de...?
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.disabled"
-                      sx={{ fontWeight: 600, mt: -0.5 }}
-                    >
-                      (Baja 3 semitonos)
-                    </Typography>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: 800,
-                        color: "#004d40",
-                        textAlign: "center",
-                      }}
-                    >
-                      {flashcardVisualMasked
-                        ? "Escucha la pista"
-                        : extractAmericanNotation(currentFlashcard.major)}
-                    </Typography>
-                  </>
-                ) : flashcardMode === "minorToMajor" ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600 }}
-                    >
-                      ¿A qué Mayor corresponde este Relativo?
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.disabled"
-                      sx={{ fontWeight: 600, mt: -0.5 }}
-                    >
-                      (Sube 3 semitonos)
-                    </Typography>
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 800,
-                        color: "#00695c",
-                        textAlign: "center",
-                      }}
-                    >
-                      {flashcardVisualMasked
-                        ? "Escucha la pista"
-                        : extractAmericanNotation(
-                            currentFlashcard.relativeMinor,
-                          )}
-                    </Typography>
-                    <Chip
-                      label={
-                        flashcardVisualMasked
-                          ? "Pista visual oculta"
-                          : currentFlashcard.keySignature
-                      }
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      sx={{ fontWeight: 600 }}
-                    />
-                  </>
-                ) : flashcardMode === "signatureToKeys" ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600, mb: 1 }}
-                    >
-                      ¿A qué escalas pertenece esta armadura?
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.disabled"
-                      sx={{ fontWeight: 600, mt: -1.5, mb: 0.5 }}
-                    >
-                      (Último # + 1/2 tono / Penúltimo b)
-                    </Typography>
-                    <Chip
-                      label={
-                        flashcardVisualMasked
-                          ? "Usa audio o pistas"
-                          : currentFlashcard.keySignature
-                      }
-                      color="secondary"
-                      sx={{ fontWeight: 800, fontSize: "1.2rem", py: 2.5 }}
-                    />
-                  </>
-                ) : flashcardMode === "sixthDegreeToKey" ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600, px: 2, textAlign: "center" }}
-                    >
-                      Si esta nota es el 6º grado de una Escala Mayor...
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.disabled"
-                      sx={{ fontWeight: 600, mt: -0.5, mb: 1 }}
-                    >
-                      (Recuerda, el 6º grado es el Relativo Menor)
-                    </Typography>
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        fontWeight: 800,
-                        color: "#00695c",
-                        textAlign: "center",
-                      }}
-                    >
-                      {flashcardVisualMasked
-                        ? "Escucha la pista"
-                        : extractAmericanNotation(currentFlashcard.sixthDegree)}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600, mt: 1 }}
-                    >
-                      ¿De qué Escala Mayor se trata?
-                    </Typography>
-                  </>
-                ) : (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600, mb: 1 }}
-                    >
-                      ¿Qué escala menor natural es esta?
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.disabled"
-                      sx={{ fontWeight: 600, mt: -1.5, mb: 0.5 }}
-                    >
-                      (Fíjate en las alteraciones o distancias T-st)
-                    </Typography>
-                    <Stack
-                      direction="row"
-                      spacing={0.5}
-                      flexWrap="wrap"
-                      justifyContent="center"
-                      px={2}
-                    >
-                      {flashcardVisualMasked ? (
-                        <Chip
-                          label="Notas ocultas"
-                          size="small"
-                          sx={{
-                            fontWeight: 600,
-                            bgcolor: "#fff3e0",
-                            color: "#e65100",
-                          }}
-                        />
-                      ) : (
-                        currentFlashcard.minorNotes.map((note, idx) => (
+                {/* FRENTE */}
+                <Paper
+                  elevation={4}
+                  sx={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bgcolor: majorOnlyMode
+                      ? "#fff8e1"
+                      : flashcardMode === "majorToMinor" ||
+                          flashcardMode === "signatureToKeys" ||
+                          flashcardMode === "notesToMinorKey"
+                        ? "#fff"
+                        : "#e0f2f1",
+                    borderRadius: 3,
+                    border: majorOnlyMode
+                      ? "2px solid #ffe082"
+                      : flashcardMode === "majorToMinor" ||
+                          flashcardMode === "signatureToKeys" ||
+                          flashcardMode === "notesToMinorKey"
+                        ? "2px solid #b2dfdb"
+                        : "2px solid #4db6ac",
+                    gap: 1,
+                  }}
+                >
+                  {majorOnlyMode ? (
+                    renderMajorOnlyFlashcardFront()
+                  ) : flashcardMode === "majorToMinor" ? (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600 }}
+                      >
+                        ¿Cuál es el Relativo Menor de...?
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ fontWeight: 600, mt: -0.5 }}
+                      >
+                        (Baja 3 semitonos)
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 800,
+                          color: "#004d40",
+                          textAlign: "center",
+                        }}
+                      >
+                        {flashcardVisualMasked
+                          ? "Escucha la pista"
+                          : extractAmericanNotation(currentFlashcard.major)}
+                      </Typography>
+                    </>
+                  ) : flashcardMode === "minorToMajor" ? (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600 }}
+                      >
+                        ¿A qué Mayor corresponde este Relativo?
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ fontWeight: 600, mt: -0.5 }}
+                      >
+                        (Sube 3 semitonos)
+                      </Typography>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: 800,
+                          color: "#00695c",
+                          textAlign: "center",
+                        }}
+                      >
+                        {flashcardVisualMasked
+                          ? "Escucha la pista"
+                          : extractAmericanNotation(
+                              currentFlashcard.relativeMinor,
+                            )}
+                      </Typography>
+                      <Chip
+                        label={
+                          flashcardVisualMasked
+                            ? "Pista visual oculta"
+                            : currentFlashcard.keySignature
+                        }
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        sx={{ fontWeight: 600 }}
+                      />
+                    </>
+                  ) : flashcardMode === "signatureToKeys" ? (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600, mb: 1 }}
+                      >
+                        ¿A qué escalas pertenece esta armadura?
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ fontWeight: 600, mt: -1.5, mb: 0.5 }}
+                      >
+                        (Último # + 1/2 tono / Penúltimo b)
+                      </Typography>
+                      <Chip
+                        label={
+                          flashcardVisualMasked
+                            ? "Usa audio o pistas"
+                            : currentFlashcard.keySignature
+                        }
+                        color="secondary"
+                        sx={{ fontWeight: 800, fontSize: "1.2rem", py: 2.5 }}
+                      />
+                    </>
+                  ) : flashcardMode === "sixthDegreeToKey" ? (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600, px: 2, textAlign: "center" }}
+                      >
+                        Si esta nota es el 6º grado de una Escala Mayor...
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ fontWeight: 600, mt: -0.5, mb: 1 }}
+                      >
+                        (Recuerda, el 6º grado es el Relativo Menor)
+                      </Typography>
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          fontWeight: 800,
+                          color: "#00695c",
+                          textAlign: "center",
+                        }}
+                      >
+                        {flashcardVisualMasked
+                          ? "Escucha la pista"
+                          : extractAmericanNotation(
+                              currentFlashcard.sixthDegree,
+                            )}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600, mt: 1 }}
+                      >
+                        ¿De qué Escala Mayor se trata?
+                      </Typography>
+                    </>
+                  ) : (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600, mb: 1 }}
+                      >
+                        ¿Qué escala menor natural es esta?
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ fontWeight: 600, mt: -1.5, mb: 0.5 }}
+                      >
+                        (Fíjate en las alteraciones o distancias T-st)
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        flexWrap="wrap"
+                        justifyContent="center"
+                        px={2}
+                      >
+                        {flashcardVisualMasked ? (
                           <Chip
-                            key={idx}
-                            label={note}
+                            label="Notas ocultas"
                             size="small"
                             sx={{
                               fontWeight: 600,
-                              bgcolor: "#e0f2f1",
-                              color: "#004d40",
+                              bgcolor: "#fff3e0",
+                              color: "#e65100",
                             }}
                           />
-                        ))
-                      )}
-                    </Stack>
-                  </>
-                )}
-                <Typography
-                  variant="body2"
-                  sx={{ mt: 2, color: "text.disabled", fontSize: "0.75rem" }}
-                >
-                  Toca para voltear ↻
-                </Typography>
-              </Paper>
+                        ) : (
+                          currentFlashcard.minorNotes.map((note, idx) => (
+                            <Chip
+                              key={idx}
+                              label={note}
+                              size="small"
+                              sx={{
+                                fontWeight: 600,
+                                bgcolor: "#e0f2f1",
+                                color: "#004d40",
+                              }}
+                            />
+                          ))
+                        )}
+                      </Stack>
+                    </>
+                  )}
+                  <Typography
+                    variant="body2"
+                    sx={{ mt: 2, color: "text.disabled", fontSize: "0.75rem" }}
+                  >
+                    Toca para voltear ↻
+                  </Typography>
+                </Paper>
 
-              {/* REVERSO */}
-              <Paper
-                elevation={4}
-                sx={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  backfaceVisibility: "hidden",
-                  WebkitBackfaceVisibility: "hidden",
-                  transform: "rotateY(180deg)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  bgcolor: majorOnlyMode
-                    ? "#fff3e0"
-                    : flashcardMode === "majorToMinor" ||
-                        flashcardMode === "signatureToKeys" ||
-                        flashcardMode === "notesToMinorKey"
-                      ? "#e0f2f1"
-                      : "#fff",
-                  borderRadius: 3,
-                  border: majorOnlyMode
-                    ? "2px solid #ffb74d"
-                    : flashcardMode === "majorToMinor" ||
-                        flashcardMode === "signatureToKeys" ||
-                        flashcardMode === "notesToMinorKey"
-                      ? "2px solid #4db6ac"
-                      : "2px solid #b2dfdb",
-                  gap: 1,
-                }}
-              >
-                {majorOnlyMode ? (
-                  renderMajorOnlyFlashcardBack()
-                ) : flashcardMode === "majorToMinor" ? (
-                  <>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: 800, color: "#00695c" }}
-                    >
-                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
-                    </Typography>
-                    <Chip
-                      label={`Armadura: ${currentFlashcard.keySignature}`}
-                      color="primary"
-                      variant="outlined"
-                      sx={{ fontWeight: 700, fontSize: "0.95rem", py: 2.5 }}
-                    />
-                  </>
-                ) : flashcardMode === "minorToMajor" ? (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600 }}
-                    >
-                      Tonalidad Mayor:
-                    </Typography>
-                    <Typography
-                      variant="h4"
-                      sx={{ fontWeight: 800, color: "#004d40" }}
-                    >
-                      {extractAmericanNotation(currentFlashcard.major)}
-                    </Typography>
-                  </>
-                ) : flashcardMode === "signatureToKeys" ? (
-                  <>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: 800, color: "#004d40" }}
-                    >
-                      {extractAmericanNotation(currentFlashcard.major)}
-                    </Typography>
-                    <Divider sx={{ width: "60%", my: 0.5 }} />
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: 700, color: "#00695c" }}
-                    >
-                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
-                    </Typography>
-                  </>
-                ) : flashcardMode === "sixthDegreeToKey" ? (
-                  <>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: 800, color: "#004d40", mb: 1 }}
-                    >
-                      {extractAmericanNotation(currentFlashcard.major)}
-                    </Typography>
-                    <Chip
-                      label={`Relativo Menor: ${extractAmericanNotation(currentFlashcard.relativeMinor)}`}
-                      color="primary"
-                      variant="outlined"
-                      sx={{ fontWeight: 700 }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontWeight: 600 }}
-                    >
-                      Es la escala relativa de:
-                    </Typography>
-                    <Typography
-                      variant="h4"
-                      sx={{ fontWeight: 800, color: "#00695c" }}
-                    >
-                      {extractAmericanNotation(currentFlashcard.relativeMinor)}
-                    </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      color="text.disabled"
-                      sx={{ mt: 1 }}
-                    >
-                      ({extractAmericanNotation(currentFlashcard.major)})
-                    </Typography>
-                  </>
-                )}
-              </Paper>
+                {/* REVERSO */}
+                <Paper
+                  elevation={4}
+                  sx={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bgcolor: majorOnlyMode
+                      ? "#fff3e0"
+                      : flashcardMode === "majorToMinor" ||
+                          flashcardMode === "signatureToKeys" ||
+                          flashcardMode === "notesToMinorKey"
+                        ? "#e0f2f1"
+                        : "#fff",
+                    borderRadius: 3,
+                    border: majorOnlyMode
+                      ? "2px solid #ffb74d"
+                      : flashcardMode === "majorToMinor" ||
+                          flashcardMode === "signatureToKeys" ||
+                          flashcardMode === "notesToMinorKey"
+                        ? "2px solid #4db6ac"
+                        : "2px solid #b2dfdb",
+                    gap: 1,
+                  }}
+                >
+                  {majorOnlyMode ? (
+                    renderMajorOnlyFlashcardBack()
+                  ) : flashcardMode === "majorToMinor" ? (
+                    <>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 800, color: "#00695c" }}
+                      >
+                        {extractAmericanNotation(
+                          currentFlashcard.relativeMinor,
+                        )}
+                      </Typography>
+                      <Chip
+                        label={`Armadura: ${currentFlashcard.keySignature}`}
+                        color="primary"
+                        variant="outlined"
+                        sx={{ fontWeight: 700, fontSize: "0.95rem", py: 2.5 }}
+                      />
+                    </>
+                  ) : flashcardMode === "minorToMajor" ? (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600 }}
+                      >
+                        Tonalidad Mayor:
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        sx={{ fontWeight: 800, color: "#004d40" }}
+                      >
+                        {extractAmericanNotation(currentFlashcard.major)}
+                      </Typography>
+                    </>
+                  ) : flashcardMode === "signatureToKeys" ? (
+                    <>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 800, color: "#004d40" }}
+                      >
+                        {extractAmericanNotation(currentFlashcard.major)}
+                      </Typography>
+                      <Divider sx={{ width: "60%", my: 0.5 }} />
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: 700, color: "#00695c" }}
+                      >
+                        {extractAmericanNotation(
+                          currentFlashcard.relativeMinor,
+                        )}
+                      </Typography>
+                    </>
+                  ) : flashcardMode === "sixthDegreeToKey" ? (
+                    <>
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 800, color: "#004d40", mb: 1 }}
+                      >
+                        {extractAmericanNotation(currentFlashcard.major)}
+                      </Typography>
+                      <Chip
+                        label={`Relativo Menor: ${extractAmericanNotation(currentFlashcard.relativeMinor)}`}
+                        color="primary"
+                        variant="outlined"
+                        sx={{ fontWeight: 700 }}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontWeight: 600 }}
+                      >
+                        Es la escala relativa de:
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        sx={{ fontWeight: 800, color: "#00695c" }}
+                      >
+                        {extractAmericanNotation(
+                          currentFlashcard.relativeMinor,
+                        )}
+                      </Typography>
+                      <Typography
+                        variant="subtitle2"
+                        color="text.disabled"
+                        sx={{ mt: 1 }}
+                      >
+                        ({extractAmericanNotation(currentFlashcard.major)})
+                      </Typography>
+                    </>
+                  )}
+                </Paper>
+              </Box>
             </Box>
-          </Box>
 
-          {/* Quick Access: Quintas Diatónicas + Escala */}
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 1.5,
-              borderColor: "#ffcc80",
-              bgcolor: "#fffde7",
-              borderRadius: 2,
-              minWidth: 200,
-              flexShrink: 0,
-              display: { xs: "none", md: "block" },
-            }}
-          >
-            <Stack direction="row" spacing={2.5}>
-              {/* Fifths pairs column */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ fontWeight: 700, color: "#e65100", mb: 0.5, display: "block" }}
-                >
-                  Quintas ↓
-                </Typography>
-                {[
-                  ["C", "G"],
-                  ["B", "F"],
-                  ["A", "E"],
-                  ["G", "D"],
-                  ["F", "C"],
-                  ["E", "B"],
-                  ["D", "A"],
-                  ["C", "G"],
-                ].map(([left, right], idx) => (
-                  <Stack
-                    key={`fifth-${idx}`}
-                    direction="row"
-                    spacing={0.5}
-                    alignItems="center"
+            {/* Quick Access: Quintas Diatónicas + Escala */}
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 1.5,
+                borderColor: "#ffcc80",
+                bgcolor: "#fffde7",
+                borderRadius: 2,
+                minWidth: 200,
+                flexShrink: 0,
+                display: { xs: "none", md: "block" },
+              }}
+            >
+              <Stack direction="row" spacing={2.5}>
+                {/* Fifths pairs column */}
+                <Box>
+                  <Typography
+                    variant="caption"
                     sx={{
-                      py: 0.15,
-                      borderBottom: idx < 7 ? "1px solid #fff3e0" : "none",
+                      fontWeight: 700,
+                      color: "#e65100",
+                      mb: 0.5,
+                      display: "block",
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 700, color: "#bf360c", minWidth: 24, textAlign: "right" }}
+                    Quintas ↓
+                  </Typography>
+                  {[
+                    ["C", "G"],
+                    ["B", "F"],
+                    ["A", "E"],
+                    ["G", "D"],
+                    ["F", "C"],
+                    ["E", "B"],
+                    ["D", "A"],
+                    ["C", "G"],
+                  ].map(([left, right], idx) => (
+                    <Stack
+                      key={`fifth-${idx}`}
+                      direction="row"
+                      spacing={0.5}
+                      alignItems="center"
+                      sx={{
+                        py: 0.15,
+                        borderBottom: idx < 7 ? "1px solid #fff3e0" : "none",
+                      }}
                     >
-                      {left}
-                    </Typography>
-                    <Typography variant="body2" color="text.disabled">—</Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 600, color: "#4e342e", minWidth: 24 }}
-                    >
-                      {right}
-                    </Typography>
-                  </Stack>
-                ))}
-              </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 700,
+                          color: "#bf360c",
+                          minWidth: 24,
+                          textAlign: "right",
+                        }}
+                      >
+                        {left}
+                      </Typography>
+                      <Typography variant="body2" color="text.disabled">
+                        —
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: "#4e342e", minWidth: 24 }}
+                      >
+                        {right}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Box>
 
-              {/* Divider */}
-              <Divider orientation="vertical" flexItem />
+                {/* Divider */}
+                <Divider orientation="vertical" flexItem />
 
-              {/* Thirds pairs column */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ fontWeight: 700, color: "#1565c0", mb: 0.5, display: "block" }}
-                >
-                  Terceras ↓
-                </Typography>
-                {[
-                  ["C", "E"],
-                  ["B", "D"],
-                  ["A", "C"],
-                  ["G", "B"],
-                  ["F", "A"],
-                  ["E", "G"],
-                  ["D", "F"],
-                  ["C", "E"],
-                ].map(([left, right], idx) => (
-                  <Stack
-                    key={`third-${idx}`}
-                    direction="row"
-                    spacing={0.5}
-                    alignItems="center"
+                {/* Thirds pairs column */}
+                <Box>
+                  <Typography
+                    variant="caption"
                     sx={{
-                      py: 0.15,
-                      borderBottom: idx < 7 ? "1px solid #e3f2fd" : "none",
+                      fontWeight: 700,
+                      color: "#1565c0",
+                      mb: 0.5,
+                      display: "block",
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 700, color: "#1565c0", minWidth: 24, textAlign: "right" }}
+                    Terceras ↓
+                  </Typography>
+                  {[
+                    ["C", "E"],
+                    ["B", "D"],
+                    ["A", "C"],
+                    ["G", "B"],
+                    ["F", "A"],
+                    ["E", "G"],
+                    ["D", "F"],
+                    ["C", "E"],
+                  ].map(([left, right], idx) => (
+                    <Stack
+                      key={`third-${idx}`}
+                      direction="row"
+                      spacing={0.5}
+                      alignItems="center"
+                      sx={{
+                        py: 0.15,
+                        borderBottom: idx < 7 ? "1px solid #e3f2fd" : "none",
+                      }}
                     >
-                      {left}
-                    </Typography>
-                    <Typography variant="body2" color="text.disabled">—</Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 600, color: "#37474f", minWidth: 24 }}
-                    >
-                      {right}
-                    </Typography>
-                  </Stack>
-                ))}
-              </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 700,
+                          color: "#1565c0",
+                          minWidth: 24,
+                          textAlign: "right",
+                        }}
+                      >
+                        {left}
+                      </Typography>
+                      <Typography variant="body2" color="text.disabled">
+                        —
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: "#37474f", minWidth: 24 }}
+                      >
+                        {right}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Box>
 
-              {/* Divider */}
-              <Divider orientation="vertical" flexItem />
+                {/* Divider */}
+                <Divider orientation="vertical" flexItem />
 
-              {/* Scale column */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ fontWeight: 700, color: "#00695c", mb: 0.5, display: "block" }}
-                >
-                  Escala
-                </Typography>
-                {["B", "A", "G", "F", "E", "D", "C"].map(
-                  (note, idx) => (
+                {/* Scale column */}
+                <Box>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      color: "#00695c",
+                      mb: 0.5,
+                      display: "block",
+                    }}
+                  >
+                    Escala
+                  </Typography>
+                  {["B", "A", "G", "F", "E", "D", "C"].map((note, idx) => (
                     <Typography
                       key={`scale-col-${idx}`}
                       variant="body2"
@@ -4162,11 +4227,10 @@ export default function RelativeMinorScalesStudy() {
                     >
                       {note}
                     </Typography>
-                  ),
-                )}
-              </Box>
-            </Stack>
-          </Paper>
+                  ))}
+                </Box>
+              </Stack>
+            </Paper>
           </Stack>
 
           <Stack spacing={1.5} sx={{ mt: 2, alignItems: "center" }}>
@@ -4445,6 +4509,183 @@ export default function RelativeMinorScalesStudy() {
               </TableBody>
             </Table>
           </Box>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.25 }}>
+            Apoyo visual para memorizar
+          </Typography>
+
+          <Stack spacing={2}>
+            <Stack direction={{ xs: "column", lg: "row" }} spacing={2}>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1.5,
+                  bgcolor: "#fffde7",
+                  borderColor: "#ffcc80",
+                  flex: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#e65100", mb: 1 }}
+                >
+                  Tabla de Quintas
+                </Typography>
+                <Stack spacing={0.35}>
+                  {MEMO_FIFTH_PAIRS.map(([left, right], idx) => (
+                    <Stack
+                      key={`memo-fifth-${idx}`}
+                      direction="row"
+                      spacing={0.75}
+                      alignItems="center"
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 700, color: "#bf360c", minWidth: 20 }}
+                      >
+                        {left}
+                      </Typography>
+                      <Typography variant="body2" color="text.disabled">
+                        -
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {right}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+              </Paper>
+
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1.5,
+                  bgcolor: "#e3f2fd",
+                  borderColor: "#90caf9",
+                  flex: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#1565c0", mb: 1 }}
+                >
+                  Tabla de Terceras
+                </Typography>
+                <Stack spacing={0.35}>
+                  {MEMO_THIRD_PAIRS.map(([left, right], idx) => (
+                    <Stack
+                      key={`memo-third-${idx}`}
+                      direction="row"
+                      spacing={0.75}
+                      alignItems="center"
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 700, color: "#1565c0", minWidth: 20 }}
+                      >
+                        {left}
+                      </Typography>
+                      <Typography variant="body2" color="text.disabled">
+                        -
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {right}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+              </Paper>
+
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1.5,
+                  bgcolor: "#e0f2f1",
+                  borderColor: "#80cbc4",
+                  flex: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#00695c", mb: 1 }}
+                >
+                  Tabla de Escala
+                </Typography>
+                <Stack spacing={0.35}>
+                  {MEMO_SCALE_COLUMN.map((note, idx) => (
+                    <Typography
+                      key={`memo-scale-${idx}`}
+                      variant="body2"
+                      sx={{
+                        fontWeight: idx === 0 ? 800 : 600,
+                        color: idx === 0 ? "#00695c" : "#37474f",
+                      }}
+                    >
+                      {note}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Paper>
+            </Stack>
+
+            <Stack direction={{ xs: "column", lg: "row" }} spacing={2}>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1.5,
+                  bgcolor: "#f3e5f5",
+                  borderColor: "#ce93d8",
+                  flex: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#8e24aa", mb: 1 }}
+                >
+                  Tabla de Orden de Bemoles (b)
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  {MEMO_FLAT_ORDER.map((note, idx) => (
+                    <Chip
+                      key={`memo-flat-order-${note}`}
+                      label={`${idx + 1}. ${note}`}
+                      size="small"
+                      sx={{ fontWeight: 700 }}
+                    />
+                  ))}
+                </Stack>
+              </Paper>
+
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1.5,
+                  bgcolor: "#ffebee",
+                  borderColor: "#ef9a9a",
+                  flex: 1,
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "#c62828", mb: 1 }}
+                >
+                  Tabla de Orden de Sostenidos (#)
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  {MEMO_SHARP_ORDER.map((note, idx) => (
+                    <Chip
+                      key={`memo-sharp-order-${note}`}
+                      label={`${idx + 1}. ${note}`}
+                      size="small"
+                      sx={{ fontWeight: 700 }}
+                    />
+                  ))}
+                </Stack>
+              </Paper>
+            </Stack>
+          </Stack>
         </Paper>
 
         <Paper variant="outlined" sx={{ p: { xs: 2, sm: 2.5 }, mb: 4 }}>
