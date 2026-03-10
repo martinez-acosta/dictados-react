@@ -215,7 +215,6 @@ const MEMO_FIFTH_PAIRS = [
   ["F", "C"],
   ["E", "B"],
   ["D", "A"],
-  ["C", "G"],
 ] as const;
 
 const MEMO_THIRD_PAIRS = [
@@ -226,7 +225,6 @@ const MEMO_THIRD_PAIRS = [
   ["F", "A"],
   ["E", "G"],
   ["D", "F"],
-  ["C", "E"],
 ] as const;
 
 const MEMO_SCALE_COLUMN = ["B", "A", "G", "F", "E", "D", "C"] as const;
