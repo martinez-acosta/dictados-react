@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -31,6 +31,7 @@ import {
   School,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { Accidental, Factory, Formatter, Stave, StaveNote, Voice } from "vexflow";
 
 type HintLevel = "none" | "root" | "stack" | "quality" | "answer";
 type ExtensionQuality = "major" | "minor" | "diminished" | "augmented";
@@ -218,6 +219,54 @@ function normalizeText(value: string) {
     .toLowerCase();
 }
 
+function normalizeAmericanNote(note: string) {
+  const cleaned = (note || "")
+    .replace(/♭/g, "b")
+    .replace(/♯/g, "#")
+    .trim();
+  const match = cleaned.match(/^([a-gA-G])(bb|##|b|#)?$/);
+  if (!match) return null;
+  return `${match[1].toUpperCase()}${match[2] || ""}`;
+}
+
+function parseAmericanNotes(value: string) {
+  return (value || "")
+    .split(/[,\s/|-]+/)
+    .map((item) => normalizeAmericanNote(item))
+    .filter(Boolean) as string[];
+}
+
+function noteMidi(name: string, octave: number) {
+  const parts = parseNoteParts(name);
+  return (
+    (octave + 1) * 12 +
+    NATURAL_PC[parts.letter] +
+    accidentalToShift(parts.accidental)
+  );
+}
+
+function buildTrebleKeys(notes: string[]) {
+  let previousMidi = -Infinity;
+  let octave = 4;
+
+  return notes.map((name) => {
+    const parts = parseNoteParts(name);
+    let midi = noteMidi(name, octave);
+
+    while (midi <= previousMidi) {
+      octave += 1;
+      midi = noteMidi(name, octave);
+    }
+
+    previousMidi = midi;
+
+    return {
+      key: `${parts.letter.toLowerCase()}/${octave}`,
+      accidental: parts.accidental,
+    };
+  });
+}
+
 function buildMajorScale(root: string) {
   return MAJOR_SCALE_INTERVALS.map((interval, index) =>
     spelledNoteForDegree(root, index, interval),
@@ -310,6 +359,61 @@ function hintTextForRow(row: DiatonicDegreeRow, level: HintLevel) {
     return `Calidad esperada: ${row.quality}. Símbolo base: ${row.symbol}.`;
   }
   return `Respuesta completa: ${row.stackNotes.join(" - ")} · ${row.quality} · ${row.symbol}.`;
+}
+
+function TrebleChordPreview({ notes }: { notes: string[] }) {
+  const holderRef = useRef<HTMLDivElement | null>(null);
+  const holderId = useRef(
+    `major-scale-staff-${Math.random().toString(36).slice(2)}`,
+  );
+
+  useEffect(() => {
+    if (!holderRef.current) return;
+
+    holderRef.current.innerHTML = "";
+    if (notes.length === 0) return;
+
+    const renderedNotes = buildTrebleKeys(notes);
+    const width = 210;
+    const height = 110;
+    const vf = new Factory({
+      renderer: {
+        elementId: holderId.current,
+        width,
+        height,
+      },
+    });
+    const context = vf.getContext();
+    const stave = new Stave(10, 15, width - 20);
+    stave.addClef("treble").setContext(context).draw();
+
+    const chord = new StaveNote({
+      clef: "treble",
+      keys: renderedNotes.map((item) => item.key),
+      duration: "w",
+    });
+
+    renderedNotes.forEach((item, index) => {
+      if (item.accidental) {
+        chord.addModifier(new Accidental(item.accidental), index);
+      }
+    });
+
+    const voice = new Voice({ num_beats: 4, beat_value: 4 });
+    voice.addTickables([chord]);
+    new Formatter().joinVoices([voice]).format([voice], width - 70);
+    voice.draw(context, stave);
+  }, [notes]);
+
+  return (
+    <Box>
+      <Box
+        ref={holderRef}
+        id={holderId.current}
+        sx={{ width: 210, minHeight: 90 }}
+      />
+    </Box>
+  );
 }
 
 export default function MajorScaleChordTableStudy() {
@@ -642,6 +746,7 @@ export default function MajorScaleChordTableStudy() {
                   <TableCell>Nota base</TableCell>
                   <TableCell>1-3-5</TableCell>
                   <TableCell>Notas del acorde</TableCell>
+                  <TableCell>Clave de Sol</TableCell>
                   <TableCell>Calidad</TableCell>
                   <TableCell>Símbolo</TableCell>
                   <TableCell>Pistas / revisión</TableCell>
@@ -653,6 +758,9 @@ export default function MajorScaleChordTableStudy() {
                   const answer = currentAnswer(rowKey);
                   const result = currentResult(rowKey);
                   const hintLevel = currentHintLevel(rowKey);
+                  const displayNotes = practiceMode
+                    ? parseAmericanNotes(answer.notes)
+                    : row.stackNotes;
 
                   return (
                     <TableRow key={rowKey}>
@@ -683,6 +791,15 @@ export default function MajorScaleChordTableStudy() {
                           />
                         ) : (
                           row.stackNotes.join(" - ")
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ minWidth: 230 }}>
+                        {displayNotes.length > 0 ? (
+                          <TrebleChordPreview notes={displayNotes} />
+                        ) : (
+                          <Typography variant="caption" color="text.secondary">
+                            Escribe notas para ver el diagrama
+                          </Typography>
                         )}
                       </TableCell>
                       <TableCell sx={{ minWidth: 170 }}>
