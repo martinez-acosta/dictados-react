@@ -121,6 +121,8 @@ type FlashcardCard = {
   audioNotes: string[];
   chordSymbol: string;
   inversionLabel: string;
+  activeInversionIndex: number;
+  inversions: InversionData[];
 };
 
 type FlashcardCheckResult = {
@@ -500,6 +502,8 @@ function buildFlashcard(
         audioNotes: inversion.noteNamesWithOctave,
         chordSymbol: chord.symbol,
         inversionLabel: inversion.label,
+        activeInversionIndex: inversion.index,
+        inversions: chord.inversions,
       };
     case "notesToInversion":
       return {
@@ -519,6 +523,8 @@ function buildFlashcard(
         audioNotes: inversion.noteNamesWithOctave,
         chordSymbol: chord.symbol,
         inversionLabel: inversion.label,
+        activeInversionIndex: inversion.index,
+        inversions: chord.inversions,
       };
     case "bassToInversion":
       return {
@@ -536,6 +542,8 @@ function buildFlashcard(
         audioNotes: inversion.noteNamesWithOctave,
         chordSymbol: chord.symbol,
         inversionLabel: inversion.label,
+        activeInversionIndex: inversion.index,
+        inversions: chord.inversions,
       };
     case "degreesToInversion":
       return {
@@ -555,6 +563,8 @@ function buildFlashcard(
         audioNotes: inversion.noteNamesWithOctave,
         chordSymbol: chord.symbol,
         inversionLabel: inversion.label,
+        activeInversionIndex: inversion.index,
+        inversions: chord.inversions,
       };
     case "chordToNotes":
     default:
@@ -572,6 +582,8 @@ function buildFlashcard(
         audioNotes: inversion.noteNamesWithOctave,
         chordSymbol: chord.symbol,
         inversionLabel: inversion.label,
+        activeInversionIndex: inversion.index,
+        inversions: chord.inversions,
       };
   }
 }
@@ -772,6 +784,7 @@ export default function ChordInversionsStudy() {
     seen: 0,
     correct: 0,
   });
+  const [showFlashcardTips, setShowFlashcardTips] = useState(true);
   const [quizFamilies, setQuizFamilies] = useState<ChordFamily[]>([
     "triad",
     "seventh",
@@ -811,6 +824,9 @@ export default function ChordInversionsStudy() {
       if (typeof saved.practiceMode === "boolean") {
         setPracticeMode(saved.practiceMode);
       }
+      if (typeof saved.showFlashcardTips === "boolean") {
+        setShowFlashcardTips(saved.showFlashcardTips);
+      }
       if (saved.practiceAnswers && typeof saved.practiceAnswers === "object") {
         setPracticeAnswers(saved.practiceAnswers);
       }
@@ -828,10 +844,19 @@ export default function ChordInversionsStudy() {
         root,
         inversionIndex,
         practiceMode,
+        showFlashcardTips,
         practiceAnswers,
       }),
     );
-  }, [family, inversionIndex, practiceAnswers, practiceMode, qualityId, root]);
+  }, [
+    family,
+    inversionIndex,
+    practiceAnswers,
+    practiceMode,
+    qualityId,
+    root,
+    showFlashcardTips,
+  ]);
 
   useEffect(() => {
     if (!qualityOptions.some((quality) => quality.id === qualityId)) {
@@ -1272,7 +1297,16 @@ export default function ChordInversionsStudy() {
                   Reconoce inversiones por bajo, orden de grados y spelling.
                 </Typography>
               </Box>
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showFlashcardTips}
+                      onChange={(event) => setShowFlashcardTips(event.target.checked)}
+                    />
+                  }
+                  label="Mostrar tips"
+                />
                 <Chip
                   label={`Vistas: ${flashcardStats.seen}`}
                   color="default"
@@ -1360,6 +1394,62 @@ export default function ChordInversionsStudy() {
                     ))}
                   </Stack>
                 )}
+
+                {showFlashcardTips ? (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: "#f7fbff",
+                      borderColor: "rgba(21, 101, 192, 0.2)",
+                    }}
+                  >
+                    <Stack spacing={1}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                        Tip de estudio: resumen visual de inversiones
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Usa este apoyo mientras memorizas qué grado cae en el bajo y
+                        cómo se reordena el acorde.
+                      </Typography>
+                      <Grid container spacing={1}>
+                        {flashcard.inversions.map((item) => (
+                          <Grid item xs={12} sm={6} md={3} key={`${flashcard.id}-${item.index}`}>
+                            <Paper
+                              variant="outlined"
+                              sx={{
+                                p: 1,
+                                borderColor:
+                                  item.index === flashcard.activeInversionIndex
+                                    ? "primary.main"
+                                    : "divider",
+                                backgroundColor:
+                                  item.index === flashcard.activeInversionIndex
+                                    ? "rgba(25, 118, 210, 0.05)"
+                                    : "transparent",
+                              }}
+                            >
+                              <Stack spacing={0.4}>
+                                <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                                  {item.label}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  Bajo: {item.bassNote} ({item.bassDegree})
+                                </Typography>
+                                <Typography variant="caption">
+                                  {expectedNotesText(item.noteNames)}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {item.degrees.join(" - ")}
+                                </Typography>
+                              </Stack>
+                            </Paper>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Stack>
+                  </Paper>
+                ) : null}
 
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   <Button variant="contained" onClick={checkFlashcard}>

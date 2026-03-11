@@ -21,6 +21,7 @@ import CancionesMenu from "./components/CancionesMenu.jsx";
 import BassArpeggiosPage from "./components/BassArpeggiosPage.tsx";
 import RelativeMinorScalesStudy from "./components/RelativeMinorScalesStudy.tsx";
 import ChordInversionsStudy from "./components/ChordInversionsStudy.tsx";
+import MajorScaleChordTableStudy from "./components/MajorScaleChordTableStudy.tsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
@@ -54,6 +55,10 @@ createRoot(document.getElementById("root")).render(
         <Route
           path="/inversiones-acordes"
           element={<ChordInversionsStudy />}
+        />
+        <Route
+          path="/armonizacion-mayor"
+          element={<MajorScaleChordTableStudy />}
         />
         <Route path="/canciones" element={<CancionesMenu />} />
       </Routes>

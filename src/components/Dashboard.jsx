@@ -211,6 +211,19 @@ const EXERCISE_SECTIONS = [
         icon: LibraryMusic,
         iconColor: "#00838f",
       },
+      {
+        route: "/armonizacion-mayor",
+        title: "Armonización Mayor",
+        description:
+          "Aprende a construir a mano los 7 acordes diatónicos de una escala mayor con pistas opcionales.",
+        buttonLabel: "Abrir Armonización",
+        buttonSx: {
+          backgroundColor: "#2e7d32",
+          "&:hover": { backgroundColor: "#1b5e20" },
+        },
+        icon: LibraryMusic,
+        iconColor: "#2e7d32",
+      },
     ],
   },
   {
