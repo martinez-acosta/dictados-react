@@ -20,6 +20,7 @@ import TunerPage from "./components/TunerPage.tsx";
 import CancionesMenu from "./components/CancionesMenu.jsx";
 import BassArpeggiosPage from "./components/BassArpeggiosPage.tsx";
 import RelativeMinorScalesStudy from "./components/RelativeMinorScalesStudy.tsx";
+import ChordInversionsStudy from "./components/ChordInversionsStudy.tsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
@@ -49,6 +50,10 @@ createRoot(document.getElementById("root")).render(
         <Route
           path="/escalas-relativas"
           element={<RelativeMinorScalesStudy />}
+        />
+        <Route
+          path="/inversiones-acordes"
+          element={<ChordInversionsStudy />}
         />
         <Route path="/canciones" element={<CancionesMenu />} />
       </Routes>

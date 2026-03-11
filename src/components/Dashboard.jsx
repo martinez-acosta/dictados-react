@@ -198,6 +198,19 @@ const EXERCISE_SECTIONS = [
         icon: LibraryMusic,
         iconColor: "#1565c0",
       },
+      {
+        route: "/inversiones-acordes",
+        title: "Inversiones de Acordes",
+        description:
+          "Estudia tríadas y cuatríadas con inversiones, flashcards, práctica escrita y quiz.",
+        buttonLabel: "Estudiar Inversiones",
+        buttonSx: {
+          backgroundColor: "#00838f",
+          "&:hover": { backgroundColor: "#006064" },
+        },
+        icon: LibraryMusic,
+        iconColor: "#00838f",
+      },
     ],
   },
   {
