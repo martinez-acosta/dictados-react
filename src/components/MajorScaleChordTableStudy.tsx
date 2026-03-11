@@ -7,6 +7,7 @@ import {
   Chip,
   FormControl,
   FormControlLabel,
+  FormGroup,
   Grid,
   InputLabel,
   MenuItem,
@@ -35,6 +36,14 @@ import { Accidental, Factory, Formatter, Stave, StaveNote, Voice } from "vexflow
 
 type HintLevel = "none" | "root" | "stack" | "quality" | "answer";
 type ExtensionQuality = "major" | "minor" | "diminished" | "augmented";
+type FlashcardMode =
+  | "familyRootToNotes"
+  | "familyNotesToQuality"
+  | "familyRootToSymbol"
+  | "diatonicDegreeToChord"
+  | "diatonicChordToDegree"
+  | "diatonicDegreeToNotes";
+type FlashcardAnswerKind = "notes" | "choice";
 
 type MajorKeyOption = {
   root: string;
@@ -75,6 +84,25 @@ type FamilyTriadRow = {
   symbol: string;
 };
 
+type FlashcardCard = {
+  id: string;
+  mode: FlashcardMode;
+  contextLabel: string;
+  prompt: string;
+  answerKind: FlashcardAnswerKind;
+  answerNotes?: string[];
+  answerChoice?: string;
+  options?: string[];
+  answerLines: string[];
+  tipTitle: string;
+  tipLines: string[];
+};
+
+type FlashcardCheckResult = {
+  isCorrect: boolean;
+  expected: string;
+};
+
 const STORAGE_KEY = "dictados-react-major-scale-chord-table-study";
 const LETTERS = ["C", "D", "E", "F", "G", "A", "B"] as const;
 const NATURAL_PC: Record<string, number> = {
@@ -113,6 +141,34 @@ const HINT_LEVEL_ORDER: HintLevel[] = [
   "quality",
   "answer",
 ];
+const ALL_FLASHCARD_MODES: FlashcardMode[] = [
+  "familyRootToNotes",
+  "familyNotesToQuality",
+  "familyRootToSymbol",
+  "diatonicDegreeToChord",
+  "diatonicChordToDegree",
+  "diatonicDegreeToNotes",
+];
+const FLASHCARD_MODE_LABELS: Record<FlashcardMode, string> = {
+  familyRootToNotes: "Familia -> notas",
+  familyNotesToQuality: "Notas -> calidad",
+  familyRootToSymbol: "Raíz + familia -> símbolo",
+  diatonicDegreeToChord: "Grado -> acorde",
+  diatonicChordToDegree: "Acorde -> grado",
+  diatonicDegreeToNotes: "Grado -> notas",
+};
+const FAMILY_FORMULAS: Record<ExtensionQuality, string> = {
+  major: "1 - 3 - 5",
+  minor: "1 - b3 - 5",
+  diminished: "1 - b3 - b5",
+  augmented: "1 - 3 - #5",
+};
+const FAMILY_LABELS: Record<ExtensionQuality, string> = {
+  major: "Mayor",
+  minor: "Menor",
+  diminished: "Disminuida",
+  augmented: "Aumentada",
+};
 const MAJOR_KEY_OPTIONS: MajorKeyOption[] = [
   { root: "C", label: "C major" },
   { root: "G", label: "G major" },
@@ -368,6 +424,193 @@ function hintTextForRow(row: DiatonicDegreeRow, level: HintLevel) {
   return `Respuesta completa: ${row.stackNotes.join(" - ")} · ${row.quality} · ${row.symbol}.`;
 }
 
+function shuffleArray<T>(items: T[]) {
+  const clone = [...items];
+  for (let index = clone.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [clone[index], clone[randomIndex]] = [clone[randomIndex], clone[index]];
+  }
+  return clone;
+}
+
+function pickRandom<T>(items: T[]) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function buildChoiceOptions(correct: string, pool: string[], size = 4) {
+  const distractors = shuffleArray(
+    Array.from(new Set(pool.filter((item) => item !== correct))),
+  ).slice(0, Math.max(0, size - 1));
+  return shuffleArray([correct, ...distractors]);
+}
+
+function expectedNotesText(notes: string[]) {
+  return notes.join(" - ");
+}
+
+function checkChoiceAnswer(input: string, expected: string) {
+  return normalizeText(input) === normalizeText(expected);
+}
+
+function buildFlashcard(
+  diatonicRows: DiatonicDegreeRow[],
+  scaleNotes: string[],
+  familyRows: FamilyTriadRow[],
+  selectedKey: string,
+  extensionQuality: ExtensionQuality,
+  modes: FlashcardMode[],
+): FlashcardCard {
+  const enabledModes = modes.length ? modes : ALL_FLASHCARD_MODES;
+  const mode = pickRandom(enabledModes);
+  const familyRow = pickRandom(familyRows);
+  const diatonicRow = pickRandom(diatonicRows);
+  const qualityPattern = DIATONIC_ROMAN_NUMERALS.map(
+    (degree, index) => `${degree} ${DIATONIC_QUALITIES[index]}`,
+  ).join(" · ");
+
+  if (mode === "familyRootToNotes") {
+    return {
+      id: `${mode}-${extensionQuality}-${familyRow.root}`,
+      mode,
+      contextLabel: `Familia ${FAMILY_LABELS[extensionQuality]}`,
+      prompt: `Escribe las notas de ${familyRow.symbol}.`,
+      answerKind: "notes",
+      answerNotes: familyRow.notes,
+      answerLines: [
+        `${familyRow.symbol} = ${expectedNotesText(familyRow.notes)}`,
+        `Calidad: ${familyRow.qualityLabel}.`,
+      ],
+      tipTitle: "Tip de familia",
+      tipLines: [
+        `La fórmula activa es ${FAMILY_FORMULAS[extensionQuality]}.`,
+        `Parte desde ${familyRow.root} y apila terceras.`,
+        `Símbolo esperado: ${familyRow.symbol}.`,
+      ],
+    };
+  }
+
+  if (mode === "familyNotesToQuality") {
+    return {
+      id: `${mode}-${extensionQuality}-${familyRow.root}`,
+      mode,
+      contextLabel: `Familia ${FAMILY_LABELS[extensionQuality]}`,
+      prompt: `¿Qué calidad tiene ${expectedNotesText(familyRow.notes)}?`,
+      answerKind: "choice",
+      answerChoice: familyRow.qualityLabel,
+      options: buildChoiceOptions(familyRow.qualityLabel, Object.values(FAMILY_LABELS)),
+      answerLines: [
+        `${expectedNotesText(familyRow.notes)} = ${familyRow.qualityLabel}.`,
+        `Símbolo: ${familyRow.symbol}.`,
+      ],
+      tipTitle: "Tip de fórmula",
+      tipLines: [
+        "Mayor = 1-3-5.",
+        "Menor = 1-b3-5.",
+        "Aumentada = 1-3-#5.",
+        "Disminuida = 1-b3-b5.",
+      ],
+    };
+  }
+
+  if (mode === "familyRootToSymbol") {
+    const symbolPool = [
+      triadSymbol(familyRow.root, "major"),
+      triadSymbol(familyRow.root, "minor"),
+      triadSymbol(familyRow.root, "augmented"),
+      triadSymbol(familyRow.root, "diminished"),
+    ];
+
+    return {
+      id: `${mode}-${extensionQuality}-${familyRow.root}`,
+      mode,
+      contextLabel: `Familia ${FAMILY_LABELS[extensionQuality]}`,
+      prompt: `¿Cuál es el símbolo correcto para la tríada ${familyRow.qualityLabel.toLowerCase()} de ${familyRow.root}?`,
+      answerKind: "choice",
+      answerChoice: familyRow.symbol,
+      options: buildChoiceOptions(familyRow.symbol, symbolPool),
+      answerLines: [
+        `La respuesta correcta es ${familyRow.symbol}.`,
+        `Notas: ${expectedNotesText(familyRow.notes)}.`,
+      ],
+      tipTitle: "Tip de símbolo",
+      tipLines: [
+        "Mayor no lleva sufijo.",
+        "Menor usa m.",
+        "Aumentada usa +.",
+        "Disminuida usa °.",
+      ],
+    };
+  }
+
+  if (mode === "diatonicDegreeToChord") {
+    return {
+      id: `${mode}-${selectedKey}-${diatonicRow.degreeRoman}`,
+      mode,
+      contextLabel: `${selectedKey} major`,
+      prompt: `En ${selectedKey} major, ¿qué acorde corresponde a ${diatonicRow.degreeRoman}?`,
+      answerKind: "choice",
+      answerChoice: diatonicRow.symbol,
+      options: buildChoiceOptions(
+        diatonicRow.symbol,
+        diatonicRows.map((row) => row.symbol),
+      ),
+      answerLines: [
+        `${diatonicRow.degreeRoman} = ${diatonicRow.symbol}.`,
+        `Notas: ${expectedNotesText(diatonicRow.stackNotes)}.`,
+      ],
+      tipTitle: "Tip diatónico",
+      tipLines: [
+        `Patrón fijo del modo mayor: ${qualityPattern}.`,
+        `Escala actual: ${scaleNotes.join(" - ")}.`,
+      ],
+    };
+  }
+
+  if (mode === "diatonicChordToDegree") {
+    return {
+      id: `${mode}-${selectedKey}-${diatonicRow.degreeRoman}`,
+      mode,
+      contextLabel: `${selectedKey} major`,
+      prompt: `En ${selectedKey} major, ${diatonicRow.symbol} es qué grado?`,
+      answerKind: "choice",
+      answerChoice: diatonicRow.degreeRoman,
+      options: buildChoiceOptions(
+        diatonicRow.degreeRoman,
+        DIATONIC_ROMAN_NUMERALS as unknown as string[],
+        5,
+      ),
+      answerLines: [
+        `${diatonicRow.symbol} es ${diatonicRow.degreeRoman}.`,
+        `Notas: ${expectedNotesText(diatonicRow.stackNotes)}.`,
+      ],
+      tipTitle: "Tip diatónico",
+      tipLines: [
+        `Empieza por la escala: ${scaleNotes.join(" - ")}.`,
+        `Luego aplica el patrón ${qualityPattern}.`,
+      ],
+    };
+  }
+
+  return {
+    id: `${mode}-${selectedKey}-${diatonicRow.degreeRoman}`,
+    mode,
+    contextLabel: `${selectedKey} major`,
+    prompt: `En ${selectedKey} major, escribe las notas de ${diatonicRow.degreeRoman}.`,
+    answerKind: "notes",
+    answerNotes: diatonicRow.stackNotes,
+    answerLines: [
+      `${diatonicRow.degreeRoman} = ${expectedNotesText(diatonicRow.stackNotes)}.`,
+      `Símbolo: ${diatonicRow.symbol}.`,
+    ],
+    tipTitle: "Tip de 1-3-5",
+    tipLines: [
+      `Nota base: ${diatonicRow.rootNote}.`,
+      "Apila terceras diatónicas: 1-3-5.",
+      `Patrón del modo mayor: ${qualityPattern}.`,
+    ],
+  };
+}
+
 function TrebleChordPreview({ notes }: { notes: string[] }) {
   const holderRef = useRef<HTMLDivElement | null>(null);
   const holderId = useRef(
@@ -446,6 +689,30 @@ export default function MajorScaleChordTableStudy() {
   const [familyResultsByQuality, setFamilyResultsByQuality] = useState<
     Record<string, Record<string, PracticeCheck | null>>
   >({});
+  const [activeFlashcardModes, setActiveFlashcardModes] =
+    useState<FlashcardMode[]>(ALL_FLASHCARD_MODES);
+  const [flashcard, setFlashcard] = useState<FlashcardCard>(() =>
+    buildFlashcard(
+      buildDiatonicRows("C"),
+      buildMajorScale("C"),
+      buildFamilyTriads("major"),
+      "C",
+      "major",
+      ALL_FLASHCARD_MODES,
+    ),
+  );
+  const [flashcardInput, setFlashcardInput] = useState("");
+  const [flashcardChoice, setFlashcardChoice] = useState("");
+  const [flashcardResult, setFlashcardResult] = useState<FlashcardCheckResult | null>(
+    null,
+  );
+  const [flashcardRevealed, setFlashcardRevealed] = useState(false);
+  const [flashcardReviewQueue, setFlashcardReviewQueue] = useState<FlashcardCard[]>([]);
+  const [flashcardStats, setFlashcardStats] = useState({
+    seen: 0,
+    correct: 0,
+  });
+  const [showFlashcardTips, setShowFlashcardTips] = useState(true);
 
   useEffect(() => {
     try {
@@ -464,6 +731,9 @@ export default function MajorScaleChordTableStudy() {
       if (typeof saved.validateLabels === "boolean") {
         setValidateLabels(saved.validateLabels);
       }
+      if (typeof saved.showFlashcardTips === "boolean") {
+        setShowFlashcardTips(saved.showFlashcardTips);
+      }
       if (saved.answersByKey && typeof saved.answersByKey === "object") {
         setAnswersByKey(saved.answersByKey);
       }
@@ -475,6 +745,14 @@ export default function MajorScaleChordTableStudy() {
       }
       if (saved.hintLevelsByKey && typeof saved.hintLevelsByKey === "object") {
         setHintLevelsByKey(saved.hintLevelsByKey);
+      }
+      if (Array.isArray(saved.activeFlashcardModes)) {
+        const validModes = saved.activeFlashcardModes.filter((mode: string) =>
+          ALL_FLASHCARD_MODES.includes(mode as FlashcardMode),
+        );
+        if (validModes.length > 0) {
+          setActiveFlashcardModes(validModes as FlashcardMode[]);
+        }
       }
     } catch (error) {
       console.error("No se pudo cargar la práctica de armonización mayor", error);
@@ -489,17 +767,21 @@ export default function MajorScaleChordTableStudy() {
         practiceMode,
         showHints,
         validateLabels,
+        showFlashcardTips,
         answersByKey,
         familyAnswersByQuality,
         hintLevelsByKey,
+        activeFlashcardModes,
       }),
     );
   }, [
+    activeFlashcardModes,
     answersByKey,
     familyAnswersByQuality,
     hintLevelsByKey,
     practiceMode,
     selectedKey,
+    showFlashcardTips,
     showHints,
     validateLabels,
   ]);
@@ -678,6 +960,104 @@ export default function MajorScaleChordTableStudy() {
   const resolvedFamilyCount = extensionRows.filter(
     (row) => currentFamilyResult(row.root)?.overall,
   ).length;
+
+  useEffect(() => {
+    clearFlashcardAttempt();
+    setFlashcard(
+      buildFlashcard(
+        rows,
+        scaleNotes,
+        extensionRows,
+        selectedKey,
+        extensionQuality,
+        activeFlashcardModes,
+      ),
+    );
+  }, [activeFlashcardModes, extensionQuality, rows, scaleNotes, selectedKey, extensionRows]);
+
+  function clearFlashcardAttempt() {
+    setFlashcardInput("");
+    setFlashcardChoice("");
+    setFlashcardResult(null);
+    setFlashcardRevealed(false);
+  }
+
+  function toggleFlashcardMode(mode: FlashcardMode, checked: boolean) {
+    setActiveFlashcardModes((prev) => {
+      if (checked) {
+        return prev.includes(mode) ? prev : [...prev, mode];
+      }
+      const next = prev.filter((item) => item !== mode);
+      return next.length ? next : [mode];
+    });
+  }
+
+  function nextFlashcard() {
+    clearFlashcardAttempt();
+    setFlashcard((previous) => {
+      if (flashcardReviewQueue.length > 0) {
+        const [first, ...rest] = flashcardReviewQueue;
+        setFlashcardReviewQueue(rest);
+        return first;
+      }
+
+      let nextCard = buildFlashcard(
+        rows,
+        scaleNotes,
+        extensionRows,
+        selectedKey,
+        extensionQuality,
+        activeFlashcardModes,
+      );
+      if (previous.id === nextCard.id) {
+        nextCard = buildFlashcard(
+          rows,
+          scaleNotes,
+          extensionRows,
+          selectedKey,
+          extensionQuality,
+          activeFlashcardModes,
+        );
+      }
+      return nextCard;
+    });
+  }
+
+  function checkFlashcard() {
+    if (flashcardResult) {
+      setFlashcardRevealed(true);
+      return flashcardResult;
+    }
+
+    const result =
+      flashcard.answerKind === "notes"
+        ? checkNotesAnswer(flashcardInput, flashcard.answerNotes || [])
+        : checkChoiceAnswer(flashcardChoice, flashcard.answerChoice || "");
+    const expected =
+      flashcard.answerKind === "notes"
+        ? expectedNotesText(flashcard.answerNotes || [])
+        : flashcard.answerChoice || "";
+    const finalResult = { isCorrect: result, expected };
+
+    setFlashcardResult(finalResult);
+    setFlashcardRevealed(true);
+    setFlashcardStats((prev) => ({
+      seen: prev.seen + 1,
+      correct: prev.correct + (result ? 1 : 0),
+    }));
+
+    return finalResult;
+  }
+
+  function submitFlashcardAssessment(level: "again" | "hard" | "easy") {
+    const lastResult = flashcardResult || checkFlashcard();
+    if (level === "again") {
+      setFlashcardReviewQueue((prev) => [...prev, flashcard, flashcard]);
+    } else if (level === "hard" || !lastResult.isCorrect) {
+      setFlashcardReviewQueue((prev) => [...prev, flashcard]);
+    }
+    nextFlashcard();
+  }
 
   return (
     <Box sx={{ width: "100%", px: { xs: 1.5, sm: 2.5 }, py: 3 }}>
@@ -972,6 +1352,202 @@ export default function MajorScaleChordTableStudy() {
                 })}
               </TableBody>
             </Table>
+          </Stack>
+        </Paper>
+
+        <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={2}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: { xs: "flex-start", md: "center" },
+                justifyContent: "space-between",
+                gap: 1.5,
+                flexDirection: { xs: "column", md: "row" },
+              }}
+            >
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  Práctica rápida: flashcards
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Mezcla tarjetas de familias y de acordes diatónicos para estudiar
+                  spelling, calidad, símbolo y grado.
+                </Typography>
+              </Box>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={showFlashcardTips}
+                      onChange={(event) => setShowFlashcardTips(event.target.checked)}
+                    />
+                  }
+                  label="Mostrar tips"
+                />
+                <Chip label={`Vistas: ${flashcardStats.seen}`} variant="outlined" />
+                <Chip
+                  label={`Correctas: ${flashcardStats.correct}`}
+                  color="success"
+                  variant="outlined"
+                />
+                <Chip
+                  label={`Repaso: ${flashcardReviewQueue.length}`}
+                  color="warning"
+                  variant="outlined"
+                />
+              </Stack>
+            </Box>
+
+            <FormGroup row>
+              {ALL_FLASHCARD_MODES.map((mode) => (
+                <FormControlLabel
+                  key={mode}
+                  control={
+                    <Checkbox
+                      checked={activeFlashcardModes.includes(mode)}
+                      onChange={(event) =>
+                        toggleFlashcardMode(mode, event.target.checked)
+                      }
+                    />
+                  }
+                  label={FLASHCARD_MODE_LABELS[mode]}
+                />
+              ))}
+            </FormGroup>
+
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Stack spacing={1.5}>
+                <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  spacing={1}
+                  justifyContent="space-between"
+                  alignItems={{ xs: "flex-start", md: "center" }}
+                >
+                  <Box>
+                    <Chip
+                      label={flashcard.contextLabel}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ mb: 1 }}
+                    />
+                    <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                      {flashcard.prompt}
+                    </Typography>
+                  </Box>
+                  <Button variant="outlined" startIcon={<Refresh />} onClick={nextFlashcard}>
+                    Otra
+                  </Button>
+                </Stack>
+
+                {flashcard.answerKind === "notes" ? (
+                  <TextField
+                    label="Tu respuesta"
+                    placeholder="Ej. C E G"
+                    fullWidth
+                    value={flashcardInput}
+                    onChange={(event) => setFlashcardInput(event.target.value)}
+                  />
+                ) : (
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {(flashcard.options || []).map((option) => (
+                      <Chip
+                        key={`${flashcard.id}-${option}`}
+                        label={option}
+                        clickable
+                        color={flashcardChoice === option ? "primary" : "default"}
+                        variant={flashcardChoice === option ? "filled" : "outlined"}
+                        onClick={() => setFlashcardChoice(option)}
+                      />
+                    ))}
+                  </Stack>
+                )}
+
+                {showFlashcardTips ? (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: "#f7fbff",
+                      borderColor: "rgba(21, 101, 192, 0.2)",
+                    }}
+                  >
+                    <Stack spacing={0.75}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                        {flashcard.tipTitle}
+                      </Typography>
+                      {flashcard.tipLines.map((line) => (
+                        <Typography key={`${flashcard.id}-${line}`} variant="body2">
+                          {line}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </Paper>
+                ) : null}
+
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Button variant="contained" onClick={checkFlashcard}>
+                    Comprobar
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setFlashcardRevealed(true);
+                      if (!flashcardResult) {
+                        setFlashcardResult({
+                          isCorrect: false,
+                          expected:
+                            flashcard.answerKind === "notes"
+                              ? expectedNotesText(flashcard.answerNotes || [])
+                              : flashcard.answerChoice || "",
+                        });
+                      }
+                    }}
+                  >
+                    Mostrar respuesta
+                  </Button>
+                </Stack>
+
+                {flashcardRevealed ? (
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      p: 1.5,
+                      borderColor: flashcardResult?.isCorrect ? "success.main" : "warning.main",
+                    }}
+                  >
+                    <Stack spacing={0.75}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <CheckCircleOutline
+                          color={flashcardResult?.isCorrect ? "success" : "warning"}
+                        />
+                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                          {flashcardResult?.isCorrect ? "Correcto" : "Respuesta mostrada"}
+                        </Typography>
+                      </Box>
+                      {flashcard.answerLines.map((line) => (
+                        <Typography key={`${flashcard.id}-answer-${line}`} variant="body2">
+                          {line}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </Paper>
+                ) : null}
+
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Button onClick={() => submitFlashcardAssessment("again")} color="warning">
+                    Again
+                  </Button>
+                  <Button onClick={() => submitFlashcardAssessment("hard")} color="secondary">
+                    Hard
+                  </Button>
+                  <Button onClick={() => submitFlashcardAssessment("easy")} color="success">
+                    Easy
+                  </Button>
+                </Stack>
+              </Stack>
+            </Paper>
           </Stack>
         </Paper>
 

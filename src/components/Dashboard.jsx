@@ -224,6 +224,19 @@ const EXERCISE_SECTIONS = [
         icon: LibraryMusic,
         iconColor: "#2e7d32",
       },
+      {
+        route: "/campo-armonico-septimas",
+        title: "Campo Armónico con Séptimas",
+        description:
+          "Resuelve a mano el campo armónico de escalas major y natural minor con acordes de 7a.",
+        buttonLabel: "Abrir Campo Armónico",
+        buttonSx: {
+          backgroundColor: "#6a1b9a",
+          "&:hover": { backgroundColor: "#4a148c" },
+        },
+        icon: LibraryMusic,
+        iconColor: "#6a1b9a",
+      },
     ],
   },
   {
