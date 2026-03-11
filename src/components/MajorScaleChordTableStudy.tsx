@@ -68,6 +68,13 @@ type DiatonicDegreeRow = {
   symbol: string;
 };
 
+type FamilyTriadRow = {
+  root: string;
+  notes: string[];
+  qualityLabel: string;
+  symbol: string;
+};
+
 const STORAGE_KEY = "dictados-react-major-scale-chord-table-study";
 const LETTERS = ["C", "D", "E", "F", "G", "A", "B"] as const;
 const NATURAL_PC: Record<string, number> = {
@@ -304,7 +311,7 @@ function buildDiatonicRows(root: string): DiatonicDegreeRow[] {
   });
 }
 
-function buildFamilyTriads(quality: ExtensionQuality) {
+function buildFamilyTriads(quality: ExtensionQuality): FamilyTriadRow[] {
   const semitoneFormulas: Record<ExtensionQuality, [number, number, number]> = {
     major: [0, 4, 7],
     minor: [0, 3, 7],
@@ -433,6 +440,12 @@ export default function MajorScaleChordTableStudy() {
   const [resultsByKey, setResultsByKey] = useState<
     Record<string, Record<string, PracticeCheck | null>>
   >({});
+  const [familyAnswersByQuality, setFamilyAnswersByQuality] = useState<
+    Record<string, Record<string, PracticeState>>
+  >({});
+  const [familyResultsByQuality, setFamilyResultsByQuality] = useState<
+    Record<string, Record<string, PracticeCheck | null>>
+  >({});
 
   useEffect(() => {
     try {
@@ -454,6 +467,12 @@ export default function MajorScaleChordTableStudy() {
       if (saved.answersByKey && typeof saved.answersByKey === "object") {
         setAnswersByKey(saved.answersByKey);
       }
+      if (
+        saved.familyAnswersByQuality &&
+        typeof saved.familyAnswersByQuality === "object"
+      ) {
+        setFamilyAnswersByQuality(saved.familyAnswersByQuality);
+      }
       if (saved.hintLevelsByKey && typeof saved.hintLevelsByKey === "object") {
         setHintLevelsByKey(saved.hintLevelsByKey);
       }
@@ -471,11 +490,13 @@ export default function MajorScaleChordTableStudy() {
         showHints,
         validateLabels,
         answersByKey,
+        familyAnswersByQuality,
         hintLevelsByKey,
       }),
     );
   }, [
     answersByKey,
+    familyAnswersByQuality,
     hintLevelsByKey,
     practiceMode,
     selectedKey,
@@ -500,6 +521,14 @@ export default function MajorScaleChordTableStudy() {
 
   function currentResult(rowKey: string) {
     return resultsByKey[selectedKey]?.[rowKey] || null;
+  }
+
+  function currentFamilyAnswer(rowKey: string) {
+    return familyAnswersByQuality[extensionQuality]?.[rowKey] || defaultPracticeState();
+  }
+
+  function currentFamilyResult(rowKey: string) {
+    return familyResultsByQuality[extensionQuality]?.[rowKey] || null;
   }
 
   function updateRowAnswer(
@@ -536,6 +565,30 @@ export default function MajorScaleChordTableStudy() {
     }));
   }
 
+  function updateFamilyAnswer(
+    rowKey: string,
+    field: keyof PracticeState,
+    value: string,
+  ) {
+    setFamilyAnswersByQuality((prev) => ({
+      ...prev,
+      [extensionQuality]: {
+        ...(prev[extensionQuality] || {}),
+        [rowKey]: {
+          ...currentFamilyAnswer(rowKey),
+          [field]: value,
+        },
+      },
+    }));
+    setFamilyResultsByQuality((prev) => ({
+      ...prev,
+      [extensionQuality]: {
+        ...(prev[extensionQuality] || {}),
+        [rowKey]: null,
+      },
+    }));
+  }
+
   function checkRow(row: DiatonicDegreeRow) {
     const rowKey = row.degreeRoman;
     const answer = currentAnswer(rowKey);
@@ -564,6 +617,35 @@ export default function MajorScaleChordTableStudy() {
     rows.forEach((row) => checkRow(row));
   }
 
+  function checkFamilyRow(row: FamilyTriadRow) {
+    const rowKey = row.root;
+    const answer = currentFamilyAnswer(rowKey);
+    const noteCheck = checkNotesAnswer(answer.notes, row.notes);
+    const qualityCheck =
+      normalizeText(answer.quality) === normalizeText(row.qualityLabel);
+    const symbolCheck = normalizeText(answer.symbol) === normalizeText(row.symbol);
+    const finalCheck = {
+      notes: noteCheck,
+      quality: qualityCheck,
+      symbol: symbolCheck,
+      overall: validateLabels
+        ? noteCheck && qualityCheck && symbolCheck
+        : noteCheck,
+    };
+
+    setFamilyResultsByQuality((prev) => ({
+      ...prev,
+      [extensionQuality]: {
+        ...(prev[extensionQuality] || {}),
+        [rowKey]: finalCheck,
+      },
+    }));
+  }
+
+  function checkAllFamilyRows() {
+    extensionRows.forEach((row) => checkFamilyRow(row));
+  }
+
   function clearCurrentKeyPractice() {
     setAnswersByKey((prev) => ({
       ...prev,
@@ -579,8 +661,22 @@ export default function MajorScaleChordTableStudy() {
     }));
   }
 
+  function clearCurrentFamilyPractice() {
+    setFamilyAnswersByQuality((prev) => ({
+      ...prev,
+      [extensionQuality]: {},
+    }));
+    setFamilyResultsByQuality((prev) => ({
+      ...prev,
+      [extensionQuality]: {},
+    }));
+  }
+
   const resolvedCount = rows.filter(
     (row) => currentResult(row.degreeRoman)?.overall,
+  ).length;
+  const resolvedFamilyCount = extensionRows.filter(
+    (row) => currentFamilyResult(row.root)?.overall,
   ).length;
 
   return (
@@ -634,7 +730,257 @@ export default function MajorScaleChordTableStudy() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <School color="primary" />
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Tabla guiada principal
+                Tabla guiada principal: 7 acordes por familia
+              </Typography>
+            </Box>
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="extension-quality-label">Familia</InputLabel>
+                  <Select
+                    labelId="extension-quality-label"
+                    label="Familia"
+                    value={extensionQuality}
+                    onChange={(event) =>
+                      setExtensionQuality(event.target.value as ExtensionQuality)
+                    }
+                  >
+                    <MenuItem value="major">7 mayores</MenuItem>
+                    <MenuItem value="minor">7 menores</MenuItem>
+                    <MenuItem value="augmented">7 aumentadas</MenuItem>
+                    <MenuItem value="diminished">7 disminuidas</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Paper
+                  variant="outlined"
+                  sx={{ p: 1.5, height: "100%", backgroundColor: "#fafcff" }}
+                >
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                    Orden sugerido
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Primero 7 mayores, luego 7 menores, luego 7 aumentadas y al
+                    final 7 disminuidas.
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Paper
+                  variant="outlined"
+                  sx={{ p: 1.5, height: "100%", backgroundColor: "#fafcff" }}
+                >
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                    Fórmula activa
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {extensionRows.map((row) => (
+                      <Chip
+                        key={`${extensionQuality}-${row.root}`}
+                        label={row.symbol}
+                        variant="outlined"
+                      />
+                    ))}
+                  </Stack>
+                </Paper>
+              </Grid>
+            </Grid>
+
+            <Alert severity="info">
+              Aquí no estás armonizando una tonalidad. Aquí construyes una misma
+              familia de tríadas sobre `C D E F G A B`.
+            </Alert>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: { xs: "flex-start", md: "center" },
+                justifyContent: "space-between",
+                gap: 1.5,
+                flexDirection: { xs: "column", md: "row" },
+              }}
+            >
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={practiceMode}
+                      onChange={(event) => setPracticeMode(event.target.checked)}
+                    />
+                  }
+                  label="Modo práctica"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={validateLabels}
+                      onChange={(event) => setValidateLabels(event.target.checked)}
+                    />
+                  }
+                  label="Validar calidad y símbolo"
+                />
+              </Stack>
+              <Stack direction="row" spacing={1}>
+                <Chip
+                  label={`Correctas: ${resolvedFamilyCount}/7`}
+                  color={resolvedFamilyCount === 7 ? "success" : "default"}
+                  variant="outlined"
+                />
+                {practiceMode ? (
+                  <>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Refresh />}
+                      onClick={clearCurrentFamilyPractice}
+                    >
+                      Limpiar familia
+                    </Button>
+                    <Button variant="contained" onClick={checkAllFamilyRows}>
+                      Revisar familia
+                    </Button>
+                  </>
+                ) : null}
+              </Stack>
+            </Box>
+
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Raíz</TableCell>
+                  <TableCell>Notas</TableCell>
+                  <TableCell>Clave de Sol</TableCell>
+                  <TableCell>Calidad</TableCell>
+                  <TableCell>Símbolo</TableCell>
+                  <TableCell>Revisión</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {extensionRows.map((row) => {
+                  const rowKey = row.root;
+                  const answer = currentFamilyAnswer(rowKey);
+                  const result = currentFamilyResult(rowKey);
+                  const displayNotes = practiceMode
+                    ? parseAmericanNotes(answer.notes)
+                    : row.notes;
+
+                  return (
+                    <TableRow key={`${extensionQuality}-${row.root}`}>
+                      <TableCell sx={{ fontWeight: 700 }}>{row.root}</TableCell>
+                      <TableCell sx={{ minWidth: 220 }}>
+                        {practiceMode ? (
+                          <TextField
+                            size="small"
+                            fullWidth
+                            placeholder="Ej. C E G"
+                            value={answer.notes}
+                            onChange={(event) =>
+                              updateFamilyAnswer(rowKey, "notes", event.target.value)
+                            }
+                          />
+                        ) : (
+                          row.notes.join(" - ")
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ minWidth: 230 }}>
+                        {displayNotes.length > 0 ? (
+                          <TrebleChordPreview notes={displayNotes} />
+                        ) : (
+                          <Typography variant="caption" color="text.secondary">
+                            Escribe notas para ver el diagrama
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ minWidth: 170 }}>
+                        {practiceMode ? (
+                          <TextField
+                            size="small"
+                            fullWidth
+                            disabled={!validateLabels}
+                            placeholder={row.qualityLabel}
+                            value={answer.quality}
+                            onChange={(event) =>
+                              updateFamilyAnswer(rowKey, "quality", event.target.value)
+                            }
+                          />
+                        ) : (
+                          row.qualityLabel
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ minWidth: 140 }}>
+                        {practiceMode ? (
+                          <TextField
+                            size="small"
+                            fullWidth
+                            disabled={!validateLabels}
+                            placeholder={row.symbol}
+                            value={answer.symbol}
+                            onChange={(event) =>
+                              updateFamilyAnswer(rowKey, "symbol", event.target.value)
+                            }
+                          />
+                        ) : (
+                          row.symbol
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ minWidth: 220 }}>
+                        {practiceMode ? (
+                          <Stack spacing={1}>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => checkFamilyRow(row)}
+                            >
+                              Revisar fila
+                            </Button>
+                            {result ? (
+                              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                <Chip
+                                  size="small"
+                                  label={result.notes ? "Notas OK" : "Notas pendientes"}
+                                  color={result.notes ? "success" : "warning"}
+                                  variant={result.notes ? "filled" : "outlined"}
+                                />
+                                {validateLabels ? (
+                                  <>
+                                    <Chip
+                                      size="small"
+                                      label={result.quality ? "Calidad OK" : "Calidad pendiente"}
+                                      color={result.quality ? "success" : "warning"}
+                                      variant={result.quality ? "filled" : "outlined"}
+                                    />
+                                    <Chip
+                                      size="small"
+                                      label={result.symbol ? "Símbolo OK" : "Símbolo pendiente"}
+                                      color={result.symbol ? "success" : "warning"}
+                                      variant={result.symbol ? "filled" : "outlined"}
+                                    />
+                                  </>
+                                ) : null}
+                              </Stack>
+                            ) : null}
+                          </Stack>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            Tabla resuelta
+                          </Typography>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Stack>
+        </Paper>
+
+        <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={2}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <School color="primary" />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Referencia extra: acordes diatónicos por tonalidad
               </Typography>
             </Box>
 
@@ -915,70 +1261,14 @@ export default function MajorScaleChordTableStudy() {
               Pistas opcionales
             </Typography>
             <Typography variant="body2">
-              Las pistas avanzan por fila en este orden: nota base, apilar 1-3-5,
-              calidad, respuesta completa. Si quieres estudiar de verdad, deja las
-              pistas apagadas y sólo actívalas cuando te bloquees.
+              Usa primero la tabla de familias para construir los 28 acordes. La
+              tabla por tonalidad queda como apoyo aparte para entender por qué en
+              `C major` solo aparecen mayores, menores y un disminuido.
             </Typography>
             <Alert severity="info">
-              Regla rápida para revisar mentalmente: en la escala mayor las
-              tríadas salen siempre I mayor, ii menor, iii menor, IV mayor, V
-              mayor, vi menor, vii disminuido.
-            </Alert>
-          </Stack>
-        </Paper>
-
-        <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-          <Stack spacing={2}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              Extra: 7 tríadas por familia sobre notas naturales
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Esta parte es referencia separada. No es la misma tarea que armonizar
-              el modo mayor; sirve para practicar cómo se forman mayores, menores,
-              disminuidas y aumentadas desde C-D-E-F-G-A-B.
-            </Typography>
-
-            <FormControl size="small" sx={{ maxWidth: 260 }}>
-              <InputLabel id="extension-quality-label">Familia</InputLabel>
-              <Select
-                labelId="extension-quality-label"
-                label="Familia"
-                value={extensionQuality}
-                onChange={(event) =>
-                  setExtensionQuality(event.target.value as ExtensionQuality)
-                }
-              >
-                <MenuItem value="major">Mayores</MenuItem>
-                <MenuItem value="minor">Menores</MenuItem>
-                <MenuItem value="diminished">Disminuidas</MenuItem>
-                <MenuItem value="augmented">Aumentadas</MenuItem>
-              </Select>
-            </FormControl>
-
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Raíz</TableCell>
-                  <TableCell>Notas</TableCell>
-                  <TableCell>Símbolo</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {extensionRows.map((row) => (
-                    <TableRow key={`${extensionQuality}-${row.root}`}>
-                    <TableCell>{formatNote(row.root)}</TableCell>
-                    <TableCell>
-                      {row.notes.map(formatNote).join(" - ")}
-                    </TableCell>
-                    <TableCell>{row.symbol}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
-            <Alert severity="success" icon={<CheckCircleOutline />}>
-              Ejercicio sugerido: primero memoriza C major completo, luego cambia
-              a G major y F major para acostumbrarte a sostenidos y bemoles.
+              Regla rápida: la tarea de familias no depende de una tonalidad fija.
+              La tarea por tonalidad saca los acordes diatónicos de una escala
+              concreta.
             </Alert>
           </Stack>
         </Paper>
