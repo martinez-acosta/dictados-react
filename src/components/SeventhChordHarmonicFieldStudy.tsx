@@ -17,6 +17,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   TextField,
@@ -376,6 +377,19 @@ function hintTextForRow(row: SeventhChordRow, mode: ScaleMode, scaleNotes: strin
   return `Respuesta completa: ${row.stackNotes.join(" - ")} · ${row.qualityLabel} · ${row.symbol}. Escala: ${scaleNotes.join(" - ")}.`;
 }
 
+function qualityReasonText(qualityId: SeventhQualityId) {
+  if (qualityId === "maj7") {
+    return "3ra mayor + 5ta justa + 7ma mayor = 1 - 3 - 5 - 7";
+  }
+  if (qualityId === "m7") {
+    return "3ra menor + 5ta justa + 7ma menor = 1 - b3 - 5 - b7";
+  }
+  if (qualityId === "7") {
+    return "3ra mayor + 5ta justa + 7ma menor = 1 - 3 - 5 - b7";
+  }
+  return "3ra menor + 5ta disminuida + 7ma menor = 1 - b3 - b5 - b7";
+}
+
 function TrebleChordPreview({ notes }: { notes: string[] }) {
   const holderRef = useRef<HTMLDivElement | null>(null);
   const holderId = useRef(
@@ -631,7 +645,7 @@ export default function SeventhChordHarmonicFieldStudy() {
 
   return (
     <Box sx={{ width: "100%", px: { xs: 1.5, sm: 2.5 }, py: 3 }}>
-      <Stack spacing={2.5} maxWidth="1320px" mx="auto">
+      <Stack spacing={2.5} maxWidth="1760px" mx="auto">
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <Button
             variant="outlined"
@@ -990,171 +1004,197 @@ export default function SeventhChordHarmonicFieldStudy() {
               </Stack>
             </Box>
 
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Grado</TableCell>
-                  <TableCell>Nota base</TableCell>
-                  <TableCell>1-3-5-7</TableCell>
-                  <TableCell>Notas del acorde</TableCell>
-                  <TableCell>Clave de Sol</TableCell>
-                  <TableCell>Calidad</TableCell>
-                  <TableCell>Símbolo</TableCell>
-                  <TableCell>Pistas / revisión</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => {
-                  const rowKey = row.degreeRoman;
-                  const answer = currentAnswer(rowKey);
-                  const result = currentResult(rowKey);
-                  const hintLevel = currentHintLevel(rowKey);
-                  const displayNotes = practiceMode
-                    ? parseAmericanNotes(answer.notes)
-                    : row.stackNotes;
+            <TableContainer
+              sx={{
+                width: "100%",
+                overflowX: "auto",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 1,
+              }}
+            >
+              <Table size="small" sx={{ minWidth: 1650 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Grado</TableCell>
+                    <TableCell>Nota base</TableCell>
+                    <TableCell>1-3-5-7</TableCell>
+                    <TableCell>Notas del acorde</TableCell>
+                    <TableCell>Clave de Sol</TableCell>
+                    <TableCell>Calidad</TableCell>
+                    <TableCell>Por qué</TableCell>
+                    <TableCell>Símbolo</TableCell>
+                    <TableCell>Pistas / revisión</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => {
+                    const rowKey = row.degreeRoman;
+                    const answer = currentAnswer(rowKey);
+                    const result = currentResult(rowKey);
+                    const hintLevel = currentHintLevel(rowKey);
+                    const displayNotes = practiceMode
+                      ? parseAmericanNotes(answer.notes)
+                      : row.stackNotes;
 
-                  return (
-                    <TableRow key={`${configKey}-${rowKey}`}>
-                      <TableCell sx={{ fontWeight: 700 }}>{row.degreeRoman}</TableCell>
-                      <TableCell>{row.rootNote}</TableCell>
-                      <TableCell>
-                        {!practiceMode
-                          ? row.stackNotes.join(" - ")
-                          : showHints &&
-                              (hintLevel === "stack" ||
-                                hintLevel === "quality" ||
-                                hintLevel === "answer")
-                          ? row.stackNotes.join(" - ")
-                          : row.stackFormula}
-                      </TableCell>
-                      <TableCell sx={{ minWidth: 240 }}>
-                        {practiceMode ? (
-                          <TextField
-                            size="small"
-                            fullWidth
-                            placeholder="Ej. C E G B"
-                            value={answer.notes}
-                            onChange={(event) =>
-                              updateRowAnswer(rowKey, "notes", event.target.value)
-                            }
-                          />
-                        ) : (
-                          row.stackNotes.join(" - ")
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ minWidth: 260 }}>
-                        {displayNotes.length > 0 ? (
-                          <TrebleChordPreview notes={displayNotes} />
-                        ) : (
-                          <Typography variant="caption" color="text.secondary">
-                            Escribe notas para ver el acorde
+                    return (
+                      <TableRow key={`${configKey}-${rowKey}`}>
+                        <TableCell sx={{ fontWeight: 700, verticalAlign: "top" }}>
+                          {row.degreeRoman}
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: "top" }}>{row.rootNote}</TableCell>
+                        <TableCell sx={{ verticalAlign: "top", whiteSpace: "nowrap" }}>
+                          {!practiceMode
+                            ? row.stackNotes.join(" - ")
+                            : showHints &&
+                                (hintLevel === "stack" ||
+                                  hintLevel === "quality" ||
+                                  hintLevel === "answer")
+                            ? row.stackNotes.join(" - ")
+                            : row.stackFormula}
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 220, verticalAlign: "top" }}>
+                          {practiceMode ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              placeholder="Ej. C E G B"
+                              value={answer.notes}
+                              onChange={(event) =>
+                                updateRowAnswer(rowKey, "notes", event.target.value)
+                              }
+                            />
+                          ) : (
+                            row.stackNotes.join(" - ")
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 240, verticalAlign: "top" }}>
+                          {displayNotes.length > 0 ? (
+                            <TrebleChordPreview notes={displayNotes} />
+                          ) : (
+                            <Typography variant="caption" color="text.secondary">
+                              Escribe notas para ver el acorde
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 170, verticalAlign: "top" }}>
+                          {practiceMode ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              disabled={!validateLabels}
+                              placeholder={row.qualityLabel}
+                              value={answer.quality}
+                              onChange={(event) =>
+                                updateRowAnswer(rowKey, "quality", event.target.value)
+                              }
+                            />
+                          ) : (
+                            row.qualityLabel
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 240, verticalAlign: "top" }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ whiteSpace: "normal" }}
+                          >
+                            {qualityReasonText(row.qualityId)}
                           </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ minWidth: 180 }}>
-                        {practiceMode ? (
-                          <TextField
-                            size="small"
-                            fullWidth
-                            disabled={!validateLabels}
-                            placeholder={row.qualityLabel}
-                            value={answer.quality}
-                            onChange={(event) =>
-                              updateRowAnswer(rowKey, "quality", event.target.value)
-                            }
-                          />
-                        ) : (
-                          row.qualityLabel
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ minWidth: 150 }}>
-                        {practiceMode ? (
-                          <TextField
-                            size="small"
-                            fullWidth
-                            disabled={!validateLabels}
-                            placeholder={row.symbol}
-                            value={answer.symbol}
-                            onChange={(event) =>
-                              updateRowAnswer(rowKey, "symbol", event.target.value)
-                            }
-                          />
-                        ) : (
-                          row.symbol
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ minWidth: 310 }}>
-                        {practiceMode ? (
-                          <Stack spacing={1}>
-                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                              {showHints ? (
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 140, verticalAlign: "top" }}>
+                          {practiceMode ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              disabled={!validateLabels}
+                              placeholder={row.symbol}
+                              value={answer.symbol}
+                              onChange={(event) =>
+                                updateRowAnswer(rowKey, "symbol", event.target.value)
+                              }
+                            />
+                          ) : (
+                            row.symbol
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 300, verticalAlign: "top" }}>
+                          {practiceMode ? (
+                            <Stack spacing={1}>
+                              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                {showHints ? (
+                                  <Button
+                                    variant="outlined"
+                                    size="small"
+                                    startIcon={<LightbulbOutlined />}
+                                    onClick={() => revealNextHint(rowKey)}
+                                  >
+                                    Siguiente pista
+                                  </Button>
+                                ) : null}
                                 <Button
                                   variant="outlined"
                                   size="small"
-                                  startIcon={<LightbulbOutlined />}
-                                  onClick={() => revealNextHint(rowKey)}
+                                  onClick={() => checkRow(row)}
                                 >
-                                  Siguiente pista
+                                  Revisar fila
                                 </Button>
-                              ) : null}
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                onClick={() => checkRow(row)}
-                              >
-                                Revisar fila
-                              </Button>
-                            </Stack>
-
-                            {showHints ? (
-                              <Typography variant="caption" color="text.secondary">
-                                {hintTextForRow(row, scaleMode, scaleNotes, hintLevel)}
-                              </Typography>
-                            ) : null}
-
-                            {result ? (
-                              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                                <Chip
-                                  size="small"
-                                  label={result.notes ? "Notas OK" : "Notas pendientes"}
-                                  color={result.notes ? "success" : "warning"}
-                                  variant={result.notes ? "filled" : "outlined"}
-                                />
-                                {validateLabels ? (
-                                  <>
-                                    <Chip
-                                      size="small"
-                                      label={result.quality ? "Calidad OK" : "Calidad pendiente"}
-                                      color={result.quality ? "success" : "warning"}
-                                      variant={result.quality ? "filled" : "outlined"}
-                                    />
-                                    <Chip
-                                      size="small"
-                                      label={result.symbol ? "Símbolo OK" : "Símbolo pendiente"}
-                                      color={result.symbol ? "success" : "warning"}
-                                      variant={result.symbol ? "filled" : "outlined"}
-                                    />
-                                  </>
-                                ) : null}
-                                <Chip
-                                  size="small"
-                                  label={result.overall ? "Fila correcta" : "Revisa esta fila"}
-                                  color={result.overall ? "success" : "warning"}
-                                />
                               </Stack>
-                            ) : null}
-                          </Stack>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary">
-                            Tabla resuelta
-                          </Typography>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+
+                              {showHints ? (
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ whiteSpace: "normal" }}
+                                >
+                                  {hintTextForRow(row, scaleMode, scaleNotes, hintLevel)}
+                                </Typography>
+                              ) : null}
+
+                              {result ? (
+                                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                  <Chip
+                                    size="small"
+                                    label={result.notes ? "Notas OK" : "Notas pendientes"}
+                                    color={result.notes ? "success" : "warning"}
+                                    variant={result.notes ? "filled" : "outlined"}
+                                  />
+                                  {validateLabels ? (
+                                    <>
+                                      <Chip
+                                        size="small"
+                                        label={result.quality ? "Calidad OK" : "Calidad pendiente"}
+                                        color={result.quality ? "success" : "warning"}
+                                        variant={result.quality ? "filled" : "outlined"}
+                                      />
+                                      <Chip
+                                        size="small"
+                                        label={result.symbol ? "Símbolo OK" : "Símbolo pendiente"}
+                                        color={result.symbol ? "success" : "warning"}
+                                        variant={result.symbol ? "filled" : "outlined"}
+                                      />
+                                    </>
+                                  ) : null}
+                                  <Chip
+                                    size="small"
+                                    label={result.overall ? "Fila correcta" : "Revisa esta fila"}
+                                    color={result.overall ? "success" : "warning"}
+                                  />
+                                </Stack>
+                              ) : null}
+                            </Stack>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              Tabla resuelta
+                            </Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Stack>
         </Paper>
 
