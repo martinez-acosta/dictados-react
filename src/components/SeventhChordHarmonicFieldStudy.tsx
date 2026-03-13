@@ -390,6 +390,26 @@ function qualityReasonText(qualityId: SeventhQualityId) {
   return "3ra menor + 5ta disminuida + 7ma menor = 1 - b3 - b5 - b7";
 }
 
+function degreeMeaningText(row: SeventhChordRow) {
+  const ordinalLabels = [
+    "primer",
+    "segundo",
+    "tercer",
+    "cuarto",
+    "quinto",
+    "sexto",
+    "séptimo",
+  ];
+  const qualityMeaning: Record<SeventhQualityId, string> = {
+    maj7: "con séptima mayor",
+    m7: "menor séptima",
+    "7": "dominante",
+    m7b5: "semidisminuido",
+  };
+
+  return `${ordinalLabels[row.degreeNumber - 1]} grado ${qualityMeaning[row.qualityId]}`;
+}
+
 function TrebleChordPreview({ notes }: { notes: string[] }) {
   const holderRef = useRef<HTMLDivElement | null>(null);
   const holderId = useRef(
@@ -760,6 +780,64 @@ export default function SeventhChordHarmonicFieldStudy() {
               séptima. En otras palabras: miras qué tercera tiene, qué quinta
               tiene y qué séptima tiene.
             </Typography>
+            <Typography variant="body2">
+              Piensa así: tomas la raíz como punto de partida y comparas las
+              demás notas contra ella. Si la tercera está alta, es tercera
+              mayor. Si está un semitono abajo de esa posición, es tercera
+              menor. Lo mismo con la séptima: `7` es séptima mayor y `b7` es
+              séptima menor.
+            </Typography>
+            <Paper
+              variant="outlined"
+              sx={{ p: 1.5, backgroundColor: "#fafcff" }}
+            >
+              <Stack spacing={0.75}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                  Cómo leer la fórmula
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" sx={{ fontFamily: "monospace", fontWeight: 700 }}>
+                    1 - 3 - 5 - 7
+                  </Box>{" "}
+                  significa raíz, tercera mayor, quinta justa y séptima mayor.
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" sx={{ fontFamily: "monospace", fontWeight: 700 }}>
+                    1 - b3 - 5 - b7
+                  </Box>{" "}
+                  significa que la tercera y la séptima están bajadas medio tono
+                  respecto a la versión mayor.
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" sx={{ fontFamily: "monospace", fontWeight: 700 }}>
+                    1 - 3 - 5 - b7
+                  </Box>{" "}
+                  conserva la tercera mayor, pero la séptima ya es menor.
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" sx={{ fontFamily: "monospace", fontWeight: 700 }}>
+                    1 - b3 - b5 - b7
+                  </Box>{" "}
+                  baja tercera, quinta y séptima.
+                </Typography>
+              </Stack>
+            </Paper>
+            <Alert severity="warning">
+              La dominante es el acorde `7`, no `maj7`. Se llama dominante
+              porque en el campo armónico mayor aparece naturalmente sobre el
+              quinto grado. En `C major`, el quinto grado es `G`, y al apilar
+              1-3-5-7 sale `G - B - D - F`: tercera mayor, quinta justa y
+              séptima menor. Por eso es `G7`, no `Gmaj7`.
+            </Alert>
+            <Typography variant="body2">
+              Entonces la diferencia clave entre `maj7` y `7` está solo en la
+              séptima:
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <Chip label="maj7 = 3ra mayor + 7ma mayor" variant="outlined" />
+              <Chip label="7 = 3ra mayor + 7ma menor" variant="outlined" />
+              <Chip label="m7 = 3ra menor + 7ma menor" variant="outlined" />
+            </Stack>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6} lg={3}>
                 <Paper variant="outlined" sx={{ p: 1.5, height: "100%" }}>
@@ -1013,10 +1091,11 @@ export default function SeventhChordHarmonicFieldStudy() {
                 borderRadius: 1,
               }}
             >
-              <Table size="small" sx={{ minWidth: 1650 }}>
+              <Table size="small" sx={{ minWidth: 1820 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Grado</TableCell>
+                    <TableCell>Qué significa</TableCell>
                     <TableCell>Nota base</TableCell>
                     <TableCell>1-3-5-7</TableCell>
                     <TableCell>Notas del acorde</TableCell>
@@ -1041,6 +1120,15 @@ export default function SeventhChordHarmonicFieldStudy() {
                       <TableRow key={`${configKey}-${rowKey}`}>
                         <TableCell sx={{ fontWeight: 700, verticalAlign: "top" }}>
                           {row.degreeRoman}
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 210, verticalAlign: "top" }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ whiteSpace: "normal" }}
+                          >
+                            {degreeMeaningText(row)}
+                          </Typography>
                         </TableCell>
                         <TableCell sx={{ verticalAlign: "top" }}>{row.rootNote}</TableCell>
                         <TableCell sx={{ verticalAlign: "top", whiteSpace: "nowrap" }}>
