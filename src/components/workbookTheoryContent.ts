@@ -50,6 +50,8 @@ export type WorkbookChapter = {
   title: string;
   summary: string;
   objective: string;
+  studyFlow: string[];
+  memoryHooks: string[];
   sections: WorkbookSection[];
   commonMistakes: string[];
   reviewSummary: string[];
@@ -64,6 +66,16 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Base para nombrar distancias entre notas, leer formulas y entender acordes y escalas.",
     objective:
       "Reconocer como se cuenta un intervalo y diferenciar cantidad numerica y calidad.",
+    studyFlow: [
+      "Primero saca el numero contando letras, no semitonos.",
+      "Despues identifica si la referencia base es mayor o justa.",
+      "Por ultimo corrige con b, #, aumentado o disminuido si la distancia real cambio.",
+    ],
+    memoryHooks: [
+      "2a, 3a, 6a y 7a se comparan contra mayor o menor.",
+      "4a, 5a y 8a se comparan contra justo, aumentado o disminuido.",
+      "Si no sabes el numero, no puedes nombrar bien el intervalo.",
+    ],
     sections: [
       {
         title: "Que es un intervalo",
@@ -161,6 +173,16 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Acordes de tres notas construidos por terceras: raiz, tercera y quinta.",
     objective:
       "Construir triadas a mano y reconocer sus calidades por formula e intervalo.",
+    studyFlow: [
+      "Escribe la raiz y apila 3a y 5a por nombre de nota.",
+      "Revisa si la tercera es mayor o menor.",
+      "Revisa si la quinta quedo justa, disminuida o aumentada.",
+    ],
+    memoryHooks: [
+      "Mayor = 1-3-5",
+      "Menor = 1-b3-5",
+      "Disminuida y aumentada cambian la quinta",
+    ],
     sections: [
       {
         title: "Construccion basica",
@@ -250,6 +272,16 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Relacion entre una escala mayor y su menor relativa: comparten notas y armadura.",
     objective:
       "Encontrar la menor relativa desde el sexto grado y la mayor relativa desde el tercer grado de la menor.",
+    studyFlow: [
+      "Escribe la escala mayor completa.",
+      "Busca el sexto grado para hallar la menor relativa.",
+      "Comprueba que ambas escalas comparten exactamente las mismas notas.",
+    ],
+    memoryHooks: [
+      "Mayor -> 6o grado",
+      "Menor -> 3er grado",
+      "Relativas comparten notas; paralelas comparten tonica",
+    ],
     sections: [
       {
         title: "Idea central",
@@ -340,6 +372,16 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Reordenar un acorde sin cambiar su calidad, cambiando la nota que queda en el bajo.",
     objective:
       "Distinguir posicion fundamental e inversiones, y leer que grado queda abajo.",
+    studyFlow: [
+      "Identifica primero la calidad del acorde en posicion fundamental.",
+      "Mira que nota quedo en el bajo.",
+      "Traduce ese bajo a 1, 3, 5 o 7 para nombrar la inversion.",
+    ],
+    memoryHooks: [
+      "Invertir no cambia la calidad",
+      "El bajo decide la inversion",
+      "En cuatriadas existe 3a inversion",
+    ],
     sections: [
       {
         title: "Que cambia y que no cambia",
@@ -419,6 +461,16 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Construccion de los 7 acordes diatonicos de una escala mayor apilando terceras.",
     objective:
       "Resolver a mano el patron diatonico de triadas del modo mayor.",
+    studyFlow: [
+      "Escribe las 7 notas de la tonalidad.",
+      "Construye cada acorde con 1-3-5 sin salirte de la escala.",
+      "Al final compara el resultado con el patron I ii iii IV V vi vii°.",
+    ],
+    memoryHooks: [
+      "Mayor, menor, menor, Mayor, Mayor, menor, disminuido",
+      "El patron de calidad no cambia entre tonalidades mayores",
+      "Lo que cambia es el spelling",
+    ],
     sections: [
       {
         title: "El procedimiento",
@@ -436,6 +488,49 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
             type: "paragraph",
             text:
               "Si haces esto en C major, obtienes C, Dm, Em, F, G, Am y Bdim. Ese patron no es casual: sale de la forma interna de la escala mayor.",
+          },
+        ],
+      },
+      {
+        title: "Como sabes si es mayor, menor o disminuida",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Despues de construir 1-3-5, no basta con mirar las letras: tienes que revisar la distancia entre la raiz y la tercera, y luego entre la raiz y la quinta. Esa combinacion es la que define la calidad.",
+          },
+          {
+            type: "table",
+            columns: [
+              "Acorde",
+              "Notas",
+              "3ra desde la raiz",
+              "5ta desde la raiz",
+              "Calidad",
+            ],
+            rows: [
+              ["C", "C E G", "Mayor", "Justa", "Mayor"],
+              ["Dm", "D F A", "Menor", "Justa", "Menor"],
+              ["Em", "E G B", "Menor", "Justa", "Menor"],
+              ["F", "F A C", "Mayor", "Justa", "Mayor"],
+              ["G", "G B D", "Mayor", "Justa", "Mayor"],
+              ["Am", "A C E", "Menor", "Justa", "Menor"],
+              ["Bdim", "B D F", "Menor", "Disminuida", "Disminuida"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Entonces la regla practica es esta: si la tercera es mayor y la quinta es justa, el acorde es mayor. Si la tercera es menor y la quinta es justa, es menor. Si la tercera es menor y la quinta tambien se encoge, el acorde se vuelve disminuido.",
+          },
+          {
+            type: "example",
+            title: "Lectura paso a paso en C major",
+            lines: [
+              "I: C-E-G -> 3ra mayor + 5ta justa -> C mayor",
+              "ii: D-F-A -> 3ra menor + 5ta justa -> D menor",
+              "vii°: B-D-F -> 3ra menor + 5ta disminuida -> B disminuido",
+            ],
           },
         ],
       },
@@ -458,6 +553,11 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
               ["vi", "Menor", "Am"],
               ["vii°", "Disminuida", "Bdim"],
             ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Ese patron no se memoriza como algo magico: es el resumen de las calidades que acabas de sacar al apilar terceras dentro de la escala mayor. Primero lo construyes; despues lo memorizas para ir mas rapido.",
           },
         ],
       },
@@ -503,6 +603,16 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Version de cuatro notas del campo armonico, usando 1-3-5-7 y calidad de cuatriadas.",
     objective:
       "Distinguir grado, calidad y simbolo al construir acordes de septima en major y natural minor.",
+    studyFlow: [
+      "Separa siempre grado, calidad y simbolo.",
+      "Construye 1-3-5-7 dentro de la escala elegida.",
+      "Revisa si la septima es mayor o menor antes de escribir maj7 o 7.",
+    ],
+    memoryHooks: [
+      "maj7 = 1-3-5-7",
+      "7 = 1-3-5-b7",
+      "m7b5 = 1-b3-b5-b7",
+    ],
     sections: [
       {
         title: "Grado y calidad no son lo mismo",
@@ -605,6 +715,16 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Base visual para ubicar notas, claves, lineas adicionales y alteraciones.",
     objective:
       "Leer notas de forma mas segura en clave de Sol y de Fa, entendiendo la logica del pentagrama.",
+    studyFlow: [
+      "Fija una nota de referencia segura en la clave.",
+      "Cuenta lineas y espacios desde esa referencia.",
+      "Verifica armadura y alteraciones antes de cantar o tocar.",
+    ],
+    memoryHooks: [
+      "La clave cambia el mapa, no la musica",
+      "Primero clave, luego posicion, luego alteraciones",
+      "Leer rapido no es adivinar",
+    ],
     sections: [
       {
         title: "El pentagrama y las claves",

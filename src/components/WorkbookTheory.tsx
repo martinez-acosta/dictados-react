@@ -43,10 +43,79 @@ function defaultProgress(): WorkbookProgress {
   };
 }
 
+function chapterTheme(index: number) {
+  const themes = [
+    {
+      accent: "#1565c0",
+      soft: "linear-gradient(135deg, rgba(21,101,192,0.12), rgba(144,202,249,0.18))",
+      border: "rgba(21,101,192,0.22)",
+    },
+    {
+      accent: "#2e7d32",
+      soft: "linear-gradient(135deg, rgba(46,125,50,0.12), rgba(165,214,167,0.18))",
+      border: "rgba(46,125,50,0.22)",
+    },
+    {
+      accent: "#6a1b9a",
+      soft: "linear-gradient(135deg, rgba(106,27,154,0.12), rgba(206,147,216,0.18))",
+      border: "rgba(106,27,154,0.22)",
+    },
+    {
+      accent: "#ef6c00",
+      soft: "linear-gradient(135deg, rgba(239,108,0,0.12), rgba(255,204,128,0.22))",
+      border: "rgba(239,108,0,0.22)",
+    },
+  ];
+
+  return themes[index % themes.length];
+}
+
+function sectionAnchorId(chapterId: string, title: string) {
+  return `${chapterId}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+}
+
+function QuickPanel({
+  title,
+  items,
+  accent,
+}: {
+  title: string;
+  items: string[];
+  accent: string;
+}) {
+  return (
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 2,
+        height: "100%",
+        borderColor: accent,
+        background: `linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,252,255,0.95))`,
+      }}
+    >
+      <Stack spacing={1}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: accent }}>
+          {title}
+        </Typography>
+        {items.map((item) => (
+          <Typography key={item} variant="body2">
+            - {item}
+          </Typography>
+        ))}
+      </Stack>
+    </Paper>
+  );
+}
+
 function renderBlock(block: WorkbookSectionBlock) {
   if (block.type === "paragraph") {
     return (
-      <Typography key={block.text} variant="body1" color="text.primary">
+      <Typography
+        key={block.text}
+        variant="body1"
+        color="text.primary"
+        sx={{ lineHeight: 1.8 }}
+      >
         {block.text}
       </Typography>
     );
@@ -60,16 +129,29 @@ function renderBlock(block: WorkbookSectionBlock) {
             {block.title}
           </Typography>
         ) : null}
-        <List dense sx={{ py: 0 }}>
+        <Stack spacing={0.75}>
           {block.items.map((item) => (
-            <ListItemText
+            <Typography
               key={item}
-              primary={`- ${item}`}
-              primaryTypographyProps={{ variant: "body1", color: "text.primary" }}
-              sx={{ my: 0.25 }}
-            />
+              variant="body1"
+              sx={{ pl: 1.5, position: "relative", lineHeight: 1.75 }}
+            >
+              <Box
+                component="span"
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  color: "primary.main",
+                  fontWeight: 700,
+                }}
+              >
+                -
+              </Box>
+              {item}
+            </Typography>
           ))}
-        </List>
+        </Stack>
       </Stack>
     );
   }
@@ -81,8 +163,9 @@ function renderBlock(block: WorkbookSectionBlock) {
         variant="outlined"
         sx={{
           p: 2,
-          backgroundColor: "#f7fbff",
+          background: "linear-gradient(135deg, rgba(21,101,192,0.08), rgba(255,255,255,0.96))",
           borderColor: "rgba(21, 101, 192, 0.2)",
+          borderLeft: "4px solid #1565c0",
         }}
       >
         <Stack spacing={0.75}>
@@ -116,7 +199,12 @@ function renderBlock(block: WorkbookSectionBlock) {
         ) : null}
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           {block.items.map((item) => (
-            <Chip key={item} label={item} variant="outlined" />
+            <Chip
+              key={item}
+              label={item}
+              variant="outlined"
+              sx={{ backgroundColor: "rgba(255,255,255,0.7)" }}
+            />
           ))}
         </Stack>
       </Stack>
@@ -148,7 +236,7 @@ function renderBlock(block: WorkbookSectionBlock) {
               verticalAlign: "top",
             },
             "& th": {
-              backgroundColor: "#fafcff",
+              background: "linear-gradient(180deg, rgba(21,101,192,0.08), rgba(255,255,255,0.92))",
               fontWeight: 700,
             },
           }}
@@ -246,84 +334,179 @@ function WorkbookIndex({
 
   return (
     <Stack spacing={2.5}>
-      <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-        <Stack spacing={2}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <School color="primary" />
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>
-              Workbook de teoria
-            </Typography>
-          </Box>
-          <Typography variant="body1">
-            Este workbook funciona como cuaderno de consulta. Reune explicacion
-            teorica detallada, ejemplos concretos, errores comunes y checklist
-            final por tema.
-          </Typography>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            <Chip label={`${chapters.length} capitulos`} variant="outlined" />
-            <Chip
-              label={`Revisados: ${reviewedCount}/${chapters.length}`}
-              color={reviewedCount === chapters.length ? "success" : "default"}
-              variant="outlined"
-            />
-            {lastVisitedChapter ? (
-              <Chip
-                label={`Ultimo visto: ${lastVisitedChapter.title}`}
-                color="primary"
-                variant="outlined"
-              />
-            ) : null}
-          </Stack>
-          {lastVisitedChapter ? (
-            <Box>
-              <Button
-                variant="contained"
-                onClick={() => onOpenChapter(lastVisitedChapter.chapterId)}
+      <Paper
+        sx={{
+          p: { xs: 2.5, sm: 4 },
+          background:
+            "linear-gradient(135deg, rgba(11,42,80,0.96), rgba(21,101,192,0.88))",
+          color: "#fff",
+          overflow: "hidden",
+        }}
+      >
+        <Grid container spacing={2.5} alignItems="stretch">
+          <Grid item xs={12} md={8}>
+            <Stack spacing={2}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <MenuBook sx={{ color: "#fff" }} />
+                <Typography variant="overline" sx={{ letterSpacing: 1.6 }}>
+                  Consulta teorica
+                </Typography>
+              </Stack>
+              <Typography variant="h3" sx={{ fontWeight: 800, lineHeight: 1.1 }}>
+                Workbook de teoria musical
+              </Typography>
+              <Typography variant="body1" sx={{ maxWidth: 780, opacity: 0.92 }}>
+                Un manual de estudio para revisar conceptos, formulas, patrones y
+                errores tipicos antes o despues de practicar en los entrenadores.
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <Chip
+                  label={`${chapters.length} capitulos`}
+                  sx={{ color: "#fff", borderColor: "rgba(255,255,255,0.28)" }}
+                  variant="outlined"
+                />
+                <Chip
+                  label={`Revisados: ${reviewedCount}/${chapters.length}`}
+                  sx={{ color: "#fff", borderColor: "rgba(255,255,255,0.28)" }}
+                  variant="outlined"
+                />
+                {lastVisitedChapter ? (
+                  <Chip
+                    label={`Ultimo visto: ${lastVisitedChapter.title}`}
+                    sx={{ color: "#fff", borderColor: "rgba(255,255,255,0.28)" }}
+                    variant="outlined"
+                  />
+                ) : null}
+              </Stack>
+              {lastVisitedChapter ? (
+                <Box>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#fff",
+                      color: "#0b2a50",
+                      "&:hover": { backgroundColor: "#e3f2fd" },
+                    }}
+                    onClick={() => onOpenChapter(lastVisitedChapter.chapterId)}
+                  >
+                    Continuar lectura
+                  </Button>
+                </Box>
+              ) : null}
+            </Stack>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Stack spacing={1.5} sx={{ height: "100%" }}>
+              <Paper
+                sx={{
+                  p: 2,
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  color: "#fff",
+                  backdropFilter: "blur(6px)",
+                }}
               >
-                Continuar lectura
-              </Button>
-            </Box>
-          ) : null}
-        </Stack>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75 }}>
+                  Que vas a encontrar
+                </Typography>
+                <Typography variant="body2">
+                  Teoria explicada por tema, tablas rapidas, formulas, errores
+                  comunes y checklist para saber si ya dominas lo esencial.
+                </Typography>
+              </Paper>
+              <Paper
+                sx={{
+                  p: 2,
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  color: "#fff",
+                  backdropFilter: "blur(6px)",
+                }}
+              >
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75 }}>
+                  Como usarlo
+                </Typography>
+                <Typography variant="body2">
+                  Lee un capitulo, marca ideas clave, compara con tus ejercicios
+                  y usa el checklist final para detectar huecos antes del examen.
+                </Typography>
+              </Paper>
+            </Stack>
+          </Grid>
+        </Grid>
       </Paper>
 
       <Grid container spacing={2}>
         {chapters.map((chapter, index) => {
           const reviewed = reviewedChapterIds.includes(chapter.chapterId);
+          const theme = chapterTheme(index);
           return (
             <Grid item xs={12} md={6} xl={4} key={chapter.chapterId}>
               <Paper
                 variant="outlined"
                 sx={{
-                  p: 2.5,
+                  p: 0,
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  gap: 1.5,
+                  overflow: "hidden",
+                  borderColor: theme.border,
                 }}
               >
-                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-                  <Chip label={`Capitulo ${index + 1}`} size="small" />
-                  <Chip
-                    label={reviewed ? "Revisado" : "Pendiente"}
-                    size="small"
-                    color={reviewed ? "success" : "default"}
-                    variant={reviewed ? "filled" : "outlined"}
-                  />
+                <Box sx={{ p: 2.5, background: theme.soft }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    alignItems="center"
+                    flexWrap="wrap"
+                    useFlexGap
+                  >
+                    <Chip
+                      label={`Capitulo ${index + 1}`}
+                      size="small"
+                      sx={{ backgroundColor: "#fff" }}
+                    />
+                    <Chip
+                      label={reviewed ? "Revisado" : "Pendiente"}
+                      size="small"
+                      color={reviewed ? "success" : "default"}
+                      variant={reviewed ? "filled" : "outlined"}
+                    />
+                  </Stack>
+                  <Typography variant="h6" sx={{ fontWeight: 800, mt: 1.5, mb: 0.75 }}>
+                    {chapter.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {chapter.summary}
+                  </Typography>
+                </Box>
+                <Stack spacing={1.25} sx={{ p: 2.5, flexGrow: 1 }}>
+                  <Typography variant="body2">
+                    Objetivo: {chapter.objective}
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    <Chip label={`${chapter.sections.length} secciones`} size="small" variant="outlined" />
+                    <Chip
+                      label={`${chapter.checklistItems.length} puntos de cierre`}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </Stack>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Para memorizar
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {chapter.memoryHooks[0]}
+                    </Typography>
+                  </Box>
                 </Stack>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {chapter.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {chapter.summary}
-                </Typography>
-                <Typography variant="body2">
-                  Objetivo: {chapter.objective}
-                </Typography>
-                <Box sx={{ mt: "auto" }}>
+                <Box sx={{ px: 2.5, pb: 2.5, mt: "auto" }}>
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     fullWidth
+                    sx={{
+                      backgroundColor: theme.accent,
+                      "&:hover": { backgroundColor: theme.accent },
+                    }}
                     onClick={() => onOpenChapter(chapter.chapterId)}
                   >
                     Abrir capitulo
@@ -354,6 +537,7 @@ function WorkbookChapterView({
   const chapterIndex = chapters.findIndex(
     (item) => item.chapterId === chapter.chapterId,
   );
+  const theme = chapterTheme(chapterIndex);
   const previousChapter = chapterIndex > 0 ? chapters[chapterIndex - 1] : null;
   const nextChapter =
     chapterIndex < chapters.length - 1 ? chapters[chapterIndex + 1] : null;
@@ -371,7 +555,14 @@ function WorkbookChapterView({
       </Grid>
       <Grid item xs={12} md={9}>
         <Stack spacing={2.5}>
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Paper
+            sx={{
+              p: { xs: 2.5, sm: 3.5 },
+              background: theme.soft,
+              border: "1px solid",
+              borderColor: theme.border,
+            }}
+          >
             <Stack spacing={1.5}>
               <Stack
                 direction={{ xs: "column", sm: "row" }}
@@ -380,6 +571,14 @@ function WorkbookChapterView({
                 alignItems={{ xs: "flex-start", sm: "center" }}
               >
                 <Box>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 1 }}>
+                    <Chip
+                      label={`Capitulo ${chapterIndex + 1}`}
+                      size="small"
+                      sx={{ backgroundColor: "#fff" }}
+                    />
+                    <Chip label={`${chapter.sections.length} secciones`} size="small" variant="outlined" />
+                  </Stack>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
                     {chapter.title}
                   </Typography>
@@ -399,63 +598,152 @@ function WorkbookChapterView({
             </Stack>
           </Paper>
 
-          {chapter.sections.map((section) => (
-            <Paper key={section.title} sx={{ p: { xs: 2, sm: 3 } }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <QuickPanel
+                title="Como estudiarlo"
+                items={chapter.studyFlow}
+                accent={theme.accent}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <QuickPanel
+                title="Para memorizar"
+                items={chapter.memoryHooks}
+                accent={theme.accent}
+              />
+            </Grid>
+          </Grid>
+
+          <Paper variant="outlined" sx={{ p: 2, borderColor: theme.border }}>
+            <Stack spacing={1}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                Navegacion interna
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                {chapter.sections.map((section) => (
+                  <Chip
+                    key={section.title}
+                    label={section.title}
+                    clickable
+                    variant="outlined"
+                    onClick={() => {
+                      const sectionElement = document.getElementById(
+                        sectionAnchorId(chapter.chapterId, section.title),
+                      );
+                      if (sectionElement) {
+                        sectionElement.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+                    }}
+                  />
+                ))}
+              </Stack>
+            </Stack>
+          </Paper>
+
+          {chapter.sections.map((section, index) => (
+            <Paper
+              key={section.title}
+              id={sectionAnchorId(chapter.chapterId, section.title)}
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderLeft: `5px solid ${theme.accent}`,
+                scrollMarginTop: 96,
+              }}
+            >
               <Stack spacing={1.5}>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {section.title}
-                </Typography>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  alignItems={{ xs: "flex-start", sm: "center" }}
+                >
+                  <Chip
+                    label={`Seccion ${index + 1}`}
+                    size="small"
+                    sx={{ backgroundColor: `${theme.accent}12`, color: theme.accent }}
+                  />
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    {section.title}
+                  </Typography>
+                </Stack>
                 {section.blocks.map((block) => renderBlock(block))}
               </Stack>
             </Paper>
           ))}
 
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-            <Stack spacing={1.5}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Errores comunes
-              </Typography>
-              {chapter.commonMistakes.map((item) => (
-                <Typography key={item} variant="body1">
-                  - {item}
-                </Typography>
-              ))}
-            </Stack>
-          </Paper>
-
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-            <Stack spacing={1.5}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Resumen
-              </Typography>
-              {chapter.reviewSummary.map((item) => (
-                <Typography key={item} variant="body1">
-                  - {item}
-                </Typography>
-              ))}
-            </Stack>
-          </Paper>
-
-          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
-            <Stack spacing={1.5}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Checklist de estudio
-              </Typography>
-              {chapter.checklistItems.map((item) => (
-                <Box
-                  key={item.id}
-                  sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
-                >
-                  {reviewed ? (
-                    <CheckCircleOutline color="success" sx={{ mt: 0.1 }} />
-                  ) : (
-                    <RadioButtonUnchecked color="disabled" sx={{ mt: 0.1 }} />
-                  )}
-                  <Typography variant="body1">{item.text}</Typography>
-                </Box>
-              ))}
-            </Stack>
-          </Paper>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <Paper
+                sx={{
+                  p: { xs: 2, sm: 3 },
+                  height: "100%",
+                  borderTop: `4px solid ${theme.accent}`,
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Errores comunes
+                  </Typography>
+                  {chapter.commonMistakes.map((item) => (
+                    <Typography key={item} variant="body1">
+                      - {item}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper
+                sx={{
+                  p: { xs: 2, sm: 3 },
+                  height: "100%",
+                  borderTop: `4px solid ${theme.accent}`,
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Resumen
+                  </Typography>
+                  {chapter.reviewSummary.map((item) => (
+                    <Typography key={item} variant="body1">
+                      - {item}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Paper
+                sx={{
+                  p: { xs: 2, sm: 3 },
+                  height: "100%",
+                  borderTop: `4px solid ${theme.accent}`,
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Checklist de estudio
+                  </Typography>
+                  {chapter.checklistItems.map((item) => (
+                    <Box
+                      key={item.id}
+                      sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
+                    >
+                      {reviewed ? (
+                        <CheckCircleOutline color="success" sx={{ mt: 0.1 }} />
+                      ) : (
+                        <RadioButtonUnchecked color="disabled" sx={{ mt: 0.1 }} />
+                      )}
+                      <Typography variant="body1">{item.text}</Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </Paper>
+            </Grid>
+          </Grid>
 
           <Paper sx={{ p: { xs: 2, sm: 3 } }}>
             <Stack
