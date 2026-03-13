@@ -237,6 +237,19 @@ const EXERCISE_SECTIONS = [
         icon: LibraryMusic,
         iconColor: "#6a1b9a",
       },
+      {
+        route: "/workbook-teoria",
+        title: "Workbook de Teoria",
+        description:
+          "Manual de consulta por capitulos con teoria, ejemplos, errores comunes y checklist de estudio.",
+        buttonLabel: "Abrir Workbook",
+        buttonSx: {
+          backgroundColor: "#455a64",
+          "&:hover": { backgroundColor: "#263238" },
+        },
+        icon: MenuBook,
+        iconColor: "#455a64",
+      },
     ],
   },
   {

@@ -23,6 +23,7 @@ import RelativeMinorScalesStudy from "./components/RelativeMinorScalesStudy.tsx"
 import ChordInversionsStudy from "./components/ChordInversionsStudy.tsx";
 import MajorScaleChordTableStudy from "./components/MajorScaleChordTableStudy.tsx";
 import SeventhChordHarmonicFieldStudy from "./components/SeventhChordHarmonicFieldStudy.tsx";
+import WorkbookTheory from "./components/WorkbookTheory.tsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
@@ -65,6 +66,8 @@ createRoot(document.getElementById("root")).render(
           path="/campo-armonico-septimas"
           element={<SeventhChordHarmonicFieldStudy />}
         />
+        <Route path="/workbook-teoria" element={<WorkbookTheory />} />
+        <Route path="/workbook-teoria/:chapterId" element={<WorkbookTheory />} />
         <Route path="/canciones" element={<CancionesMenu />} />
       </Routes>
     </BrowserRouter>
