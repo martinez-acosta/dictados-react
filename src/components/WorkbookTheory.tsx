@@ -34,6 +34,11 @@ type WorkbookProgress = {
   lastVisitedChapterId: string | null;
 };
 
+type ChapterUnitGroup = {
+  unit: string;
+  chapters: WorkbookChapter[];
+};
+
 const STORAGE_KEY = "dictados-react-theory-workbook-progress";
 
 function defaultProgress(): WorkbookProgress {
@@ -72,6 +77,39 @@ function chapterTheme(index: number) {
 
 function sectionAnchorId(chapterId: string, title: string) {
   return `${chapterId}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+}
+
+function groupChaptersByUnit(chapters: WorkbookChapter[]): ChapterUnitGroup[] {
+  const groups: ChapterUnitGroup[] = [];
+
+  chapters.forEach((chapter) => {
+    const matchingGroup = groups.find((group) => group.unit === chapter.unit);
+
+    if (matchingGroup) {
+      matchingGroup.chapters.push(chapter);
+      return;
+    }
+
+    groups.push({
+      unit: chapter.unit,
+      chapters: [chapter],
+    });
+  });
+
+  return groups;
+}
+
+function resolvePrerequisiteTitles(
+  chapters: WorkbookChapter[],
+  prerequisiteIds?: string[],
+) {
+  if (!prerequisiteIds?.length) return [];
+
+  return prerequisiteIds.map(
+    (prerequisiteId) =>
+      chapters.find((chapter) => chapter.chapterId === prerequisiteId)?.title ||
+      prerequisiteId,
+  );
 }
 
 function QuickPanel({
@@ -278,6 +316,8 @@ function ChapterSidebar({
   reviewedChapterIds: string[];
   onOpenChapter: (chapterId: string) => void;
 }) {
+  const groupedChapters = groupChaptersByUnit(chapters);
+
   return (
     <Paper
       variant="outlined"
@@ -290,29 +330,45 @@ function ChapterSidebar({
       <Typography variant="subtitle2" sx={{ fontWeight: 700, px: 1, py: 0.5 }}>
         Capitulos
       </Typography>
-      <List sx={{ py: 0 }}>
-        {chapters.map((chapter, index) => {
-          const reviewed = reviewedChapterIds.includes(chapter.chapterId);
-          return (
-            <ListItemButton
-              key={chapter.chapterId}
-              selected={chapter.chapterId === activeChapterId}
-              onClick={() => onOpenChapter(chapter.chapterId)}
-              sx={{ borderRadius: 1, mb: 0.5 }}
+      <Stack spacing={1} sx={{ pt: 0.5 }}>
+        {groupedChapters.map((group) => (
+          <Box key={group.unit}>
+            <Typography
+              variant="caption"
+              sx={{ px: 1, pb: 0.5, display: "block", color: "text.secondary" }}
             >
-              <ListItemText
-                primary={`${index + 1}. ${chapter.title}`}
-                secondary={reviewed ? "Revisado" : "Pendiente"}
-                primaryTypographyProps={{ variant: "body2", fontWeight: 600 }}
-                secondaryTypographyProps={{
-                  variant: "caption",
-                  color: reviewed ? "success.main" : "text.secondary",
-                }}
-              />
-            </ListItemButton>
-          );
-        })}
-      </List>
+              {group.unit}
+            </Typography>
+            <List sx={{ py: 0 }}>
+              {group.chapters.map((chapter) => {
+                const reviewed = reviewedChapterIds.includes(chapter.chapterId);
+                const chapterIndex = chapters.findIndex(
+                  (item) => item.chapterId === chapter.chapterId,
+                );
+
+                return (
+                  <ListItemButton
+                    key={chapter.chapterId}
+                    selected={chapter.chapterId === activeChapterId}
+                    onClick={() => onOpenChapter(chapter.chapterId)}
+                    sx={{ borderRadius: 1, mb: 0.5 }}
+                  >
+                    <ListItemText
+                      primary={`${chapterIndex + 1}. ${chapter.title}`}
+                      secondary={reviewed ? "Revisado" : "Pendiente"}
+                      primaryTypographyProps={{ variant: "body2", fontWeight: 600 }}
+                      secondaryTypographyProps={{
+                        variant: "caption",
+                        color: reviewed ? "success.main" : "text.secondary",
+                      }}
+                    />
+                  </ListItemButton>
+                );
+              })}
+            </List>
+          </Box>
+        ))}
+      </Stack>
     </Paper>
   );
 }
@@ -331,6 +387,7 @@ function WorkbookIndex({
   const reviewedCount = reviewedChapterIds.length;
   const lastVisitedChapter =
     chapters.find((chapter) => chapter.chapterId === lastVisitedChapterId) || null;
+  const groupedChapters = groupChaptersByUnit(chapters);
 
   return (
     <Stack spacing={2.5}>
@@ -434,89 +491,153 @@ function WorkbookIndex({
         </Grid>
       </Paper>
 
-      <Grid container spacing={2}>
-        {chapters.map((chapter, index) => {
-          const reviewed = reviewedChapterIds.includes(chapter.chapterId);
-          const theme = chapterTheme(index);
-          return (
-            <Grid item xs={12} md={6} xl={4} key={chapter.chapterId}>
-              <Paper
+      <Stack spacing={2.5}>
+        {groupedChapters.map((group) => (
+          <Stack key={group.unit} spacing={1.5}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              justifyContent="space-between"
+              alignItems={{ xs: "flex-start", sm: "center" }}
+            >
+              <Box>
+                <Typography variant="overline" sx={{ letterSpacing: 1.2, color: "text.secondary" }}>
+                  Ruta progresiva
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 800 }}>
+                  {group.unit}
+                </Typography>
+              </Box>
+              <Chip
+                icon={<School />}
+                label={`${group.chapters.length} capitulos`}
                 variant="outlined"
-                sx={{
-                  p: 0,
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  overflow: "hidden",
-                  borderColor: theme.border,
-                }}
-              >
-                <Box sx={{ p: 2.5, background: theme.soft }}>
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    flexWrap="wrap"
-                    useFlexGap
-                  >
-                    <Chip
-                      label={`Capitulo ${index + 1}`}
-                      size="small"
-                      sx={{ backgroundColor: "#fff" }}
-                    />
-                    <Chip
-                      label={reviewed ? "Revisado" : "Pendiente"}
-                      size="small"
-                      color={reviewed ? "success" : "default"}
-                      variant={reviewed ? "filled" : "outlined"}
-                    />
-                  </Stack>
-                  <Typography variant="h6" sx={{ fontWeight: 800, mt: 1.5, mb: 0.75 }}>
-                    {chapter.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {chapter.summary}
-                  </Typography>
-                </Box>
-                <Stack spacing={1.25} sx={{ p: 2.5, flexGrow: 1 }}>
-                  <Typography variant="body2">
-                    Objetivo: {chapter.objective}
-                  </Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    <Chip label={`${chapter.sections.length} secciones`} size="small" variant="outlined" />
-                    <Chip
-                      label={`${chapter.checklistItems.length} puntos de cierre`}
-                      size="small"
+              />
+            </Stack>
+            <Grid container spacing={2}>
+              {group.chapters.map((chapter) => {
+                const reviewed = reviewedChapterIds.includes(chapter.chapterId);
+                const index = chapters.findIndex(
+                  (item) => item.chapterId === chapter.chapterId,
+                );
+                const theme = chapterTheme(index);
+                const prerequisiteTitles = resolvePrerequisiteTitles(
+                  chapters,
+                  chapter.prerequisites,
+                );
+
+                return (
+                  <Grid item xs={12} md={6} xl={4} key={chapter.chapterId}>
+                    <Paper
                       variant="outlined"
-                    />
-                  </Stack>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Para memorizar
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 0.5 }}>
-                      {chapter.memoryHooks[0]}
-                    </Typography>
-                  </Box>
-                </Stack>
-                <Box sx={{ px: 2.5, pb: 2.5, mt: "auto" }}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      backgroundColor: theme.accent,
-                      "&:hover": { backgroundColor: theme.accent },
-                    }}
-                    onClick={() => onOpenChapter(chapter.chapterId)}
-                  >
-                    Abrir capitulo
-                  </Button>
-                </Box>
-              </Paper>
+                      sx={{
+                        p: 0,
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        overflow: "hidden",
+                        borderColor: theme.border,
+                      }}
+                    >
+                      <Box sx={{ p: 2.5, background: theme.soft }}>
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                          flexWrap="wrap"
+                          useFlexGap
+                        >
+                          <Chip
+                            label={`Capitulo ${index + 1}`}
+                            size="small"
+                            sx={{ backgroundColor: "#fff" }}
+                          />
+                          <Chip
+                            label={chapter.focusBadge}
+                            size="small"
+                            variant="outlined"
+                            sx={{ backgroundColor: "rgba(255,255,255,0.65)" }}
+                          />
+                          <Chip
+                            label={reviewed ? "Revisado" : "Pendiente"}
+                            size="small"
+                            color={reviewed ? "success" : "default"}
+                            variant={reviewed ? "filled" : "outlined"}
+                          />
+                        </Stack>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 800, mt: 1.5, mb: 0.75 }}
+                        >
+                          {chapter.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {chapter.summary}
+                        </Typography>
+                      </Box>
+                      <Stack spacing={1.25} sx={{ p: 2.5, flexGrow: 1 }}>
+                        <Typography variant="body2">
+                          Objetivo: {chapter.objective}
+                        </Typography>
+                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                          <Chip
+                            label={`${chapter.sections.length} secciones`}
+                            size="small"
+                            variant="outlined"
+                          />
+                          <Chip
+                            label={`${chapter.checklistItems.length} puntos de cierre`}
+                            size="small"
+                            variant="outlined"
+                          />
+                          {chapter.microExercises?.length ? (
+                            <Chip
+                              label={`${chapter.microExercises.length} mini practicas`}
+                              size="small"
+                              variant="outlined"
+                            />
+                          ) : null}
+                        </Stack>
+                        {prerequisiteTitles.length ? (
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Antes de entrar
+                            </Typography>
+                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                              {prerequisiteTitles.join(", ")}
+                            </Typography>
+                          </Box>
+                        ) : null}
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            Para memorizar
+                          </Typography>
+                          <Typography variant="body2" sx={{ mt: 0.5 }}>
+                            {chapter.memoryHooks[0]}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      <Box sx={{ px: 2.5, pb: 2.5, mt: "auto" }}>
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          sx={{
+                            backgroundColor: theme.accent,
+                            "&:hover": { backgroundColor: theme.accent },
+                          }}
+                          onClick={() => onOpenChapter(chapter.chapterId)}
+                        >
+                          Abrir capitulo
+                        </Button>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                );
+              })}
             </Grid>
-          );
-        })}
-      </Grid>
+          </Stack>
+        ))}
+      </Stack>
     </Stack>
   );
 }
@@ -538,6 +659,10 @@ function WorkbookChapterView({
     (item) => item.chapterId === chapter.chapterId,
   );
   const theme = chapterTheme(chapterIndex);
+  const prerequisiteTitles = resolvePrerequisiteTitles(
+    chapters,
+    chapter.prerequisites,
+  );
   const previousChapter = chapterIndex > 0 ? chapters[chapterIndex - 1] : null;
   const nextChapter =
     chapterIndex < chapters.length - 1 ? chapters[chapterIndex + 1] : null;
@@ -572,12 +697,18 @@ function WorkbookChapterView({
               >
                 <Box>
                   <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 1 }}>
+                    <Chip label={chapter.unit} size="small" variant="outlined" />
                     <Chip
                       label={`Capitulo ${chapterIndex + 1}`}
                       size="small"
                       sx={{ backgroundColor: "#fff" }}
                     />
-                    <Chip label={`${chapter.sections.length} secciones`} size="small" variant="outlined" />
+                    <Chip label={chapter.focusBadge} size="small" variant="outlined" />
+                    <Chip
+                      label={`${chapter.sections.length} secciones`}
+                      size="small"
+                      variant="outlined"
+                    />
                   </Stack>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
                     {chapter.title}
@@ -601,15 +732,40 @@ function WorkbookChapterView({
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <QuickPanel
-                title="Como estudiarlo"
-                items={chapter.studyFlow}
+                title="Antes de estudiar este capitulo"
+                items={
+                  prerequisiteTitles.length
+                    ? prerequisiteTitles
+                    : ["No tiene prerrequisitos formales dentro del workbook."]
+                }
                 accent={theme.accent}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <QuickPanel
+                title="Como estudiarlo"
+                items={chapter.studyFlow}
+                accent={theme.accent}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <QuickPanel
                 title="Para memorizar"
                 items={chapter.memoryHooks}
+                accent={theme.accent}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <QuickPanel
+                title="Lo que mas pueden preguntarte"
+                items={
+                  chapter.examFocus?.length
+                    ? chapter.examFocus
+                    : ["Usalo como repaso teorico general."]
+                }
                 accent={theme.accent}
               />
             </Grid>
@@ -744,6 +900,81 @@ function WorkbookChapterView({
               </Paper>
             </Grid>
           </Grid>
+
+          {chapter.microExercises?.length ? (
+            <Paper
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderLeft: `5px solid ${theme.accent}`,
+              }}
+            >
+              <Stack spacing={1.5}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  Mini practica
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Intenta responder primero sin ver la solucion y luego compara tu proceso.
+                </Typography>
+                <Grid container spacing={1.5}>
+                  {chapter.microExercises.map((exercise, index) => (
+                    <Grid item xs={12} key={`${exercise.prompt}-${index}`}>
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          p: 2,
+                          background:
+                            "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(246,249,255,0.96))",
+                        }}
+                      >
+                        <Stack spacing={1}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                            Ejercicio {index + 1}
+                          </Typography>
+                          <Typography variant="body1">{exercise.prompt}</Typography>
+                          <Divider />
+                          <Typography variant="body2" color="text.secondary">
+                            Respuesta guia
+                          </Typography>
+                          <Typography variant="body1">{exercise.answer}</Typography>
+                        </Stack>
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Stack>
+            </Paper>
+          ) : null}
+
+          {chapter.glossary?.length ? (
+            <Paper
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderLeft: `5px solid ${theme.accent}`,
+              }}
+            >
+              <Stack spacing={1.5}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  Glosario del capitulo
+                </Typography>
+                <Grid container spacing={1.5}>
+                  {chapter.glossary.map((item) => (
+                    <Grid item xs={12} md={6} key={item.term}>
+                      <Paper variant="outlined" sx={{ p: 2, height: "100%" }}>
+                        <Stack spacing={0.75}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                            {item.term}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {item.definition}
+                          </Typography>
+                        </Stack>
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Stack>
+            </Paper>
+          ) : null}
 
           <Paper sx={{ p: { xs: 2, sm: 3 } }}>
             <Stack
