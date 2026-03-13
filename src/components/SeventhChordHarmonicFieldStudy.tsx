@@ -525,6 +525,15 @@ export default function SeventhChordHarmonicFieldStudy() {
     [scaleMode, selectedKey],
   );
   const configKey = `${scaleMode}:${selectedKey}`;
+  const qualityExamples = useMemo(
+    () => ({
+      maj7: rows.find((row) => row.qualityId === "maj7") || null,
+      m7: rows.find((row) => row.qualityId === "m7") || null,
+      "7": rows.find((row) => row.qualityId === "7") || null,
+      m7b5: rows.find((row) => row.qualityId === "m7b5") || null,
+    }),
+    [rows],
+  );
 
   function currentAnswer(rowKey: string) {
     return answersByConfig[configKey]?.[rowKey] || defaultPracticeState();
@@ -666,6 +675,159 @@ export default function SeventhChordHarmonicFieldStudy() {
             <Alert severity="info">
               Regla rápida: `7` significa séptima menor. `maj7` significa séptima
               mayor. Por eso `D7 = D F# A C` y `Dmaj7 = D F# A C#`.
+            </Alert>
+          </Stack>
+        </Paper>
+
+        <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={2}>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              De dónde salen los grados
+            </Typography>
+            <Typography variant="body2">
+              El grado es solo la posición de una nota dentro de la escala.
+              Si estás en {selectedKey} {modeLabel(scaleMode)}, la nota 1 es la
+              tónica, la 2 es el segundo grado, la 3 es el tercero y así hasta
+              el 7.
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {scaleNotes.map((note, index) => (
+                <Chip
+                  key={`degree-source-${note}-${index}`}
+                  label={`${index + 1} = ${note}`}
+                  color={index === 0 ? "primary" : "default"}
+                  variant={index === 0 ? "filled" : "outlined"}
+                />
+              ))}
+            </Stack>
+            <Grid container spacing={2}>
+              {rows.slice(0, 3).map((row) => (
+                <Grid item xs={12} md={4} key={`degree-explainer-${row.degreeRoman}`}>
+                  <Paper
+                    variant="outlined"
+                    sx={{ p: 1.5, height: "100%", backgroundColor: "#fafcff" }}
+                  >
+                    <Stack spacing={0.75}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                        {row.degreeRoman}
+                      </Typography>
+                      <Typography variant="body2">
+                        Empieza en la nota {row.degreeNumber}: {row.rootNote}.
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Luego apilas terceras dentro de la escala:
+                      </Typography>
+                      <Typography variant="body2">
+                        {row.rootNote}
+                        {" -> "}
+                        {row.stackNotes.join(" -> ")}
+                      </Typography>
+                    </Stack>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+            <Alert severity="info">
+              Ejemplo rápido: si la escala es `C major`, el grado 2 empieza en
+              `D`. Si apilas terceras dentro de esa escala te sale
+              `D - F - A - C`, o sea `Dm7`.
+            </Alert>
+          </Stack>
+        </Paper>
+
+        <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={2}>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              Cómo sale la calidad del acorde
+            </Typography>
+            <Typography variant="body2">
+              La calidad ya no depende del nombre del grado sino de las
+              distancias internas entre la raíz, la tercera, la quinta y la
+              séptima. En otras palabras: miras qué tercera tiene, qué quinta
+              tiene y qué séptima tiene.
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6} lg={3}>
+                <Paper variant="outlined" sx={{ p: 1.5, height: "100%" }}>
+                  <Stack spacing={0.75}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      maj7
+                    </Typography>
+                    <Typography variant="body2">
+                      3ra mayor + 5ta justa + 7ma mayor
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Fórmula: 1 - 3 - 5 - 7
+                    </Typography>
+                    <Typography variant="body2">
+                      Ejemplo: {qualityExamples.maj7?.symbol || "Cmaj7"} ={" "}
+                      {qualityExamples.maj7?.stackNotes.join(" - ") || "C - E - G - B"}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <Paper variant="outlined" sx={{ p: 1.5, height: "100%" }}>
+                  <Stack spacing={0.75}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      m7
+                    </Typography>
+                    <Typography variant="body2">
+                      3ra menor + 5ta justa + 7ma menor
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Fórmula: 1 - b3 - 5 - b7
+                    </Typography>
+                    <Typography variant="body2">
+                      Ejemplo: {qualityExamples.m7?.symbol || "Dm7"} ={" "}
+                      {qualityExamples.m7?.stackNotes.join(" - ") || "D - F - A - C"}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <Paper variant="outlined" sx={{ p: 1.5, height: "100%" }}>
+                  <Stack spacing={0.75}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      7
+                    </Typography>
+                    <Typography variant="body2">
+                      3ra mayor + 5ta justa + 7ma menor
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Fórmula: 1 - 3 - 5 - b7
+                    </Typography>
+                    <Typography variant="body2">
+                      Ejemplo: {qualityExamples["7"]?.symbol || "G7"} ={" "}
+                      {qualityExamples["7"]?.stackNotes.join(" - ") || "G - B - D - F"}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={6} lg={3}>
+                <Paper variant="outlined" sx={{ p: 1.5, height: "100%" }}>
+                  <Stack spacing={0.75}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      m7b5
+                    </Typography>
+                    <Typography variant="body2">
+                      3ra menor + 5ta disminuida + 7ma menor
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Fórmula: 1 - b3 - b5 - b7
+                    </Typography>
+                    <Typography variant="body2">
+                      Ejemplo: {qualityExamples.m7b5?.symbol || "Bm7b5"} ={" "}
+                      {qualityExamples.m7b5?.stackNotes.join(" - ") || "B - D - F - A"}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              </Grid>
+            </Grid>
+            <Alert severity="warning">
+              Los números romanos te dicen desde qué nota empiezas. La calidad
+              te la dicen las notas que salen al apilar 1-3-5-7 dentro de la
+              escala.
             </Alert>
           </Stack>
         </Paper>
