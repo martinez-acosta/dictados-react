@@ -194,31 +194,34 @@ function renderBlock(block: WorkbookSectionBlock) {
     return (
       <Stack
         key={`${block.title || "list"}-${block.items[0] || "empty"}`}
-        spacing={1}
+        spacing={0.9}
       >
         {block.title ? (
-          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 700, color: "text.primary" }}
+          >
             {block.title}
           </Typography>
         ) : null}
-        <Stack spacing={0.75}>
+        <Stack spacing={0.6}>
           {block.items.map((item) => (
             <Typography
               key={item}
               variant="body1"
-              sx={{ pl: 1.5, position: "relative", lineHeight: 1.75 }}
+              sx={{ pl: 1.4, position: "relative", lineHeight: 1.75 }}
             >
               <Box
                 component="span"
                 sx={{
                   position: "absolute",
                   left: 0,
-                  top: 0,
-                  color: "primary.main",
+                  top: 1,
+                  color: "rgba(15, 76, 129, 0.9)",
                   fontWeight: 700,
                 }}
               >
-                -
+                •
               </Box>
               {item}
             </Typography>
@@ -234,22 +237,36 @@ function renderBlock(block: WorkbookSectionBlock) {
         key={`${block.title}-${block.lines[0] || "example"}`}
         variant="outlined"
         sx={{
-          p: 2,
-          background:
-            "linear-gradient(135deg, rgba(21,101,192,0.08), rgba(255,255,255,0.96))",
-          borderColor: "rgba(21, 101, 192, 0.2)",
-          borderLeft: "4px solid #1565c0",
+          p: 2.25,
+          borderRadius: 2.5,
+          background: "rgba(247, 250, 253, 0.98)",
+          borderColor: "rgba(15, 76, 129, 0.14)",
+          borderLeft: "3px solid rgba(15, 76, 129, 0.7)",
         }}
       >
-        <Stack spacing={0.75}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+        <Stack spacing={0.8}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: 700,
+              color: "rgba(15, 76, 129, 0.92)",
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              fontSize: "0.8rem",
+            }}
+          >
             {block.title}
           </Typography>
           {block.lines.map((line) => (
             <Typography
               key={line}
               variant="body2"
-              sx={{ fontFamily: "monospace", whiteSpace: "pre-wrap" }}
+              sx={{
+                fontFamily:
+                  '"SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, monospace',
+                whiteSpace: "pre-wrap",
+                lineHeight: 1.65,
+              }}
             >
               {line}
             </Typography>
@@ -303,15 +320,17 @@ function renderBlock(block: WorkbookSectionBlock) {
             borderCollapse: "collapse",
             "& th, & td": {
               border: "1px solid",
-              borderColor: "divider",
+              borderColor: "rgba(15, 23, 42, 0.08)",
               p: 1.25,
               textAlign: "left",
               verticalAlign: "top",
             },
             "& th": {
-              background:
-                "linear-gradient(180deg, rgba(21,101,192,0.08), rgba(255,255,255,0.92))",
+              background: "rgba(241, 246, 250, 0.96)",
               fontWeight: 700,
+            },
+            "& td": {
+              backgroundColor: "rgba(255,255,255,0.84)",
             },
           }}
         >
@@ -1702,45 +1721,66 @@ function WorkbookChapterView({
             </Stack>
           </Paper>
 
-          {chapter.sections.map((section, index) => (
-            <Paper
-              key={section.title}
-              id={sectionAnchorId(chapter.chapterId, section.title)}
-              sx={{
-                p: { xs: 2, sm: 3 },
-                borderLeft: `5px solid ${theme.accent}`,
-                scrollMarginTop: 96,
-                borderRadius: 4,
-                background:
-                  index % 2 === 0
-                    ? "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.94))"
-                    : "linear-gradient(180deg, rgba(250,252,255,0.98), rgba(255,255,255,0.94))",
-                boxShadow: "0 18px 40px rgba(15, 23, 42, 0.05)",
-              }}
-            >
-              <Stack spacing={1.5}>
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={1}
-                  alignItems={{ xs: "flex-start", sm: "center" }}
+          <Paper
+            variant="outlined"
+            sx={{
+              p: { xs: 2.25, sm: 4 },
+              borderRadius: 4,
+              borderColor: "rgba(15, 23, 42, 0.08)",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252,253,255,0.96))",
+              boxShadow: "0 18px 44px rgba(15, 23, 42, 0.05)",
+            }}
+          >
+            <Stack spacing={4}>
+              {chapter.sections.map((section, index) => (
+                <Box
+                  key={section.title}
+                  id={sectionAnchorId(chapter.chapterId, section.title)}
+                  sx={{ scrollMarginTop: 96 }}
                 >
-                  <Chip
-                    label={`Seccion ${index + 1}`}
-                    size="small"
-                    sx={{
-                      backgroundColor: `${theme.accent}14`,
-                      color: theme.accent,
-                      fontWeight: 700,
-                    }}
-                  />
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    {section.title}
-                  </Typography>
-                </Stack>
-                {section.blocks.map((block) => renderBlock(block))}
-              </Stack>
-            </Paper>
-          ))}
+                  <Stack spacing={1.75}>
+                    <Stack spacing={0.9}>
+                      <Typography
+                        variant="overline"
+                        sx={{
+                          letterSpacing: 1.4,
+                          color: theme.accent,
+                          fontWeight: 800,
+                        }}
+                      >
+                        Seccion {index + 1}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 800,
+                          lineHeight: 1.12,
+                          fontSize: { xs: "1.65rem", md: "2rem" },
+                        }}
+                      >
+                        {section.title}
+                      </Typography>
+                      <Divider
+                        sx={{
+                          borderColor: `${theme.accent}22`,
+                          width: "100%",
+                        }}
+                      />
+                    </Stack>
+                    <Stack spacing={1.4}>
+                      {section.blocks.map((block) => renderBlock(block))}
+                    </Stack>
+                  </Stack>
+                  {index < chapter.sections.length - 1 ? (
+                    <Divider
+                      sx={{ mt: 4, borderColor: "rgba(15, 23, 42, 0.08)" }}
+                    />
+                  ) : null}
+                </Box>
+              ))}
+            </Stack>
+          </Paper>
 
           <Grid container spacing={2}>
             <Grid item xs={12} md={4}>
