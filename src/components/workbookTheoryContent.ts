@@ -3025,11 +3025,27 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
               ["Negra", "1 negra", "Dura 1 tiempo"],
               ["Corchea", "1/2 negra", "Dura medio tiempo"],
               ["Semicorchea", "1/4 negra", "Dura un cuarto de tiempo"],
+              ["Fusa", "1/8 negra", "Dura un octavo de tiempo"],
+              ["Semifusa", "1/16 negra", "Dura un dieciseisavo de tiempo"],
             ],
           },
           {
             type: "paragraph",
-            text: "El punto de aumentacion agrega la mitad del valor de la figura. Una blanca con punto equivale a 3 negras. Ese punto es muy frecuente en compas compuesto.",
+            text: "El punto de aumentacion agrega la mitad del valor de la figura. Una blanca con punto equivale a 3 negras. Ese punto es muy frecuente en compas compuesto. El doble punto agrega la mitad de la mitad: una negra con doble punto vale 1 + 1/2 + 1/4 = 1.75 tiempos.",
+          },
+          {
+            type: "table",
+            title: "Figuras con punto de aumentacion",
+            columns: ["Figura con punto", "Equivalencia", "Uso comun"],
+            rows: [
+              ["Blanca con punto", "3 negras (3 tiempos)", "Llena un compas de 3/4"],
+              ["Negra con punto", "1.5 negras (1.5 tiempos)", "Unidad de tiempo en compas compuesto (6/8, 9/8, 12/8)"],
+              ["Corchea con punto", "3/4 de negra", "Frecuente en ritmos con puntillo + semicorchea"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Cada figura tiene un silencio equivalente con la misma duracion. El silencio de redonda se escribe debajo de la 4a linea, el de blanca encima de la 3a linea. Reconocer los silencios es tan importante como reconocer las figuras.",
           },
         ],
       },
@@ -3068,6 +3084,79 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         ],
       },
       {
+        title: "Subdivision binaria vs ternaria",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "La diferencia fundamental entre compas simple y compuesto es como se divide cada tiempo. En subdivision binaria cada tiempo se parte en 2 (corcheas en 4/4). En subdivision ternaria cada tiempo se parte en 3 (corcheas en 6/8). Esa diferencia cambia completamente la sensacion ritmica aunque el numero de acentos por compas sea igual.",
+          },
+          {
+            type: "table",
+            columns: ["Caracteristica", "Binaria (simple)", "Ternaria (compuesto)"],
+            rows: [
+              ["Division del tiempo", "2 partes iguales", "3 partes iguales"],
+              ["Figura del tiempo", "Negra (en 2/4, 3/4, 4/4)", "Negra con punto (en 6/8, 9/8, 12/8)"],
+              ["Subdivision tipica", "Corcheas en pares", "Corcheas en grupos de 3"],
+              ["Sensacion", "Marcha, rock, pop", "Vals, jiga, blues shuffle"],
+              ["Ejemplo clasico", "4/4 = 4 negras por compas", "6/8 = 2 negras con punto por compas"],
+            ],
+          },
+          {
+            type: "example",
+            title: "3/4 vs 6/8: mismas corcheas, distinto acento",
+            lines: [
+              "3/4: | NEG neg neg | = 3 tiempos, subdivision binaria",
+              "6/8: | neg.con.punto neg.con.punto | = 2 tiempos, subdivision ternaria",
+              "Ambos tienen 6 corcheas por compas, pero los acentos caen diferente",
+              "3/4 acentua cada 2 corcheas (1-2-3-4-5-6 → 1 3 5)",
+              "6/8 acentua cada 3 corcheas (1-2-3-4-5-6 → 1 4)",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Compases de amalgama",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Los compases de amalgama combinan grupos de tiempos desiguales. En lugar de tener todos los tiempos con la misma duracion, mezclan grupos de 2 y de 3. Son comunes en musica folklorica, progresiva y contemporanea.",
+          },
+          {
+            type: "table",
+            columns: ["Compas", "Agrupacion", "Tiempos", "Ejemplo de genero"],
+            rows: [
+              ["5/8", "3+2 o 2+3", "2 tiempos desiguales", "Musica folklorica balcanica, jazz"],
+              ["7/8", "3+2+2 o 2+2+3", "3 tiempos desiguales", "Prog rock (Money de Pink Floyd = 7/4)"],
+              ["5/4", "3+2 o 2+3", "2 tiempos desiguales", "Take Five de Brubeck"],
+              ["11/8", "3+3+3+2 u otras", "Combinaciones variadas", "Musica contemporanea"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Para leer un compas de amalgama, primero identifica la agrupacion (suele estar indicada con barras de agrupacion o acentos). Luego cuenta los pulsos internos. La clave es sentir los grupos, no los pulsos individuales.",
+          },
+        ],
+      },
+      {
+        title: "Anacrusa",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "La anacrusa es una nota o grupo de notas que precede al primer tiempo fuerte del primer compas completo. No ocupa un compas entero: es un compas incompleto al inicio. Muchas melodias conocidas comienzan en anacrusa.",
+          },
+          {
+            type: "example",
+            title: "Anacrusa en la practica",
+            lines: [
+              "Si una pieza en 4/4 comienza con una sola negra antes del primer compas completo:",
+              "| neg | NEG neg neg neg | NEG neg neg neg | ...",
+              "Esa negra sola es la anacrusa. El primer compas fuerte es el siguiente.",
+              "Regla: el valor de la anacrusa + el valor del ultimo compas = 1 compas completo.",
+            ],
+          },
+        ],
+      },
+      {
         title: "Sincopa y contratiempo",
         blocks: [
           {
@@ -3101,11 +3190,16 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Confundir el numero superior del compas con el numero de figuras en total.",
       "Pensar que 6/8 es un compas de 6 tiempos.",
       "No distinguir sincopa de contratiempo porque ambos atacan en tiempo debil.",
+      "Confundir 3/4 con 6/8: tienen las mismas corcheas pero los acentos son distintos.",
+      "Olvidar que la anacrusa no es un compas completo y no se numera como compas 1.",
+      "No reconocer compases de amalgama porque se intenta forzar una subdivision regular.",
     ],
     reviewSummary: [
-      "Las figuras tienen valores relativos entre si.",
+      "Las figuras tienen valores relativos entre si: redonda = 4 negras, blanca = 2, corchea = 1/2.",
       "El compas simple divide el tiempo en 2; el compuesto en 3.",
+      "Los compases de amalgama combinan grupos de 2 y 3 (5/8, 7/8).",
       "Sincopa y contratiempo desplazan el acento pero de manera distinta.",
+      "La anacrusa es un compas incompleto al inicio de la pieza.",
     ],
     checklistItems: [
       {
@@ -3119,6 +3213,14 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         id: "rit-3",
         text: "Puedo reconocer una sincopa en un ejemplo escrito.",
+      },
+      {
+        id: "rit-4",
+        text: "Puedo distinguir 3/4 de 6/8 por la agrupacion de acentos.",
+      },
+      {
+        id: "rit-5",
+        text: "Puedo identificar una anacrusa al inicio de una pieza.",
       },
     ],
     microExercises: [
@@ -3141,6 +3243,29 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         answer:
           "La sincopa esta ligada al tiempo fuerte; el contratiempo ataca en el debil y el fuerte queda en silencio.",
       },
+      {
+        prompt: "Cuanto vale una negra con punto?",
+        answer: "1.5 tiempos (1 + la mitad de 1).",
+      },
+      {
+        prompt: "Diferencia entre 3/4 y 6/8?",
+        answer:
+          "3/4 tiene 3 tiempos con subdivision binaria; 6/8 tiene 2 tiempos con subdivision ternaria. Ambos suman 6 corcheas.",
+      },
+      {
+        prompt: "Que es una anacrusa?",
+        answer:
+          "Un compas incompleto al inicio de la pieza, antes del primer tiempo fuerte.",
+      },
+      {
+        prompt: "El compas 5/8 es simple, compuesto o de amalgama?",
+        answer:
+          "De amalgama: combina un grupo de 3 y uno de 2 (o viceversa).",
+      },
+      {
+        prompt: "Cuantas corcheas caben en una blanca con punto?",
+        answer: "Seis corcheas (3 negras x 2 corcheas cada una).",
+      },
     ],
     glossary: [
       {
@@ -3156,6 +3281,10 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         definition: "Compas donde el tiempo se divide en 3.",
       },
       {
+        term: "Compas de amalgama",
+        definition: "Compas que mezcla grupos de 2 y de 3, como 5/8 o 7/8.",
+      },
+      {
         term: "Sincopa",
         definition:
           "Desplazamiento del acento al tiempo debil, ligado al fuerte.",
@@ -3165,8 +3294,20 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         definition: "Ataque en tiempo debil con silencio en el tiempo fuerte.",
       },
       {
+        term: "Anacrusa",
+        definition: "Nota o grupo de notas que preceden al primer tiempo fuerte del primer compas completo.",
+      },
+      {
         term: "Punto de aumentacion",
         definition: "Signo que agrega la mitad del valor a una figura.",
+      },
+      {
+        term: "Subdivision binaria",
+        definition: "Division del tiempo en 2 partes iguales (tipica de compas simple).",
+      },
+      {
+        term: "Subdivision ternaria",
+        definition: "Division del tiempo en 3 partes iguales (tipica de compas compuesto).",
       },
     ],
   },
@@ -3881,6 +4022,117 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         ],
       },
       {
+        title: "Campo armonico de la escala menor armonica",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "La escala menor armonica sube el VII grado un semitono respecto a la menor natural. Ese cambio tiene un efecto enorme en el campo armonico: el V pasa de menor a Mayor (y puede ser V7 dominante), y aparecen calidades nuevas como el acorde aumentado en III y el disminuido en VII.",
+          },
+          {
+            type: "table",
+            columns: [
+              "Grado",
+              "Simbolo",
+              "Calidad",
+              "Ejemplo en Am armonica",
+            ],
+            rows: [
+              ["I", "i", "menor", "Am"],
+              ["II", "ii°", "Disminuido", "B°"],
+              ["III", "III+", "Aumentado", "C+"],
+              ["IV", "iv", "menor", "Dm"],
+              ["V", "V", "Mayor", "E"],
+              ["VI", "VI", "Mayor", "F"],
+              ["VII", "vii°", "Disminuido", "G#°"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "El cambio mas importante: ahora el V es Mayor, lo que permite la cadencia autentica V→i con la sensible (G#) resolviendo a la tonica (A). Por eso la menor armonica es la escala mas usada en contextos armonicos de modo menor.",
+          },
+        ],
+      },
+      {
+        title: "Campo armonico de la escala menor melodica",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "La escala menor melodica sube tanto el VI como el VII grado. Esto produce un campo armonico con calidades unicas, incluyendo acordes que no existen en ningun otro campo diatonico. Esta escala es muy importante en jazz.",
+          },
+          {
+            type: "table",
+            columns: [
+              "Grado",
+              "Simbolo",
+              "Calidad",
+              "Ejemplo en Am melodica",
+            ],
+            rows: [
+              ["I", "i", "menor", "Am"],
+              ["II", "II", "Mayor", "B (o Bsus)"],
+              ["III", "III+", "Aumentado", "C+"],
+              ["IV", "IV", "Mayor", "D"],
+              ["V", "V", "Mayor", "E"],
+              ["VI", "vi°", "Disminuido", "F#°"],
+              ["VII", "vii°", "Disminuido", "G#°"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "En jazz, la menor melodica se usa completa (ascendente y descendente con los mismos grados). El IV Mayor (lydian dominant) y el VII disminuido (altered scale) son fuente de escalas muy usadas en improvisacion.",
+          },
+        ],
+      },
+      {
+        title: "Funciones armonicas agrupadas",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Los 7 grados del campo armonico se agrupan en 3 funciones: tonica (reposo), subdominante (movimiento) y dominante (tension). Cada funcion contiene un grado principal y grados sustitutos que comparten notas en comun.",
+          },
+          {
+            type: "table",
+            columns: ["Funcion", "Grado principal", "Sustitutos", "Sensacion"],
+            rows: [
+              ["Tonica", "I", "iii, vi", "Reposo, estabilidad, llegada"],
+              ["Subdominante", "IV", "ii", "Movimiento, partida, preparacion"],
+              ["Dominante", "V", "vii°", "Tension, necesidad de resolver"],
+            ],
+          },
+          {
+            type: "example",
+            title: "Por que iii y vi sustituyen al I?",
+            lines: [
+              "I en C = C-E-G",
+              "iii en C = E-G-B (comparte E y G con el I)",
+              "vi en C = A-C-E (comparte C y E con el I)",
+              "Al compartir 2 de 3 notas, suenan 'parecido' al I y producen sensacion de reposo.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Este esquema de funciones es la base del analisis armonico. Cualquier progresion tonal se puede reducir a una secuencia de funciones: T → S → D → T es el ciclo armonico mas basico.",
+          },
+        ],
+      },
+      {
+        title: "Comparacion mayor vs menor: resumen",
+        blocks: [
+          {
+            type: "table",
+            title: "Diferencias clave entre campos armonicos",
+            columns: ["Aspecto", "Mayor", "Menor natural", "Menor armonica"],
+            rows: [
+              ["Patron", "M-m-m-M-M-m-dim", "m-dim-M-m-m-M-M", "m-dim-Aum-m-M-M-dim"],
+              ["Grado V", "Mayor (dominante)", "menor (no dominante)", "Mayor (dominante)"],
+              ["Grado III", "menor", "Mayor", "Aumentado"],
+              ["Grado VII", "Disminuido", "Mayor", "Disminuido"],
+              ["Cadencia autentica V→I", "Natural", "Requiere armonica", "Natural"],
+            ],
+          },
+        ],
+      },
+      {
         title: "Como identificar la calidad de un acorde apilado",
         blocks: [
           {
@@ -3923,11 +4175,16 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Agregar alteraciones que no estan en la escala al apilar terceras.",
       "Olvidar que el patron de calidades cambia entre mayor y menor natural.",
       "Confundir el v menor de la escala menor natural con el V mayor (armonico).",
+      "No distinguir menor natural de menor armonica: el VII grado alterado cambia todo.",
+      "Pensar que iii y vi son 'iguales' al I; son sustitutos, no equivalentes exactos.",
+      "Olvidar que el III en menor armonica es aumentado, no mayor.",
     ],
     reviewSummary: [
       "El campo armonico se construye apilando terceras diatonicas desde cada grado.",
       "En modo mayor el patron es: M-m-m-M-M-m-dim.",
       "En modo menor natural el patron es: m-dim-M-m-m-M-M.",
+      "En modo menor armonico el V es Mayor y el VII es disminuido.",
+      "Los grados se agrupan en funciones: tonica (I, iii, vi), subdominante (IV, ii), dominante (V, vii°).",
     ],
     checklistItems: [
       {
@@ -3941,6 +4198,14 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         id: "cat-3",
         text: "Puedo decir la calidad del iii grado en modo mayor sin calcular.",
+      },
+      {
+        id: "cat-4",
+        text: "Se que calidades cambian entre menor natural y menor armonica.",
+      },
+      {
+        id: "cat-5",
+        text: "Puedo agrupar los grados en funciones de tonica, subdominante y dominante.",
       },
     ],
     microExercises: [
@@ -3965,6 +4230,23 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         answer:
           "Porque en menor natural ese grado es Mayor (VII), no disminuido.",
       },
+      {
+        prompt: "Que cambia en el campo armonico al usar menor armonica en vez de natural?",
+        answer:
+          "El V pasa de menor a Mayor, el III se vuelve aumentado, y el VII pasa de Mayor a disminuido.",
+      },
+      {
+        prompt: "Cuales son los grados con funcion de tonica en modo mayor?",
+        answer: "I, iii y vi (comparten notas con el I).",
+      },
+      {
+        prompt: "En Am armonica, que acorde es el V?",
+        answer: "E Mayor (con G#, la sensible que resuelve a A).",
+      },
+      {
+        prompt: "Cual es el ciclo armonico basico de funciones?",
+        answer: "Tonica → Subdominante → Dominante → Tonica (T-S-D-T).",
+      },
     ],
     glossary: [
       {
@@ -3980,12 +4262,22 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         term: "Patron de calidades",
         definition:
-          "Secuencia fija de calidades de acorde que resulta de costruir el campo armonico de un modo dado.",
+          "Secuencia fija de calidades de acorde que resulta de construir el campo armonico de un modo dado.",
       },
       {
         term: "v menor",
         definition:
           "El quinto grado del modo menor natural, que es una triada menor (no mayor).",
+      },
+      {
+        term: "Funcion armonica",
+        definition:
+          "Rol que cumple un acorde dentro de la tonalidad: tonica (reposo), subdominante (movimiento) o dominante (tension).",
+      },
+      {
+        term: "Acorde aumentado",
+        definition:
+          "Triada con tercera mayor y quinta aumentada (1-3-#5). Aparece en el III grado de la menor armonica.",
       },
     ],
   },
@@ -4136,11 +4428,82 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
           },
         ],
       },
+      {
+        title: "Tonalidades vecinas y lejanas",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Dos tonalidades son vecinas (o cercanas) cuando difieren en 0 o 1 alteracion. En el circulo, las vecinas estan justo al lado. Las tonalidades lejanas estan a mayor distancia en el circulo y difieren en muchas alteraciones. La distancia en el circulo determina que tan 'dramatica' suena una modulacion.",
+          },
+          {
+            type: "table",
+            columns: ["Desde C major", "Tonalidad", "Distancia", "Relacion"],
+            rows: [
+              ["→", "G major (1#)", "1 paso", "Vecina (V de C)"],
+              ["→", "F major (1b)", "1 paso", "Vecina (IV de C)"],
+              ["→", "Am (0)", "0 pasos", "Relativa menor"],
+              ["→", "Dm (1b)", "1 paso", "Vecina (relativa de F)"],
+              ["→", "Em (1#)", "1 paso", "Vecina (relativa de G)"],
+              ["→", "F# major (6#)", "6 pasos", "Lejana (tritono)"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Regla practica: las tonalidades vecinas de una tonica son el IV, el V, sus relativas menores, y la propia relativa menor. Esas 5 tonalidades son las mas faciles para modular porque comparten casi todas las notas.",
+          },
+          {
+            type: "chips",
+            title: "Vecinas de C major",
+            items: ["G major (V)", "F major (IV)", "Am (vi/relativa)", "Em (relativa de G)", "Dm (relativa de F)"],
+          },
+        ],
+      },
+      {
+        title: "Uso practico del circulo de quintas",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "El circulo no es solo un mapa teorico: es una herramienta de uso diario para componer, improvisar y analizar. Tres aplicaciones concretas:",
+          },
+          {
+            type: "list",
+            title: "Aplicaciones practicas",
+            items: [
+              "Progresiones: muchas progresiones populares se mueven por cuartas (= sentido antihorario en el circulo). La progresion ii-V-I en C es Dm-G-C: tres pasos consecutivos en el circulo.",
+              "Modulacion: para modular a una tonalidad vecina, busca un acorde pivote que pertenezca a ambas tonalidades. Las vecinas comparten casi todo su campo armonico.",
+              "Improvisacion: si estas en G major y el acorde cambia a Em, sabes que es la relativa menor (vi). Puedes usar la misma escala sin cambiar nada.",
+            ],
+          },
+          {
+            type: "example",
+            title: "Progresion por cuartas en el circulo",
+            lines: [
+              "Tomemos la progresion: Bm7 - Em7 - Am7 - Dm7 - Gmaj7 - Cmaj7 - F#m7b5 - Bmaj7",
+              "Cada acorde esta a una cuarta justa del anterior:",
+              "B → E → A → D → G → C → F# → B",
+              "Esto es recorrer el circulo en sentido antihorario.",
+              "Esta secuencia se llama 'ciclo de cuartas' y es la base de muchos estandares de jazz.",
+            ],
+          },
+          {
+            type: "example",
+            title: "Encontrar la escala para improvisar",
+            lines: [
+              "Estas tocando en Bb major y ves un acorde Gm7.",
+              "En el circulo: Gm es la relativa menor de Bb.",
+              "Conclusion: puedes usar la escala de Bb major sobre Gm7.",
+              "Si ves un Eb major: esta a 1 paso (es el IV de Bb). Misma familia, misma escala base.",
+            ],
+          },
+        ],
+      },
     ],
     commonMistakes: [
       "Confundir el orden de los sostenidos y los bemoles.",
       "Aplicar la regla del 'ultimo sostenido' a armaduras de bemoles.",
       "Olvidar que con 1 solo bemol (Bb) la tonalidad es F, no Bb.",
+      "Pensar que tonalidades lejanas en el circulo no pueden relacionarse (si pueden, pero la modulacion es mas dramatica).",
+      "No usar el circulo como herramienta practica: solo memorizarlo sin aplicarlo.",
     ],
     reviewSummary: [
       "El circulo organiza las 12 tonalidades por quintas; cada paso agrega 1 alteracion.",
@@ -4159,6 +4522,14 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         id: "cq-3",
         text: "Se el relativo menor de las tonalidades mas comunes (C, G, D, F, Bb, Eb).",
+      },
+      {
+        id: "cq-4",
+        text: "Puedo nombrar las 5 tonalidades vecinas de cualquier tonica.",
+      },
+      {
+        id: "cq-5",
+        text: "Puedo usar el circulo para encontrar progresiones por cuartas.",
       },
     ],
     microExercises: [
@@ -4182,6 +4553,22 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         prompt: "Que par enarmonico tiene 6 alteraciones?",
         answer: "Gb major (6b) = F# major (6#).",
+      },
+      {
+        prompt: "Nombra las 5 tonalidades vecinas de D major.",
+        answer: "A major (V), G major (IV), Bm (relativa), F#m (relativa de A), Em (relativa de G).",
+      },
+      {
+        prompt: "Si recorres el circulo en sentido antihorario desde C, que notas encuentras?",
+        answer: "C - F - Bb - Eb - Ab - Db - Gb/F# - B - E - A - D - G - C. Es el ciclo de cuartas.",
+      },
+      {
+        prompt: "Cuantas alteraciones tiene Bb major?",
+        answer: "2 bemoles: Bb y Eb.",
+      },
+      {
+        prompt: "La progresion ii-V-I en F major usa que acordes?",
+        answer: "Gm7 - C7 - Fmaj7. Tres pasos consecutivos en el circulo.",
       },
     ],
     glossary: [
@@ -4209,6 +4596,21 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         term: "Sensible",
         definition:
           "VII grado de la escala; el ultimo sostenido de una armadura es la sensible de esa tonalidad.",
+      },
+      {
+        term: "Tonalidades vecinas",
+        definition:
+          "Tonalidades que difieren en 0 o 1 alteracion; estan adyacentes en el circulo de quintas.",
+      },
+      {
+        term: "Ciclo de cuartas",
+        definition:
+          "Recorrer el circulo de quintas en sentido antihorario; cada tonalidad esta a una cuarta justa de la anterior.",
+      },
+      {
+        term: "Acorde pivote",
+        definition:
+          "Acorde que pertenece a dos tonalidades y sirve de puente para modular de una a otra.",
       },
     ],
   },
@@ -4381,11 +4783,95 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
           },
         ],
       },
+      {
+        title: "Patrones de arpegio para bajo electrico",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "En el bajo electrico los arpegios son la herramienta principal para construir lineas. No tocas acordes completos sino que despliegas las notas del acorde en patrones ritmicos. Conocer estos patrones y poder moverlos por el diapason es esencial.",
+          },
+          {
+            type: "table",
+            title: "Patrones basicos de arpegio en el bajo",
+            columns: ["Patron", "Notas (sobre C)", "Uso", "Nivel"],
+            rows: [
+              ["1-5", "C - G", "Lineas de rock, punk, country basico", "Principiante"],
+              ["1-3-5", "C - E - G", "Arpegio completo de triada, base de todo", "Principiante"],
+              ["1-5-8", "C - G - C (octava)", "Lineas con movimiento vertical", "Principiante"],
+              ["1-3-5-8", "C - E - G - C", "Arpegio ascendente completo con octava", "Intermedio"],
+              ["1-b3-5-b7", "C - Eb - G - Bb", "Arpegio m7 completo para jazz/funk", "Intermedio"],
+              ["1-3-5-7-8", "C - E - G - B - C", "Arpegio maj7 ascendente", "Intermedio"],
+              ["Walking: 1-3-5-cromatismo", "C - E - G - G#/Ab", "Aproximacion cromatica al siguiente acorde", "Avanzado"],
+            ],
+          },
+          {
+            type: "example",
+            title: "Linea de walking bass usando arpegios",
+            lines: [
+              "Progresion: Dm7 | G7 | Cmaj7 | Cmaj7 |",
+              "Walking: D-F-A-C# | G-B-D-Eb | C-E-G-A | C-G-E-D",
+              "Nota: la ultima nota de cada compas se aproxima cromaticamente a la raiz del siguiente.",
+              "El C# al final de Dm7 sube a D? No: baja un semitono a C (raiz de Cmaj7).",
+              "Correccion: D-F-A-Ab | G-B-D-Db | C-E-G-A | ...",
+              "Cada aproximacion cromatica crea movimiento hacia la siguiente raiz.",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Tensiones disponibles por tipo de acorde",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "No todas las extensiones suenan bien sobre todos los acordes. Las 'tensiones disponibles' son las extensiones que no chocan con las notas del acorde. Las 'tensiones a evitar' (avoid notes) crean disonancia no deseada a menos que se manejen con cuidado.",
+          },
+          {
+            type: "table",
+            columns: ["Tipo de acorde", "Tensiones disponibles", "Tensiones a evitar"],
+            rows: [
+              ["maj7 (I)", "9, #11, 13", "11 natural (choca con la 3ª mayor)"],
+              ["m7 (ii, iii, vi)", "9, 11, 13 (en ii y vi)", "b13 sobre iii (contexto dependiente)"],
+              ["7 (V dominante)", "9, #11, 13, b9, #9, b13", "Ninguna fija: el dominante acepta todas las alteraciones"],
+              ["m7b5 (vii°)", "9, 11, b13", "La 13 natural puede chocar"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Para el bajo: al construir lineas, las tensiones disponibles son notas de paso seguras. Si tocas la 9a sobre un ii-7, suena natural. Si tocas la 11 natural sobre un Imaj7, choca con la 3a mayor (a un semitono). Estas reglas se aplican mas en jazz y armonia funcional que en rock o pop.",
+          },
+        ],
+      },
+      {
+        title: "Voicings basicos y su relacion con arpegios",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Un voicing es la forma especifica en que distribuyes las notas de un acorde. No cambias las notas, cambias el orden y el registro en que aparecen. Los arpegios de bajo implicitamente sugieren un voicing segun el orden en que tocas las notas.",
+          },
+          {
+            type: "list",
+            title: "Tipos de voicing basicos",
+            items: [
+              "Posicion cerrada: todas las notas dentro de una octava (C-E-G-B). Sonido compacto.",
+              "Posicion abierta: las notas se distribuyen en mas de una octava (C-G-E-B). Sonido espacioso.",
+              "Drop 2: tomas la 2a nota mas aguda y la bajas una octava. Voicing muy usado en guitarra y piano jazz.",
+              "Shell voicing: solo la raiz, 3a y 7a. Lo minimo para definir el acorde. Ideal para bajo + piano duo.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Como bajista, tu funcion principal es tocar la raiz y definir el movimiento armonico. Pero al tocar arpegios, implicitamente estas creando un voicing lineal. Si tocas C-E-G-B (ascendente), el oyente percibe un Cmaj7 en posicion cerrada. Si tocas C-B-G-E (descendente), el efecto es diferente aunque el acorde sea el mismo.",
+          },
+        ],
+      },
     ],
     commonMistakes: [
       "Confundir maj7 (7ª mayor) con 7 (dominante, 7ª menor).",
       "Pensar que la 9ª y la 2ª son lo mismo sin entender la octava de diferencia.",
       "Olvidar que el semidisminuido tiene 5ª disminuida (diferente al dominante que tiene 5ª justa).",
+      "Tocar la 11 natural sobre un acorde maj7: choca con la 3ª a distancia de semitono.",
+      "No usar aproximacion cromatica en walking bass, lo que produce lineas 'saltadas' sin direccion.",
+      "Confundir voicing con inversion: el voicing es la distribucion espacial, la inversion cambia la nota mas grave.",
     ],
     reviewSummary: [
       "Un arpegio son las notas de un acorde tocadas en sucesion.",
@@ -4393,6 +4879,8 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Los 4 acordes de septima principales: maj7, m7, 7 (dominante), m7b5.",
       "Las guide tones (3ª y 7ª) definen la calidad del acorde.",
       "9ª = 2ª + octava. 11ª = 4ª + octava. 13ª = 6ª + octava.",
+      "En el bajo, los patrones de arpegio (1-3-5, 1-5-8, walking) son la base de las lineas.",
+      "Las tensiones disponibles varian segun el tipo de acorde.",
     ],
     checklistItems: [
       { id: "arp-1", text: "Puedo distinguir arpegio de acorde." },
@@ -4403,6 +4891,14 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         id: "arp-3",
         text: "Se que la 3a y la 7a son las guide tones que definen la calidad.",
+      },
+      {
+        id: "arp-4",
+        text: "Puedo tocar al menos 3 patrones de arpegio en el bajo.",
+      },
+      {
+        id: "arp-5",
+        text: "Entiendo que extensiones son disponibles sobre un acorde maj7 vs un dominante.",
       },
     ],
     microExercises: [
@@ -4427,6 +4923,27 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         prompt: "Que formula tiene el arpegio semidisminuido?",
         answer: "1-b3-b5-b7.",
+      },
+      {
+        prompt: "Que patron de bajo usarias para una linea simple de rock?",
+        answer: "1-5 o 1-5-8: raiz y quinta, con o sin octava.",
+      },
+      {
+        prompt: "Por que se evita la 11 natural sobre un acorde maj7?",
+        answer: "Porque la 11 (4ª) esta a un semitono de la 3ª mayor, creando una disonancia aspera.",
+      },
+      {
+        prompt: "Que es una aproximacion cromatica en walking bass?",
+        answer:
+          "Tocar una nota a un semitono de distancia de la raiz del siguiente acorde, justo antes de que cambie.",
+      },
+      {
+        prompt: "Que notas tiene un shell voicing de Dm7?",
+        answer: "D (raiz), F (3ª menor), C (7ª menor). Solo 3 notas.",
+      },
+      {
+        prompt: "Que extensiones son disponibles sobre un V7 dominante?",
+        answer: "Todas: 9, b9, #9, #11, 13, b13. El dominante acepta cualquier alteracion.",
       },
     ],
     glossary: [
@@ -4456,7 +4973,27 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         term: "Novena",
         definition:
-          "Segunda un octava arriba; agrega color sin cambiar la funcion armonica basica.",
+          "Segunda una octava arriba; agrega color sin cambiar la funcion armonica basica.",
+      },
+      {
+        term: "Tension disponible",
+        definition:
+          "Extension que suena consonante sobre un tipo de acorde especifico, sin chocar con sus notas basicas.",
+      },
+      {
+        term: "Avoid note",
+        definition:
+          "Nota de la escala que genera disonancia aspera contra una nota del acorde (ej. 11 natural sobre maj7).",
+      },
+      {
+        term: "Walking bass",
+        definition:
+          "Linea de bajo que se mueve principalmente por grado conjunto y arpegios, con un ataque por tiempo, tipica del jazz.",
+      },
+      {
+        term: "Voicing",
+        definition:
+          "Distribucion especifica de las notas de un acorde en cuanto a registro y orden.",
       },
     ],
   },
