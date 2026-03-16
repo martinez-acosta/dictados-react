@@ -526,7 +526,10 @@ function ChapterSidebar({
                             variant="text"
                             onClick={() => {
                               const sectionElement = document.getElementById(
-                                sectionAnchorId(chapter.chapterId, section.title),
+                                sectionAnchorId(
+                                  chapter.chapterId,
+                                  section.title,
+                                ),
                               );
                               if (sectionElement) {
                                 sectionElement.scrollIntoView({
@@ -1152,227 +1155,203 @@ function WorkbookContentsView({
   onOpenChapter: (chapterId: string) => void;
   onOpenSection: (chapterId: string, sectionTitle: string) => void;
 }) {
+  const reviewedCount = reviewedChapterIds.length;
+
   return (
     <Stack spacing={2.5}>
       <Paper
         sx={{
-          p: { xs: 2.5, sm: 4 },
-          borderRadius: 5,
-          color: "#fff",
+          p: { xs: 2.5, sm: 3.5 },
+          maxWidth: 980,
+          mx: "auto",
+          borderRadius: 4,
           background:
-            "linear-gradient(135deg, rgba(10,28,50,0.98), rgba(18,90,134,0.92))",
-          boxShadow: "0 28px 80px rgba(8, 33, 62, 0.28)",
+            "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.96))",
+          border: "1px solid rgba(15, 23, 42, 0.08)",
+          boxShadow: "0 20px 45px rgba(15, 23, 42, 0.06)",
         }}
       >
-        <Stack spacing={1.25}>
+        <Stack spacing={1} alignItems="center" textAlign="center">
           <Stack direction="row" spacing={1} alignItems="center">
-            <FormatListBulleted />
-            <Typography variant="overline" sx={{ letterSpacing: 2 }}>
-              Mapa completo
+            <FormatListBulleted sx={{ color: "#0f4c81" }} />
+            <Typography
+              variant="overline"
+              sx={{ letterSpacing: 1.8, color: "text.secondary" }}
+            >
+              Tabla de contenido
             </Typography>
           </Stack>
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 900,
-              lineHeight: 1.04,
-              fontSize: { xs: "2.2rem", md: "3.2rem" },
-            }}
-          >
+          <Typography variant="h3" sx={{ fontWeight: 800, color: "#102a43" }}>
             Contenido
           </Typography>
-          <Typography variant="body1" sx={{ maxWidth: 860, opacity: 0.9 }}>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ maxWidth: 860 }}
+          >
             Esta vista se genera automaticamente desde el mismo arbol del menu:
             bloques, capitulos y subcapitulos. Si actualizas el workbook, este
             contenido se actualiza tambien.
           </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {blocks.length} bloques, {chapters.length} capitulos,{" "}
+            {reviewedCount} revisados.
+          </Typography>
         </Stack>
       </Paper>
 
-      <Stack spacing={2}>
-        {blocks.map((block, blockIndex) => {
-          const theme = chapterTheme(blockIndex);
-          const reviewedInBlock = block.chapters.filter((chapter) =>
-            reviewedChapterIds.includes(chapter.chapterId),
-          ).length;
+      <Paper
+        variant="outlined"
+        sx={{
+          p: { xs: 2, sm: 3 },
+          maxWidth: 980,
+          mx: "auto",
+          width: "100%",
+          borderRadius: 4,
+          borderColor: "rgba(15, 23, 42, 0.08)",
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,252,255,0.96))",
+        }}
+      >
+        <Stack spacing={1.5}>
+          <Typography
+            variant="overline"
+            sx={{ letterSpacing: 1.6, color: "text.secondary" }}
+          >
+            Indice general
+          </Typography>
 
-          return (
-            <Paper
-              key={block.blockId}
-              variant="outlined"
-              sx={{
-                p: { xs: 2, sm: 2.5 },
-                borderRadius: 5,
-                borderColor: theme.border,
-                background: theme.panel,
-                boxShadow: `0 22px 55px ${theme.glow}`,
-              }}
-            >
-              <Stack spacing={2}>
-                <Stack
-                  direction={{ xs: "column", md: "row" }}
-                  justifyContent="space-between"
-                  spacing={1.5}
-                >
-                  <Box sx={{ maxWidth: 900 }}>
+          <Stack spacing={1.25}>
+            {blocks.map((block, blockIndex) => {
+              const theme = chapterTheme(blockIndex);
+              const reviewedInBlock = block.chapters.filter((chapter) =>
+                reviewedChapterIds.includes(chapter.chapterId),
+              ).length;
+
+              return (
+                <Box key={block.blockId}>
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={1}
+                    justifyContent="space-between"
+                    alignItems={{ xs: "flex-start", sm: "baseline" }}
+                    sx={{ pb: 0.5 }}
+                  >
                     <Typography
-                      variant="overline"
+                      variant="h6"
                       sx={{
-                        letterSpacing: 1.6,
-                        color: theme.accent,
                         fontWeight: 800,
+                        color: theme.accent,
+                        lineHeight: 1.2,
                       }}
                     >
                       {block.title}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                      {block.summary}
-                    </Typography>
-                  </Box>
-                  <Stack spacing={0.75} sx={{ minWidth: { md: 220 } }}>
                     <Typography variant="caption" color="text.secondary">
                       {reviewedInBlock}/{block.chapters.length} revisados
                     </Typography>
-                    <LinearProgress
-                      variant="determinate"
-                      value={blockProgress(block, reviewedChapterIds)}
-                      sx={{
-                        height: 8,
-                        borderRadius: 999,
-                        bgcolor: "rgba(15, 23, 42, 0.06)",
-                        "& .MuiLinearProgress-bar": {
-                          borderRadius: 999,
-                          background: `linear-gradient(90deg, ${theme.accent}, ${theme.deep})`,
-                        },
-                      }}
-                    />
                   </Stack>
-                </Stack>
 
-                <Stack spacing={1.5}>
-                  {block.chapters.map((chapter) => {
-                    const chapterIndex = chapters.findIndex(
-                      (item) => item.chapterId === chapter.chapterId,
-                    );
-                    const reviewed = reviewedChapterIds.includes(
-                      chapter.chapterId,
-                    );
+                  <Stack spacing={0.65} sx={{ pl: { xs: 0.5, sm: 2 } }}>
+                    {block.chapters.map((chapter) => {
+                      const chapterIndex = chapters.findIndex(
+                        (item) => item.chapterId === chapter.chapterId,
+                      );
+                      const reviewed = reviewedChapterIds.includes(
+                        chapter.chapterId,
+                      );
 
-                    return (
-                      <Paper
-                        key={chapter.chapterId}
-                        variant="outlined"
-                        sx={{
-                          p: 1.5,
-                          borderRadius: 3,
-                          borderColor: `${theme.accent}22`,
-                          background: "rgba(255,255,255,0.84)",
-                        }}
-                      >
-                        <Stack spacing={1.25}>
+                      return (
+                        <Box key={chapter.chapterId}>
                           <Stack
                             direction={{ xs: "column", sm: "row" }}
-                            justifyContent="space-between"
-                            spacing={1}
+                            spacing={0.5}
+                            alignItems={{ xs: "flex-start", sm: "baseline" }}
                           >
-                            <Box>
-                              <Stack
-                                direction="row"
-                                spacing={1}
-                                flexWrap="wrap"
-                                useFlexGap
-                                sx={{ mb: 0.5 }}
-                              >
-                                <Chip
-                                  size="small"
-                                  label={`Capitulo ${chapterIndex + 1}`}
-                                  sx={{ backgroundColor: `${theme.accent}14` }}
-                                />
-                                <Chip
-                                  size="small"
-                                  label={reviewed ? "Revisado" : "Pendiente"}
-                                  color={reviewed ? "success" : "default"}
-                                  variant={reviewed ? "filled" : "outlined"}
-                                />
-                              </Stack>
-                              <Typography
-                                variant="h6"
-                                sx={{ fontWeight: 800, lineHeight: 1.15 }}
-                              >
-                                {chapter.title}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ mt: 0.5 }}
-                              >
-                                {chapter.summary}
-                              </Typography>
-                            </Box>
                             <Button
-                              variant="outlined"
-                              sx={{ borderRadius: 999, alignSelf: "flex-start" }}
+                              variant="text"
                               onClick={() => onOpenChapter(chapter.chapterId)}
+                              sx={{
+                                px: 0,
+                                py: 0,
+                                minWidth: 0,
+                                textTransform: "none",
+                                justifyContent: "flex-start",
+                                color: "text.primary",
+                                fontWeight: 600,
+                                fontSize: "0.98rem",
+                                lineHeight: 1.45,
+                                "&:hover": {
+                                  backgroundColor: "transparent",
+                                  color: theme.accent,
+                                },
+                              }}
                             >
-                              Abrir capitulo
+                              {chapterIndex + 1}. {chapter.title}
                             </Button>
-                          </Stack>
-
-                          <Stack spacing={0.75}>
                             <Typography
                               variant="caption"
-                              sx={{ color: theme.accent, fontWeight: 700 }}
+                              sx={{
+                                color: reviewed
+                                  ? "success.main"
+                                  : "text.secondary",
+                                pl: { xs: 0, sm: 0.5 },
+                              }}
                             >
-                              Subcapitulos
+                              {reviewed
+                                ? "revisado"
+                                : `${chapter.sections.length} subcapitulos`}
                             </Typography>
-                            <Grid container spacing={1}>
-                              {chapter.sections.map((section, sectionIndex) => (
-                                <Grid
-                                  item
-                                  xs={12}
-                                  md={6}
-                                  key={`${chapter.chapterId}-${section.title}`}
-                                >
-                                  <Button
-                                    variant="text"
-                                    onClick={() =>
-                                      onOpenSection(
-                                        chapter.chapterId,
-                                        section.title,
-                                      )
-                                    }
-                                    sx={{
-                                      justifyContent: "flex-start",
-                                      width: "100%",
-                                      px: 1.2,
-                                      py: 0.8,
-                                      borderRadius: 2.5,
-                                      textTransform: "none",
-                                      color: "text.primary",
-                                      backgroundColor: "rgba(255,255,255,0.7)",
-                                      border:
-                                        "1px solid rgba(15, 23, 42, 0.05)",
-                                      "&:hover": {
-                                        backgroundColor: `${theme.accent}10`,
-                                      },
-                                    }}
-                                  >
-                                    {sectionIndex + 1}. {section.title}
-                                  </Button>
-                                </Grid>
-                              ))}
-                            </Grid>
                           </Stack>
-                        </Stack>
-                      </Paper>
-                    );
-                  })}
-                </Stack>
-              </Stack>
-            </Paper>
-          );
-        })}
-      </Stack>
+
+                          <Stack
+                            spacing={0.25}
+                            sx={{
+                              pl: { xs: 1.5, sm: 3 },
+                              pt: 0.15,
+                              pb: 0.35,
+                            }}
+                          >
+                            {chapter.sections.map((section, sectionIndex) => (
+                              <Button
+                                key={`${chapter.chapterId}-${section.title}`}
+                                variant="text"
+                                onClick={() =>
+                                  onOpenSection(
+                                    chapter.chapterId,
+                                    section.title,
+                                  )
+                                }
+                                sx={{
+                                  px: 0,
+                                  py: 0,
+                                  minWidth: 0,
+                                  textTransform: "none",
+                                  justifyContent: "flex-start",
+                                  color: "text.secondary",
+                                  fontSize: "0.9rem",
+                                  lineHeight: 1.45,
+                                  "&:hover": {
+                                    backgroundColor: "transparent",
+                                    color: theme.accent,
+                                  },
+                                }}
+                              >
+                                {chapterIndex + 1}.{sectionIndex + 1}{" "}
+                                {section.title}
+                              </Button>
+                            ))}
+                          </Stack>
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                </Box>
+              );
+            })}
+          </Stack>
+        </Stack>
+      </Paper>
     </Stack>
   );
 }
