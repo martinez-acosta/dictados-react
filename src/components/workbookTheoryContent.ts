@@ -287,19 +287,106 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Numero y calidad",
+        title: "Numero y calidad: el sistema de dos pasos",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Todo intervalo tiene dos partes. El numero dice cuantas letras abarca. La calidad dice como es esa distancia en comparacion con el modelo base. Por eso C a E puede ser una tercera; despues decides si es mayor o menor.",
+              "Todo intervalo tiene dos componentes independientes que debes calcular por separado. El numero (2ª, 3ª, 5ª, etc.) indica cuantas letras musicales abarca la distancia, contando siempre tanto la nota de salida como la de llegada. La calidad (mayor, menor, justa, aumentada, disminuida) indica el tamaño exacto en semitonos comparado con un modelo de referencia. El error mas comun es mezclar ambos pasos: intentar deducir la calidad sin haber fijado primero el numero correcto.",
           },
           {
             type: "example",
-            title: "Ejemplo",
+            title: "Paso 1: el numero",
             lines: [
-              "C a G = quinta porque cuentas C-D-E-F-G.",
-              "Despues comparas la distancia real y confirmas que es quinta justa.",
+              "C a G: cuentas las letras C-D-E-F-G = 5 letras = quinta.",
+              "C a E: cuentas C-D-E = 3 letras = tercera.",
+              "D a B: cuentas D-E-F-G-A-B = 6 letras = sexta.",
+              "IMPORTANTE: no cuentas teclas ni semitonos para el numero. Solo letras.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Una vez que tienes el numero, pasas a la calidad. Para eso necesitas saber cuantos semitonos mide el intervalo y compararlo con el modelo base. El modelo base se toma de la escala mayor construida desde la nota inferior: si el intervalo coincide con la nota de esa escala mayor, la calidad es mayor (para 2ª, 3ª, 6ª, 7ª) o justa (para 4ª, 5ª, 8ª).",
+          },
+          {
+            type: "example",
+            title: "Paso 2: la calidad",
+            lines: [
+              "C a E: tercera. En C major, E es el 3er grado = 4 semitonos = 3ª mayor.",
+              "C a Eb: tercera. Eb esta 1 semitono abajo del E natural = 3 semitonos = 3ª menor.",
+              "C a G: quinta. En C major, G es el 5o grado = 7 semitonos = 5ª justa.",
+              "C a G#: quinta. G# esta 1 semitono arriba del G natural = 8 semitonos = 5ª aumentada.",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Tabla de referencia completa de intervalos",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "La siguiente tabla muestra todos los intervalos simples con su tamaño en semitonos. Memorizar al menos los intervalos justos y mayores desde C es fundamental, porque sirven como patron de comparacion para calcular cualquier otro intervalo. Si un intervalo mayor se reduce un semitono, se vuelve menor. Si un intervalo justo se reduce, se vuelve disminuido. Si un intervalo mayor o justo se amplia, se vuelve aumentado.",
+          },
+          {
+            type: "table",
+            columns: ["Intervalo", "Semitonos", "Calidad", "Ejemplo desde C"],
+            rows: [
+              ["1ª justa (unisono)", "0", "Justa", "C - C"],
+              ["2ª menor", "1", "Menor", "C - Db"],
+              ["2ª mayor", "2", "Mayor", "C - D"],
+              ["3ª menor", "3", "Menor", "C - Eb"],
+              ["3ª mayor", "4", "Mayor", "C - E"],
+              ["4ª justa", "5", "Justa", "C - F"],
+              ["4ª aumentada / tritono", "6", "Aumentada", "C - F#"],
+              ["5ª disminuida / tritono", "6", "Disminuida", "C - Gb"],
+              ["5ª justa", "7", "Justa", "C - G"],
+              ["5ª aumentada", "8", "Aumentada", "C - G#"],
+              ["6ª menor", "8", "Menor", "C - Ab"],
+              ["6ª mayor", "9", "Mayor", "C - A"],
+              ["7ª menor", "10", "Menor", "C - Bb"],
+              ["7ª mayor", "11", "Mayor", "C - B"],
+              ["8ª justa", "12", "Justa", "C - C (octava)"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Observa que 5ª aumentada y 6ª menor tienen el mismo numero de semitonos (8), pero no son el mismo intervalo: uno abarca 5 letras y el otro abarca 6. Esa es la razon por la que no puedes clasificar intervalos solo contando semitonos: el nombre de las notas importa.",
+          },
+        ],
+      },
+      {
+        title: "Clasificacion completa de calidades",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Los intervalos se dividen en dos familias segun que calidades admiten. Los intervalos 'perfectos' (1ª, 4ª, 5ª, 8ª) se miden contra la calidad 'justa'. Los intervalos 'imperfectos' (2ª, 3ª, 6ª, 7ª) se miden contra la calidad 'mayor'. Este es el sistema completo:",
+          },
+          {
+            type: "table",
+            columns: ["Familia", "Posibles calidades (de menor a mayor tamaño)"],
+            rows: [
+              ["Perfectos (1ª, 4ª, 5ª, 8ª)", "disminuido → justo → aumentado"],
+              ["Imperfectos (2ª, 3ª, 6ª, 7ª)", "disminuido → menor → mayor → aumentado"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Nunca existe una '5ª mayor' ni una '3ª justa'. Los intervalos perfectos no tienen calidad mayor ni menor; los imperfectos no tienen calidad justa. Mezclar estas familias es un error frecuente en examenes de ingreso.",
+          },
+          {
+            type: "list",
+            title: "Como modificar la calidad",
+            items: [
+              "Intervalo mayor - 1 semitono = menor.",
+              "Intervalo menor - 1 semitono = disminuido.",
+              "Intervalo mayor + 1 semitono = aumentado.",
+              "Intervalo justo - 1 semitono = disminuido.",
+              "Intervalo justo + 1 semitono = aumentado.",
             ],
           },
         ],
@@ -310,73 +397,133 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
           {
             type: "paragraph",
             text:
-              "Un intervalo melodico se escucha una nota despues de otra. Un intervalo armonico se escucha al mismo tiempo. El nombre del intervalo puede ser el mismo, aunque la presentacion auditiva cambie.",
+              "Un intervalo melodico se produce cuando las dos notas suenan una despues de otra. Un intervalo armonico se produce cuando suenan al mismo tiempo. El nombre y la calidad del intervalo son identicos en ambos casos; lo que cambia es la presentacion auditiva. En dictado melodico necesitas reconocer intervalos sucesivos; en armonia escrita y analisis vertical trabajas con intervalos armonicos.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "Los intervalos melodicos pueden ser ascendentes o descendentes. En ambos casos, para nombrar el intervalo se cuentan las letras entre las dos notas de la misma manera. La direccion no cambia el nombre: C subiendo a E y C bajando a E (la E debajo) siguen siendo una tercera mayor, pero en direcciones opuestas.",
           },
           {
             type: "list",
-            title: "Proceso practico",
+            title: "Proceso practico para nombrar un intervalo",
             items: [
               "Escribe la nota de salida y la de llegada.",
-              "Cuenta letras incluyendo ambas notas.",
-              "Revisa la distancia real en semitonos.",
+              "Cuenta letras incluyendo ambas notas: eso da el numero.",
+              "Cuenta los semitonos reales entre las dos notas.",
+              "Compara ese numero de semitonos con la tabla de referencia.",
               "Asigna la calidad correcta.",
             ],
           },
         ],
       },
       {
-        title: "Patron de referencia e inversion",
+        title: "El tritono: caso especial",
         blocks: [
           {
-            type: "table",
-            columns: ["Intervalo base", "Desde C", "Tipo base"],
-            rows: [
-              ["2a", "C-D", "Mayor"],
-              ["3a", "C-E", "Mayor"],
-              ["4a", "C-F", "Justa"],
-              ["5a", "C-G", "Justa"],
-              ["6a", "C-A", "Mayor"],
-              ["7a", "C-B", "Mayor"],
-              ["8a", "C-C", "Justa"],
-            ],
+            type: "paragraph",
+            text:
+              "El tritono vale exactamente 6 semitonos (3 tonos enteros, de ahi su nombre). Es el unico intervalo que divide la octava exactamente a la mitad. Por eso es el intervalo mas inestable del sistema tonal y juega un papel central en la funcion de dominante.",
           },
           {
             type: "paragraph",
             text:
-              "Las inversiones tambien importan: una 3a suele invertir a 6a, una 2a a 7a y una 4a a 5a. Esta idea sirve mucho mas adelante en armonia y contrapunto.",
+              "Lo peculiar del tritono es que puede escribirse como 4ª aumentada o como 5ª disminuida, dependiendo de los nombres de las notas. C-F# es una 4ª aumentada (C-D-E-F = 4 letras). C-Gb es una 5ª disminuida (C-D-E-F-G = 5 letras). Ambas suenan identico pero se escriben diferente. En armonia funcional, la forma de escribirlo determina como resuelve: la 4ª aumentada resuelve abriendose (las notas se alejan), la 5ª disminuida resuelve cerrandose (las notas se acercan).",
+          },
+          {
+            type: "example",
+            title: "El tritono en el V7",
+            lines: [
+              "En C major, G7 tiene las notas G-B-D-F.",
+              "Entre B (3ª del acorde) y F (7ª del acorde) hay un tritono.",
+              "B tiende a subir a C (sensible → tonica).",
+              "F tiende a bajar a E (7ª → 3ª de la tonica).",
+              "Esa doble atraccion es la que produce la fuerza de la cadencia V-I.",
+            ],
           },
         ],
       },
       {
-        title: "Consonancia, disonancia e inversion",
+        title: "Inversion de intervalos",
         blocks: [
           {
             type: "paragraph",
             text:
-              "En teoria tonal no todos los intervalos generan la misma estabilidad. Las consonancias perfectas, como la 5a justa y la 8a, producen reposo fuerte. Las consonancias imperfectas, como 3as y 6as mayores o menores, tambien son estables, pero con menor rigidez. Las 2as, 7as y muchas 4as en ciertos contextos funcionan como disonancias y suelen pedir resolucion.",
+              "Invertir un intervalo significa trasladar una de las dos notas a la otra octava de modo que el intervalo pase a su complemento. La regla es simple: el numero del intervalo original + el numero del intervalo invertido = 9. Una 3ª invierte a 6ª (3+6=9). Una 2ª invierte a 7ª (2+7=9). Una 4ª invierte a 5ª (4+5=9).",
           },
           {
             type: "paragraph",
             text:
-              "La inversion de intervalos consiste en cambiar una nota de lugar de modo que el intervalo pase a su complemento dentro de la octava. Una 3a invierte a 6a, una 2a a 7a y una 4a a 5a. En esa inversion, mayor pasa a menor, menor pasa a mayor, aumentado pasa a disminuido, disminuido pasa a aumentado y justo permanece justo.",
+              "Al invertir, la calidad tambien se transforma de forma predecible: mayor pasa a menor, menor pasa a mayor, aumentado pasa a disminuido, disminuido pasa a aumentado y justo permanece justo. Esto no es una regla arbitraria: refleja el hecho de que los semitonos que faltan para completar la octava determinan la calidad del intervalo invertido.",
           },
           {
             type: "table",
-            columns: ["Intervalo", "Invierte a"],
+            columns: ["Intervalo original", "Invierte a", "Cambio de calidad"],
             rows: [
-              ["2a", "7a"],
-              ["3a", "6a"],
-              ["4a", "5a"],
-              ["5a", "4a"],
-              ["6a", "3a"],
-              ["7a", "2a"],
-              ["8a", "1a u 8a segun contexto"],
+              ["2ª mayor (2 st)", "7ª menor (10 st)", "Mayor → Menor"],
+              ["3ª menor (3 st)", "6ª mayor (9 st)", "Menor → Mayor"],
+              ["4ª justa (5 st)", "5ª justa (7 st)", "Justa → Justa"],
+              ["4ª aumentada (6 st)", "5ª disminuida (6 st)", "Aumentada → Disminuida"],
+              ["5ª justa (7 st)", "4ª justa (5 st)", "Justa → Justa"],
+              ["6ª mayor (9 st)", "3ª menor (3 st)", "Mayor → Menor"],
+              ["7ª mayor (11 st)", "2ª menor (1 st)", "Mayor → Menor"],
             ],
           },
           {
             type: "chips",
             title: "Regla rapida de calidad al invertir",
             items: ["Mayor ↔ Menor", "Aumentado ↔ Disminuido", "Justo ↔ Justo"],
+          },
+        ],
+      },
+      {
+        title: "Consonancia y disonancia",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "En teoria tonal, los intervalos se clasifican tambien por su grado de estabilidad sonora. Esta clasificacion es central para entender contrapunto, conduccion de voces y formacion de acordes.",
+          },
+          {
+            type: "table",
+            columns: ["Categoria", "Intervalos", "Efecto"],
+            rows: [
+              ["Consonancia perfecta", "Unisono, 5ª justa, 8ª justa", "Maximo reposo; las voces se funden"],
+              ["Consonancia imperfecta", "3ª mayor/menor, 6ª mayor/menor", "Estable pero con color; base de la triada"],
+              ["Disonancia suave", "4ª justa (en ciertos contextos)", "Estable entre voces internas pero disonante contra el bajo"],
+              ["Disonancia fuerte", "2ª mayor/menor, 7ª mayor/menor, tritono", "Tension que pide resolucion por grado conjunto"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "La 4ª justa es un caso especial: entre voces superiores suena consonante (por eso existe el acorde en segunda inversion), pero contra el bajo suena disonante. Es por eso que el acorde 6/4 se trata con mucho cuidado en armonia clasica. Las 3ªs y 6ªs son la base de la triada y del contrapunto a terceras, la textura mas comun en la musica tonal.",
+          },
+        ],
+      },
+      {
+        title: "Intervalos compuestos",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Un intervalo compuesto es aquel que excede la octava. Se nombra sumando 7 al intervalo simple correspondiente: la 2ª + octava = 9ª, la 3ª + octava = 10ª, la 4ª + octava = 11ª, la 5ª + octava = 12ª, la 6ª + octava = 13ª. La calidad se hereda del intervalo simple: una 9ª mayor tiene la misma calidad que una 2ª mayor, solo que una octava mas arriba.",
+          },
+          {
+            type: "table",
+            columns: ["Compuesto", "Equivale a", "Semitonos", "Uso principal"],
+            rows: [
+              ["9ª mayor", "2ª mayor + octava", "14", "Extension de acordes de septima"],
+              ["9ª menor", "2ª menor + octava", "13", "Dominante alterado (7b9)"],
+              ["11ª justa", "4ª justa + octava", "17", "Extension en acordes menores"],
+              ["11ª aumentada", "4ª aumentada + octava", "18", "Extension lidia en maj7#11"],
+              ["13ª mayor", "6ª mayor + octava", "21", "Extension en dominantes y mayores"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Los intervalos compuestos son fundamentales para entender la nomenclatura de acordes extendidos en jazz y armonia moderna. Cuando ves un acorde 'Dm9', el 9 se refiere a la novena mayor agregada sobre la septima. No es lo mismo que una segunda: la novena presupone que ya existe la septima debajo de ella.",
           },
         ],
       },
@@ -440,64 +587,133 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Escala y tonalidad",
+        title: "Escala y tonalidad: conceptos diferentes",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Una escala es una sucesion ordenada de notas. Una tonalidad es un sistema musical donde una nota funciona como centro y organiza las tensiones y resoluciones. Por eso una escala es material; una tonalidad es funcion.",
+              "Una escala es una sucesion ordenada de notas separadas por intervalos especificos. Una tonalidad es un sistema musical donde una nota funciona como centro de gravedad y organiza las tensiones y resoluciones. La escala es el material sonoro; la tonalidad es la funcion. Por eso puedes tocar una escala sin que eso signifique que estas 'en esa tonalidad': hace falta que el contexto musical establezca un centro tonal.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "Esta distincion importa porque dos escalas pueden compartir las mismas notas (como C mayor y A menor natural) y producir tonalidades completamente distintas. Lo que cambia es que nota actua como punto de reposo, que nota es la sensible, y como se comportan las tensiones. Cuando decimos 'la tonalidad de G mayor', estamos diciendo que G es el centro, que la escala mayor organizada desde G provee el material, y que las funciones tonales (tonica, dominante, predominante) se articulan alrededor de esa nota.",
           },
           {
             type: "chips",
-            items: ["Escala = notas ordenadas", "Tonalidad = centro tonal y funcion"],
+            items: ["Escala = notas ordenadas por patron", "Tonalidad = sistema funcional con centro", "Dos escalas con las mismas notas pueden ser tonalidades distintas"],
           },
         ],
       },
       {
-        title: "Patrones mayores y menores",
+        title: "Construccion de la escala mayor paso a paso",
         blocks: [
           {
-            type: "table",
-            columns: ["Tipo", "Patron"],
-            rows: [
-              ["Mayor", "T T S T T T S"],
-              ["Menor natural", "T S T T S T T"],
-              ["Menor armonica", "T S T T S T+S S"],
-              ["Menor melodica asc.", "T S T T T T S"],
+            type: "paragraph",
+            text:
+              "La escala mayor se construye aplicando un patron fijo de tonos (T) y semitonos (S): T-T-S-T-T-T-S. Este patron funciona desde cualquier nota. El procedimiento es siempre el mismo: eliges una nota de partida (la tonica), y aplicas el patron nota por nota, asegurandote de usar una letra distinta para cada grado (no repites letras ni saltas letras). Esa disciplina de spelling es tan importante como las alturas reales.",
+          },
+          {
+            type: "example",
+            title: "Construccion de G major paso a paso",
+            lines: [
+              "Tonica: G",
+              "G + T = A (2o grado)",
+              "A + T = B (3er grado)",
+              "B + S = C (4o grado)",
+              "C + T = D (5o grado)",
+              "D + T = E (6o grado)",
+              "E + T = F# (7o grado: no F natural, sino F# para cumplir un Tono)",
+              "F# + S = G (octava: cierra el ciclo)",
+              "Resultado: G A B C D E F#",
             ],
           },
           {
             type: "example",
-            title: "Ejemplos comparativos",
+            title: "Construccion de Eb major paso a paso",
             lines: [
-              "A natural minor = A B C D E F G",
-              "A harmonic minor = A B C D E F G#",
-              "A melodic minor asc. = A B C D E F# G#",
-              "A melodic minor desc. en enfoque tradicional = A G F E D C B A",
+              "Tonica: Eb",
+              "Eb + T = F",
+              "F + T = G",
+              "G + S = Ab",
+              "Ab + T = Bb",
+              "Bb + T = C",
+              "C + T = D",
+              "D + S = Eb",
+              "Resultado: Eb F G Ab Bb C D",
             ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Observa que en G major aparece un sostenido (F#) y en Eb major aparecen tres bemoles (Eb, Ab, Bb). El patron T-T-S-T-T-T-S es identico; lo que cambia son las alteraciones necesarias para mantener ese patron desde cada tonica. Esas alteraciones son exactamente las que aparecen en la armadura.",
           },
         ],
       },
       {
-        title: "Grados de la escala",
+        title: "Las tres formas de la escala menor",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Cada nota de la escala cumple una funcion por grado: tonica, supertonica, mediante, subdominante, dominante, superdominante y sensible o subtónica segun el contexto. Esas funciones preparan el terreno para armonizacion y analisis.",
+              "A diferencia de la escala mayor, que tiene una sola forma, la escala menor tiene tres variantes. Cada una modifica los grados 6o y/o 7o para lograr un efecto armonico o melodico distinto. No son tres escalas independientes: son tres estados del mismo sistema menor. Un compositor puede usar las tres dentro de la misma pieza, incluso dentro de la misma frase.",
           },
           {
             type: "table",
-            columns: ["Numero", "Nombre funcional"],
+            columns: ["Forma", "Patron", "Grados modificados", "Notas en A"],
             rows: [
-              ["1", "Tonica"],
-              ["2", "Supertonica"],
-              ["3", "Mediante"],
-              ["4", "Subdominante"],
-              ["5", "Dominante"],
-              ["6", "Superdominante"],
-              ["7", "Sensible o subtónica"],
+              ["Menor natural", "T S T T S T T", "Ninguno", "A B C D E F G"],
+              ["Menor armonica", "T S T T S T+S S", "7o elevado", "A B C D E F G#"],
+              ["Menor melodica asc.", "T S T T T T S", "6o y 7o elevados", "A B C D E F# G#"],
             ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "La menor natural es la forma base: comparte exactamente las mismas notas que su relativa mayor (A menor natural = C mayor). Su problema funcional es que el 7o grado (G) esta a un tono de la tonica (A), no a un semitono. Eso significa que no hay sensible y la dominante es debil.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "La menor armonica resuelve ese problema elevando el 7o grado medio tono (G pasa a G#). Ahora G# esta a un semitono de A, creando una sensible fuerte y permitiendo que el acorde de dominante sea mayor (E-G#-B en lugar de E-G-B). El precio es que entre F y G# queda un intervalo de tono y medio (segunda aumentada), que suena exotico y a veces incomodo melodicamente.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "La menor melodica suaviza ese intervalo incomodo elevando tambien el 6o grado (F pasa a F#). Asi F#-G# es un tono normal. En el enfoque clasico, al descender se vuelve a la forma natural (A-G-F-E-D-C-B-A) porque ya no se necesita la sensible. En el enfoque jazz/moderno, la forma ascendente se usa en ambas direcciones.",
+          },
+        ],
+      },
+      {
+        title: "Grados de la escala y sus funciones",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Cada posicion dentro de la escala recibe un nombre funcional que describe su papel en el sistema tonal. Estos nombres no son arbitrarios: reflejan la relacion de cada nota con la tonica y su tendencia de movimiento. Conocer estos nombres es esencial para entender la armonizacion y el analisis funcional.",
+          },
+          {
+            type: "table",
+            columns: ["Grado", "Nombre funcional", "Papel en el sistema tonal"],
+            rows: [
+              ["1o", "Tonica", "Centro de gravedad; punto de maximo reposo"],
+              ["2o", "Supertonica", "Un grado por encima de la tonica; base del ii"],
+              ["3o", "Mediante", "Define si el caracter es mayor (3a mayor) o menor (3a menor)"],
+              ["4o", "Subdominante", "Zona de preparacion; tiende hacia la dominante"],
+              ["5o", "Dominante", "Maxima tension funcional; polo opuesto a la tonica"],
+              ["6o", "Superdominante", "Un grado por encima de la dominante; base del vi"],
+              ["7o", "Sensible (mayor/armo.) o Subtonica (nat.)", "A semitono de la tonica = sensible; a tono = subtonica"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "El 3er grado es especial porque determina el modo: si la distancia entre tonica y mediante es de 4 semitonos (3a mayor), el modo es mayor; si es de 3 semitonos (3a menor), el modo es menor. Esa sola nota cambia completamente el color de la escala.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "La distincion entre sensible y subtonica es critica: la sensible (7o grado a semitono de la tonica) genera una atraccion irresistible hacia la tonica, especialmente en contextos armonicos. La subtonica (a un tono) no tiene esa fuerza. Por eso la menor natural tiene una dominante debil: su 7o grado es subtonica, no sensible.",
           },
         ],
       },
@@ -507,20 +723,22 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
           {
             type: "paragraph",
             text:
-              "La armadura resume que alteraciones son habituales dentro de una tonalidad o pasaje. No equivale por si sola a toda la explicacion musical, pero orienta de inmediato sobre el material sonoro probable. Por ejemplo, una armadura con un sostenido suele apuntar hacia G mayor o E menor, aunque el centro tonal real se confirma por contexto, reposo y funcion.",
+              "La armadura resume que alteraciones son habituales dentro de una tonalidad. No equivale a toda la explicacion musical, pero orienta de inmediato sobre el material sonoro probable. Una armadura con un sostenido (F#) puede corresponder a G mayor o E menor, porque ambas tonalidades comparten las mismas notas y la misma armadura. El centro tonal real se confirma por otros medios: melodía, bajo, cadencias y reposo.",
           },
           {
             type: "paragraph",
             text:
-              "El centro tonal es la nota que funciona como punto principal de reposo. Por eso dos escalas pueden compartir notas y, aun asi, no sentirse iguales. La organizacion de tensiones, la sensible y la direccion melodica dependen de que nota actua como tonica.",
+              "El centro tonal es la nota que funciona como punto principal de reposo. Por eso dos escalas pueden compartir notas y producir sensaciones completamente distintas. La organizacion de tensiones, la presencia o ausencia de sensible, y la direccion melodica dependen de que nota actua como tonica. Determinar el centro tonal de una pieza es el primer paso del analisis armonico.",
           },
           {
             type: "example",
-            title: "Relacion entre armadura y centro tonal",
+            title: "Como confirmar el centro tonal",
             lines: [
-              "Un sostenido en armadura puede corresponder a G mayor o E menor.",
-              "Las notas pueden coincidir, pero el centro tonal cambia la percepcion musical.",
-              "Por eso la armadura orienta, pero no sustituye el analisis.",
+              "1. Mira en que nota tiende a terminar la melodia (reposo).",
+              "2. Observa el bajo: suele apoyar la tonica en puntos cadenciales.",
+              "3. Busca cadencias V-I: la nota de llegada es la tonica probable.",
+              "4. Si la armadura tiene F# y la musica reposa en G, la tonalidad es G mayor.",
+              "5. Si reposa en E con la misma armadura, la tonalidad es E menor.",
             ],
           },
         ],
@@ -586,42 +804,73 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Relativas",
+        title: "Escalas relativas: mismas notas, diferente centro",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Una escala mayor y su menor relativa tienen las mismas notas y la misma armadura. Lo que cambia es la tonica. Por ejemplo, C major y A minor usan exactamente C D E F G A B.",
+              "Dos escalas son relativas cuando comparten exactamente las mismas notas y la misma armadura, pero tienen diferente tonica. La relativa menor de cualquier escala mayor se encuentra en el 6o grado. La relativa mayor de cualquier escala menor se encuentra en el 3er grado. Esta relacion es sistematica y funciona para todas las tonalidades.",
           },
           {
-            type: "list",
-            items: [
-              "Mayor -> menor relativa = 6o grado.",
-              "Menor -> mayor relativa = 3er grado.",
-              "La armadura es la misma.",
+            type: "table",
+            columns: ["Mayor", "Armadura", "Menor relativa"],
+            rows: [
+              ["C major", "0 alteraciones", "A minor"],
+              ["G major", "1# (F#)", "E minor"],
+              ["D major", "2# (F#, C#)", "B minor"],
+              ["F major", "1b (Bb)", "D minor"],
+              ["Bb major", "2b (Bb, Eb)", "G minor"],
+              ["Eb major", "3b (Bb, Eb, Ab)", "C minor"],
+              ["A major", "3# (F#, C#, G#)", "F# minor"],
             ],
           },
           {
             type: "paragraph",
             text:
-              "Aunque dos escalas relativas comparten exactamente las mismas notas, no producen la misma sensacion tonal. La razon es que la tonica cambia. Eso modifica jerarquias, puntos de reposo, comportamiento de la sensible y direccion general de la frase. Compartir material no significa compartir funcion.",
+              "Aunque relativas comparten las mismas notas, producen sensaciones tonales completamente dferentes. La razon es que el centro tonal cambia. En C mayor, la nota C es el punto de maximo reposo y B funciona como sensible. En A menor, la nota A es el reposo y el 7o grado (G) es subtonica, no sensible. Eso cambia radicalmente la jerarquia de tensiones, el comportamiento de las cadencias, y la direccion melodica general.",
+          },
+          {
+            type: "example",
+            title: "C major vs A minor: mismas notas, diferente funcion",
+            lines: [
+              "Notas compartidas: C D E F G A B",
+              "En C major: C = tonica, G = dominante, B = sensible",
+              "En A minor: A = tonica, E = dominante, G = subtonica (no sensible)",
+              "La melodia que reposa en C suena 'cerrada' en C major",
+              "La misma melodia reposando en A suena 'cerrada' en A minor",
+            ],
           },
         ],
       },
       {
-        title: "Paralelas",
+        title: "Escalas paralelas: misma tonica, diferente material",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Las escalas paralelas comparten tonica, no notas. C major y C minor empiezan en C, pero no tienen la misma armadura ni el mismo material sonoro.",
+              "Dos escalas son paralelas cuando comparten la misma tonica pero tienen notas distintas. C major y C minor empiezan en C, pero no usan las mismas alteraciones. C major tiene 0 alteraciones; C minor tiene 3 bemoles (Bb, Eb, Ab). Las diferencias principales estan en los grados 3o, 6o y 7o: en mayor son naturales, en menor son medio tono mas bajos.",
           },
           {
             type: "table",
-            columns: ["Relacion", "Comparte", "Ejemplo"],
+            columns: ["Relacion", "Que comparte", "Que cambia", "Ejemplo"],
             rows: [
-              ["Relativas", "Notas y armadura", "C major / A minor"],
-              ["Paralelas", "Tonica", "C major / C minor"],
+              ["Relativas", "Notas y armadura", "Tonica", "C major / A minor"],
+              ["Paralelas", "Tonica", "Notas y armadura", "C major / C minor"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "El intercambio modal (borrowing) consiste en tomar acordes prestados de la paralela. Por ejemplo, estando en C major puedes usar el acorde de Ab (IV de C minor) como acorde 'prestado'. Este recurso es muy comun en musica popular y romantica, y produce un color especial que enriquece la armonia sin salir de la tonalidad principal. Entender la relacion entre paralelas es la base para comprender el intercambio modal.",
+          },
+          {
+            type: "example",
+            title: "Comparacion C major vs C minor",
+            lines: [
+              "C major: C D E F G A B (0 alteraciones)",
+              "C minor: C D Eb F G Ab Bb (3 bemoles)",
+              "Diferencias clave: 3o, 6o y 7o grados",
+              "Acorde prestado tipico: usar Ab o Fm (de C minor) dentro de C major",
             ],
           },
         ],
@@ -682,85 +931,144 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Construccion basica",
+        title: "Que es una triada y como se construye",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Una triada se forma apilando dos terceras sobre una nota raiz. El resultado minimo es raiz, tercera y quinta. Lo primero es escribir esas letras correctas; despues revisas la calidad real.",
+              "Una triada es el acorde mas basico de la musica tonal: tres notas apiladas por terceras sobre una raiz. Las tres notas reciben nombres funcionales: raiz (o fundamental), tercera y quinta. El proceso de construccion es siempre el mismo: empiezas en la raiz, saltas una letra para llegar a la tercera, y saltas otra letra para llegar a la quinta. Despues ajustas con alteraciones segun la calidad que necesites.",
           },
           {
             type: "example",
-            title: "Esqueleto de C",
+            title: "Procedimiento paso a paso desde D",
             lines: [
-              "Raiz: C",
-              "Tercera: E",
-              "Quinta: G",
-              "Resultado: C-E-G",
+              "1. Raiz: D",
+              "2. Tercera: salta una letra (E) y llega a F. Pero D mayor necesita F#.",
+              "3. Quinta: salta una letra (G) y llega a A. A es la quinta justa de D.",
+              "4. Resultado: D-F#-A = triada de D mayor.",
+              "5. Si quieres D menor: baja la tercera un semitono = D-F-A.",
             ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Observa que primero fijas las letras correctas (D-F-A) y despues decides las alteraciones. Este orden es fundamental en teoria: la estructura por letras (spelling) es tan importante como la altura real. D-F#-A es un D mayor bien escrito. D-Gb-A suena identico pero esta mal deletreado porque Gb no es una tercera de D, es una cuarta disminuida.",
           },
         ],
       },
       {
-        title: "Calidades y simbolos",
+        title: "Las cuatro calidades de triada",
         blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Las cuatro calidades surgen de combinar dos tipos de tercera (mayor o menor) con tres tipos de quinta (justa, disminuida o aumentada). Cada combinacion produce un color sonoro distinto. En la practica, la mayor y la menor son las mas frecuentes; la disminuida aparece naturalmente en el VII grado del modo mayor; la aumentada es la menos comun en contextos diatonicos.",
+          },
           {
             type: "table",
-            columns: ["Calidad", "Formula", "Ejemplo", "Simbolo habitual"],
+            columns: ["Calidad", "Formula", "Semitonos", "Ejemplo en C", "Ejemplo en E", "Simbolo"],
             rows: [
-              ["Mayor", "1 - 3 - 5", "C E G", "C"],
-              ["Menor", "1 - b3 - 5", "C Eb G", "Cm"],
-              ["Disminuida", "1 - b3 - b5", "C Eb Gb", "Cdim o C°"],
-              ["Aumentada", "1 - 3 - #5", "C E G#", "C+ o Caug"],
+              ["Mayor", "1 - 3 - 5", "0 - 4 - 7", "C E G", "E G# B", "C / E"],
+              ["Menor", "1 - b3 - 5", "0 - 3 - 7", "C Eb G", "E G B", "Cm / Em"],
+              ["Disminuida", "1 - b3 - b5", "0 - 3 - 6", "C Eb Gb", "E G Bb", "Cdim (C°) / Edim"],
+              ["Aumentada", "1 - 3 - #5", "0 - 4 - 8", "C E G#", "E G# B# (=C)", "Caug (C+) / Eaug"],
             ],
           },
           {
             type: "paragraph",
             text:
-              "Si la tercera es mayor y la quinta justa, la triada es mayor. Si la tercera baja, se vuelve menor. Si ademas la quinta se encoge, se vuelve disminuida. Si la quinta sube, se vuelve aumentada.",
+              "La diferencia entre mayor y menor es un solo semitono en la tercera (4 vs 3 semitonos). La diferencia entre menor y disminuida es un solo semitono en la quinta (7 vs 6 semitonos). La aumentada sube la quinta un semitono respecto a la mayor (7 vs 8 semitonos). Por eso un solo semitono de diferencia cambia completamente el caracter del acorde.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "Es util pensar en las triadas como combinaciones de dos terceras apiladas: la mayor se construye con una 3a mayor + una 3a menor. La menor con una 3a menor + una 3a mayor. La disminuida con dos 3as menores. La aumentada con dos 3as mayores. Esta perspectiva te permite construir cualquier triada mentalmente con mucha rapidez.",
+          },
+          {
+            type: "table",
+            columns: ["Calidad", "Tercera inferior", "Tercera superior", "Resultado"],
+            rows: [
+              ["Mayor", "3a mayor (4 st)", "3a menor (3 st)", "5a justa (7 st)"],
+              ["Menor", "3a menor (3 st)", "3a mayor (4 st)", "5a justa (7 st)"],
+              ["Disminuida", "3a menor (3 st)", "3a menor (3 st)", "5a disminuida (6 st)"],
+              ["Aumentada", "3a mayor (4 st)", "3a mayor (4 st)", "5a aumentada (8 st)"],
+            ],
           },
         ],
       },
       {
-        title: "Estado fundamental y disposicion",
+        title: "Por que suenan diferente: la acustica basica",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Una triada en estado fundamental tiene la raiz abajo. Eso no es lo mismo que hablar de disposicion abierta o cerrada. Disposicion describe separacion entre voces; inversion describe que nota esta en el bajo.",
+              "La triada mayor suena brillante y estable porque sus intervalos internos coinciden con los primeros armonicos naturales de una nota (la serie armonica). La tercera mayor y la quinta justa son los intervalos mas simples despues del unisono y la octava. La triada menor invierte el orden de las terceras, lo que produce un color mas oscuro y melancolico. La disminuida acumula tension por la quinta disminuida (tritono implicito). La aumentada genera un efecto de apertura e inestabilidad porque la quinta aumentada no tiene resolucion clara.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "Estas diferencias no son subjetivas: tienen una base acustica en la forma en que las frecuencias se relacionan. Aunque no necesitas estudiar acustica para un examen de ingreso, es util saber que el sistema tonal no es arbitrario: los intervalos que suenan mas estables son los que tienen relaciones de frecuencia mas simples.",
+          },
+        ],
+      },
+      {
+        title: "Estado fundamental, inversiones y disposicion",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Una triada en estado fundamental tiene la raiz como nota mas grave. Cuando la tercera esta en el bajo, es primera inversion. Cuando la quinta esta en el bajo, es segunda inversion. Es crucial distinguir inversion de disposicion: la inversion dice que nota esta en el bajo; la disposicion dice como estan separadas las voces (cerrada = dentro de una octava, abierta = voces separadas por mas de una octava).",
+          },
+          {
+            type: "table",
+            columns: ["Estado", "Ejemplo en C", "Bajo", "Cifrado"],
+            rows: [
+              ["Fundamental", "C-E-G", "C (raiz)", "5 (o sin cifra)"],
+              ["1a inversion", "E-G-C", "E (3a)", "6"],
+              ["2a inversion", "G-C-E", "G (5a)", "6/4"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Invertir un acorde no cambia su nombre ni su calidad: E-G-C sigue siendo un acorde de C mayor, solo que en primera inversion. Lo que cambia es la sonoridad y la funcion del bajo. La segunda inversion (6/4) es la mas inestable y se usa con restricciones en armonia clasica.",
           },
           {
             type: "example",
-            title: "Comparacion",
+            title: "Inversion vs disposicion",
             lines: [
-              "C-E-G = fundamental, disposicion cerrada",
-              "C-G-E = fundamental, disposicion abierta",
-              "E-G-C = 1a inversion",
+              "C-E-G = fundamental, disposicion cerrada.",
+              "C-G-E (una octava arriba) = fundamental, disposicion abierta.",
+              "E-G-C = 1a inversion, disposicion cerrada.",
+              "E-C-G (una octava arriba) = 1a inversion, disposicion abierta.",
+              "En todos los casos, la calidad es C mayor.",
             ],
           },
         ],
       },
       {
-        title: "Spelling correcto",
+        title: "Spelling correcto: por que importa la escritura",
         blocks: [
           {
             type: "paragraph",
             text:
-              "En teoria no basta con aproximarse al sonido en un teclado. Tambien importa la escritura correcta de las notas. Una triada debe conservar la logica de raiz, tercera y quinta por nombre de letra. Si se rompe esa logica, la escritura deja de reflejar la estructura real del acorde.",
+              "En teoria musical no basta con que las notas suenen correctas: la escritura debe reflejar la estructura real del acorde. Una triada siempre se escribe con letras alternas (saltas una): raiz, tercera (2 letras mas arriba), quinta (2 letras mas arriba). Si se rompe esa logica, la escritura no refleja la funcion y confunde el analisis.",
           },
           {
             type: "table",
-            columns: ["Caso", "Escritura", "Comentario"],
+            columns: ["Caso", "Escritura", "Correcto?", "Por que"],
             rows: [
-              ["Triada aumentada correcta", "C E G#", "Mantiene raiz, 3a y 5a alterada"],
-              ["Error de spelling", "C Fb G", "No esta escrita por terceras apiladas"],
-              ["Triada disminuida correcta", "B D F", "Raiz, 3a menor y 5a disminuida"],
+              ["Triada mayor de C", "C E G", "Si", "Letras alternas: C-(D)-E-(F)-G"],
+              ["Triada aumentada de C", "C E G#", "Si", "Raiz-3a-5a aumentada por nombre"],
+              ["Equivalente incorrecto", "C E Ab", "No", "Ab es una 6a menor, no una 5a aumentada"],
+              ["Triada disminuida de B", "B D F", "Si", "Raiz-3a menor-5a disminuida"],
+              ["Equivalente incorrecto", "B D E#", "No", "E# es una 4a aumentada, no una 5a"],
             ],
           },
           {
             type: "paragraph",
             text:
-              "Por eso, al construir una triada, primero se fijan las letras correctas y despues se corrigen con alteraciones. Esa disciplina es muy importante en armonia, analisis y examenes de ingreso.",
+              "La regla es: primero fija las tres letras correctas (siempre alternas en el alfabeto musical), y despues ajusta con sostenidos o bemoles para lograr la calidad deseada. Jamas reorganices las letras saltandote posiciones del alfabeto. Esta disciplina es indispensable en examenes de armonia y analisis.",
           },
         ],
       },
@@ -1250,42 +1558,64 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "De triada a cuatriada",
+        title: "De triada a cuatriada: como se agrega la septima",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Un acorde de septima nace cuando a la triada le agregas la septima correspondiente. Por eso primero debes dominar la triada y luego revisar que tipo de septima aparece sobre la raiz.",
+              "Un acorde de septima (o cuatriada) se forma cuando a una triada le agregas una tercera mas, obteniendo una cuarta nota: la septima. El proceso es identico al de las triadas: partes de la raiz, apilas la tercera, la quinta y despues la septima, todo dentro de la misma logica de letras alternas. Hay dos tipos de septima que debes distinguir: la septima mayor (a 11 semitonos de la raiz) y la septima menor (a 10 semitonos). Ademas existe la septima disminuida (9 semitonos), que aparece solo en el acorde dim7.",
           },
           {
             type: "example",
-            title: "Ejemplos",
+            title: "Construccion de Cmaj7 paso a paso",
             lines: [
-              "Cmaj7 = C E G B",
-              "Am7 = A C E G",
-              "G7 = G B D F",
+              "1. Triada base: C mayor = C-E-G",
+              "2. Septima: la siguiente tercera apilada es B (C-D-E-F-G-A-B = 7 letras)",
+              "3. C a B = 11 semitonos = septima mayor",
+              "4. Resultado: C-E-G-B = Cmaj7",
+            ],
+          },
+          {
+            type: "example",
+            title: "Construccion de C7 (dominante) paso a paso",
+            lines: [
+              "1. Triada base: C mayor = C-E-G",
+              "2. Septima: la septima por letra es B, pero la bajamos un semitono: Bb",
+              "3. C a Bb = 10 semitonos = septima menor",
+              "4. Resultado: C-E-G-Bb = C7",
+              "5. Observa: la triada es mayor pero la septima es menor. Esa combinacion es unica del acorde dominante.",
             ],
           },
         ],
       },
       {
-        title: "Calidades principales",
+        title: "Las cinco calidades principales de septima",
         blocks: [
           {
+            type: "paragraph",
+            text:
+              "Existen cinco calidades principales de acordes de septima. Cada una combina un tipo de triada con un tipo de septima. Memorizarlas es indispensable porque aparecen constantemente en armonia, analisis y examen de ingreso.",
+          },
+          {
             type: "table",
-            columns: ["Simbolo", "Formula", "Lectura"],
+            columns: ["Simbolo", "Formula", "Semitonos", "Triada base", "Septima", "Ejemplo en C"],
             rows: [
-              ["maj7", "1 - 3 - 5 - 7", "Triada mayor + septima mayor"],
-              ["m7", "1 - b3 - 5 - b7", "Triada menor + septima menor"],
-              ["7", "1 - 3 - 5 - b7", "Triada mayor + septima menor"],
-              ["m7b5", "1 - b3 - b5 - b7", "Semidisminuido"],
-              ["dim7", "1 - b3 - b5 - bb7", "Disminuido completo"],
+              ["maj7", "1-3-5-7", "0-4-7-11", "Mayor", "Mayor (11 st)", "C E G B"],
+              ["m7", "1-b3-5-b7", "0-3-7-10", "Menor", "Menor (10 st)", "C Eb G Bb"],
+              ["7 (dom.)", "1-3-5-b7", "0-4-7-10", "Mayor", "Menor (10 st)", "C E G Bb"],
+              ["m7b5 (ø)", "1-b3-b5-b7", "0-3-6-10", "Disminuida", "Menor (10 st)", "C Eb Gb Bb"],
+              ["dim7 (°7)", "1-b3-b5-bb7", "0-3-6-9", "Disminuida", "Disminuida (9 st)", "C Eb Gb Bbb (=A)"],
             ],
           },
           {
             type: "paragraph",
             text:
-              "La gran confusion suele ser entre maj7 y 7. Ambos tienen tercera mayor, pero la septima cambia: maj7 lleva 7 natural; dominante 7 lleva b7.",
+              "La confusion mas peligrosa es entre maj7 y 7. Ambos tienen triada mayor como base, pero la septima es diferente: maj7 lleva septima mayor (B natural en C), mientras que 7 (dominante) lleva septima menor (Bb en C). Un truco practico: si la septima esta a un semitono de la octava, es mayor (maj7). Si esta a un tono de la octava, es menor (7). Esta diferencia de un solo semitono cambia completamente la funcion del acorde.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "Otro error comun es confundir m7b5 con dim7. Ambos tienen triada disminuida como base, pero el tipo de septima es distinto: m7b5 tiene septima menor (10 semitonos), dim7 tiene septima disminuida (9 semitonos). m7b5 aparece naturalmente en el VII de la escala mayor. dim7 aparece en el vii de la menor armonica y tiene la particularidad de estar formado por tres terceras menores iguales, lo que lo hace simetricamente divisible.",
           },
         ],
       },
@@ -1561,64 +1891,121 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Tres grandes zonas funcionales",
+        title: "El sistema de tres funciones",
         blocks: [
+          {
+            type: "paragraph",
+            text:
+              "La armonia tonal se organiza en tres grandes funciones: tonica, predominante (o subdominante) y dominante. Esta no es una clasificacion arbitraria: refleja la jerarquia de tensiones que estructura el lenguaje musical tonal. La tonica es el punto de reposo; la dominante es el punto de maxima tension que exige resolucion; la predominante es la zona que prepara y dirige el movimiento hacia la dominante.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "La fuerza de este sistema radica en la direccion: el flujo natural es T (tonica) → PD (predominante) → D (dominante) → T (tonica). Este ciclo no es una ley inviolable, pero si el patron mas comun y el que el oido espera en contextos tonales. Cuando un compositor lo sigue, la musica suena 'logica'; cuando lo rompe intencionalmente (como en una cadencia de engaño), la sorpresa tiene efecto precisamente porque viola esa expectativa.",
+          },
           {
             type: "table",
-            columns: ["Zona", "Grados frecuentes", "Sensacion general"],
+            columns: ["Zona funcional", "Grados principales", "Grados sustitutos", "Sensacion"],
             rows: [
-              ["Tonica", "I, vi, a veces iii", "Reposo, estabilidad"],
-              ["Predominante", "ii, IV", "Preparacion"],
-              ["Dominante", "V, vii°", "Tension, necesidad de resolver"],
-            ],
-          },
-          {
-            type: "paragraph",
-            text:
-              "Estas zonas no son una regla mecanica absoluta, pero sirven muchisimo para empezar a analizar progresiones y para entender por que ciertos acordes tienden a otros.",
-          },
-        ],
-      },
-      {
-        title: "Sensible y resolucion",
-        blocks: [
-          {
-            type: "paragraph",
-            text:
-              "La sensible es el 7o grado que esta a semitono de la tonica. Por eso genera mucha atraccion hacia ella. Cuando aparece en V o vii°, la sensacion de resolucion hacia I se vuelve muy fuerte.",
-          },
-          {
-            type: "example",
-            title: "En C major",
-            lines: [
-              "B tiende a C",
-              "G7 tiende a C",
-              "Bdim tiende a C",
+              ["Tonica (T)", "I", "vi, iii (parcialmente)", "Reposo, estabilidad, llegada"],
+              ["Predominante (PD)", "IV, ii", "vi (a veces)", "Preparacion, movimiento hacia D"],
+              ["Dominante (D)", "V", "vii°", "Tension maxima, necesidad de resolver"],
             ],
           },
         ],
       },
       {
-        title: "Progresiones funcionales basicas",
+        title: "Por que cada grado cumple su funcion",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Una funcion tonal se entiende mejor cuando se observa dentro de una progresion real. La tonica da reposo, la predominante prepara el movimiento y la dominante concentra la tension que busca resolucion. Ver esa direccion en cadenas sencillas es esencial para el analisis inicial.",
+              "I es tonica porque contiene la nota fundamental de la tonalidad y produce la maxima estabilidad. vi funciona como sustituto de I porque comparte dos notas con el acorde de tonica (en C major: Am tiene A-C-E, dos notas comunes con C-E-G). iii es el miembro mas ambiguo: en C major, Em tiene E-G-B, comparte dos notas con I pero tambien con V. Por eso iii puede funcionar como tonica debil o como dominante sin sensible, dependiendo del contexto.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "IV y ii son predominantes porque preparan armonicamente la llegada de V. IV suena como una expansion directa desde I (solo un grado mas arriba). ii es el predominante mas fuerte porque contiene la cuarta de la escala (nota fundamental de IV) y al moverse a V produce un movimiento de bajo por quinta descendente (D → G en C major), que es el movimiento de bajo mas poderoso en armonia tonal.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "V y vii° son dominantes porque ambos contienen la sensible (7o grado de la escala). La sensible esta a semitono de la tonica y genera una atraccion casi irresistible hacia ella. V7 ademas contiene un tritono entre la sensible y la septima (B-F en G7), lo que duplica la tension. vii° contiene ese mismo tritono como parte de su estructura interna, por eso puede sustituir a V: comparte el mecanismo de tension.",
+          },
+          {
+            type: "table",
+            columns: ["Grado en C major", "Notas", "Notas comunes con I (C-E-G)", "Funcion"],
+            rows: [
+              ["I: C", "C E G", "3 de 3", "Tonica principal"],
+              ["ii: Dm", "D F A", "0 de 3", "Predominante fuerte"],
+              ["iii: Em", "E G B", "2 de 3", "Tonica debil / ambiguo"],
+              ["IV: F", "F A C", "1 de 3", "Predominante"],
+              ["V: G", "G B D", "0 de 3", "Dominante"],
+              ["vi: Am", "A C E", "2 de 3", "Tonica sustituta"],
+              ["vii°: Bdim", "B D F", "0 de 3", "Dominante sin raiz"],
+            ],
+          },
+        ],
+      },
+      {
+        title: "La sensible como motor de la resolucion",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "La sensible es el 7o grado cuando esta a un semitono de la tonica (B en C major).  Su poder de atraccion es la fuerza central del sistema tonal. Cuando aparece en el acorde de V, la tension se concentra entre la sensible (que quiere subir a la tonica) y la septima del acorde dominante (que quiere bajar al tercer grado). Esa doble atraccion del tritono es el mecanismo que hace que V7 → I sea la cadencia mas poderosa de la musica tonal.",
           },
           {
             type: "example",
-            title: "Progresiones frecuentes",
+            title: "Resolucion del tritono en C major",
             lines: [
-              "I - IV - V - I = reposo, preparacion, tension, resolucion",
-              "I - ii - V - I = tonica, predominante, dominante, tonica",
-              "vi - ii - V - I = zona tonica, predominante, dominante, tonica",
+              "G7 = G-B-D-F",
+              "B (sensible) → C (tonica): sube por semitono",
+              "F (7a del acorde) → E (3a de la tonica): baja por semitono",
+              "El tritono B-F (6 semitonos) se resuelve contrayendose a C-E (4 semitonos)",
+              "Esa contraccion es la resolucion obligada del tritono en modo mayor",
             ],
           },
           {
             type: "paragraph",
             text:
-              "Aunque iii y vi pueden agruparse en zona tonica, no sustituyen exactamente el peso estructural de I. La tonica principal sigue siendo el centro mas estable de la tonalidad.",
+              "Por esta razon, en el modo menor natural (donde el 7o grado es subtonica, no sensible), la dominante es debil: no tiene esa fuerza de semitono. Es por eso que la menor armonica eleva el 7o grado: para crear la sensible que el modo menor natural no tiene.",
+          },
+        ],
+      },
+      {
+        title: "El flujo funcional normativo",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "El movimiento funcional mas comun en armonia tonal sigue el patron T → PD → D → T. Este flujo puede tomar muchas formas concretas, pero la direccionalidad es siempre la misma: desde la estabilidad hacia la tension y de regreso a la estabilidad.",
+          },
+          {
+            type: "example",
+            title: "Progresiones que siguen el flujo normativo",
+            lines: [
+              "I - IV - V - I = T - PD - D - T (basica)",
+              "I - ii - V7 - I = T - PD - D - T (ii como predominante fuerte)",
+              "I - vi - ii - V7 - I = T - T(sust) - PD - D - T (inicio ampliado)",
+              "I - IV - ii - V7 - I = T - PD - PD - D - T (doble preparacion)",
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Lo importante es notar el patron: la musica tonal raramente salta de tonica directamente a tonica. Casi siempre pasa por predominante y dominante. Y la dominante casi nunca va a predominante: el flujo retrogrado (D → PD) suena antinatural. Cuando ocurre (como V → IV), suele ser un efecto especial, no la norma.",
+          },
+          {
+            type: "table",
+            columns: ["Movimiento", "Frecuencia", "Comentario"],
+            rows: [
+              ["T → PD", "Muy comun", "I → IV, I → ii"],
+              ["PD → D", "Muy comun", "IV → V, ii → V"],
+              ["D → T", "Esperado", "V → I (cadencia autentica)"],
+              ["D → PD (retrogrado)", "Raro", "V → IV suena fuera de lo normal"],
+              ["T → D (salto)", "Posible", "I → V omite la preparacion"],
+            ],
           },
         ],
       },
@@ -1678,47 +2065,134 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Tipos principales",
+        title: "Las cuatro cadencias fundamentales",
         blocks: [
           {
+            type: "paragraph",
+            text:
+              "Las cadencias son los puntos de articulacion mas importantes de la musica tonal. Funcionan como la puntuacion del lenguaje: un punto final (cadencia autentica), una coma (semicadencia), una pregunta retorica (cadencia de engano) o un cierre suave (plagal). Reconocerlas es indispensable para analizar la estructura de cualquier pieza.",
+          },
+          {
             type: "table",
-            columns: ["Cadencia", "Formula base", "Efecto"],
+            columns: ["Cadencia", "Formula", "Efecto", "Analogia"],
             rows: [
-              ["Autentica", "V-I", "Cierre fuerte"],
-              ["Plagal", "IV-I", "Cierre mas suave"],
-              ["Semicadencia", "x-V", "Pausa abierta"],
-              ["De engaño / interrumpida", "V-vi", "Cierre evitado; el oido espera I pero llega vi"],
+              ["Autentica", "V → I", "Cierre firme y conclusivo", "Punto final"],
+              ["Plagal", "IV → I", "Cierre suave, confirmatorio", "Amen"],
+              ["Semicadencia", "x → V", "Pausa abierta; la frase queda suspendida", "Coma o punto y coma"],
+              ["De engano (interrumpida)", "V → vi", "Cierre evitado; sorpresa armonica", "Pregunta sin respuesta"],
             ],
           },
           {
             type: "paragraph",
             text:
-              "La cadencia de engaño tambien se llama cadencia interrumpida. Su efecto es sorpresivo: justamente cuando el oido espera el cierre en I, el acorde resuelve en vi. Es un recurso muy frecuente en musica tonal y aparece en examenes de analisis.",
-          },
-          {
-            type: "paragraph",
-            text:
-              "La cadencia no depende solo de la calidad del acorde, sino de la funcion tonal del enlace. Por eso debes pensar en grados y direccion, no solo en simbolos aislados.",
+              "La cadencia no se define solo por los acordes que participan, sino por su posicion en la frase y por la funcion tonal del enlace. Un V-I en medio de una progresion puede no ser una cadencia autentica si no funciona como cierre de frase. El contexto metrico y melodico importa tanto como la progresion armonica.",
           },
         ],
       },
       {
-        title: "Cadencia autentica perfecta e imperfecta",
+        title: "Cadencia autentica: perfecta e imperfecta",
         blocks: [
           {
             type: "paragraph",
             text:
-              "Dentro de la cadencia autentica, algunos cursos distinguen entre autentica perfecta e imperfecta. La perfecta produce un cierre mas fuerte cuando la dominante y la tonica aparecen en posicion que refuerza claramente la llegada. La imperfecta conserva el enlace V-I, pero debilita en algun grado la sensacion de clausura.",
+              "La cadencia autentica (V → I) es el cierre mas fuerte de la musica tonal. Pero no toda cadencia autentica tiene la misma fuerza. La teoria distingue entre cadencia autentica perfecta (CAP) y cadencia autentica imperfecta (CAI) segun tres condiciones que deben cumplirse simultaneamente para la perfecta:",
+          },
+          {
+            type: "list",
+            title: "Condiciones para la cadencia autentica perfecta",
+            items: [
+              "V y I estan ambos en estado fundamental (raiz en el bajo).",
+              "La voz superior (soprano) llega a la tonica (1er grado) en el acorde final.",
+              "El movimiento ocurre en un punto fuerte de la frase (cierre de periodo o seccion).",
+            ],
           },
           {
             type: "paragraph",
             text:
-              "Aunque no todos los examenes exigen ese nivel de detalle, conviene reconocer desde ahora que no todo V-I suena con la misma fuerza. El contexto, la posicion de las voces y el peso metrico influyen en la sensacion final.",
+              "Si alguna de estas condiciones falla, la cadencia se debilita. Por ejemplo: si el V esta en inversion, si la soprano termina en la 3a o la 5a del acorde en lugar de la tonica, o si el cierre ocurre en una parte debil del compas, la cadencia es imperfecta. La CAI funciona como cierre parcial: cierra pero no con toda la fuerza posible.",
+          },
+          {
+            type: "table",
+            columns: ["Caso", "V", "I", "Soprano en I", "Tipo"],
+            rows: [
+              ["Perfecto", "G (fundamental)", "C (fundamental)", "C (tonica)", "CAP"],
+              ["Imperfecto (soprano en 3a)", "G (fundamental)", "C (fundamental)", "E (3a)", "CAI"],
+              ["Imperfecto (V invertido)", "B-D-G (6)", "C (fundamental)", "C (tonica)", "CAI"],
+            ],
+          },
+        ],
+      },
+      {
+        title: "Plagal, semicadencia y cadencia de engano",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "La cadencia plagal (IV → I) se usa frecuentemente como extension despues de una cadencia autentica. El clasico 'Amen' de la musica coral es una cadencia plagal. Su efecto es de confirmacion mas que de conclusión. En analisis, suele verse al final de una seccion que ya cerró con V → I.",
           },
           {
             type: "paragraph",
             text:
-              "Ademas, la cadencia no es solo una formula de acordes: organiza el fraseo. Es decir, ayuda a percibir donde una idea termina, se suspende o evita cerrar del todo.",
+              "La semicadencia es cualquier cadencia que termina en V. El acorde anterior puede variar (I, ii, IV, vi), pero el punto clave es que la frase se detiene en el dominante sin resolver. Es como una pregunta sin respuesta: la tension queda abierta y pide continuacion. Por eso la semicadencia suele aparecer al final de la frase antecedente de un periodo.",
+          },
+          {
+            type: "paragraph",
+            text:
+              "La cadencia de engano (V → vi) es uno de los recursos mas expresivos de la armonia tonal. El oido espera que V resuelva a I, pero en su lugar llega vi. vi funciona como sustituto de I (comparten dos notas: C-E en C major), lo que hace que la sorpresa sea aceptable pero inesperada. El resultado es una prolongacion de la tension: la musica necesita volver a intentar cerrar.",
+          },
+          {
+            type: "example",
+            title: "Cadencia de engano y su consecuencia",
+            lines: [
+              "Progresion: I - ii - V - vi (engano) - IV - V - I (cierre real)",
+              "El primer intento de cierre (V-vi) falla.",
+              "La musica vuelve a predominante (IV) y reintenta V-I.",
+              "El efecto es de prolongacion y mayor impacto en el cierre final.",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Cadencias en modo menor",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Las mismas cadencias existen en modo menor, pero con diferencias importantes. Para que la cadencia autentica sea fuerte, el V debe ser mayor (tomado de la menor armonica, no de la natural). Si usas v (menor) en lugar de V (mayor), la cadencia es mucho mas debil porque no hay sensible.",
+          },
+          {
+            type: "table",
+            columns: ["Cadencia en A minor", "Acordes", "Observacion"],
+            rows: [
+              ["Autentica fuerte", "E (mayor) → Am", "G# es la sensible; V tomado de menor armonica"],
+              ["Autentica debil", "Em (menor) → Am", "Sin sensible; v de menor natural"],
+              ["Semicadencia", "Am - Dm - E", "Termina en V (mayor)"],
+              ["De engano", "E → F", "V → VI (F es la relativa mayor en A minor)"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Nota que en modo menor, la cadencia de engano suele ir a VI (acorde mayor, no menor como en modo mayor). En A menor: V (E) → VI (F mayor). Esto produce un color distinto al de la cadencia de engano en modo mayor.",
+          },
+        ],
+      },
+      {
+        title: "Cadencia y fraseo",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Las cadencias no son solo formulas armonicas: organizan la estructura del discurso musical. Cada cadencia marca un punto de articulacion en la frase. La CAP marca el final definitivo de una seccion. La semicadencia marca el final del antecedente en un periodo. La cadencia de engano prolonga la frase y retrasa el cierre. El analisis de cadencias es el primer paso para entender la forma de una pieza.",
+          },
+          {
+            type: "example",
+            title: "Periodo tipico de 8 compases",
+            lines: [
+              "Compases 1-4: frase antecedente, termina en semicadencia (x → V)",
+              "Compases 5-8: frase consecuente, termina en CAP (V → I)",
+              "Las cadencias definen la pregunta y la respuesta de la frase.",
+            ],
           },
         ],
       },
