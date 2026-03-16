@@ -444,58 +444,109 @@ function ChapterSidebar({
                 const chapterIndex = chapters.findIndex(
                   (item) => item.chapterId === chapter.chapterId,
                 );
+                const isActiveChapter = chapter.chapterId === activeChapterId;
 
                 return (
-                  <ListItemButton
-                    key={chapter.chapterId}
-                    selected={chapter.chapterId === activeChapterId}
-                    onClick={() => onOpenChapter(chapter.chapterId)}
-                    sx={{
-                      borderRadius: 2.5,
-                      mb: 0.5,
-                      border: "1px solid transparent",
-                      alignItems: "flex-start",
-                      "&.Mui-selected": {
-                        backgroundColor: `${chapterTheme(blockIndex).accent}14`,
-                        borderColor: `${chapterTheme(blockIndex).accent}30`,
-                      },
-                      "&:hover": {
-                        backgroundColor: `${chapterTheme(blockIndex).accent}0d`,
-                      },
-                    }}
-                  >
-                    <Box
+                  <Box key={chapter.chapterId} sx={{ mb: 0.5 }}>
+                    <ListItemButton
+                      selected={isActiveChapter}
+                      onClick={() => onOpenChapter(chapter.chapterId)}
                       sx={{
-                        width: 9,
-                        height: 9,
-                        borderRadius: "50%",
-                        mt: 1,
-                        mr: 1.25,
-                        flexShrink: 0,
-                        backgroundColor: reviewed
-                          ? "success.main"
-                          : chapter.chapterId === activeChapterId
-                            ? chapterTheme(blockIndex).accent
-                            : "rgba(15, 23, 42, 0.14)",
-                        boxShadow:
-                          chapter.chapterId === activeChapterId
+                        borderRadius: 2.5,
+                        border: "1px solid transparent",
+                        alignItems: "flex-start",
+                        "&.Mui-selected": {
+                          backgroundColor: `${chapterTheme(blockIndex).accent}14`,
+                          borderColor: `${chapterTheme(blockIndex).accent}30`,
+                        },
+                        "&:hover": {
+                          backgroundColor: `${chapterTheme(blockIndex).accent}0d`,
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 9,
+                          height: 9,
+                          borderRadius: "50%",
+                          mt: 1,
+                          mr: 1.25,
+                          flexShrink: 0,
+                          backgroundColor: reviewed
+                            ? "success.main"
+                            : isActiveChapter
+                              ? chapterTheme(blockIndex).accent
+                              : "rgba(15, 23, 42, 0.14)",
+                          boxShadow: isActiveChapter
                             ? `0 0 0 6px ${chapterTheme(blockIndex).accent}14`
                             : "none",
-                      }}
-                    />
-                    <ListItemText
-                      primary={`${chapterIndex + 1}. ${chapter.title}`}
-                      secondary={reviewed ? "Revisado" : "Pendiente"}
-                      primaryTypographyProps={{
-                        variant: "body2",
-                        fontWeight: 600,
-                      }}
-                      secondaryTypographyProps={{
-                        variant: "caption",
-                        color: reviewed ? "success.main" : "text.secondary",
-                      }}
-                    />
-                  </ListItemButton>
+                        }}
+                      />
+                      <ListItemText
+                        primary={`${chapterIndex + 1}. ${chapter.title}`}
+                        secondary={reviewed ? "Revisado" : "Pendiente"}
+                        primaryTypographyProps={{
+                          variant: "body2",
+                          fontWeight: 600,
+                        }}
+                        secondaryTypographyProps={{
+                          variant: "caption",
+                          color: reviewed ? "success.main" : "text.secondary",
+                        }}
+                      />
+                    </ListItemButton>
+
+                    {isActiveChapter ? (
+                      <Stack spacing={0.4} sx={{ pl: 4.5, pr: 0.5, pt: 0.75 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: chapterTheme(blockIndex).accent,
+                            fontWeight: 700,
+                            letterSpacing: 0.3,
+                          }}
+                        >
+                          Subcapitulos
+                        </Typography>
+                        {chapter.sections.map((section, sectionIndex) => (
+                          <Button
+                            key={section.title}
+                            variant="text"
+                            onClick={() => {
+                              const sectionElement = document.getElementById(
+                                sectionAnchorId(chapter.chapterId, section.title),
+                              );
+                              if (sectionElement) {
+                                sectionElement.scrollIntoView({
+                                  behavior: "smooth",
+                                  block: "start",
+                                });
+                              }
+                            }}
+                            sx={{
+                              justifyContent: "flex-start",
+                              px: 1,
+                              py: 0.6,
+                              minHeight: 0,
+                              textTransform: "none",
+                              borderRadius: 2,
+                              color: "text.secondary",
+                              fontSize: "0.78rem",
+                              lineHeight: 1.35,
+                              backgroundColor: "rgba(255,255,255,0.52)",
+                              border: "1px solid rgba(15, 23, 42, 0.05)",
+                              "&:hover": {
+                                backgroundColor: `${chapterTheme(blockIndex).accent}10`,
+                                color: chapterTheme(blockIndex).accent,
+                              },
+                            }}
+                          >
+                            {sectionIndex + 1}. {section.title}
+                          </Button>
+                        ))}
+                      </Stack>
+                    ) : null}
+                  </Box>
                 );
               })}
             </List>
