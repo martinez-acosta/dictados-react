@@ -44,10 +44,10 @@ import {
 
 const BLOCK_PATTERN = ["treble", "bass", "treble"];
 const BLOCK_SIZE_OPTIONS = [2, 4, 6, 8];
-const STAFF_CANVAS_WIDTH = 1220;
+const STAFF_CANVAS_WIDTH = 1280;
 const STAFF_CANVAS_HEIGHT = 390;
 const STAVE_X = 92;
-const STAVE_WIDTH = 1060;
+const STAVE_WIDTH = 1120;
 const TREBLE_Y = 34;
 const BASS_Y = 236;
 
@@ -211,16 +211,18 @@ export default function DictadosGranPentagrama() {
         .draw();
 
       const slots = Math.max(1, notes.length || totalNotes);
-      const startX = trebleStave.getNoteStartX() + 2;
-      const endX = trebleStave.getX() + trebleStave.getWidth() - 24;
-      const availableWidth = endX - startX;
-      const blockWidth = availableWidth / BLOCK_PATTERN.length;
-      const leftPadding = Math.min(10, blockWidth * 0.04);
-      const rightPadding = Math.min(34, blockWidth * 0.14);
-      const usableBlockWidth = Math.max(
-        blockWidth - leftPadding - rightPadding,
-        blockWidth * 0.68,
-      );
+      const usableStartX = trebleStave.getNoteStartX() + 12;
+      const usableEndX = trebleStave.getX() + trebleStave.getWidth() - 42;
+      const usableWidth = usableEndX - usableStartX;
+      const blockWidth = usableWidth / BLOCK_PATTERN.length;
+      const blockRanges = BLOCK_PATTERN.map((clef, index) => ({
+        clef,
+        index,
+        startX: usableStartX + index * blockWidth,
+        endX: usableStartX + (index + 1) * blockWidth,
+      }));
+      const leftInset = 12;
+      const rightInset = 28;
       const positions = [];
 
       if (typeof context.save === "function") {
@@ -233,7 +235,9 @@ export default function DictadosGranPentagrama() {
         context.setFont("14px Georgia");
       }
       blockSummary.forEach((block) => {
-        const blockX = startX + block.index * blockWidth + blockWidth * 0.18;
+        const range = blockRanges[block.index];
+        const blockX = (range.startX + range.endX) / 2;
+        context.textAlign = "center";
         context.fillText(
           `Bloque ${block.index + 1} · ${CLEF_LONG_LABELS[block.clef]}`,
           blockX,
@@ -247,21 +251,23 @@ export default function DictadosGranPentagrama() {
       for (let index = 0; index < slots; index += 1) {
         const slot = notes[index];
         const expectedSlot = slot ?? dictationNotes[index];
-        const resolvedBlockIndex =
-          expectedSlot?.blockIndex ?? Math.floor(index / Math.max(1, blockSize));
+        const resolvedBlockIndex = clamp(
+          expectedSlot?.blockIndex ?? Math.floor(index / Math.max(1, blockSize)),
+          0,
+          BLOCK_PATTERN.length - 1,
+        );
         const slotInBlock = index % Math.max(1, blockSize);
-        const blockStartX =
-          startX + resolvedBlockIndex * blockWidth + leftPadding;
-        const blockEndX =
-          startX + (resolvedBlockIndex + 1) * blockWidth - rightPadding;
-        const noteX =
+        const blockRange = blockRanges[resolvedBlockIndex];
+        const blockStartX = blockRange.startX + leftInset;
+        const blockEndX = blockRange.endX - rightInset;
+        const noteCenterX =
           blockSize === 1
             ? (blockStartX + blockEndX) / 2
             : blockStartX +
               (slotInBlock / (blockSize - 1)) * (blockEndX - blockStartX);
 
         positions.push({
-          x: noteX,
+          x: noteCenterX,
           clef: expectedSlot?.clef ?? BLOCK_PATTERN[resolvedBlockIndex],
           blockIndex: resolvedBlockIndex,
         });
@@ -283,20 +289,13 @@ export default function DictadosGranPentagrama() {
           note.setStave(slot.clef === "treble" ? trebleStave : bassStave);
           note.setContext(context);
           const tickContext = new TickContext();
-          tickContext.addTickable(note).preFormat().setX(noteX);
+          tickContext.addTickable(note).preFormat();
+          const noteWidth =
+            typeof note.getWidth === "function" ? note.getWidth() : 18;
+          tickContext.setX(noteCenterX - noteWidth / 2);
           note.setTickContext(tickContext);
           note.draw();
         }
-      }
-
-      for (let blockIndex = 1; blockIndex < BLOCK_PATTERN.length; blockIndex += 1) {
-        const barX = startX + blockIndex * blockWidth;
-        context.beginPath();
-        context.moveTo(barX, trebleStave.getYForLine(0));
-        context.lineTo(barX, bassStave.getYForLine(4));
-        context.strokeStyle = "#1d4ed8";
-        context.lineWidth = 1.8;
-        context.stroke();
       }
 
       for (let index = 4; index < positions.length; index += 4) {
@@ -307,7 +306,7 @@ export default function DictadosGranPentagrama() {
         context.beginPath();
         context.moveTo(barX, trebleStave.getYForLine(0));
         context.lineTo(barX, bassStave.getYForLine(4));
-        context.strokeStyle = "#94a3b8";
+        context.strokeStyle = "rgba(148, 163, 184, 0.45)";
         context.lineWidth = 1;
         context.stroke();
       }
