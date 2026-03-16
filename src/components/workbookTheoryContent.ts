@@ -110,6 +110,19 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
+        title: "Conceptos iniciales: Reposo y Tension",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Antes de profundizar en las notas, es util entender que la musica tonal funciona como una conversacion entre momentos de tension y momentos de reposo. El punto de maximo reposo se llama 'Tonica' (la nota que da nombre a la tonalidad). Los puntos de maxima tension suelen ocurrir en la 'Dominante'.",
+          },
+          {
+            type: "paragraph",
+            text: "A los puntos de llegada o pausas al final de una frase musical los llamamos 'Cadencias'. Piensalo como los signos de puntuacion en el lenguaje: un punto final (cadencia conclusiva) o una coma (cadencia suspensiva). Veremos los detalles tecnicos mas adelante, pero por ahora recuerda que la musica siempre busca 'regresar a casa' (a la tonica).",
+          },
+        ],
+      },
+      {
         title: "El pentagrama y las claves",
         blocks: [
           {
@@ -314,6 +327,15 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         term: "Linea adicional",
         definition:
           "Linea corta que extiende el pentagrama para escribir notas fuera de sus cinco lineas.",
+      },
+      {
+        term: "Cadencia",
+        definition:
+          "Punto de reposo o llegada al final de una frase musical, similar a un signo de puntuacion.",
+      },
+      {
+        term: "Tonica",
+        definition: "La nota que funciona como centro de gravedad y punto de reposo principal.",
       },
       {
         term: "Nota de referencia",
@@ -981,6 +1003,11 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         term: "Menor armonica",
         definition:
           "Forma de la escala menor que eleva el 7o grado para crear sensible.",
+      },
+      {
+        term: "Cadencia",
+        definition:
+          "Punto de reposo o llegada al final de una frase musical (visto en Lectura Musical).",
       },
       {
         term: "Patron",
