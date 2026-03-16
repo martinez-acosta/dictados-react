@@ -1162,8 +1162,8 @@ function WorkbookContentsView({
       <Paper
         sx={{
           p: { xs: 2.5, sm: 3.5 },
-          maxWidth: 980,
-          mx: "auto",
+          width: "min(100%, 980px)",
+          alignSelf: "center",
           borderRadius: 4,
           background:
             "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,251,255,0.96))",
@@ -1204,9 +1204,8 @@ function WorkbookContentsView({
         variant="outlined"
         sx={{
           p: { xs: 2, sm: 3 },
-          maxWidth: 980,
-          mx: "auto",
-          width: "100%",
+          width: "min(100%, 980px)",
+          alignSelf: "center",
           borderRadius: 4,
           borderColor: "rgba(15, 23, 42, 0.08)",
           background:
