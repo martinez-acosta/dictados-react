@@ -372,6 +372,43 @@ const BASS_EXERCISES = {
     description:
       "Lectura integral en clave de Fa con todas las notas naturales equivalentes al rango Si3-Si5 de la clave de sol.",
   },
+  // ========== PATRONES FIJOS DE 3 NOTAS ==========
+  "fa-tres-notas-do-fa-la": {
+    name: "3 notas fijas: Do-Fa-La",
+    notes: ["c/3", "f/3", "a/3"],
+    description:
+      "Tres alturas constantes dentro del pentagrama de Fa para fijar el dibujo visual de Do, Fa y La.",
+  },
+  "fa-tres-notas-re-fa-la": {
+    name: "3 notas fijas: Re-Fa-La (lineas)",
+    notes: ["d/3", "f/3", "a/3"],
+    description:
+      "Trabajo de lectura sobre lineas del pentagrama de Fa: Re, Fa y La, sin salir del ambito central.",
+  },
+  "fa-tres-notas-do-mi-sol": {
+    name: "3 notas fijas: Do-Mi-Sol (espacios)",
+    notes: ["c/3", "e/3", "g/3"],
+    description:
+      "Trabajo de lectura sobre espacios intermedios del pentagrama de Fa: Do, Mi y Sol.",
+  },
+  "fa-tres-notas-mi-sol-si": {
+    name: "3 notas fijas: Mi-Sol-Si",
+    notes: ["e/2", "g/2", "b/2"],
+    description:
+      "Patron de tres notas con una sola linea adicional inferior como maximo, ideal para consolidar el registro grave en clave de Fa.",
+  },
+  "fa-tres-notas-fa-la-do": {
+    name: "3 notas fijas: Fa-La-Do",
+    notes: ["f/2", "a/2", "c/3"],
+    description:
+      "Tres notas fijas entre linea y espacios bajos del pentagrama de Fa, utiles para orientacion rapida.",
+  },
+  "fa-tres-notas-mi-la-do": {
+    name: "3 notas fijas: Mi-La-Do",
+    notes: ["e/2", "a/2", "c/3"],
+    description:
+      "Patron mixto con una linea adicional inferior maxima y dos alturas internas para reforzar lectura por referencia.",
+  },
 } as const;
 
 const EXERCISES_BY_CLEF = {
