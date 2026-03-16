@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import {
   Alert,
   Box,
@@ -1722,6 +1722,10 @@ export default function WorkbookTheory() {
         : null,
     [chapterId, chapters],
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [chapterId]);
 
   useEffect(() => {
     if (!activeChapter) return;
