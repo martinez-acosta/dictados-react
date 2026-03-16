@@ -113,6 +113,16 @@ const EXERCISE_SECTIONS = [
         iconColor: "primary.main",
       },
       {
+        route: "/dictados-gran-pentagrama",
+        title: "Dictados en Gran Pentagrama",
+        description:
+          "Trabaja por bloques Sol → Fa → Sol en un gran pentagrama con dictado y respuesta sobre ambos pentagramas.",
+        buttonLabel: "Abrir Gran Pentagrama",
+        buttonColor: "primary",
+        icon: MenuBook,
+        iconColor: "#1d4ed8",
+      },
+      {
         route: "/dictados-intervalos",
         title: "Dictados de Intervalos",
         description:

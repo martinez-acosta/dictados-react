@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard.jsx";
 import DictadosMelodicos from "./components/DictadosMelodicos.jsx";
+import DictadosGranPentagrama from "./components/DictadosGranPentagrama.jsx";
 import EjerciciosIntervalos from "./components/EjerciciosIntervalos.tsx";
 import IntervalosPiano from "./components/IntervalosPiano";
 import BajoTrainer from "./components/BajoTrainer.tsx";
@@ -33,6 +34,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/" element={<Dashboard />} />
         <Route path="/afinador" element={<TunerPage />} />
         <Route path="/dictados" element={<DictadosMelodicos />} />
+        <Route
+          path="/dictados-gran-pentagrama"
+          element={<DictadosGranPentagrama />}
+        />
         <Route path="/dictados-intervalos" element={<DictadosIntervalos />} />
         <Route path="/intervalos" element={<EjerciciosIntervalos />} />
         <Route path="/bajo" element={<BajoTrainer />} />
