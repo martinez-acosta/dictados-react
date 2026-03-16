@@ -43,12 +43,29 @@ type WorkbookChipsBlock = {
   items: string[];
 };
 
+export type WorkbookStaffNote = {
+  keys: string[];
+  duration: string;
+  accidental?: string;
+};
+
+export type WorkbookStaffBlock = {
+  type: "staff";
+  title?: string;
+  clef?: string;
+  keySignature?: string;
+  timeSignature?: string;
+  notes: WorkbookStaffNote[];
+  width?: number;
+};
+
 export type WorkbookSectionBlock =
   | WorkbookParagraphBlock
   | WorkbookListBlock
   | WorkbookExampleBlock
   | WorkbookTableBlock
-  | WorkbookChipsBlock;
+  | WorkbookChipsBlock
+  | WorkbookStaffBlock;
 
 export type WorkbookSection = {
   title: string;
@@ -223,12 +240,23 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
             text: "La armadura afecta todas las notas de ese nombre en la obra o seccion, mientras no cambie la armadura. Las alteraciones accidentales afectan a partir del punto donde aparecen y duran solo dentro del compas, salvo repeticion de la misma nota.",
           },
           {
+            type: "staff",
+            title: "Efecto del becuadro en el compas (Tonalidad: Sol Mayor)",
+            keySignature: "G",
+            notes: [
+              { keys: ["f/4"], duration: "q", accidental: "#" },
+              { keys: ["f/4"], duration: "q", accidental: "n" },
+              { keys: ["f/4"], duration: "q" },
+              { keys: ["g/4"], duration: "q" },
+            ],
+          },
+          {
             type: "example",
-            title: "Ejemplos",
+            title: "Reglas de las alteraciones",
             lines: [
-              "Si la armadura tiene F#, todo F del pentagrama vale F#.",
-              "Si aparece un becuadro sobre F en un compas, ese F vuelve a ser natural solo en ese compas.",
-              "En el compas siguiente, si no hay becuadro, vuelve a mandar la armadura.",
+              "Si la armadura tiene F#, todo F del pentagrama vale F# por defecto.",
+              "Si aparece un becuadro sobre F, ese F vuelve a ser natural solo en ese compas.",
+              "En el compas siguiente, si no hay alteraciones accidentales, vuelve a mandar la armadura (F#).",
             ],
           },
         ],

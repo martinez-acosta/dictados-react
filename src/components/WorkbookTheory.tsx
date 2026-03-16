@@ -1,4 +1,11 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  Accidental,
+  Factory,
+  Formatter,
+  Stave,
+  StaveNote,
+} from "vexflow";
 import {
   Alert,
   Box,
@@ -31,6 +38,7 @@ import {
   type WorkbookBlock,
   type WorkbookChapter,
   type WorkbookSectionBlock,
+  type WorkbookStaffBlock,
 } from "./workbookTheoryContent";
 
 type WorkbookProgress = {
@@ -176,6 +184,86 @@ function QuickPanel({
   );
 }
 
+function WorkbookStaff({ block }: { block: WorkbookStaffBlock }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const idRef = useRef(`staff-${Math.random().toString(36).slice(2, 9)}`);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+
+    // Limpiar contenido previo
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+
+    const div = document.createElement("div");
+    div.id = idRef.current;
+    container.appendChild(div);
+
+    try {
+      const width = block.width || 400;
+      const height = 150;
+      const vf = new Factory({
+        renderer: { elementId: idRef.current, width, height },
+      });
+      const ctx = vf.getContext();
+      ctx.scale(0.8, 0.8); // Un poco mas pequeño para que quepa bien en el flujo del texto
+
+      const stave = new Stave(10, 10, (width - 20) / 0.8);
+      const clef = block.clef || "treble";
+      stave.addClef(clef);
+
+      if (block.keySignature) {
+        stave.addKeySignature(block.keySignature);
+      }
+      if (block.timeSignature) {
+        stave.addTimeSignature(block.timeSignature);
+      }
+
+      stave.setContext(ctx).draw();
+
+      const notes = block.notes.map((n) => {
+        const sn = new StaveNote({
+          clef,
+          keys: n.keys,
+          duration: n.duration,
+        });
+        if (n.accidental) {
+          sn.addModifier(new Accidental(n.accidental));
+        }
+        return sn;
+      });
+
+      Formatter.FormatAndDraw(ctx, stave, notes);
+    } catch (e) {
+      console.error("Error rendering VexFlow staff:", e);
+    }
+  }, [block]);
+
+  return (
+    <Box sx={{ my: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+      {block.title && (
+        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700, color: "text.secondary" }}>
+          {block.title}
+        </Typography>
+      )}
+      <Paper
+        variant="outlined"
+        sx={{
+          p: 1,
+          bgcolor: "#fff",
+          borderRadius: 2,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          overflow: "hidden"
+        }}
+      >
+        <div ref={containerRef} />
+      </Paper>
+    </Box>
+  );
+}
+
 function renderBlock(block: WorkbookSectionBlock) {
   if (block.type === "paragraph") {
     return (
@@ -299,6 +387,10 @@ function renderBlock(block: WorkbookSectionBlock) {
         </Stack>
       </Stack>
     );
+  }
+
+  if (block.type === "staff") {
+    return <WorkbookStaff key={block.title || "staff"} block={block} />;
   }
 
   return (
