@@ -2609,7 +2609,7 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         blocks: [
           {
             type: "paragraph",
-            text: "Las cadencias son los puntos de articulacion mas importantes de la musica tonal. Funcionan como la puntuacion del lenguaje: un punto final (cadencia autentica), una coma (semicadencia), una pregunta retorica (cadencia de engano) o un cierre suave (plagal). Reconocerlas es indispensable para analizar la estructura de cualquier pieza.",
+            text: "Las cadencias son los puntos de articulacion mas importantes de la musica tonal. Funcionan como la puntuacion del lenguaje: un punto final (cadencia autentica), una coma (semicadencia), una sorpresa (cadencia de engano) o un cierre suave (plagal). Reconocerlas es indispensable para analizar la estructura de cualquier pieza.",
           },
           {
             type: "table",
@@ -2629,16 +2629,12 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
                 "Coma o punto y coma",
               ],
               [
-                "De engano (interrumpida)",
+                "De engano",
                 "V → vi",
                 "Cierre evitado; sorpresa armonica",
-                "Pregunta sin respuesta",
+                "Puntos suspensivos",
               ],
             ],
-          },
-          {
-            type: "paragraph",
-            text: "La cadencia no se define solo por los acordes que participan, sino por su posicion en la frase y por la funcion tonal del enlace. Un V-I en medio de una progresion puede no ser una cadencia autentica si no funciona como cierre de frase. El contexto metrico y melodico importa tanto como la progresion armonica.",
           },
         ],
       },
@@ -2647,20 +2643,20 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         blocks: [
           {
             type: "paragraph",
-            text: "La cadencia autentica (V → I) es el cierre mas fuerte de la musica tonal. Pero no toda cadencia autentica tiene la misma fuerza. La teoria distingue entre cadencia autentica perfecta (CAP) y cadencia autentica imperfecta (CAI) segun tres condiciones que deben cumplirse simultaneamente para la perfecta:",
+            text: "La cadencia autentica (V → I) es el cierre mas fuerte. Pero no toda cadencia autentica tiene la misma fuerza. La teoria distingue entre cadencia autentica perfecta (CAP) y cadencia autentica imperfecta (CAI) segun tres condiciones que deben cumplirse para la perfecta:",
           },
           {
             type: "list",
-            title: "Condiciones para la cadencia autentica perfecta",
+            title: "Condiciones para la cadencia autentica perfecta (CAP)",
             items: [
               "V y I estan ambos en estado fundamental (raiz en el bajo).",
               "La voz superior (soprano) llega a la tonica (1er grado) en el acorde final.",
-              "El movimiento ocurre en un punto fuerte de la frase (cierre de periodo o seccion).",
+              "Ambos acordes ocurren en posiciones metricas adecuadas (V en tiempo debil o semifuerte, I en tiempo fuerte).",
             ],
           },
           {
             type: "paragraph",
-            text: "Si alguna de estas condiciones falla, la cadencia se debilita. Por ejemplo: si el V esta en inversion, si la soprano termina en la 3a o la 5a del acorde en lugar de la tonica, o si el cierre ocurre en una parte debil del compas, la cadencia es imperfecta. La CAI funciona como cierre parcial: cierra pero no con toda la fuerza posible.",
+            text: "Si alguna de estas condiciones falla (por ejemplo, el V esta invertido, o la soprano termina en la 3a o 5a), la cadencia es imperfecta (CAI). La CAI cierra la frase pero deja una sensacion de continuidad menor que la CAP.",
           },
           {
             type: "table",
@@ -2668,22 +2664,22 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
             rows: [
               [
                 "Perfecto",
-                "G (fundamental)",
-                "C (fundamental)",
+                "G (fund.)",
+                "C (fund.)",
                 "C (tonica)",
                 "CAP",
               ],
               [
-                "Imperfecto (soprano en 3a)",
-                "G (fundamental)",
-                "C (fundamental)",
+                "Soprano en 3a",
+                "G (fund.)",
+                "C (fund.)",
                 "E (3a)",
                 "CAI",
               ],
               [
-                "Imperfecto (V invertido)",
-                "B-D-G (6)",
-                "C (fundamental)",
+                "V invertido",
+                "G/B (6)",
+                "C (fund.)",
                 "C (tonica)",
                 "CAI",
               ],
@@ -2692,81 +2688,45 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         ],
       },
       {
-        title: "Plagal, semicadencia y cadencia de engano",
+        title: "Semicadencia y Cadencia Frigia",
         blocks: [
           {
             type: "paragraph",
-            text: "La cadencia plagal (IV → I) se usa frecuentemente como extension despues de una cadencia autentica. El clasico 'Amen' de la musica coral es una cadencia plagal. Su efecto es de confirmacion mas que de conclusión. En analisis, suele verse al final de una seccion que ya cerró con V → I.",
+            text: "La semicadencia es una pausa sobre el acorde de dominante (V). Es una interrupcion temporal del discurso que genera expectativa de resolucion. Cualquier acorde puede preceder al V, pero los mas comunes son I, ii, IV o vi.",
           },
           {
             type: "paragraph",
-            text: "La semicadencia es cualquier cadencia que termina en V. El acorde anterior puede variar (I, ii, IV, vi), pero el punto clave es que la frase se detiene en el dominante sin resolver. Es como una pregunta sin respuesta: la tension queda abierta y pide continuacion. Por eso la semicadencia suele aparecer al final de la frase antecedente de un periodo.",
-          },
-          {
-            type: "paragraph",
-            text: "La cadencia de engano (V → vi) es uno de los recursos mas expresivos de la armonia tonal. El oido espera que V resuelva a I, pero en su lugar llega vi. vi funciona como sustituto de I (comparten dos notas: C-E en C major), lo que hace que la sorpresa sea aceptable pero inesperada. El resultado es una prolongacion de la tension: la musica necesita volver a intentar cerrar.",
+            text: "Un tipo especial de semicadencia en modo menor es la Cadencia Frigia. Ocurre cuando el enlace es iv6 → V. Se llama asi porque el bajo desciende por semitono (de la sexta del iv a la fundamental del V), imitando el movimiento cadencial del modo frigio (fa → mi).",
           },
           {
             type: "example",
-            title: "Cadencia de engano y su consecuencia",
+            title: "Ejemplo de Cadencia Frigia en A minor",
             lines: [
-              "Progresion: I - ii - V - vi (engano) - IV - V - I (cierre real)",
-              "El primer intento de cierre (V-vi) falla.",
-              "La musica vuelve a predominante (IV) y reintenta V-I.",
-              "El efecto es de prolongacion y mayor impacto en el cierre final.",
+              "Acordes: Dm/F (iv6) → E (V)",
+              "Bajo: F (fa) → E (mi)",
+              "Contexto: Muy comun en el periodo barroco como final de movimientos lentos.",
             ],
           },
         ],
       },
       {
-        title: "Cadencias en modo menor",
+        title: "Cadencia de Engaño y Plagal",
         blocks: [
           {
             type: "paragraph",
-            text: "Las mismas cadencias existen en modo menor, pero con diferencias importantes. Para que la cadencia autentica sea fuerte, el V debe ser mayor (tomado de la menor armonica, no de la natural). Si usas v (menor) en lugar de V (mayor), la cadencia es mucho mas debil porque no hay sensible.",
-          },
-          {
-            type: "table",
-            columns: ["Cadencia en A minor", "Acordes", "Observacion"],
-            rows: [
-              [
-                "Autentica fuerte",
-                "E (mayor) → Am",
-                "G# es la sensible; V tomado de menor armonica",
-              ],
-              [
-                "Autentica debil",
-                "Em (menor) → Am",
-                "Sin sensible; v de menor natural",
-              ],
-              ["Semicadencia", "Am - Dm - E", "Termina en V (mayor)"],
-              [
-                "De engano",
-                "E → F",
-                "V → VI (F es la relativa mayor en A minor)",
-              ],
-            ],
+            text: "La cadencia de engano (V → vi) evita la resolucion esperada. El oido espera el I, pero recibe el vi. Esto prolonga la frase y permite al compositor expandir la seccion antes del cierre definitivo.",
           },
           {
             type: "paragraph",
-            text: "Nota que en modo menor, la cadencia de engano suele ir a VI (acorde mayor, no menor como en modo mayor). En A menor: V (E) → VI (F mayor). Esto produce un color distinto al de la cadencia de engano en modo mayor.",
-          },
-        ],
-      },
-      {
-        title: "Cadencia y fraseo",
-        blocks: [
-          {
-            type: "paragraph",
-            text: "Las cadencias no son solo formulas armonicas: organizan la estructura del discurso musical. Cada cadencia marca un punto de articulacion en la frase. La CAP marca el final definitivo de una seccion. La semicadencia marca el final del antecedente en un periodo. La cadencia de engano prolonga la frase y retrasa el cierre. El analisis de cadencias es el primer paso para entender la forma de una pieza.",
+            text: "La cadencia plagal (IV → I) tiene un caracter mas estatico y solemne. A menudo se usa como un 'post-scriptum' despues de una cadencia autentica perfecta, reforzando la llegada a la tonica sin la tension del tritono de la dominante.",
           },
           {
-            type: "example",
-            title: "Periodo tipico de 8 compases",
-            lines: [
-              "Compases 1-4: frase antecedente, termina en semicadencia (x → V)",
-              "Compases 5-8: frase consecuente, termina en CAP (V → I)",
-              "Las cadencias definen la pregunta y la respuesta de la frase.",
+            type: "chips",
+            title: "Resumen de funciones en cadencias",
+            items: [
+              "Conclusivas: CAP, CAI, Plagal",
+              "Suspensivas: Semicadencia, Frigia",
+              "Evitativas: Engaño (V-vi), V-IV",
             ],
           },
         ],
@@ -2872,59 +2832,73 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Ruta minima de analisis",
+        title: "Pasos para el Analisis Armonico",
         blocks: [
           {
-            type: "list",
-            items: [
-              "Encuentra la tonalidad probable.",
-              "Escribe los grados romanos de cada acorde.",
-              "Ubica las funciones tonales principales.",
-              "Mira si hay cadencia o punto de reposo.",
-            ],
+            type: "paragraph",
+            text: "El analisis no es solo nombrar acordes aislados, es entender su relacion en el tiempo. Sigue esta guia paso a paso para analizar cualquier pasaje tonal.",
           },
           {
-            type: "example",
-            title: "Ejemplo corto en C major",
-            lines: [
-              "Acordes: C - Dm - G - C",
-              "Romanos: I - ii - V - I",
-              "Funciones: tonica - predominante - dominante - tonica",
-              "Cierre: autentica final",
+            type: "list",
+            title: "Guia Paso a Paso",
+            items: [
+              "Identifica la Armadura y el Centro Tonal: ¿En que tonalidad estamos? ¿Es mayor o menor?",
+              "Segmenta el Pasaje: Busca donde cambian los acordes (ritmo armonico).",
+              "Identifica la Nota del Bajo: Es vital para saber la inversion (fundamental, 6, 6/4).",
+              "Cifra el Acorde con Numeros Romanos: Indica el grado y la calidad (I, ii, iii, etc.).",
+              "Analiza las Funciones Tonales: Agrupa los acordes en Tonica, Predominante o Dominante.",
+              "Ubica las Cadencias: Identifica los puntos de reposo y su fuerza conclusiva.",
             ],
           },
         ],
       },
       {
-        title: "Errores frecuentes al analizar",
+        title: "Cifrado Romano Detallado",
         blocks: [
           {
-            type: "list",
+            type: "table",
+            columns: ["Grado", "Calidad (Mayor)", "Calidad (Menor)", "Simbolo"],
+            rows: [
+              ["I", "Mayor", "Menor", "I / i"],
+              ["II", "Menor", "Disminuido", "ii / ii°"],
+              ["III", "Menor", "Mayor (o Aum.)", "iii / III"],
+              ["IV", "Mayor", "Menor", "IV / iv"],
+              ["V", "Mayor", "Mayor", "V"],
+              ["VI", "Menor", "Mayor", "vi / VI"],
+              ["VII", "Disminuido", "Disminuido", "vii°"],
+            ],
+          },
+          {
+            type: "chips",
+            title: "Cifrado de Inversiones",
             items: [
-              "Analizar acordes sin haber fijado primero la tonalidad.",
-              "Confundir calidad del acorde con funcion tonal.",
-              "Pensar que un acorde mayor siempre cumple la misma funcion.",
-              "Ignorar las cadencias al leer una progresion.",
+              "Estado Fundamental: Sin numero (o 5/3)",
+              "Primera Inversion: 6",
+              "Segunda Inversion: 6/4",
+              "Septima (Fund.): 7",
+              "Septima (1a inv): 6/5",
+              "Septima (2a inv): 4/3",
+              "Septima (3a inv): 4/2 (o 2)",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Ejemplo de Analisis Integrado",
+        blocks: [
+          {
+            type: "example",
+            title: "Analisis de una Progresion en G Major",
+            lines: [
+              "Compas 1: G (I) -> C (IV) [Tonica a Predominante]",
+              "Compas 2: D7 (V7) -> G (I) [Dominante a Tonica]",
+              "Analisis Funcional: T - P - D - T",
+              "Cadencia: Cadencia Autentica Perfecta (CAP)",
             ],
           },
           {
             type: "paragraph",
-            text: "Analizar no consiste en poner nombres aislados a los acordes. Consiste en leer relaciones dentro de una tonalidad. Por eso el primer paso serio siempre es definir el contexto tonal y luego entender como cada grado participa en la direccion general de la progresion.",
-          },
-        ],
-      },
-      {
-        title: "Ejemplo adicional en menor",
-        blocks: [
-          {
-            type: "example",
-            title: "Ejemplo corto en A minor",
-            lines: [
-              "Acordes: Am - Dm - E - Am",
-              "Romanos: i - iv - V - i",
-              "Funciones: tonica - predominante - dominante - tonica",
-              "Observacion: la dominante fuerte presupone la presencia de G# en el contexto tonal menor",
-            ],
+            text: "Al analizar, fijate siempre en las notas de paso o bordaduras que no pertenecen al acorde. No todo lo que suena es una nota estructural.",
           },
         ],
       },
@@ -3416,11 +3390,11 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         ],
       },
       {
-        title: "Duplicacion en triadas",
+        title: "Reglas de Duplicacion y Resolucion",
         blocks: [
           {
             type: "paragraph",
-            text: "En armonia a cuatro voces, una de las notas de la triada debe duplicarse para completar las cuatro partes. La eleccion de que nota duplicar no es arbitraria.",
+            text: "En armonia a cuatro voces, una de las notas de la triada debe duplicarse. La regla general es duplicar la fundamental, especialmente en acordes en estado fundamental. En inversiones, las reglas cambian para favorecer la sonoridad y la conduccion.",
           },
           {
             type: "table",
@@ -3432,29 +3406,59 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
             rows: [
               [
                 "Triada mayor en fund.",
-                "Raiz",
-                "Tercera (en V evita duplicar la sensible)",
+                "Raiz (fundamental)",
+                "Tercera (especialmente la sensible)",
               ],
               [
                 "Triada menor en fund.",
-                "Raiz",
-                "Tercera en la mayoria de los casos",
+                "Raiz o tercera",
+                "Quinta",
               ],
               [
                 "Triada disminuida",
                 "Tercera",
-                "Quinta disminuida (muy inestable duplicada)",
+                "Quinta disminuida (muy inestable)",
               ],
               [
-                "V en modo mayor/menor",
-                "Raiz o quinta, nunca la sensible",
-                "Sensible (B en C major)",
+                "Primera Inversion (6)",
+                "Bajo o soprano (notas estables)",
+                "Sensible",
+              ],
+              [
+                "Segunda Inversion (6/4)",
+                "La quinta del acorde (el bajo)",
+                "Raiz",
               ],
             ],
           },
           {
             type: "paragraph",
-            text: "Duplicar la sensible en el V produce que esta quiera resolver en dos voces a la vez, lo que genera octavas paralelas hacia la tonica. Por eso es uno de los errores mas comunes en examenes.",
+            text: "Ademas de la duplicacion, existen reglas de resolucion obligatoria. La Sensible (7o grado) siempre debe resolver ascendentemente a la Tonica (1er grado) cuando forma parte del acorde de dominante. La Septima de un acorde siempre debe resolver descendentemente por grado conjunto.",
+          },
+          {
+            type: "example",
+            title: "Resolucion de V7 a I",
+            lines: [
+              "V7 (G-B-D-F) -> I (C-C-E-G)",
+              "B (sensible) sube a C",
+              "F (septima) baja a E",
+              "G (fundamental) salta a C (o se mantiene si es voz interna)",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Resumen de prohibiciones",
+        blocks: [
+          {
+            type: "list",
+            title: "Lo que debes evitar siempre",
+            items: [
+              "Quintas y Octavas paralelas: Dos voces moviendose en la misma direccion manteniendo el intervalo de 5a o 8a.",
+              "Quintas y Octavas ocultas (directas): Llegar a una 5a o 8a por movimiento similar en las voces extremas.",
+              "Cruzamiento de voces: Que la contralto cante mas agudo que la soprano, o el tenor mas grave que el bajo.",
+              "Saltos aumentados o disminuidos: Especialmente la 4a aumentada (tritono) en una sola voz.",
+            ],
           },
         ],
       },
@@ -3565,69 +3569,84 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Que es modular",
+        title: "Diferencia entre Modulacion e Inflexion",
         blocks: [
           {
             type: "paragraph",
-            text: "Modular no es solo usar una nota cromatica. Modular implica establecer un nuevo centro tonal que se confirma con una cadencia. Sin ese cierre en la nueva tonica, el pasaje es solo una inflexion o un color transitorio.",
-          },
-          {
-            type: "chips",
-            title: "Diferencias clave",
-            items: [
-              "Inflexion = nota cromatica sin nuevo centro confirmado",
-              "Modulacion = nuevo centro tonal con cadencia de arribo",
-            ],
-          },
-        ],
-      },
-      {
-        title: "Modulacion por acorde pivote",
-        blocks: [
-          {
-            type: "paragraph",
-            text: "El metodo mas comun en musica tonal clasica. El acorde pivote pertenece a las dos tonalidades al mismo tiempo. En la tonalidad de origen es un grado determinado; en la nueva tonalidad, ese mismo acorde tiene un grado distinto. El analisis cambia de nombre romanos justo en ese acorde.",
-          },
-          {
-            type: "example",
-            title: "Ejemplo: C major a G major",
-            lines: [
-              "En C major: I - IV - ii - [V] ...",
-              "El IV de C (F-A-C) es tambien VII de G? No.",
-              "El ii de C (D-F-A) es IV de A minor.",
-              "El acorde Am (vi de C) es tambien ii de G major.",
-              "Desde Am se analiza como ii de G y se confirma con D-G.",
-            ],
+            text: "No toda alteración accidental implica un cambio de tonalidad. Es fundamental distinguir entre una Inflexión (o tonificación momentánea) y una Modulación real.",
           },
           {
             type: "table",
-            columns: [
-              "Tonalidad origen",
-              "Tonalidad destino",
-              "Acorde pivote tipico",
-            ],
+            columns: ["Caracteristica", "Inflexion", "Modulacion"],
             rows: [
-              ["C major", "G major", "I de C = IV de G, o vi de C = ii de G"],
-              ["C major", "F major", "IV de C = I de F, o ii de C = vi de F"],
               [
-                "C major",
-                "A minor (relativa)",
-                "iv de Am = ii de C; vi de C = i de Am",
+                "Duracion",
+                "Breve (1-2 acordes)",
+                "Prolongada (una frase o seccion)",
+              ],
+              [
+                "Confirmacion",
+                "No requiere cadencia fuerte",
+                "Requiere CAP en la nueva tonalidad",
+              ],
+              [
+                "Centro Tonal",
+                "Sigue siendo el original",
+                "Se establece uno nuevo",
+              ],
+              [
+                "Ejemplo",
+                "Dominante secundaria (V7/ii)",
+                "Pasar de C mayor a G mayor",
               ],
             ],
           },
         ],
       },
       {
-        title: "Modulacion cromatica",
+        title: "Tipos de Modulacion",
         blocks: [
           {
-            type: "paragraph",
-            text: "La modulacion cromatica no usa un acorde pivote diatonico. En cambio, una voz se mueve por semitono a una nota que pertenece a la nueva tonalidad, y desde ahi se establece el nuevo centro. Es mas abrupt y se reconoce porque el cambio de armonia no se puede explicar dentro de la tonalidad de origen.",
+            type: "list",
+            title: "Clasificacion por Procedimiento",
+            items: [
+              "Modulacion Diatonica (por acorde pivote): El nexo es un acorde que pertenece a ambas tonalidades.",
+              "Modulacion Cromatica: El cambio se produce mediante el movimiento semitonal de una o mas voces.",
+              "Modulacion Directa (Fraseologica): Ocurre tras un silencio o pausa, empezando directamente en la nueva tonalidad.",
+              "Modulacion Enarmonica: Un acorde se reinterpreta cambiando el nombre de sus notas (ej: de 7a disminuida a 6a aumentada).",
+            ],
           },
           {
             type: "paragraph",
-            text: "Para preparacion de ingreso basta reconocer que existe y distinguirla de la modulacion por pivote. La modulacion cromatica es mas frecuente en musica del siglo XIX.",
+            text: "La modulacion mas comun es a tonalidades vecinas (aquellas que difieren en no mas de una alteracion en la armadura, o la relativa).",
+          },
+        ],
+      },
+      {
+        title: "El Acorde Pivote",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "El acorde pivote es el 'puente' funcional. Se analiza con un doble cifrado: su grado en la tonalidad vieja y su grado en la nueva.",
+          },
+          {
+            type: "example",
+            title: "Analisis de Pivote: C mayor -> G mayor",
+            lines: [
+              "C: I - IV - vi (Pivote)",
+              "G:         ii - V7 - I",
+              "El acorde Am funciona como vi en C y como ii en G.",
+            ],
+          },
+          {
+            type: "table",
+            title: "Pivotes comunes entre tonalidades vecinas",
+            columns: ["Relacion", "Ejemplo", "Acordes en comun"],
+            rows: [
+              ["Dominante", "C -> G", "C, Em, G, Am"],
+              ["Subdominante", "C -> F", "C, Dm, F, Am"],
+              ["Relativa", "C -> Am", "C, Dm, F, G, Am"],
+            ],
           },
         ],
       },
@@ -3727,92 +3746,71 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
     sections: [
       {
-        title: "Frase y periodo",
+        title: "Unidades Estructurales: Motivo, Frase y Periodo",
         blocks: [
           {
             type: "paragraph",
-            text: "Una frase es la unidad musical mas pequena con sentido propio. Suele terminar en una cadencia. Normalmente tiene entre 4 y 8 compases, aunque eso varia. El periodo esta formado por dos frases: la frase antecedente, que queda abierta (semicadencia frecuente), y la frase consecuente, que cierra con cadencia autentica.",
+            text: "La musica se organiza de forma jerarquica, desde la celula mas pequeña hasta la obra completa.",
+          },
+          {
+            type: "list",
+            title: "Jerarquia Formal",
+            items: [
+              "Motivo: La unidad mas pequeña con identidad rítmica o melódica (ej: el inicio de la 5a de Beethoven).",
+              "Semicadencia (Inciso): Fragmento de una frase.",
+              "Frase: Unidad con sentido propio que termina en una cadencia. Suele durar 4 compases.",
+              "Periodo: Union de dos frases (Antecedente y Consecuente) con relacion de pregunta y respuesta.",
+              "Seccion: Conjunto de periodos que forman una parte mayor de la obra (A, B, C).",
+            ],
           },
           {
             type: "table",
-            columns: ["Unidad", "Longitud tipica", "Cadencia de cierre"],
+            title: "Tipos de Periodo",
+            columns: ["Tipo", "Relacion entre frases", "Caracteristica"],
             rows: [
-              [
-                "Frase antecedente",
-                "4-8 compases",
-                "Semicadencia o cadencia debil",
-              ],
-              [
-                "Frase consecuente",
-                "4-8 compases",
-                "Cadencia autentica (cierre fuerte)",
-              ],
-              ["Periodo", "2 frases = 8-16 compases", "Autentica al final"],
+              ["Paralelo", "Inician igual", "El material tematico se repite al inicio de ambas"],
+              ["Contrastante", "Inician distinto", "La segunda frase presenta material nuevo"],
+              ["Simetrico", "Misma longitud", "4+4 o 8+8 compases"],
+              ["Asimetrico", "Distinta longitud", "4+6 o similar (menos comun)"],
             ],
           },
         ],
       },
       {
-        title: "Formas principales",
+        title: "Estructuras Binarias y Ternarias",
         blocks: [
           {
             type: "paragraph",
-            text: "Las formas describen como se organiza el material tematico a lo largo de una pieza. Para preparacion de ingreso basta reconocer si una seccion se repite, contrasta o regresa.",
+            text: "Las formas basicas se clasifican segun el numero de secciones principales y como se relacionan entre si.",
           },
           {
             type: "table",
-            columns: ['Forma", "Esquema", "Descripcion basica'],
+            columns: ["Forma", "Esquema", "Descripcion"],
             rows: [
-              [
-                "Binaria simple",
-                "A B",
-                "Dos secciones contrastantes; cada una puede repetirse",
-              ],
-              [
-                "Binaria redondeada",
-                "A B A'",
-                "La segunda seccion regresa al material de A, aunque abreviado",
-              ],
-              [
-                "Ternaria",
-                "A B A",
-                "Tres secciones; B contrasta; A regresa completa",
-              ],
-              [
-                "Forma cancion",
-                "a a b a",
-                "Cuatro frases: dos iguales, una de contraste, regreso a a",
-              ],
-            ],
-          },
-          {
-            type: "example",
-            title: "Como analizar una pieza corta",
-            lines: [
-              "1. Escucha o lee y marca los cierres cadenciales.",
-              "2. Agrupa las frases en secciones por contenido tematico.",
-              "3. Asigna letras: A para el tema inicial, B para contraste.",
-              "4. Si A regresa, escribe A o A'.",
-              "5. El esquema de letras es la forma.",
+              ["Binaria Simple", "A B", "Dos secciones distintas, usualmente con repeticiones (||:A:||:B:||)"],
+              ["Binaria Redondeada", "A B A'", "La seccion B termina con un retorno breve del material de A"],
+              ["Ternaria (Da Capo)", "A B A", "Tres secciones completas; B es un contraste real (Trio)"],
+              ["Rondo", "A B A C A", "Un estribillo (A) alterna con diferentes episodios"],
+              ["Forma Variacion", "A A1 A2 A3", "Un tema seguido de modificaciones ornamentales o armonicas"],
             ],
           },
         ],
       },
       {
-        title: "Relacion entre forma y cadencia",
+        title: "Analisis de la Macroforma",
         blocks: [
           {
             type: "paragraph",
-            text: "Las cadencias no solo cierran acordes: organizan la estructura. Una semicadencia suele dejar abierta una seccion, lo que impulsa hacia la siguiente. Una cadencia autentica perfecta cierra una seccion con firmeza. Por eso para identificar la forma hay que seguir las cadencias.",
+            text: "Para entender la forma de una pieza compleja, debemos observar:",
           },
           {
             type: "chips",
-            title: "Cadencias como mapa de forma",
+            title: "Elementos de Cohesion",
             items: [
-              "Semicadencia -> frase antecedente abierta",
-              "Cadencia autentica debil -> cierre parcial",
-              "Cadencia autentica perfecta -> cierre de seccion",
-              "Cadencia de engano -> extension de la frase",
+              "Repeticion: Crea unidad y familiaridad.",
+              "Variacion: Mantiene el interes sobre material conocido.",
+              "Contraste: Introduce conflicto y nuevas ideas.",
+              "Retorno: Proporciona equilibrio y cierre formal.",
             ],
           },
         ],
@@ -5819,30 +5817,36 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
           "La mezcla modal toma acordes del modo paralelo sin desplazar el centro tonal. En C major, usar F minor o Ab major no implica abandonar C como tonica; simplemente se importa color desde C minor. Esta tecnica amplifica el vocabulario tonal sin necesidad de una modulacion plena.",
         ),
         table(
+          ["Acorde Prestado", "Nombre", "Origen (desde Mayor)", "Funcion Tipica"],
           [
-            "En tonalidad mayor",
-            "Procede de la paralela menor",
-            "Uso frecuente",
-          ],
-          [
-            ["iv", "Subdominante menor", "Predominante expresiva"],
-            ["bVI", "VI de la menor", "Color amplio y giro dramatico"],
-            [
-              "bVII",
-              "VII de la menor/modal",
-              "Preparacion hacia IV o I segun estilo",
-            ],
-            ["iio", "ii disminuido menor", "Color mas raro y tenso"],
+            ["iio", "ii disminuido", "ii de la paralela menor", "Predominante"],
+            ["bIII", "III Mayor", "I de la relativa mayor de la paralela menor", "Color / expansion de T"],
+            ["iv", "Subdominante menor", "iv de la paralela menor", "Predominante suave"],
+            ["v", "v menor", "v de la menor natural", "Dominante modal"],
+            ["bVI", "VI Mayor", "VI de la paralela menor", "Sorpresa / Predominante"],
+            ["bVII", "VII Mayor", "VII de la menor natural (Subtonica)", "Cadencia Mixolidia / Rock"],
+            ["viio7", "vii disminuido 7", "vii de la paralela menor", "Dominante"],
           ],
         ),
       ]),
-      section("Como distinguirlo", [
+      section("Uso y Contexto", [
         paragraph(
-          "La dominante secundaria introduce sensible hacia otro grado; la mezcla modal introduce grados rebajados que colorean el mismo centro. Si el acorde cromatico no empuja a una tonica nueva sino que vuelve a I o prepara V desde un color paralelo, es un buen candidato a prestamo modal.",
+          "El uso mas frecuente es la importación de acordes del modo menor hacia el modo mayor. Esto añade una cualidad 'oscura' o 'nostálgica' a la tonalidad mayor. El acorde de 'Sexta de Picardía' es el caso inverso: terminar una pieza en menor con un acorde de I mayor.",
         ),
-        example("En C major", [
-          "C - Fm - G - C: Fm es iv prestado de C minor.",
-          "C - Ab - Fm - G - C: Ab (bVI) y Fm (iv) mantienen C como centro.",
+        list([
+          "Predominantes menores (iv, iio): Crean una direccion mas fuerte hacia el V.",
+          "Cierre con bVI - bVII - I: Muy comun en musica epica y bandas sonoras (cadencia aeolica).",
+          "Intercambio con otros modos: Aunque lo mas comun es mayor/menor, tambien se pueden tomar acordes del modo Dorico (IV mayor en menor) o Frigio (bII en mayor).",
+        ]),
+      ]),
+      section("Diferenciacion Analitica", [
+        paragraph(
+          "La dominante secundaria introduce una sensible hacia otro grado; la mezcla modal introduce grados rebajados que colorean el mismo centro. Si el acorde cromatico no empuja a una tonica nueva sino que vuelve a I o prepara V desde un color paralelo, es mezcla modal.",
+        ),
+        example("Ejemplo de Progresion con Mezcla", [
+          "C - Am - F - Fm - C",
+          "I - vi - IV - iv - I",
+          "El iv (Fm) añade un matiz de tristeza antes del reposo final.",
         ]),
       ]),
     ],
@@ -5928,24 +5932,39 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     sections: [
       section("Construccion", [
         paragraph(
-          "El acorde napolitano se forma sobre el 2o grado rebajado y produce una triada mayor. En tonalidad menor se siente natural por la cercania con el modo frigio; en tonalidad mayor suena mas cromatico. La disposicion mas habitual es primera inversion porque suaviza el movimiento del bajo y enfatiza su funcion de predominante.",
+          "El acorde napolitano se forma sobre el 2o grado rebajado (bII) y es una triada mayor. Aunque puede aparecer en estado fundamental, su uso mas clasico y efectivo es en primera inversion, denotado como N6. Su sonoridad es oscura y tensa, evocando un color 'frigio' dentro del sistema tonal.",
         ),
         table(
-          ["Tonalidad", "Napolitano", "Forma comun"],
+          ["Tonalidad", "Grado bII", "Notas del Acorde", "Forma Clasica (N6)"],
           [
-            ["C minor", "Db - F - Ab", "F - Ab - Db (N6)"],
-            ["C major", "Db - F - Ab", "F - Ab - Db (N6)"],
+            ["C minor", "Db", "Db - F - Ab", "F - Ab - Db"],
+            ["G minor", "Ab", "Ab - C - Eb", "C - Eb - Ab"],
+            ["D major", "Eb", "Eb - G - Bb", "G - Bb - Eb"],
           ],
         ),
-      ]),
-      section("Funcion y resolucion", [
         paragraph(
-          "El napolitano prepara la dominante. Suele ir a V, V7 o al cadencial 6/4, y sus voces cromaticas se mueven por semitono con mucha fuerza. Analiticamente no se etiqueta como II, porque su calidad y funcion no son diatonicas normales; se marca como N o bII6 segun la convencion usada.",
+          "En modo mayor, requiere alterar dos notas (b2 y b6). En modo menor, solo requiere alterar el 2o grado (b2), ya que el b6 es diatonico. Esto lo hace mas frecuente y natural en tonalidades menores.",
         ),
-        example("En C minor", [
-          "i - N6 - V - i = Cm - Db/F - G - Cm.",
-          "El Ab puede bajar a G y el Db tender hacia C o D segun disposicion.",
+      ]),
+      section("Funcion y Resolucion", [
+        paragraph(
+          "El napolitano funciona como una predominante de gran fuerza. Su destino casi inevitable es el acorde de dominante (V). La resolucion mas caracteristica implica que el b2 baje por semitono a la sensible (7) o a la fundamental (5) de la dominante.",
+        ),
+        list([
+          "Resolucion Directa: N6 -> V (ej: Db/F -> G). Produce un salto de tercera disminuida (Db a B natural) que es muy expresivo.",
+          "Resolucion via Cadencial 6/4: N6 -> I6/4 -> V. Suaviza la llegada a la dominante.",
+          "Duplicacion: En el N6, se prefiere duplicar el bajo (la 3a del acorde, que es el 4to grado de la escala) para reforzar su funcion de predominante.",
         ]),
+        example("Progresion Tipica en A minor", [
+          "Am (i) - Dm (iv) - Bb/D (N6) - E (V) - Am (i)",
+          "El bajo se mueve: A - D - D - E - A",
+          "La soprano puede cantar: C - D - Bb - G# - A",
+        ]),
+      ]),
+      section("Contexto Historico", [
+        paragraph(
+          "Aunque se llama 'napolitano' por su uso frecuente en la escuela de opera de Napoles del siglo XVIII (Scarlatti, Pergolesi), fue un recurso estandar para Bach, Mozart y especialmente Beethoven, quien lo uso para crear momentos de gran dramatismo.",
+        ),
       ]),
     ],
     commonMistakes: [
@@ -6022,27 +6041,41 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Compararlos con el napolitano como predominantes cromaticos.",
     ],
     sections: [
-      section("Estructura", [
+      section("Estructura y Tipos", [
+        paragraph(
+          "Las sextas aumentadas son acordes predominantes cromaticos construidos sobre el 6to grado rebajado (b6) de la escala. Su rasgo distintivo es el intervalo de sexta aumentada que se forma entre el b6 y el 4to grado alterado (#4). Este intervalo es inestable y tiende a expandirse por semitono hacia la octava de la dominante (5).",
+        ),
         table(
-          ["Tipo en C minor", "Notas", "Rasgo distintivo"],
+          ["Nombre", "Notas (en C)", "Contenido de Grados", "Notas Adicionales"],
           [
-            ["It+6", "Ab - C - F#", "Modelo basico"],
-            ["Fr+6", "Ab - C - D - F#", "Incluye 2 natural"],
-            ["Ger+6", "Ab - C - Eb - F#", "Incluye b3"],
+            ["Italiana (It+6)", "Ab - C - F#", "b6 - 1 - #4", "3 sonidos solamente"],
+            ["Francesa (Fr+6)", "Ab - C - D - F#", "b6 - 1 - 2 - #4", "Contiene una 2a mayor (2)"],
+            ["Alemana (Ger+6)", "Ab - C - Eb - F#", "b6 - 1 - b3 - #4", "Contiene una 3a menor (b3)"],
           ],
         ),
-        paragraph(
-          "La esencia del acorde es la sexta aumentada entre b6 y #4, que se expande por semitono hacia el 5o grado. Ese gesto dirige con mucha fuerza a la dominante. Las variantes italiana, francesa y alemana cambian las voces internas, no la funcion principal.",
-        ),
       ]),
-      section("Resolucion", [
+      section("Resolucion y Conduccion", [
         paragraph(
-          "La resolucion normal es hacia V o cadencial 6/4. El Ger+6 exige especial cuidado porque su contenido puede generar quintas paralelas si se mueve directamente a V en ciertas disposiciones; por eso a menudo pasa por cadencial 6/4. El analisis debe mostrar la cualidad concreta del acorde, no solo decir 'cromatico'.",
+          "La resolucion estandar es hacia el acorde de Dominante (V). El b6 baja al 5 y el #4 sube al 5. Debido a su estructura, cada variante tiene consideraciones especificas:",
         ),
-        example("Movimiento esencial", [
-          "En C: Ab -> G y F# -> G.",
-          "Las voces internas completan el acorde de dominante segun la variante usada.",
+        list([
+          "Italiana: Se duplica la tonica (1) para completar las 4 voces.",
+          "Francesa: El grado 2 se mantiene como nota comun al V (que es la 5a de la dominante) o baja al 7.",
+          "Alemana: Es la mas propensa a generar quintas paralelas (Ab-Eb a G-D). Para evitarlas, casi siempre resuelve primero en un cadencial 6/4 (I6/4) antes de llegar al V.",
         ]),
+        example("Resolucion Alemana en C", [
+          "Ger+6 (Ab-C-Eb-F#) -> C/G (G-C-E-G) -> G (G-B-D-G)",
+          "Evita las quintas prohibidas mediante el retraso del 6/4.",
+        ]),
+      ]),
+      section("Comparativa", [
+        table(
+          ["Acorde", "Intervalo Clave", "Origen Tonal", "Efecto"],
+          [
+            ["Napolitano", "b2 - 4 - b6", "Mezcla Modal / Frigio", "Oscuro, solemne"],
+            ["Sexta Aumentada", "b6 - #4", "Cromatismo dirigido", "Brillante, impulsivo"],
+          ],
+        ),
       ]),
     ],
     commonMistakes: [
@@ -6121,23 +6154,40 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Distinguir dominante alterado de acorde autonomo cromatico.",
     ],
     sections: [
-      section("Que se altera y por que", [
+      section("Nucleo y Tensiones", [
         paragraph(
-          "En un dominante, la 3a y la 7a definen la funcion; las alteraciones actuan como tensiones que incrementan el empuje hacia la tonica. Alterar la 5a o la 9a agrega cromatismo sin borrar el tritono funcional. Por eso estos acordes son habituales en repertorio romantico, jazz y armonia moderna.",
+          "En un acorde de dominante, la 3a y la 7a forman el tritono que define su funcion. Las alteraciones actuan sobre la 5a o la 9a para incrementar la tension cromatica hacia la tonica. Estos acordes son pilares del lenguaje romantico tardio y del jazz.",
         ),
         table(
-          ["Acorde", "Notas en C como V de F", "Tension destacada"],
+          ["Acorde", "Intervalos", "Notas (V7 de C)", "Uso / Color"],
           [
-            ["C7b9", "C E G Bb Db", "b9 intensa contra la tonica futura"],
-            ["C7#9", "C E G Bb D#", "#9 expresiva y cromatica"],
-            ["C7b5", "C E Gb Bb", "Quinta rebajada, color inestable"],
-            ["C7#5", "C E G# Bb", "Quinta aumentada, impulso ascendente"],
+            ["V7(b9)", "1, 3, 5, b7, b9", "G-B-D-F-Ab", "Clasico, muy tenso hacia la 5a de I"],
+            ["V7(#9)", "1, 3, 5, b7, #9", "G-B-D-F-A#", "Jazz / Blues ('Acorde Hendrix')"],
+            ["V7(b5)", "1, 3, b5, b7", "G-B-Db-F", "Francia / Impresionismo"],
+            ["V7(#5)", "1, 3, #5, b7", "G-B-D#-F", "Aumentado, empuje hacia la 3a de I"],
           ],
         ),
       ]),
-      section("Resolucion", [
+      section("Resolucion de Alteraciones", [
         paragraph(
-          "Las tensiones alteradas suelen resolver por semitono a notas del acorde de llegada. La b9 suele caer a la quinta de la tonica o subir a su tercera segun disposicion; la #5 puede subir a la tercera de la tonica siguiente. El principio es economizar movimiento sin perder la direccion dominante.",
+          "Las notas alteradas tienen una direccion obligada por su tendencia cromatica. Resolverlas 'en contra' de su alteracion suele sonar forzado o incorrecto.",
+        ),
+        list([
+          "La b9 siempre baja por semitono (en C: Ab -> G).",
+          "La #9 suele subir (A# -> B) o actuar como una b10 (Bb -> A) en contextos de blues.",
+          "La b5 baja por semitono (Db -> C).",
+          "La #5 sube por semitono (D# -> E).",
+        ]),
+        example("V7(#5) -> I en C Major", [
+          "G - B - D# - F  resolviendo a  C - C - E - G",
+          "El D# sube a E (3a de C)",
+          "El F baja a E (3a de C)",
+          "El B sube a C (Tonica)",
+        ]),
+      ]),
+      section("Sustitucion Tritonica", [
+        paragraph(
+          "Un concepto avanzado relacionado es la sustitucion tritonica (SubV7). Un dominante puede ser reemplazado por otro a distancia de tritono (ej: Db7 sustituye a G7) porque comparten el mismo tritono funcional (F y B/Cb).",
         ),
       ]),
     ],
@@ -6224,46 +6274,41 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Distinguir transicion modulante de simple tonicizacion extendida.",
     ],
     sections: [
-      section("Mecanismos", [
+      section("Mediantes Cromaticas", [
+        paragraph(
+          "Las mediantes cromaticas son tonalidades o acordes cuyas fundamentales estan a distancia de tercera (mayor o menor) y que no pertenecen a la tonalidad diatonica. Por ejemplo, en C major, los acordes de E major o Ab major son mediantes cromaticas.",
+        ),
         table(
-          ["Tecnica", "Idea", "Ejemplo tipico"],
+          ["Relacion", "Ejemplo (en C)", "Caracteristica"],
           [
-            [
-              "Pivote cromatico",
-              "Acorde reinterpretado entre dos contextos",
-              "iv prestado que se vuelve ii en nueva region",
-            ],
-            [
-              "Enarmonia",
-              "Misma altura, nueva grafia y funcion",
-              "vii°7 que cambia de destino",
-            ],
-            [
-              "Cadena de dominantes",
-              "Serie de aplicados hacia nueva tonica",
-              "V/V/V -> V/V -> V -> I",
-            ],
-            [
-              "Sexta aumentada",
-              "Predominante cromatico que desemboca en nueva dominante",
-              "Ger+6 reorientado",
-            ],
+            ["Mediante Mayor", "E (III)", "III mayor en lugar de iii menor"],
+            ["Submediante Menor", "Ab (bVI)", "bVI mayor prestado de C menor"],
+            ["Mediante Menor", "Eb (bIII)", "bIII mayor prestado de C menor"],
+            ["Submediante Mayor", "A (VI)", "VI mayor en lugar de vi menor"],
           ],
         ),
         paragraph(
-          "La modulacion avanzada se vuelve necesaria cuando las tonalidades ya no comparten un pivote diatonico claro. En ese contexto, el cromatismo y la reinterpretacion enarmonica permiten abrir nuevas rutas sin quiebre abrupto. Lo importante es describir el mecanismo, no solo nombrar el punto de llegada.",
+          "Estas relaciones permiten modulaciones directas o por pivote cromatico muy coloridas, tipicas del Romanticismo (Schubert, Liszt).",
         ),
       ]),
-      section("Como analizarla", [
+      section("Reinterpretacion Enarmonica", [
+        paragraph(
+          "Ciertos acordes tienen una estructura simetrica que permite reinterpretarlos enarmonicamente para modular a tonalidades lejanas. Los dos casos mas famosos son la Septima Disminuida y la Sexta Aumentada Alemana.",
+        ),
         list([
-          "Marca el ultimo momento estable de la tonalidad inicial.",
-          "Identifica el acorde o gesto que vuelve ambiguo el contexto.",
-          "Busca la primera cadencia o dominante clara en la nueva region.",
+          "Septima Disminuida (vii°7): Al ser simetrico (todo terceras menores), cualquier nota puede ser la sensible. Un vii°7 de C (B-D-F-Ab) es enarmonico al vii°7 de Eb (D-F-Ab-Cb).",
+          "Sexta Aumentada Alemana (Ger+6): Es enarmonica a un acorde de 7a de dominante (V7). Un Ger+6 en C (Ab-C-Eb-F#) suena igual a un Ab7 (V7 de Db).",
         ]),
-        example("Idea enarmonica", [
-          "Un acorde vii°7 puede reescribirse con otra grafia y funcionar como sensible de un nuevo centro.",
-          "Eso permite pasar a tonalidades lejanas con una sola sonoridad compartida.",
+        example("Modulacion via Ger+6 / V7", [
+          "Tonalidad A: C major. Acorde: Ab-C-Eb-F# (Ger+6)",
+          "Reinterpretacion: Ab-C-Eb-Gb (V7 de Db)",
+          "Tonalidad B: Db major. Resolucion a Db.",
         ]),
+      ]),
+      section("Modulacion por Tonos Vecinos vs Lejanos", [
+        paragraph(
+          "Las modulaciones avanzadas suelen dirigirse a tonalidades lejanas (mas de dos alteraciones de diferencia en el circulo de quintas). El uso de pivotes cromaticos (acordes de mezcla modal usados como nexo) es la herramienta clave para mantener la coherencia musical en estos saltos grandes.",
+        ),
       ]),
     ],
     commonMistakes: [
@@ -6355,27 +6400,40 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Cerrar con clausulas correctas.",
     ],
     sections: [
-      section("Las cinco especies", [
+      section("Las cinco especies de Fux", [
+        paragraph(
+          "El metodo de especies (popularizado por J.J. Fux en su 'Gradus ad Parnassum') entrena progresivamente la independencia de voces y el control de la disonancia.",
+        ),
         table(
-          ["Especie", "Relacion ritmica", "Idea central"],
+          ["Especie", "Relacion Ritmica", "Regla de Disonancia", "Recurso Clave"],
           [
-            ["1a", "1 nota contra 1", "Solo consonancias"],
-            ["2a", "2 contra 1", "Pasajes en tiempos debiles"],
-            ["3a", "4 contra 1", "Mayor fluidez"],
-            ["4a", "Suspensiones", "Disonancia preparada y resuelta"],
-            ["5a", "Florido", "Combinacion libre de recursos anteriores"],
+            ["1a Especie", "1:1 (Redondas)", "Prohibida", "Solo consonancias (3, 5, 6, 8)"],
+            ["2a Especie", "2:1 (Blancas)", "En tiempo debil", "Notas de paso y bordaduras"],
+            ["3a Especie", "4:1 (Negras)", "En tiempos debiles", "Nota cambiata y bordaduras"],
+            ["4a Especie", "2:1 (Sincopas)", "En tiempo fuerte", "Suspensiones (7-6, 4-3, 9-8)"],
+            ["5a Especie", "Mixta (Florido)", "Segun contexto", "Combinacion de todas las especies"],
           ],
         ),
-        paragraph(
-          "El metodo por especies no representa toda la musica real, pero entrena principios fundamentales: equilibrio melodico, control de disonancia y autonomia entre voces. Cada especie agrega una capa de complejidad sin perder el control del estilo.",
-        ),
       ]),
-      section("Reglas basicas", [
+      section("Reglas Melodicas y Armonicas", [
+        paragraph(
+          "El contrapunto busca que cada voz sea una melodia 'cantabile' por si misma, no solo un relleno armonico.",
+        ),
         list([
-          "Privilegia movimiento contrario u oblicuo entre voces.",
-          "Evita quintas y octavas paralelas o directas fuertes.",
-          "Conserva un unico climax y una linea cantable.",
-          "En 4a especie, la disonancia debe prepararse y resolverse por paso.",
+          "Movimiento: Se prefiere el movimiento contrario para asegurar la independencia.",
+          "Saltos: Evitar saltos de 7a, 9a o intervalos aumentados/disminuidos (excepto la 4a disminuida en ciertos contextos).",
+          "Unisono: Solo se permite en el primer y ultimo compas (en 1a especie).",
+          "Consonancias Perfectas: Las 5as y 8as no pueden ser paralelas ni directas fuertes.",
+        ]),
+      ]),
+      section("La Cuarta Especie: Suspensiones", [
+        paragraph(
+          "Es la especie mas importante para entender la disonancia funcional. Una suspension tiene tres partes: Preparacion (consonante), Percusion (disonante por sincopa) y Resolucion (consonante bajando por grado conjunto).",
+        ),
+        example("Tipos de Suspension en el Bajo", [
+          "Suspension 7-6: Muy comun en secuencias.",
+          "Suspension 4-3: Tipica de cadencias finales.",
+          "Suspension 2-3: Ocurre cuando la voz inferior tiene la suspension.",
         ]),
       ]),
     ],
@@ -6460,27 +6518,41 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Prever que intervalos conviene evitar segun el tipo de inversion.",
     ],
     sections: [
-      section("Idea central", [
+      section("Fundamentos de la Inversion", [
         paragraph(
-          "El contrapunto invertible permite que la voz superior pase abajo y la inferior arriba sin perder sentido musical. Eso obliga a prever no solo el intervalo actual, sino el que surgira tras la inversion. Por ejemplo, una 3a consonante se vuelve 6a consonante; una 2a disonante se vuelve 7a disonante.",
+          "El contrapunto invertible permite que la voz superior pase abajo y la inferior arriba sin perder sentido musical. Eso obliga a prever no solo el intervalo actual, sino el que surgira tras la inversion.",
         ),
         table(
-          ["Intervalo", "Inversion a la octava"],
+          ["Intervalo Original", "Inversion (Octava)", "Inversion (Decima)", "Inversion (Duodecima)"],
           [
-            ["1a", "8a"],
-            ["2a", "7a"],
-            ["3a", "6a"],
-            ["4a", "5a"],
-            ["5a", "4a"],
-            ["6a", "3a"],
-            ["7a", "2a"],
+            ["1 (Unisono)", "8 (Octava)", "10 (Decima)", "12 (Duodecima)"],
+            ["2 (Segunda)", "7 (Septima)", "9 (Novena)", "11 (Oncena)"],
+            ["3 (Tercera)", "6 (Sexta)", "8 (Octava)", "10 (Decima)"],
+            ["4 (Cuarta)", "5 (Quinta)", "7 (Septima)", "9 (Novena)"],
+            ["5 (Quinta)", "4 (Cuarta)", "6 (Sexta)", "8 (Octava)"],
+            ["6 (Sexta)", "3 (Tercera)", "5 (Quinta)", "7 (Septima)"],
+            ["7 (Septima)", "2 (Segunda)", "4 (Cuarta)", "6 (Sexta)"],
+            ["8 (Octava)", "1 (Unisono)", "3 (Tercera)", "5 (Quinta)"],
           ],
         ),
       ]),
-      section("Aplicacion", [
+      section("Reglas por Tipo de Inversion", [
         paragraph(
-          "La practica mas comun es a la octava, pero tambien existen inversiones a la decima o duodecima. Cuanto mas amplia la inversion, mas flexibilidad aparece en el registro, pero la planificacion sigue siendo estricta. En escritura imitativa, esta tecnica permite reutilizar material y variar la textura sin perder coherencia.",
+          "Dependiendo del intervalo de inversion (8, 10 o 12), ciertos intervalos 'seguros' pueden volverse problematicos.",
         ),
+        list([
+          "Inversion a la Octava: La 5a es el intervalo mas critico, pues se convierte en 4a (disonante en contrapunto a 2 voces). Se debe tratar como disonancia o evitarse en tiempos fuertes.",
+          "Inversion a la Decima: Las 3as, 6as y 10as son seguras. Se deben evitar los movimientos paralelos de 3a o 10a, ya que tras la inversion produciran octavas o unisonos paralelos.",
+          "Inversion a la Duodecima: La 6a es el intervalo critico, ya que se convierte en 7a. La 3a se convierte en 10a (segura).",
+        ]),
+        example("Ejemplo de Inversion a la Octava", [
+          "Voz Sup: E - F - G (3a - 4a - 5a sobre C)",
+          "Voz Inf: C - C - C",
+          "INVERTIDO ->",
+          "Voz Sup: C - C - C",
+          "Voz Inf: E - F - G (6a - 5a - 4a bajo C)",
+          "Nota: La 5a original se volvio 4a disonante.",
+        ]),
       ]),
     ],
     commonMistakes: [
@@ -6570,25 +6642,46 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Reconocer el papel de la dominante en la respuesta.",
     ],
     sections: [
-      section("Materiales principales", [
+      section("Arquitectura de la Fuga", [
+        paragraph(
+          "La fuga es la culminacion del pensamiento contrapuntistico tonal. Mas que una 'forma' rigida, es un procedimiento de imitacion continua de un tema principal llamado Sujeto.",
+        ),
         table(
-          ["Termino", "Funcion"],
+          ["Elemento", "Definicion", "Funcion"],
           [
-            ["Sujeto", "Tema principal que inaugura la fuga"],
-            ["Respuesta", "Entrada imitativa, real o tonal"],
-            ["Contrasujeto", "Contrapunto recurrente contra el sujeto"],
-            ["Episodio", "Pasaje de desarrollo o secuencia entre entradas"],
-            ["Estrecho", "Superposicion cercana de sujetos"],
+            ["Sujeto", "Tema principal", "Inaugura la fuga en la tonica"],
+            ["Respuesta", "Imitacion del sujeto", "Aparece en la dominante (v o V)"],
+            ["Contrasujeto", "Contrapunto recurrente", "Acompaña al sujeto/respuesta tras su entrada"],
+            ["Codetta", "Pequeño puente", "Conecta la respuesta con la siguiente entrada"],
+            ["Episodio", "Seccion libre", "Modula o desarrolla motivos entre entradas"],
+            ["Estrecho (Stretto)", "Superposicion", "Las entradas se encabalgan para crear tension"],
           ],
         ),
-        paragraph(
-          "La fuga no es un formulario rigido, pero si una forma de organizacion imitativa altamente estructurada. Su exposicion presenta el sujeto en distintas voces; despues alterna nuevas entradas y episodios. La tension crece a traves de modulaciones, densidad imitativa y retornos del sujeto.",
-        ),
       ]),
-      section("Respuesta real y tonal", [
+      section("La Exposicion", [
         paragraph(
-          "La respuesta real transpone el sujeto exactamente; la tonal ajusta algunos intervalos para preservar el equilibrio tonal. Esa decision evita que la fuga abandone demasiado pronto su centro. Por eso, incluso en una forma contrapuntistica, la funcion tonal sigue importando.",
+          "Es la primera seccion de la fuga, donde todas las voces (2, 3, 4 o mas) presentan el sujeto o la respuesta una vez cada una. El orden de entrada suele ser alternativo (Sujeto - Respuesta - Sujeto - Respuesta).",
         ),
+        list([
+          "Respuesta Real: Transposicion exacta del sujeto a la quinta justa.",
+          "Respuesta Tonal: Algunos intervalos se modifican (especialmente el salto de 5a a 4a) para no alejarse de la tonica original demasiado pronto.",
+          "Contraexposicion: A veces sigue a la exposicion, con el mismo orden de voces pero distinta relacion sujeto/respuesta.",
+        ]),
+      ]),
+      section("Desarrollo y Final", [
+        paragraph(
+          "Tras la exposicion, la fuga alterna Episodios (sin sujeto completo) y Entradas (sujeto completo en tonalidades vecinas).",
+        ),
+        list([
+          "Pedal de Dominante: Suele preceder al final para acumular tension.",
+          "Stretto Final: Las voces entran con el sujeto antes de que la anterior termine, aumentando la densidad.",
+          "Tierce de Picardie: En fugas en modo menor, es comun terminar con un acorde de Tonica mayor.",
+        ]),
+        example("Estructura de Fuga a 3 voces", [
+          "Voz 1: Sujeto (I) -> Contrasujeto 1 -> Contrasujeto 2 -> Episodio",
+          "Voz 2:           -> Respuesta (V) -> Contrasujeto 1 -> Episodio",
+          "Voz 3:                            -> Sujeto (I)    -> Episodio",
+        ]),
       ]),
     ],
     commonMistakes: [
@@ -6666,37 +6759,40 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Reconocer introduccion lenta o coda como elementos opcionales.",
     ],
     sections: [
-      section("Arquitectura general", [
+      section("Estructura Tripartita y Plan Tonal", [
+        paragraph(
+          "La Forma Sonata es el diseño estructural mas importante del periodo clasico. Se basa en una dialectica entre dos temas o grupos tematicos (A y B) y un plan tonal de tension y resolucion.",
+        ),
         table(
-          ["Seccion", "Funcion", "Rasgo tonal habitual"],
+          ["Seccion", "Sub-seccion", "Contenido Tematico", "Plan Tonal"],
           [
-            [
-              "Exposicion",
-              "Presenta temas y contraste",
-              "Modula hacia dominante o relativo",
-            ],
-            [
-              "Desarrollo",
-              "Fragmenta y transforma",
-              "Inestabilidad y secuencias",
-            ],
-            [
-              "Recapitulacion",
-              "Reexpone y estabiliza",
-              "Todo vuelve a la tonica",
-            ],
-            ["Coda", "Cierre ampliado", "Confirma llegada final"],
+            ["Exposicion", "Tema A", "Caracter energico, Tonica", "I (o i)"],
+            ["", "Puente", "Transicion modulante", "I -> V"],
+            ["", "Tema B", "Caracter cantabile, contraste", "V (o III en menor)"],
+            ["", "Codetta", "Cierre de la exposicion", "V"],
+            ["Desarrollo", "Desarrollo", "Fragmentacion de A y B", "Inestabilidad (varias ton.)"],
+            ["Recapitulacion", "Tema A", "Retorno del tema principal", "I"],
+            ["", "Puente", "Adaptado para no modular", "I"],
+            ["", "Tema B", "Retorno en la tonica", "I"],
+            ["", "Coda", "Cierre definitivo de la obra", "I"],
           ],
         ),
-        paragraph(
-          "La forma sonata combina diseno tematico y estrategia tonal. No basta con encontrar 'tema A' y 'tema B'; hay que observar como se relacionan con la salida de la tonica y su posterior regreso. Esa dinamica de partida, crisis y retorno explica su peso historico.",
-        ),
       ]),
-      section("Que mirar en analisis", [
+      section("Dinamica de las Secciones", [
         list([
-          "Donde cadencia y cierra la exposicion.",
-          "Que materiales se fragmentan en el desarrollo.",
-          "Como se adapta el segundo grupo tematico para reaparecer en la tonica durante la recapitulacion.",
+          "Exposicion: Presenta el conflicto. El paso de la Tonica a la Dominante es el motor de toda la forma.",
+          "Desarrollo: Es la zona de mayor tension. El compositor utiliza tecnicas como la fragmentacion, la secuencia y el contrapunto para 'desarmar' los temas.",
+          "Recapitulacion: Resuelve el conflicto tonal. Al reexponer el Tema B en la Tonica, se 'reconcilia' el material contrastante con el centro tonal original.",
+        ]),
+      ]),
+      section("Elementos Opcionales", [
+        paragraph(
+          "Muchas sonatas incluyen una Introduccion Lenta (para crear expectativa) y una Coda final (para dar mayor peso al cierre).",
+        ),
+        example("Plan Tonal en C Mayor", [
+          "Exposicion: Tema A (C) -> Tema B (G)",
+          "Desarrollo: Pasa por Am, Dm, F...",
+          "Recapitulacion: Tema A (C) -> Tema B (C)",
         ]),
       ]),
     ],
@@ -6783,34 +6879,32 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Explicar la funcion de episodios y retornos.",
     ],
     sections: [
-      section("Esquemas frecuentes", [
+      section("El Estribillo y los Episodios", [
+        paragraph(
+          "El Rondó se basa en la alternancia entre un tema recurrente (Estribillo o Refrain) y secciones de contraste (Episodios o Couplets). Es una de las formas mas antiguas y populares, derivando de danzas circulares francesas.",
+        ),
         table(
-          ["Tipo", "Esquema", "Idea"],
+          ["Esquema", "Tipo", "Estructura Tonal"],
           [
-            [
-              "Rondo simple",
-              "ABACA",
-              "Dos episodios separados por retornos de A",
-            ],
-            [
-              "Rondo expandido",
-              "ABACABA",
-              "Mayor extension y cierre simetrico",
-            ],
-            [
-              "Sonata-rondo",
-              "ABACABA con rasgos de recapitulacion",
-              "Hibrido clasico",
-            ],
+            ["A B A C A", "Rondó de 5 partes", "A(I) - B(V) - A(I) - C(vi/IV) - A(I)"],
+            ["A B A C A B A", "Rondó de 7 partes", "Simetrico, mayor desarrollo"],
+            ["A B A C A D A...", "Rondó encadenado", "Varios episodios contrastantes"],
           ],
         ),
-        paragraph(
-          "El rondo se sostiene sobre la memoria del oyente: cada regreso de A confirma identidad despues de un episodio de contraste. Esa alternancia lo hace especialmente util para finales de sonatas y conciertos, donde el retorno aporta energia y claridad.",
-        ),
       ]),
-      section("Rondo vs ternaria", [
+      section("Sonata-Rondó", [
         paragraph(
-          "En una forma ternaria simple, A vuelve una sola vez como gran regreso estructural. En el rondo, A reaparece varias veces y domina la percepcion total. El analisis debe contar retornos reales, no solo semejanzas vagas de textura.",
+          "En el periodo clasico, surgió un hibrido que combina el retorno tematico del rondó con la logica tonal de la sonata. La seccion B se comporta como el 'segundo tema' de una sonata, apareciendo en la dominante en la primera seccion y regresando en la tonica al final.",
+        ),
+        example("Esquema Sonata-Rondó", [
+          "Exposicion: A (Tonica) -> B (Dominante) -> A (Tonica)",
+          "Desarrollo: C (Tonalidad contrastante)",
+          "Recapitulacion: A (Tonica) -> B (Tonica) -> A (Tonica)",
+        ]),
+      ]),
+      section("Caracteristicas del Estribillo (A)", [
+        paragraph(
+          "El tema A debe ser pegadizo, ritmicamente claro y usualmente termina en una cadencia autentica perfecta (CAP) para que cada regreso se sienta como una llegada a casa estable despues de la aventura tonal del episodio.",
         ),
       ]),
     ],
@@ -6892,26 +6986,38 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Explicar estrategias comunes de transformacion.",
     ],
     sections: [
-      section("Que puede variar", [
+      section("Tecnicas de Variacion", [
+        paragraph(
+          "Variar no es simplemente cambiar notas, sino transformar una idea manteniendo su esencia. En el periodo clasico, las variaciones suelen conservar el esquema armonico y la estructura de frases del tema original.",
+        ),
         table(
-          ["Elemento", "Posible cambio"],
+          ["Tipo de Variacion", "Descripcion", "Que cambia", "Que se mantiene"],
           [
-            ["Ritmo", "Figuracion mas rapida o mas amplia"],
-            ["Textura", "Acordal, imitativa, alberti, coral"],
-            ["Armonia", "Rearmonizacion parcial o cromatismo"],
-            ["Modo/caracter", "Mayor a menor, brillante a oscuro"],
-            ["Registro", "Tema desplazado a otra zona o repartido entre voces"],
+            ["Ornamental", "Adorno de la melodia", "Figuracion rítmica", "Armonia y Estructura"],
+            ["Caracteristica", "Cambio de estilo o aire", "Tempo, Dinamica, Modo", "Contorno Melodico"],
+            ["Armonica", "Rearmonizacion del tema", "Acordes, Cromatismo", "Melodia y Fraseo"],
+            ["Simplificada", "Reduccion a lo esencial", "Densidad de notas", "Esqueleto armonico"],
+            ["Fantasía / Libre", "Transformacion radical", "Casi todo", "Motivo o germen rítmico"],
           ],
         ),
-        paragraph(
-          "En muchas variaciones clasicas, el esquema armónico y la longitud de frase permanecen mientras la superficie cambia. Otras variantes transforman el modo o la textura de forma drástica. El analisis debe identificar que se conserva para justificar que seguimos oyendo el mismo tema.",
-        ),
       ]),
-      section("Escucha analitica", [
+      section("Formas Afines: Chacona y Pasacalle", [
+        paragraph(
+          "Son variaciones continuas sobre un bajo obstinado (Ostinato). Mientras el bajo se repite constantemente, las voces superiores despliegan variaciones de textura y contrapunto.",
+        ),
         list([
-          "Busca si el bajo armonico se mantiene.",
-          "Comprueba si la forma de la frase sigue igual.",
-          "Observa si el tema aparece adornado, fragmentado o distribuido entre voces.",
+          "Chacona: Variaciones sobre una progresion armonica fija.",
+          "Pasacalle: Variaciones sobre una melodia fija en el bajo.",
+        ]),
+      ]),
+      section("Como Escuchar una Variacion", [
+        paragraph(
+          "Para analizar variaciones, debemos buscar los 'invariantes': ¿Sigue el bajo haciendo la misma progresion? ¿Estan las frases en el mismo lugar? ¿Aparece el motivo original escondido en la nueva figuracion?",
+        ),
+        example("Ejemplos Famosos", [
+          "Bach: Variaciones Goldberg (basadas en el bajo del Aria).",
+          "Beethoven: Variaciones Diabelli (transformacion de caracter).",
+          "Mozart: 'Ah, vous dirai-je, Maman' (variacion ornamental).",
         ]),
       ]),
     ],
@@ -7000,25 +7106,39 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Sostener interpretaciones con evidencia musical visible u audible.",
     ],
     sections: [
-      section("Metodo de trabajo", [
-        list([
-          "Primera pasada: identifica secciones y cambios de caracter.",
-          "Segunda pasada: localiza cadencias, modulaciones y puntos de llegada.",
-          "Tercera pasada: sigue motivos, secuencias, texturas y relaciones internas.",
-          "Cierre: redacta una hipotesis sobre como la pieza genera unidad y contraste.",
-        ]),
+      section("Metodología de Análisis Integrado", [
         paragraph(
-          "Analizar una obra no significa etiquetar cada compas con ansiedad. Lo importante es descubrir jerarquias: que eventos son estructurales, cuales son decorativos y como se enlazan forma, armonia y gesto. El analisis mas debil es el que acumula datos sin interpretar su funcion.",
+          "El análisis de una obra completa requiere combinar todas las herramientas aprendidas (armonía, contrapunto, forma y ritmo) para entender cómo funciona la música como un todo.",
+        ),
+        table(
+          ["Nivel de Análisis", "Qué buscar", "Herramientas clave"],
+          [
+            ["Macroforma", "Grandes secciones (A, B, C)", "Cadencias estructurales, Retornos"],
+            ["Tonalidad", "Plan de modulaciones", "Círculo de quintas, Acordes pivote"],
+            ["Microforma", "Frases, Periodos, Motivos", "Análisis de intervalos y ritmo"],
+            ["Textura", "Relación entre voces", "Contrapunto, Melodía acompañada"],
+            ["Estilo", "Contexto y lenguaje", "Convenciones de la época"],
+          ],
         ),
       ]),
-      section("Preguntas utiles", [
-        chips([
-          "Donde empieza y termina cada seccion?",
-          "Que regiones tonales se visitan?",
-          "Que motivos vuelven transformados?",
-          "Que cadencias articulan la forma?",
-          "Donde esta el mayor punto de tension?",
+      section("Guía de Análisis en 4 Pasos", [
+        list([
+          "1. Audición y Lectura Global: Identificar el carácter, tempo y forma general sin detenerse en detalles.",
+          "2. Esqueleto Armónico y Tonal: Marcar las cadencias principales y las tonalidades por las que pasa la obra.",
+          "3. Segmentación y Temas: Delimitar las frases y reconocer los motivos rítmico-melódicos principales.",
+          "4. Síntesis e Interpretación: Explicar cómo los elementos anteriores generan unidad (cohesión) y variedad (contraste).",
         ]),
+      ]),
+      section("Ejemplo de Análisis Aplicado", [
+        example("Minueto en G de Petzold (Bach)", [
+          "Forma: Binaria (A-B) con repeticiones.",
+          "Armonía: Empieza en G, modula a D (Dominante) al final de A, regresa a G en B.",
+          "Motivo: Una idea de corcheas ascendentes que se repite y varía.",
+          "Textura: Melodía acompañada (homofonía) con momentos de contrapunto simple.",
+        ]),
+        paragraph(
+          "Recuerda: Un buen análisis no es una lista de etiquetas, sino una narración de cómo la música se despliega en el tiempo.",
+        ),
       ]),
     ],
     commonMistakes: [
@@ -7109,28 +7229,44 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Relacionar extensiones con la cualidad del acorde base.",
     ],
     sections: [
-      section("De septima a acorde extendido", [
+      section("De Septima a Acorde Extendido", [
         paragraph(
-          "La armonia extendida conserva el nucleo funcional del acorde y agrega colores por encima de la septima. En un dominante, las extensiones pueden intensificar la tension; en un maj7 o m7, pueden aportar color mas estable. La pregunta clave es si la extension refuerza o entorpece la sonoridad principal.",
+          "La armonia extendida conserva el nucleo funcional del acorde y agrega colores por encima de la septima. Las extensiones naturales (9, 11, 13) se derivan de la escala diatonica, mientras que las alteradas (b9, #9, #11, b13) aportan cromatismo.",
         ),
         table(
-          ["Acorde", "Extension comun", "Comentario"],
+          ["Calidad Base", "Extensiones Disponibles", "Evitar / Cuidado", "Efecto / Color"],
           [
-            ["maj7", "9 o #11", "Color amplio y brillante"],
-            [
-              "m7",
-              "9 u 11",
-              "Color estable en contextos modales o funcionales",
-            ],
-            ["7", "b9, 9, #9, 13", "Tension hacia resolucion"],
-            ["m7b5", "11", "Color tenso pero coherente"],
+            ["maj7 (I, IV)", "9, #11, 13", "11 natural (choque con la 3a)", "Brillante, Lidio (#11)"],
+            ["m7 (ii, vi, iii)", "9, 11, 13", "b13 (choque con la 5a)", "Suave, Jazzy"],
+            ["7 (V7)", "9, b9, #9, #11, 13, b13", "11 natural (choque con la 3a)", "Tension y Empuje"],
+            ["m7b5 (vii°)", "11, b13", "9 natural", "Oscuro, Semidisminuido"],
           ],
         ),
       ]),
-      section("Lectura funcional", [
+      section("Voicings y Disposicion", [
         paragraph(
-          "Un Dm11 sigue siendo ii en C si su funcion y su soporte lo confirman; la extension no lo convierte en un objeto aislado. Del mismo modo, G13 sigue siendo dominante mientras 3a y 7a mantengan el tritono. Las extensiones amplian vocabulario, pero no sustituyen al pensamiento estructural.",
+          "En la practica (especialmente en el piano o la guitarra), no siempre se tocan todas las notas del acorde. Algunas notas son estructurales y otras pueden omitirse sin perder la identidad del acorde extendido.",
         ),
+        list([
+          "Notas Imprescindibles: La 3a y la 7a (definen la funcion). La extension deseada (9, 11 o 13).",
+          "Notas Omitibles: La 5a justa (no aporta funcion). La fundamental (si el bajo la toca).",
+          "Tensiones Disponibles: En Jazz, se dice que una tension es disponible si esta un tono por encima de una nota del acorde (evitando la 9a menor interna, excepto en dominantes).",
+        ]),
+      ]),
+      section("Armonia por Cuartas y Poliacordes", [
+        paragraph(
+          "Mas alla de las terceras superpuestas, la armonia extendida abre la puerta a nuevas sonoridades:",
+        ),
+        list([
+          "Acordes de Cuartas: Construidos apilando intervalos de 4a justa (ej: C-F-Bb). Sonoros y ambiguos.",
+          "Poliacordes: Dos triadas distintas sonando simultaneamente (ej: D mayor sobre C mayor), creando una tension compleja.",
+          "Clusters: Acordes formados por segundas consecutivas, creando una mancha sonora de gran densidad.",
+        ]),
+        example("Poliacorde Cmaj13(#11)", [
+          "Se puede pensar como una triada de B minor sobre una triada de C major.",
+          "Notas: (C-E-G) + (B-D-F#)",
+          "Resultado: 1, 3, 5, 7, 9, #11",
+        ]),
       ]),
     ],
     commonMistakes: [
@@ -7217,33 +7353,33 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Relacionar cromatismo con ambiguedad funcional en repertorios tardorromanticos.",
     ],
     sections: [
-      section("Dos usos del cromatismo", [
+      section("Saturacion Cromatica y Conduccion Lineal", [
+        paragraph(
+          "El cromatismo avanzado surge cuando las lineas melodicas individuales se mueven por semitono de forma tan constante que la armonia vertical resultante se vuelve ambigua o secundaria. Este fenomeno es central en el Romanticismo tardio (Wagner, Strauss, Mahler).",
+        ),
         table(
-          ["Tipo", "Funcion"],
+          ["Concepto", "Descripcion", "Ejemplo Musical"],
           [
-            [
-              "Cromatismo lineal",
-              "Adorna o conecta notas por semitono dentro de una voz",
-            ],
-            [
-              "Cromatismo armonico",
-              "Introduce acordes y relaciones no diatonicas",
-            ],
-            [
-              "Cromatismo estructural",
-              "Debilita el sentido de centro o de funcion estable",
-            ],
+            ["Acorde de Tristan", "Acorde ambiguo (F-B-D#-G#) que inicia el drama wagneriano", "Tristan e Isolda"],
+            ["Planing (Deslizamiento)", "Movimiento paralelo de acordes de la misma calidad", "Debussy (Catedral Sumergida)"],
+            ["Enarmonia Funcional", "Un acorde cambia su destino mediante el cambio de nombre de sus notas", "Modulacion a regiones lejanas"],
+            ["Omnitonalidad", "Sensacion de que cualquier nota puede seguir a cualquier otra dentro de la tonalidad", "Liszt (Bagatela sin tonalidad)"],
           ],
         ),
-        paragraph(
-          "En repertorios avanzados, el cromatismo ya no solo sirve para embellecer una cadencia. Puede acumular tension, retrasar resoluciones e incluso volver ambigua la identidad de los acordes. El analisis debe decidir si la tonalidad aun manda o si solo queda como recuerdo lejano.",
-        ),
       ]),
-      section("Escucha y analisis", [
+      section("Disolucion de la Tonalidad", [
+        paragraph(
+          "Cuando el cromatismo deja de ser un adorno y se convierte en la estructura, la jerarquia de Tonica-Dominante empieza a desmoronarse.",
+        ),
         list([
-          "Sigue si el bajo todavia articula funciones reconocibles.",
-          "Observa si las dominantes siguen resolviendo de forma convincente.",
-          "Marca donde el cromatismo se vuelve continuo y ya no excepcional.",
+          "Saturacion: El uso de las 12 notas de la octava en un espacio breve sin privilegiar ninguna.",
+          "Evitacion de la Cadencia: Las frases nunca llegan a un reposo en la Tonica, manteniendo una tension infinita.",
+          "Acordes por Cuartas y Tritonos: El abandono de la triada por terceras reduce la sensacion de reposo diatonico.",
+        ]),
+        example("El Acorde de Tristan (Wagner)", [
+          "Notas: Fa - Si - Re# - Sol#",
+          "Analisis: Se puede leer como una sexta aumentada francesa 'disfrazada' o como un ii semidisminuido con la 3a alterada.",
+          "Significado: Su resolucion se retrasa durante horas en la opera, simbolizando el deseo insatisfecho.",
         ]),
       ]),
     ],
@@ -7328,23 +7464,42 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Reconocer patrones interválicos recurrentes.",
     ],
     sections: [
-      section("Nuevo enfoque", [
+      section("De la Altura a la Clase de Altura (Pitch Class)", [
         paragraph(
-          "En musica post-tonal ya no puedes asumir que todo gira alrededor de tonica, predominante y dominante. El analisis se desplaza hacia clases de altura, vectores intervalicos, simetrias y colecciones. Eso no significa que desaparezca la coherencia; significa que cambia el tipo de coherencia que debes buscar.",
+          "En el analisis post-tonal, dejamos de pensar en 'Do central' o 'Do agudo' para pensar en la Clase de Altura (PC) 0. Todas las octavas de una misma nota son funcionalmente equivalentes.",
         ),
-        chips([
-          "Clase de altura",
-          "Coleccion",
-          "Intervalo",
-          "Simetria",
-          "Motivo",
-          "Registro",
+        table(
+          ["Nota", "Clase de Altura (Entero)", "Nota", "Clase de Altura (Entero)"],
+          [
+            ["C", "0", "F# / Gb", "6"],
+            ["C# / Db", "1", "G", "7"],
+            ["D", "2", "G# / Ab", "8"],
+            ["D# / Eb", "3", "A", "9"],
+            ["E", "4", "A# / Bb", "10"],
+            ["F", "5", "B", "11"],
+          ],
+        ),
+      ]),
+      section("Colecciones y Conjuntos (Sets)", [
+        paragraph(
+          "Al no haber tonica, los sonidos se agrupan en colecciones que definen el color de la obra. El analisis se centra en el contenido intervalico de estos conjuntos (Set Theory).",
+        ),
+        list([
+          "Coleccion Diatonica: Las 7 notas de una escala mayor/menor, pero sin jerarquia de tonica.",
+          "Escala de Tonos Enteros: 6 notas separadas por un tono (ej: C-D-E-F#-G#-A#). Sin centro claro.",
+          "Escala Octatonica (Disminuida): Alternancia de tono y semitono (8 notas). Muy simetrica.",
+          "Cromatica Total: El uso de las 12 notas de la octava.",
         ]),
       ]),
-      section("Herramientas iniciales", [
+      section("Intervalos como Clases (Interval Classes)", [
         paragraph(
-          "Una clase de altura agrupa todas las notas del mismo nombre sin importar octava. Los conjuntos se comparan por su contenido intervalico, no por su funcion tonal. En una introduccion basta con reconocer repeticion de colecciones, contraste de densidades y patrones de semitonos o tritonos.",
+          "Un intervalo de 3a menor (3 semitonos) es equivalente a su inversion, la 6a mayor (9 semitonos), en terminos de contenido armonico. Se agrupan en 6 clases de intervalos principales (IC 1 a 6).",
         ),
+        example("Ejemplos de Colecciones en el Siglo XX", [
+          "Debussy: Uso extensivo de la escala de tonos y pentatonica.",
+          "Stravinsky: Uso de la escala octatonica y poliacordes.",
+          "Bartók: Ejes de simetria y proporcion aurea en los intervalos.",
+        ]),
       ]),
     ],
     commonMistakes: [
@@ -7428,24 +7583,39 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Leer una matriz simple como mapa de transformaciones.",
     ],
     sections: [
-      section("Serie y operaciones", [
+      section("La Serie Dodecafonica", [
+        paragraph(
+          "El serialismo (o dodecafonismo), desarrollado por Arnold Schoenberg, propone que las 12 notas de la octava son iguales y deben organizarse en una Serie (o Fila) fija antes de poder repetirse.",
+        ),
+        list([
+          "Democracia Sonora: Ninguna nota actua como centro o tonica.",
+          "Orden Fijo: La serie determina la sucesion de alturas en la melodia y la armonia.",
+          "No Repeticion: No se repite una nota hasta que hayan sonado las otras 11 (con algunas excepciones artisticas).",
+        ]),
+      ]),
+      section("Las Cuatro Formas de la Serie", [
+        paragraph(
+          "Una sola serie genera 48 variantes mediante transposicion y tres operaciones basicas:",
+        ),
         table(
-          ["Operacion", "Significado"],
+          ["Forma", "Nombre", "Descripcion", "Lectura en Matriz"],
           [
-            ["P", "Forma prima: la serie original"],
-            ["R", "Retrograda: serie al reves"],
-            ["I", "Inversion: intervalos espejados"],
-            ["RI", "Retrograda de la inversion"],
+            ["P (Original)", "Prime", "La serie tal como fue concebida", "Izquierda a Derecha"],
+            ["I (Invertida)", "Inversion", "Intervalos en espejo (si sube 3, baja 3)", "Arriba hacia Abajo"],
+            ["R (Retrograda)", "Retrograde", "La serie leida desde el final", "Derecha a Izquierda"],
+            ["RI (Retro. Inv.)", "Retrograde Inversion", "La inversion leida desde el final", "Abajo hacia Arriba"],
           ],
         ),
-        paragraph(
-          "La tecnica serial busca evitar jerarquias tonales tradicionales distribuyendo las doce clases de altura en una serie ordenada. La obra no repite una nota como eje tonal; desarrolla transformaciones de la misma fila. La matriz dodecafonica sirve para visualizar rapidamente todas las formas transpuestas y operadas.",
-        ),
       ]),
-      section("Lectura inicial de matriz", [
+      section("La Matriz 12x12", [
         paragraph(
-          "En una introduccion no hace falta dominar todo el sistema combinatorio. Basta con entender que la primera fila y la primera columna generan las transposiciones posibles de P e I, y que desde ahi se leen R y RI. El analisis observa que segmentos del discurso provienen de cada forma de la serie.",
+          "La matriz es una herramienta matematica para visualizar todas las transposiciones de la serie. Permite al compositor elegir que forma usar para cada frase o seccion de la obra.",
         ),
+        example("Ejemplo de Segmentacion Serial", [
+          "Serie: C - C# - G - Bb - F - ... (P0)",
+          "Inversion: C - B - F - D - G - ... (I0)",
+          "Retrograda: ... - F - Bb - G - C# - C (R0)",
+        ]),
       ]),
     ],
     commonMistakes: [

@@ -56,58 +56,58 @@ Estos son los que más duelen si faltas a clase porque son base para todo lo dem
 
 ---
 
-## Fase 2 — Armonía funcional intermedia 🔲 PENDIENTE
+## Fase 2 — Armonía funcional intermedia ✅ COMPLETADA
 
 Capítulos que conectan fundamentos con análisis real.
 
-| Capítulo | Qué agregar |
-|---|---|
-| **cadencias-basicas** | Auténtica perfecta/imperfecta, semicadencia, plagal, rota/engañosa, frigia; ejemplos con progresiones, efecto expresivo de cada una |
-| **conduccion-de-voces** | Movimiento paralelo/contrario/oblicuo, quintas y octavas paralelas prohibidas, resolución de sensible y séptima, reglas de duplicación |
-| **introduccion-analisis-armonico** | Cómo cifrar con números romanos, análisis funcional paso a paso, ejemplo completo de una pieza corta |
-| **modulacion** | Modulación diatónica (acorde pivote), directa, cromática; cómo detectarla al oído y en partitura |
+| Capítulo | Qué agregar | Estado |
+|---|---|---|
+| **cadencias-basicas** | Auténtica perfecta/imperfecta, semicadencia, plagal, rota/engañosa, frigia; ejemplos con progresiones, efecto expresivo de cada una | ✅ |
+| **conduccion-de-voces** | Movimiento paralelo/contrario/oblicuo, quintas y octavas paralelas prohibidas, resolución de sensible y séptima, reglas de duplicación | ✅ |
+| **introduccion-analisis-armonico** | Cómo cifrar con números romanos, análisis funcional paso a paso, ejemplo completo de una pieza corta | ✅ |
+| **modulacion** | Modulación diatónica (acorde pivote), directa, cromática; cómo detectarla al oído y en partitura | ✅ |
 
 ---
 
-## Fase 3 — Armonía cromática 🔲 PENDIENTE
+## Fase 3 — Armonía cromática ✅ COMPLETADA
 
-| Capítulo | Qué agregar |
-|---|---|
-| **mezcla-modal** | Expandir: tabla completa de acordes prestados, contextos de uso, diferencia con dominantes secundarias |
-| **acorde-napolitano** | Expandir: construcción, resolución típica bII6→V→i, ejemplos en mayor y menor |
-| **sextas-aumentadas** | It6, Fr6, Ger6: construcción, resolución, contexto histórico, tabla comparativa |
-| **dominantes-alteradas** | V7#5, V7b5, V7#9, V7b9: construcción, color, resolución, uso en jazz vs clásico |
-| **modulacion-avanzada** | Mediantes cromáticas, enarmonía, modulación por acorde napolitano o sexta aumentada |
-
----
-
-## Fase 4 — Contrapunto 🔲 PENDIENTE
-
-| Capítulo | Qué agregar |
-|---|---|
-| **contrapunto-de-especies** | 5 especies de Fux explicadas, reglas de cada una, ejemplos nota contra nota hasta florecido |
-| **contrapunto-invertible** | Inversión a la octava/décima/duodécima, reglas de intervalos válidos, ejemplos |
-| **introduccion-a-la-fuga** | Sujeto, respuesta (real vs tonal), contraexposición, episodios, stretto, ejemplo analizado |
+| Capítulo | Qué agregar | Estado |
+|---|---|---|
+| **mezcla-modal** | Expandir: tabla completa de acordes prestados, contextos de uso, diferencia con dominantes secundarias | ✅ |
+| **acorde-napolitano** | Expandir: construcción, resolución típica bII6→V→i, ejemplos en mayor y menor | ✅ |
+| **sextas-aumentadas** | It6, Fr6, Ger6: construcción, resolución, contexto histórico, tabla comparativa | ✅ |
+| **dominantes-alteradas** | V7#5, V7b5, V7#9, V7b9: construcción, color, resolución, uso en jazz vs clásico | ✅ |
+| **modulacion-avanzada** | Mediantes cromáticas, enarmonía, modulación por acorde napolitano o sexta aumentada | ✅ |
 
 ---
 
-## Fase 5 — Forma y análisis 🔲 PENDIENTE
+## Fase 4 — Contrapunto ✅ COMPLETADA
 
-| Capítulo | Qué agregar |
-|---|---|
-| **forma-musical** | Panorama general: motivo, frase, periodo, formas binarias/ternarias |
-| **forma-sonata** | Exposición (1er/2do tema, puente, codetta), desarrollo, recapitulación, coda, plan tonal |
-| **rondo** | ABACA, ABACABA, rondo-sonata, contraste temático |
-| **tema-y-variaciones** | Técnicas de variación (melódica, rítmica, armónica, de carácter), ejemplos clásicos |
-| **analisis-de-obras** | Metodología: forma + armonía + textura + estilo, ejemplo integrado |
+| Capítulo | Qué agregar | Estado |
+|---|---|---|
+| **contrapunto-de-especies** | 5 especies de Fux explicadas, reglas de cada una, ejemplos nota contra nota hasta florecido | ✅ |
+| **contrapunto-invertible** | Inversión a la octava/décima/duodécima, reglas de intervalos válidos, ejemplos | ✅ |
+| **introduccion-a-la-fuga** | Sujeto, respuesta (real vs tonal), contraexposición, episodios, stretto, ejemplo analizado | ✅ |
 
 ---
 
-## Fase 6 — Teoría post-tonal 🔲 PENDIENTE
+## Fase 5 — Forma y análisis ✅ COMPLETADA
 
-| Capítulo | Qué agregar |
-|---|---|
-| **armonia-extendida** | Acordes por cuartas, clusters, poliacordes, dominantes extendidas |
-| **cromatismo-avanzado** | Saturación cromática, planing, enarmonía funcional |
-| **introduccion-post-tonal** | Pitch class sets, intervalos como clases, conjuntos, forma normal/prima |
-| **serialismo-basico** | Serie de 12 tonos, operaciones P/R/I/RI, matriz, técnica dodecafónica |
+| Capítulo | Qué agregar | Estado |
+|---|---|---|
+| **forma-musical** | Panorama general: motivo, frase, periodo, formas binarias/ternarias | ✅ |
+| **forma-sonata** | Exposición (1er/2do tema, puente, codetta), desarrollo, recapitulación, coda, plan tonal | ✅ |
+| **rondo** | ABACA, ABACABA, rondo-sonata, contraste temático | ✅ |
+| **tema-y-variaciones** | Técnicas de variación (melódica, rítmica, armónica, de carácter), ejemplos clásicos | ✅ |
+| **analisis-de-obras** | Metodología: forma + armonía + textura + estilo, ejemplo integrado | ✅ |
+
+---
+
+## Fase 6 — Teoría post-tonal ✅ COMPLETADA
+
+| Capítulo | Qué agregar | Estado |
+|---|---|---|
+| **armonia-extendida** | Acordes por cuartas, clusters, poliacordes, dominantes extendidas | ✅ |
+| **cromatismo-avanzado** | Saturación cromática, planing, enarmonía funcional | ✅ |
+| **introduccion-post-tonal** | Pitch class sets, intervalos como clases, conjuntos, forma normal/prima | ✅ |
+| **serialismo-basico** | Serie de 12 tonos, operaciones P/R/I/RI, matriz, técnica dodecafónica | ✅ |
