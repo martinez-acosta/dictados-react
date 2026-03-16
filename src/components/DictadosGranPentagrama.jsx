@@ -43,13 +43,14 @@ import {
 } from "./dictationShared";
 
 const BLOCK_PATTERN = ["treble", "bass", "treble"];
-const BLOCK_SIZE_OPTIONS = [2, 4, 6, 8];
+const BLOCK_SIZE_OPTIONS = [6, 8];
 const STAFF_CANVAS_WIDTH = 1280;
 const STAFF_CANVAS_HEIGHT = 390;
 const STAVE_X = 92;
 const STAVE_WIDTH = 1120;
 const TREBLE_Y = 34;
 const BASS_Y = 236;
+const STACKED_SYSTEM_STEP = 294;
 
 const CLEF_LABELS = {
   treble: "Sol",
@@ -89,7 +90,7 @@ function getExerciseRange(clef) {
 
 export default function DictadosGranPentagrama() {
   const navigate = useNavigate();
-  const [blockSize, setBlockSize] = useState(4);
+  const [blockSize, setBlockSize] = useState(6);
   const [bpm, setBpm] = useState(60);
   const [dur, setDur] = useState("q");
   const [mode, setMode] = useState("train");
@@ -176,54 +177,34 @@ export default function DictadosGranPentagrama() {
   useEffect(() => () => clearPlayback(), [clearPlayback]);
 
   const drawGrandStaff = useCallback(
-    ({ targetRef, elementId, notes, activeIndex, evaluationMask, hideNotes }) => {
+    ({
+      targetRef,
+      elementId,
+      notes,
+      activeIndex,
+      evaluationMask,
+      hideNotes,
+      stackByBlock,
+    }) => {
       if (!targetRef.current) return null;
 
       targetRef.current.innerHTML = "";
+      const systemCount = stackByBlock ? BLOCK_PATTERN.length : 1;
+      const canvasHeight =
+        STAFF_CANVAS_HEIGHT + (systemCount - 1) * STACKED_SYSTEM_STEP;
       const vf = new Factory({
         renderer: {
           elementId,
           width: STAFF_CANVAS_WIDTH,
-          height: STAFF_CANVAS_HEIGHT,
+          height: canvasHeight,
         },
       });
       const context = vf.getContext();
-      const trebleStave = new Stave(STAVE_X, TREBLE_Y, STAVE_WIDTH);
-      const bassStave = new Stave(STAVE_X, BASS_Y, STAVE_WIDTH);
-
-      trebleStave.addClef("treble").addTimeSignature("4/4");
-      bassStave.addClef("bass").addTimeSignature("4/4");
-
-      trebleStave.setContext(context).draw();
-      bassStave.setContext(context).draw();
-
-      new StaveConnector(trebleStave, bassStave)
-        .setType(StaveConnector.type.BRACE)
-        .setContext(context)
-        .draw();
-      new StaveConnector(trebleStave, bassStave)
-        .setType(StaveConnector.type.SINGLE_LEFT)
-        .setContext(context)
-        .draw();
-      new StaveConnector(trebleStave, bassStave)
-        .setType(StaveConnector.type.SINGLE_RIGHT)
-        .setContext(context)
-        .draw();
-
       const slots = Math.max(1, notes.length || totalNotes);
-      const usableStartX = trebleStave.getNoteStartX() + 12;
-      const usableEndX = trebleStave.getX() + trebleStave.getWidth() - 42;
-      const usableWidth = usableEndX - usableStartX;
-      const blockWidth = usableWidth / BLOCK_PATTERN.length;
-      const blockRanges = BLOCK_PATTERN.map((clef, index) => ({
-        clef,
-        index,
-        startX: usableStartX + index * blockWidth,
-        endX: usableStartX + (index + 1) * blockWidth,
-      }));
       const leftInset = 12;
       const rightInset = 28;
-      const positions = [];
+      const positions = Array.from({ length: slots }, () => null);
+      const systems = [];
 
       if (typeof context.save === "function") {
         context.save();
@@ -234,100 +215,180 @@ export default function DictadosGranPentagrama() {
       if (typeof context.setFont === "function") {
         context.setFont("14px Georgia");
       }
-      blockSummary.forEach((block) => {
-        const range = blockRanges[block.index];
-        const blockX = (range.startX + range.endX) / 2;
-        context.textAlign = "center";
-        context.fillText(
-          `Bloque ${block.index + 1} · ${CLEF_LONG_LABELS[block.clef]}`,
-          blockX,
-          TREBLE_Y - 12,
+      for (let systemIndex = 0; systemIndex < systemCount; systemIndex += 1) {
+        const trebleStave = new Stave(
+          STAVE_X,
+          TREBLE_Y + systemIndex * STACKED_SYSTEM_STEP,
+          STAVE_WIDTH,
         );
-      });
+        const bassStave = new Stave(
+          STAVE_X,
+          BASS_Y + systemIndex * STACKED_SYSTEM_STEP,
+          STAVE_WIDTH,
+        );
+
+        trebleStave.addClef("treble").addTimeSignature("4/4");
+        bassStave.addClef("bass").addTimeSignature("4/4");
+
+        trebleStave.setContext(context).draw();
+        bassStave.setContext(context).draw();
+
+        new StaveConnector(trebleStave, bassStave)
+          .setType(StaveConnector.type.BRACE)
+          .setContext(context)
+          .draw();
+        new StaveConnector(trebleStave, bassStave)
+          .setType(StaveConnector.type.SINGLE_LEFT)
+          .setContext(context)
+          .draw();
+        new StaveConnector(trebleStave, bassStave)
+          .setType(StaveConnector.type.SINGLE_RIGHT)
+          .setContext(context)
+          .draw();
+
+        const usableStartX = trebleStave.getNoteStartX() + 12;
+        const usableEndX = trebleStave.getX() + trebleStave.getWidth() - 42;
+        const systemStart = stackByBlock ? systemIndex * blockSize : 0;
+        const systemSlotCount = stackByBlock ? blockSize : slots;
+
+        systems.push({
+          blockIndex: stackByBlock ? systemIndex : null,
+          trebleStave,
+          bassStave,
+          usableStartX,
+          usableEndX,
+        });
+
+        if (stackByBlock) {
+          const block = blockSummary[systemIndex];
+          const blockX = (usableStartX + usableEndX) / 2;
+          context.textAlign = "center";
+          context.fillText(
+            `Bloque ${block.index + 1} · ${CLEF_LONG_LABELS[block.clef]}`,
+            blockX,
+            trebleStave.getY() - 12,
+          );
+        } else {
+          const usableWidth = usableEndX - usableStartX;
+          const blockWidth = usableWidth / BLOCK_PATTERN.length;
+          blockSummary.forEach((block) => {
+            const blockX =
+              usableStartX + block.index * blockWidth + blockWidth / 2;
+            context.textAlign = "center";
+            context.fillText(
+              `Bloque ${block.index + 1} · ${CLEF_LONG_LABELS[block.clef]}`,
+              blockX,
+              trebleStave.getY() - 12,
+            );
+          });
+        }
+
+        for (let slotOffset = 0; slotOffset < systemSlotCount; slotOffset += 1) {
+          const index = systemStart + slotOffset;
+          const slot = notes[index];
+          const expectedSlot = slot ?? dictationNotes[index];
+          if (!expectedSlot) {
+            continue;
+          }
+
+          const noteCenterX =
+            systemSlotCount === 1
+              ? (usableStartX + usableEndX) / 2
+              : usableStartX +
+                leftInset +
+                (slotOffset / (systemSlotCount - 1)) *
+                  (usableEndX - usableStartX - leftInset - rightInset);
+
+          let renderedNoteX = noteCenterX;
+
+          if (!hideNotes && slot?.key) {
+            const note = new StaveNote({
+              clef: CLEF_CONFIGS[slot.clef].vexflowClef,
+              keys: [slot.key],
+              duration: dur,
+            });
+
+            if (evaluationMask && typeof evaluationMask[index] === "boolean") {
+              const color = evaluationMask[index] ? "#15803d" : "#dc2626";
+              note.setStyle({ fillStyle: color, strokeStyle: color });
+            } else if (currentPlayingNote === index) {
+              note.setStyle({ fillStyle: "#c2410c", strokeStyle: "#c2410c" });
+            }
+
+            note.setStave(
+              expectedSlot.clef === "treble" ? trebleStave : bassStave,
+            );
+            note.setContext(context);
+            const tickContext = new TickContext();
+            tickContext.addTickable(note).preFormat().setX(noteCenterX);
+            note.setTickContext(tickContext);
+
+            if (
+              typeof note.getAbsoluteX === "function" &&
+              typeof note.setXShift === "function"
+            ) {
+              const absoluteX = note.getAbsoluteX();
+              if (Number.isFinite(absoluteX)) {
+                note.setXShift(noteCenterX - absoluteX);
+              }
+            }
+
+            note.draw();
+
+            if (typeof note.getAbsoluteX === "function") {
+              const absoluteX = note.getAbsoluteX();
+              if (Number.isFinite(absoluteX)) {
+                renderedNoteX = absoluteX;
+              }
+            }
+          }
+
+          positions[index] = {
+            x: renderedNoteX,
+            clef: expectedSlot.clef,
+            blockIndex: expectedSlot.blockIndex,
+            systemIndex,
+          };
+        }
+
+        for (let slotOffset = 4; slotOffset < systemSlotCount; slotOffset += 4) {
+          if (slotOffset % blockSize === 0) {
+            continue;
+          }
+
+          const leftPos = positions[systemStart + slotOffset - 1];
+          const rightPos = positions[systemStart + slotOffset];
+          if (!leftPos || !rightPos) {
+            continue;
+          }
+
+          const barX = (leftPos.x + rightPos.x) / 2;
+          context.beginPath();
+          context.moveTo(barX, trebleStave.getYForLine(0));
+          context.lineTo(barX, bassStave.getYForLine(4));
+          context.strokeStyle = "rgba(148, 163, 184, 0.45)";
+          context.lineWidth = 1;
+          context.stroke();
+        }
+      }
+
       if (typeof context.restore === "function") {
         context.restore();
       }
 
-      for (let index = 0; index < slots; index += 1) {
-        const slot = notes[index];
-        const expectedSlot = slot ?? dictationNotes[index];
-        const resolvedBlockIndex = clamp(
-          expectedSlot?.blockIndex ?? Math.floor(index / Math.max(1, blockSize)),
-          0,
-          BLOCK_PATTERN.length - 1,
-        );
-        const slotInBlock = index % Math.max(1, blockSize);
-        const blockRange = blockRanges[resolvedBlockIndex];
-        const blockStartX = blockRange.startX + leftInset;
-        const blockEndX = blockRange.endX - rightInset;
-        const noteCenterX =
-          blockSize === 1
-            ? (blockStartX + blockEndX) / 2
-            : blockStartX +
-              (slotInBlock / (blockSize - 1)) * (blockEndX - blockStartX);
-
-        positions.push({
-          x: noteCenterX,
-          clef: expectedSlot?.clef ?? BLOCK_PATTERN[resolvedBlockIndex],
-          blockIndex: resolvedBlockIndex,
-        });
-
-        if (!hideNotes && slot?.key) {
-          const note = new StaveNote({
-            clef: CLEF_CONFIGS[slot.clef].vexflowClef,
-            keys: [slot.key],
-            duration: dur,
-          });
-
-          if (evaluationMask && typeof evaluationMask[index] === "boolean") {
-            const color = evaluationMask[index] ? "#15803d" : "#dc2626";
-            note.setStyle({ fillStyle: color, strokeStyle: color });
-          } else if (currentPlayingNote === index) {
-            note.setStyle({ fillStyle: "#c2410c", strokeStyle: "#c2410c" });
-          }
-
-          note.setStave(slot.clef === "treble" ? trebleStave : bassStave);
-          note.setContext(context);
-          const tickContext = new TickContext();
-          tickContext.addTickable(note).preFormat();
-          const noteWidth =
-            typeof note.getWidth === "function" ? note.getWidth() : 18;
-          tickContext.setX(noteCenterX - noteWidth / 2);
-          note.setTickContext(tickContext);
-          note.draw();
-        }
-      }
-
-      for (let index = 4; index < positions.length; index += 4) {
-        if (index % blockSize === 0 || !positions[index - 1] || !positions[index]) {
-          continue;
-        }
-        const barX = (positions[index - 1].x + positions[index].x) / 2;
-        context.beginPath();
-        context.moveTo(barX, trebleStave.getYForLine(0));
-        context.lineTo(barX, bassStave.getYForLine(4));
-        context.strokeStyle = "rgba(148, 163, 184, 0.45)";
-        context.lineWidth = 1;
-        context.stroke();
-      }
-
-      if (activeIndex >= 0 && positions[activeIndex]) {
-        const cursorX = positions[activeIndex].x;
-        context.beginPath();
-        context.moveTo(cursorX, trebleStave.getYForLine(0) - 14);
-        context.lineTo(cursorX, bassStave.getYForLine(4) + 14);
-        context.strokeStyle = "#c2410c";
-        context.lineWidth = 2;
-        context.stroke();
-      }
-
       return {
-        trebleStave,
-        bassStave,
+        systems,
         positions,
       };
     },
-    [blockSize, blockSummary, dictationNotes, dur, totalNotes, currentPlayingNote],
+    [
+      blockSize,
+      blockSummary,
+      dictationNotes,
+      dur,
+      totalNotes,
+      currentPlayingNote,
+    ],
   );
 
   useEffect(() => {
@@ -338,6 +399,7 @@ export default function DictadosGranPentagrama() {
       activeIndex: mode === "exam" ? -1 : currentPlayingNote,
       evaluationMask: null,
       hideNotes: mode === "exam",
+      stackByBlock: mode === "exam",
     });
   }, [dictationNotes, mode, drawGrandStaff, currentPlayingNote]);
 
@@ -349,8 +411,9 @@ export default function DictadosGranPentagrama() {
       activeIndex: activeIdx,
       evaluationMask: mask,
       hideNotes: false,
+      stackByBlock: mode === "exam",
     });
-  }, [userNotes, activeIdx, mask, drawGrandStaff]);
+  }, [userNotes, activeIdx, mask, drawGrandStaff, mode]);
 
   useEffect(() => {
     const handler = (event) => {
@@ -367,25 +430,49 @@ export default function DictadosGranPentagrama() {
     const metrics = answerMetricsRef.current;
     if (!metrics) return null;
 
-    const trebleTop = metrics.trebleStave.getYForLine(0) - 18;
-    const trebleBottom = metrics.trebleStave.getYForLine(4) + 18;
-    const bassTop = metrics.bassStave.getYForLine(0) - 18;
-    const bassBottom = metrics.bassStave.getYForLine(4) + 18;
+    let bestMatch = null;
 
-    if (localY >= trebleTop && localY <= trebleBottom) return "treble";
-    if (localY >= bassTop && localY <= bassBottom) return "bass";
+    metrics.systems.forEach((system, systemIndex) => {
+      const trebleTop = system.trebleStave.getYForLine(0) - 18;
+      const trebleBottom = system.trebleStave.getYForLine(4) + 18;
+      const bassTop = system.bassStave.getYForLine(0) - 18;
+      const bassBottom = system.bassStave.getYForLine(4) + 18;
 
-    const trebleCenter = (trebleTop + trebleBottom) / 2;
-    const bassCenter = (bassTop + bassBottom) / 2;
-    return Math.abs(localY - trebleCenter) <= Math.abs(localY - bassCenter)
-      ? "treble"
-      : "bass";
+      if (localY >= trebleTop && localY <= trebleBottom) {
+        bestMatch = { clef: "treble", systemIndex };
+        return;
+      }
+      if (localY >= bassTop && localY <= bassBottom) {
+        bestMatch = { clef: "bass", systemIndex };
+        return;
+      }
+
+      const trebleCenter = (trebleTop + trebleBottom) / 2;
+      const bassCenter = (bassTop + bassBottom) / 2;
+      const nearestClef =
+        Math.abs(localY - trebleCenter) <= Math.abs(localY - bassCenter)
+          ? "treble"
+          : "bass";
+      const nearestDistance = Math.min(
+        Math.abs(localY - trebleCenter),
+        Math.abs(localY - bassCenter),
+      );
+
+      if (!bestMatch || nearestDistance < bestMatch.distance) {
+        bestMatch = { clef: nearestClef, systemIndex, distance: nearestDistance };
+      }
+    });
+
+    return bestMatch
+      ? { clef: bestMatch.clef, systemIndex: bestMatch.systemIndex }
+      : null;
   }
 
-  function keyFromStaffY(localY, clef) {
+  function keyFromStaffY(localY, clef, systemIndex = 0) {
     const metrics = answerMetricsRef.current;
+    const system = metrics?.systems?.[systemIndex];
     const stave =
-      clef === "treble" ? metrics?.trebleStave : metrics?.bassStave;
+      clef === "treble" ? system?.trebleStave : system?.bassStave;
     const exerciseRange = getExerciseRange(clef);
     if (!stave) return exerciseRange[0];
 
@@ -430,16 +517,24 @@ export default function DictadosGranPentagrama() {
 
     const rect = canvas.getBoundingClientRect();
     const localY = event.clientY - rect.top;
-    const clickedClef = resolveClickedClef(localY);
+    const clickedTarget = resolveClickedClef(localY);
+    if (!clickedTarget) return;
 
-    if (clickedClef !== expected.clef) {
+    if (mode === "exam" && clickedTarget.systemIndex !== expected.blockIndex) {
+      setStatus(
+        `La nota #${activeIdx + 1} pertenece al bloque ${expected.blockIndex + 1}. Responde en esa línea.`,
+      );
+      return;
+    }
+
+    if (clickedTarget.clef !== expected.clef) {
       setStatus(
         `La nota #${activeIdx + 1} está en el bloque ${expected.blockIndex + 1} (${CLEF_LONG_LABELS[expected.clef]}). Haz clic en ese pentagrama.`,
       );
       return;
     }
 
-    const key = keyFromStaffY(localY, clickedClef);
+    const key = keyFromStaffY(localY, clickedTarget.clef, clickedTarget.systemIndex);
     commitNoteAtIndex(
       activeIdx,
       {
@@ -982,94 +1077,116 @@ export default function DictadosGranPentagrama() {
               />
             </Stack>
 
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{
-                mt: 2,
-                overflowX: "auto",
-                pb: 0.5,
-              }}
-            >
-              {dictationNotes.map((slot, index) => {
-                const typed = userInputs[index] ?? "";
-                const parsed = parseNoteInput(typed);
-                const exerciseRange = getExerciseRange(slot.clef);
-                const inRange = parsed.valid
-                  ? exerciseRange.includes(parsed.key)
-                  : false;
-                const helper = typed
-                  ? parsed.valid
-                    ? inRange
-                      ? parsed.typedSolfege
-                        ? labelSPN(parsed.key)
-                        : labelSolfege(parsed.key)
-                      : `Solo dentro del rango ${CLEF_LABELS[slot.clef]}`
-                    : "Ej: C4 o Do4"
-                  : `${index + 1} · ${CLEF_LABELS[slot.clef]}`;
-                const color =
-                  mask && typed && parsed.valid && inRange
-                    ? mask[index]
-                      ? "success"
-                      : "error"
-                    : "primary";
-
-                return (
-                  <TextField
-                    key={`slot-${index}`}
-                    size="small"
-                    label={`#${index + 1}`}
-                    value={typed}
-                    color={color}
-                    error={Boolean(typed && (!parsed.valid || !inRange))}
-                    helperText={helper}
-                    onFocus={() => setActiveIdx(index)}
-                    onChange={(event) => {
-                      const value = event.target.value;
-                      const nextInputs = [...userInputs];
-                      nextInputs[index] = value;
-                      setUserInputs(nextInputs);
-                      setMask(null);
-                      setActiveIdx(index);
-
-                      const nextNotes = [...userNotes];
-                      const nextParsed = parseNoteInput(value);
-                      const allowedRange = getExerciseRange(slot.clef);
-                      const nextInRange = nextParsed.valid
-                        ? allowedRange.includes(nextParsed.key)
-                        : false;
-                      nextNotes[index] =
-                        nextParsed.valid && nextInRange
-                          ? {
-                              key: nextParsed.key,
-                              clef: slot.clef,
-                              blockIndex: slot.blockIndex,
-                            }
-                          : null;
-                      setUserNotes(nextNotes);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        const nextIndex = Math.min(
-                          dictationNotes.length - 1,
-                          index + 1,
-                        );
-                        inputRefs.current[nextIndex]?.focus();
-                      }
-                    }}
-                    inputRef={(node) => {
-                      inputRefs.current[index] = node;
-                    }}
+            <Stack spacing={2} sx={{ mt: 2 }}>
+              {blockSummary.map((block) => (
+                <Box key={`inputs-block-${block.index}`}>
+                  <Typography
+                    variant="overline"
                     sx={{
-                      minWidth: 96,
-                      backgroundColor:
-                        activeIdx === index
-                          ? "rgba(37, 99, 235, 0.04)"
-                          : "transparent",
+                      display: "block",
+                      mb: 1,
+                      color: "#64748b",
+                      letterSpacing: "0.12em",
                     }}
-                  />
-                );
-              })}
+                  >
+                    Bloque {block.index + 1} · {CLEF_LONG_LABELS[block.clef]}
+                  </Typography>
+                  <Box sx={{ overflowX: "auto", pb: 0.5 }}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{
+                        width: "fit-content",
+                        mx: "auto",
+                        px: 0.5,
+                      }}
+                    >
+                      {dictationNotes
+                        .slice(block.start, block.end)
+                        .map((slot, blockOffset) => {
+                          const index = block.start + blockOffset;
+                          const typed = userInputs[index] ?? "";
+                          const parsed = parseNoteInput(typed);
+                          const exerciseRange = getExerciseRange(slot.clef);
+                          const inRange = parsed.valid
+                            ? exerciseRange.includes(parsed.key)
+                            : false;
+                          const helper = typed
+                            ? parsed.valid
+                              ? inRange
+                                ? parsed.typedSolfege
+                                  ? labelSPN(parsed.key)
+                                  : labelSolfege(parsed.key)
+                                : `Solo dentro del rango ${CLEF_LABELS[slot.clef]}`
+                              : "Ej: C4 o Do4"
+                            : `${index + 1} · ${CLEF_LABELS[slot.clef]}`;
+                          const color =
+                            mask && typed && parsed.valid && inRange
+                              ? mask[index]
+                                ? "success"
+                                : "error"
+                              : "primary";
+
+                          return (
+                            <TextField
+                              key={`slot-${index}`}
+                              size="small"
+                              label={`#${index + 1}`}
+                              value={typed}
+                              color={color}
+                              error={Boolean(typed && (!parsed.valid || !inRange))}
+                              helperText={helper}
+                              onFocus={() => setActiveIdx(index)}
+                              onChange={(event) => {
+                                const value = event.target.value;
+                                const nextInputs = [...userInputs];
+                                nextInputs[index] = value;
+                                setUserInputs(nextInputs);
+                                setMask(null);
+                                setActiveIdx(index);
+
+                                const nextNotes = [...userNotes];
+                                const nextParsed = parseNoteInput(value);
+                                const allowedRange = getExerciseRange(slot.clef);
+                                const nextInRange = nextParsed.valid
+                                  ? allowedRange.includes(nextParsed.key)
+                                  : false;
+                                nextNotes[index] =
+                                  nextParsed.valid && nextInRange
+                                    ? {
+                                        key: nextParsed.key,
+                                        clef: slot.clef,
+                                        blockIndex: slot.blockIndex,
+                                      }
+                                    : null;
+                                setUserNotes(nextNotes);
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                  const nextIndex = Math.min(
+                                    dictationNotes.length - 1,
+                                    index + 1,
+                                  );
+                                  inputRefs.current[nextIndex]?.focus();
+                                }
+                              }}
+                              inputRef={(node) => {
+                                inputRefs.current[index] = node;
+                              }}
+                              sx={{
+                                minWidth: 96,
+                                backgroundColor:
+                                  activeIdx === index
+                                    ? "rgba(37, 99, 235, 0.04)"
+                                    : "transparent",
+                              }}
+                            />
+                          );
+                        })}
+                    </Stack>
+                  </Box>
+                </Box>
+              ))}
             </Stack>
           </Box>
         </Paper>
