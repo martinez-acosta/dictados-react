@@ -2386,4 +2386,530 @@ export const WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       { term: "Frase consecuente", definition: "Segunda frase del periodo; cierra con cadencia autentica." },
     ],
   },
+  {
+    chapterId: "campo-armonico-triadas",
+    unit: "Bloque 2. Armonia basica",
+    focusBadge: "Clave para la app",
+    title: "Campo armonico con triadas",
+    summary:
+      "Como construir el campo armonico apilando terceras desde cada grado de la escala, y el patron de calidades resultante.",
+    objective:
+      "Construir el campo armonico de cualquier tonalidad mayor o menor natural y reconocer la calidad de cada grado.",
+    prerequisites: ["triadas", "escalas-mayores-menores"],
+    studyFlow: [
+      "Escribe las 7 notas de la escala.",
+      "Desde cada nota apila la 3ª y la 5ª diatonicas (dentro de la escala).",
+      "Clasifica la triada resultante comparando sus intervalos internos.",
+      "Memoriza el patron de calidades: no tienes que recalcular desde cero cada vez.",
+    ],
+    memoryHooks: [
+      "Mayor: M m m M M m dim (I ii iii IV V vi vii°)",
+      "Menor natural: m dim M m m M M (i ii° III iv v VI VII)",
+      "El V en mayor siempre es Mayor, el v en menor natural siempre es menor",
+    ],
+    examFocus: [
+      "Dado un grado en modo mayor, decir su calidad.",
+      "Construir el campo armonico completo de una tonalidad dada.",
+      "Reconocer el patron de calidades de la escala menor natural.",
+    ],
+    sections: [
+      {
+        title: "Como se construye el campo armonico",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "El campo armonico es el conjunto de triadas que se forman al apilar terceras diatonicas desde cada grado de la escala. 'Diatonicas' significa que las notas que usas son siempre las de la escala, sin agregar alteraciones. El resultado es un grupo de 7 acordes, uno por cada grado.",
+          },
+          {
+            type: "example",
+            title: "Ejemplo paso a paso en C major",
+            lines: [
+              "Escala: C D E F G A B",
+              "Grado I: C + E (3ª) + G (5ª) = C-E-G = acorde Mayor",
+              "Grado II: D + F (3ª) + A (5ª) = D-F-A = acorde menor",
+              "Grado III: E + G (3ª) + B (5ª) = E-G-B = acorde menor",
+              "Grado IV: F + A (3ª) + C (5ª) = F-A-C = acorde Mayor",
+              "Grado V: G + B (3ª) + D (5ª) = G-B-D = acorde Mayor",
+              "Grado VI: A + C (3ª) + E (5ª) = A-C-E = acorde menor",
+              "Grado VII: B + D (3ª) + F (5ª) = B-D-F = acorde Disminuido",
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Nota que solo usas notas de la escala en cada paso. Por eso en G major el VII grado seria F# (no F), lo que cambia las notas exactas pero el patron de calidades permanece identico.",
+          },
+        ],
+      },
+      {
+        title: "Patron de calidades en modo mayor",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "La gran ventaja del campo armonico es que el patron de calidades es fijo para cualquier tonalidad mayor. No importa si estas en C, G, Ab o F#; el patron siempre es el mismo.",
+          },
+          {
+            type: "table",
+            columns: ["Grado", "Simbolo", "Calidad", "Ejemplo en C", "Ejemplo en G"],
+            rows: [
+              ["I", "I", "Mayor", "C", "G"],
+              ["II", "ii", "menor", "Dm", "Am"],
+              ["III", "iii", "menor", "Em", "Bm"],
+              ["IV", "IV", "Mayor", "F", "C"],
+              ["V", "V", "Mayor", "G", "D"],
+              ["VI", "vi", "menor", "Am", "Em"],
+              ["VII", "vii°", "Disminuido", "B°", "F#°"],
+            ],
+          },
+          {
+            type: "chips",
+            title: "Mnemotecnia: MAY me me MAY MAY me DIM",
+            items: [
+              "I Mayor",
+              "ii menor",
+              "iii menor",
+              "IV Mayor",
+              "V Mayor",
+              "vi menor",
+              "vii° Disminuido",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Patron de calidades en modo menor natural",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "En la escala menor natural el patron cambia porque los intervalos internos de la escala son distintos. El punto mas importante: el v (grado 5) es menor, no mayor. Esto tiene implicaciones en la armonia de la musica en modo menor (ver el capitulo de armonizacion menor para mas detalle).",
+          },
+          {
+            type: "table",
+            columns: ["Grado", "Simbolo", "Calidad", "Ejemplo en Am", "Ejemplo en Dm"],
+            rows: [
+              ["I", "i", "menor", "Am", "Dm"],
+              ["II", "ii°", "Disminuido", "B°", "E°"],
+              ["III", "III", "Mayor", "C", "F"],
+              ["IV", "iv", "menor", "Dm", "Gm"],
+              ["V", "v", "menor", "Em", "Am"],
+              ["VI", "VI", "Mayor", "F", "Bb"],
+              ["VII", "VII", "Mayor", "G", "C"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Comparando los dos patrones: en mayor los acordes mayores son I-IV-V; en menor natural los mayores son III-VI-VII. El acorde de dominante (V) es el que mas diferencia tiene: Mayor en el modo mayor, menor en el modo menor natural.",
+          },
+        ],
+      },
+      {
+        title: "Como identificar la calidad de un acorde apilado",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Una vez que tienes las 3 notas, comparas los intervalos internos para clasificar la triada.",
+          },
+          {
+            type: "table",
+            columns: ["Calidad", "Intervalo raiz-3ª", "Intervalo raiz-5ª", "Formula"],
+            rows: [
+              ["Mayor", "3ª mayor (4 semitonos)", "5ª justa (7 semitonos)", "1-3-5"],
+              ["menor", "3ª menor (3 semitonos)", "5ª justa (7 semitonos)", "1-b3-5"],
+              ["Disminuido", "3ª menor (3 semitonos)", "5ª dism. (6 semitonos)", "1-b3-b5"],
+            ],
+          },
+        ],
+      },
+    ],
+    commonMistakes: [
+      "Agregar alteraciones que no estan en la escala al apilar terceras.",
+      "Olvidar que el patron de calidades cambia entre mayor y menor natural.",
+      "Confundir el v menor de la escala menor natural con el V mayor (armonico).",
+    ],
+    reviewSummary: [
+      "El campo armonico se construye apilando terceras diatonicas desde cada grado.",
+      "En modo mayor el patron es: M-m-m-M-M-m-dim.",
+      "En modo menor natural el patron es: m-dim-M-m-m-M-M.",
+    ],
+    checklistItems: [
+      { id: "cat-1", text: "Puedo construir el campo armonico de C major sin ayuda." },
+      { id: "cat-2", text: "Se el patron de calidades del modo mayor de memoria." },
+      { id: "cat-3", text: "Puedo decir la calidad del iii grado en modo mayor sin calcular." },
+    ],
+    microExercises: [
+      { prompt: "Que calidad tiene el ii grado en modo mayor?", answer: "menor." },
+      { prompt: "Que calidad tiene el vii en modo mayor?", answer: "Disminuido." },
+      { prompt: "En C major, cuales son los acordes del campo armonico?", answer: "C, Dm, Em, F, G, Am, B°." },
+      { prompt: "En modo menor natural, que calidad tiene el V?", answer: "menor (v minuscula)." },
+      { prompt: "Por que el VII° solo aparece en modo mayor?", answer: "Porque en menor natural ese grado es Mayor (VII), no disminuido." },
+    ],
+    glossary: [
+      { term: "Campo armonico", definition: "Conjunto de 7 triadas formadas apilando terceras diatonicas desde cada grado de la escala." },
+      { term: "Terceras diatonicas", definition: "Terceras construidas usando solo las notas de la escala, sin alteraciones extras." },
+      { term: "Patron de calidades", definition: "Secuencia fija de calidades de acorde que resulta de costruir el campo armonico de un modo dado." },
+      { term: "v menor", definition: "El quinto grado del modo menor natural, que es una triada menor (no mayor)." },
+    ],
+  },
+  {
+    chapterId: "circulo-de-quintas",
+    unit: "Bloque 3. Armonia preuniversitaria",
+    focusBadge: "Clave para la app",
+    title: "Circulo de quintas",
+    summary:
+      "Mapa de las 12 tonalidades ordenadas por quintas: armaduras, orden de alteraciones, relativas y enarmonicas.",
+    objective:
+      "Leer cualquier armadura e identificar la tonalidad, y navegar el circulo para encontrar tonalidades cercanas.",
+    prerequisites: ["escalas-mayores-menores", "escalas-relativas-paralelas"],
+    studyFlow: [
+      "Aprende el orden de los sostenidos (FCGDAEB) y de los bemoles (BEADGCF).",
+      "Aprende la regla para identificar la tonalidad desde su armadura.",
+      "Ubica el relativo menor de cada tonalidad mayor en el circulo.",
+      "Identifica los tres puntos enarmonicos (B/Cb, Gb/F#, Db/C#).",
+    ],
+    memoryHooks: [
+      "Sostenidos: Fa Do Sol Re La Mi Si (FCGDAEB). Frase: Fa-Cilmente Come Gatos De Azotea El Bicho",
+      "Bemoles: Si Fa Mi Re Do Fa La (BEADGCF) = orden inverso de los sostenidos",
+      "Tonalidad de sostenidos: el ultimo sostenido es la sensible (VII) -> sube un semitono = tonica",
+      "Tonalidad de bemoles: el penultimo bemol es la tonica",
+    ],
+    examFocus: [
+      "Decir cuantas y que alteraciones tiene una tonalidad dada.",
+      "Identificar la tonalidad a partir de su armadura.",
+      "Encontrar el relativo menor de una tonalidad mayor.",
+    ],
+    sections: [
+      {
+        title: "Que es el circulo de quintas",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "El circulo de quintas organiza las 12 tonalidades mayores en un ciclo donde cada tonalidad esta a una quinta justa de distancia de la siguiente. Subir por el circulo (hacia la derecha conventionalmente) agrega un sostenido. Bajar (hacia la izquierda) agrega un bemol.",
+          },
+          {
+            type: "table",
+            columns: ["Tonalidad", "Alter.", "Tipo", "Alteraciones en orden"],
+            rows: [
+              ["C major", "0", "—", "ninguna"],
+              ["G major", "1", "#", "F#"],
+              ["D major", "2", "#", "F# C#"],
+              ["A major", "3", "#", "F# C# G#"],
+              ["E major", "4", "#", "F# C# G# D#"],
+              ["B major", "5", "#", "F# C# G# D# A#"],
+              ["F# / Gb", "6", "#/b", "F# C# G# D# A# E# / Bb Eb Ab Db Gb Cb"],
+              ["Db major", "5", "b", "Bb Eb Ab Db Gb"],
+              ["Ab major", "4", "b", "Bb Eb Ab Db"],
+              ["Eb major", "3", "b", "Bb Eb Ab"],
+              ["Bb major", "2", "b", "Bb Eb"],
+              ["F major", "1", "b", "Bb"],
+            ],
+          },
+        ],
+      },
+      {
+        title: "Orden de las alteraciones",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Las alteraciones no aparecen en cualquier orden: siempre se agregan en la misma secuencia fija. Conocer el orden es indispensable para leer una armadura rapidamente.",
+          },
+          {
+            type: "table",
+            columns: ["Tipo", "Orden", "Mnemotecnia"],
+            rows: [
+              ["Sostenidos", "F# C# G# D# A# E# B#", "Fa Do Sol Re La Mi Si"],
+              ["Bemoles", "Bb Eb Ab Db Gb Cb Fb", "Si (Bb) Re La Sol Fa Do (= sostenidos al reves)"],
+            ],
+          },
+          {
+            type: "example",
+            title: "Como leer una armadura de sostenidos",
+            lines: [
+              "Regla: el ultimo sostenido es la sensible (VII grado).",
+              "Sensible + 1 semitono = tonica de la tonalidad.",
+              "Ejemplo: armadura con F# C# G# -> ultimo # es G#.",
+              "G# + semitono = A. Tonalidad = A major.",
+            ],
+          },
+          {
+            type: "example",
+            title: "Como leer una armadura de bemoles",
+            lines: [
+              "Regla: el penultimo bemol es la tonica.",
+              "Excepcion: con 1 bemol (solo Bb) la tonica es F (memorizar).",
+              "Ejemplo: armadura con Bb Eb Ab Db -> penultimo = Ab.",
+              "Tonalidad = Ab major.",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Relativo menor en el circulo",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Cada tonalidad mayor comparte su armadura con una tonalidad menor: su relativo menor. El relativo menor esta en el VI grado de la mayor (o, dicho de otro modo, a 3 semitonos por debajo de la tonica mayor). En el circulo el relativo menor aparece en el anillo interior.",
+          },
+          {
+            type: "table",
+            columns: ["Mayor", "Relativa menor", "Armadura"],
+            rows: [
+              ["C", "Am", "0"],
+              ["G", "Em", "1#"],
+              ["D", "Bm", "2#"],
+              ["F", "Dm", "1b"],
+              ["Bb", "Gm", "2b"],
+              ["Eb", "Cm", "3b"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Regla rapida: el relativo menor es la nota que esta a una 6ª mayor sobre la tonica (o a una 3ª menor por debajo). Desde C, sube una 6ª mayor: C-D-E-F-G-A. El relativo de C mayor es Am.",
+          },
+        ],
+      },
+      {
+        title: "Enarmonicas en el circulo",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "En tres puntos del circulo existe una pareja de tonalidades enarmonicas: suenan identico pero se escriben diferente. Conocerlas evita errores de escritura en el examen.",
+          },
+          {
+            type: "table",
+            columns: ["Par enarmonico", "Version sostenidos", "Version bemoles"],
+            rows: [
+              ["B / Cb", "B major (5#)", "Cb major (7b)"],
+              ["F# / Gb", "F# major (6#)", "Gb major (6b)"],
+              ["C# / Db", "C# major (7#)", "Db major (5b)"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "La version con menos alteraciones suele ser la que se usa en practica: Db (5b) en lugar de C# (7#), Gb (6b) o F# (6#) indistintamente, y B (5#) en lugar de Cb (7b).",
+          },
+        ],
+      },
+    ],
+    commonMistakes: [
+      "Confundir el orden de los sostenidos y los bemoles.",
+      "Aplicar la regla del 'ultimo sostenido' a armaduras de bemoles.",
+      "Olvidar que con 1 solo bemol (Bb) la tonalidad es F, no Bb.",
+    ],
+    reviewSummary: [
+      "El circulo organiza las 12 tonalidades por quintas; cada paso agrega 1 alteracion.",
+      "Sostenidos: FCGDAEB. Bemoles: orden inverso BEADGCF.",
+      "El relativo menor comparte la armadura de la mayor y esta en su VI grado.",
+    ],
+    checklistItems: [
+      { id: "cq-1", text: "Puedo recitar el orden de los sostenidos de memoria." },
+      { id: "cq-2", text: "Puedo identificar la tonalidad de una armadura de sostenidos usando la regla." },
+      { id: "cq-3", text: "Se el relativo menor de las tonalidades mas comunes (C, G, D, F, Bb, Eb)." },
+    ],
+    microExercises: [
+      { prompt: "Di los sostenidos en orden.", answer: "F# C# G# D# A# E# B#." },
+      { prompt: "Una armadura tiene F# C# G# D#. Que tonalidad es?", answer: "El ultimo # es D#. D# + semitono = E. Tonalidad: E major (4 sostenidos)." },
+      { prompt: "Una armadura tiene Bb Eb Ab. Que tonalidad es?", answer: "El penultimo bemol es Eb. Tonalidad: Eb major (3 bemoles)." },
+      { prompt: "Cual es el relativo menor de G major?", answer: "Em (comparte 1 sostenido)." },
+      { prompt: "Que par enarmonico tiene 6 alteraciones?", answer: "Gb major (6b) = F# major (6#)." },
+    ],
+    glossary: [
+      { term: "Circulo de quintas", definition: "Mapa ciclico de las 12 tonalidades ordenadas a una quinta justa entre si." },
+      { term: "Armadura", definition: "Conjunto de alteraciones al inicio del pentagrama que indican la tonalidad." },
+      { term: "Enarmonica", definition: "Dos tonalidades que suenan igual pero se escriben con notacion distinta." },
+      { term: "Relativa menor", definition: "Tonalidad menor que comparte la misma armadura que una tonalidad mayor; esta en su VI grado." },
+      { term: "Sensible", definition: "VII grado de la escala; el ultimo sostenido de una armadura es la sensible de esa tonalidad." },
+    ],
+  },
+  {
+    chapterId: "arpegios-y-extensiones",
+    unit: "Bloque 3. Armonia preuniversitaria",
+    focusBadge: "Clave para la app",
+    title: "Arpegios y extensiones",
+    summary:
+      "Que es un arpegio, como se construyen sobre triadas y acordes de septima, y que son las extensiones (9a, 11a, 13a).",
+    objective:
+      "Distinguir arpegio de acorde, construir arpegios de triada y septima, y reconocer las extensiones basicas.",
+    prerequisites: ["triadas", "acordes-de-septima"],
+    studyFlow: [
+      "Entiende la diferencia entre acorde y arpegio.",
+      "Aprende las 4 formulas de arpegios de triada.",
+      "Aprende los 4 arpegios de septima principales.",
+      "Comprende como se agregan extensiones (9a, 11a, 13a).",
+    ],
+    memoryHooks: [
+      "Arpegio = notas del acorde tocadas una por una",
+      "Triada mayor: 1-3-5. Menor: 1-b3-5. Disminuida: 1-b3-b5. Aumentada: 1-3-#5",
+      "Septima: agrega la 7ª sobre la triada. Novena: agrega la 9ª sobre la septima",
+      "Guide tones (notas guia) = la 3ª y la 7ª: definen la calidad del acorde",
+    ],
+    examFocus: [
+      "Escribir las notas de un arpegio mayor, menor o dominante dado.",
+      "Distinguir m7, maj7, 7 (dominante) y m7b5 por su formula.",
+      "Saber que la 9a = 2a una octava arriba, la 11a = 4a una octava arriba.",
+    ],
+    sections: [
+      {
+        title: "Arpegio vs acorde",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Un acorde es un grupo de notas tocadas simultaneamente. Un arpegio es el mismo grupo de notas pero tocadas en sucesion, una tras otra. Las notas son exactamente las mismas; lo que cambia es si se tocan juntas o por separado. Un arpegio de Cm tiene las notas C-Eb-G igual que el acorde Cm; la diferencia es solo en la ejecucion.",
+          },
+          {
+            type: "chips",
+            title: "Mismo contenido, diferente ejecucion",
+            items: [
+              "Acorde = notas simultaneas",
+              "Arpegio = notas sucesivas",
+              "Inversion = cambia la nota mas grave pero las notas son las mismas",
+            ],
+          },
+        ],
+      },
+      {
+        title: "Arpegios de triada: las 4 familias",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Cada familia de triada produce un arpegio con una sonoridad distinta. La formula indica los intervalos desde la raiz en semitonos. En la app de arpegios de bajo estos son el punto de partida.",
+          },
+          {
+            type: "table",
+            columns: ["Familia", "Formula", "Intervalos en semitonos", "Ejemplo en C"],
+            rows: [
+              ["Mayor", "1-3-5", "0 - 4 - 7", "C E G"],
+              ["Menor", "1-b3-5", "0 - 3 - 7", "C Eb G"],
+              ["Disminuida", "1-b3-b5", "0 - 3 - 6", "C Eb Gb"],
+              ["Aumentada", "1-3-#5", "0 - 4 - 8", "C E G#"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "La diferencia entre mayor y menor es solo un semitono en la tercera. La diferencia entre menor y disminuida es solo un semitono en la quinta. La aumentada es la menos comun en el campo armonico diatonico, pero aparece en el V grado alterado.",
+          },
+        ],
+      },
+      {
+        title: "Arpegios de septima: los 4 tipos principales",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Al agregar una cuarta nota (la 7ª) obtienes arpegios de septima que son la base de la armonia jazz y funcional avanzada. Hay 4 tipos principales que debes conocer para preparacion universitaria.",
+          },
+          {
+            type: "table",
+            columns: ["Nombre", "Simbolo", "Formula", "Ejemplo en D", "Donde aparece"],
+            rows: [
+              ["Mayor septima", "maj7", "1-3-5-7", "D F# A C#", "Imaj7, IVmaj7"],
+              ["Menor septima", "m7", "1-b3-5-b7", "D F A C", "ii7, iii7, vi7"],
+              ["Dominante", "7", "1-3-5-b7", "D F# A C", "V7"],
+              ["Semidisminuido", "m7b5 o ø", "1-b3-b5-b7", "D F Ab C", "vii°7 (mayor), ii°7 (menor)"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Observa la diferencia entre maj7 y 7 (dominante): ambos tienen tercera mayor y quinta justa, pero la septima difiere en un semitono. En maj7 la septima es mayor (7 semitonos desde la 6ª), en el dominante es menor (b7). Esa diferencia de un semitono cambia completamente la funcion armonica.",
+          },
+        ],
+      },
+      {
+        title: "Guide tones: la 3ª y la 7ª",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Las notas guia (guide tones) son la 3ª y la 7ª del acorde. Estas dos notas definen la calidad del acorde mejor que cualquier otra. La 5ª es la nota menos informativa y a menudo se omite en voicings de jazz. Cuando improvisas o armonizas, priorizar la 3ª y la 7ª te da la sensacion del acorde con solo 2 notas.",
+          },
+          {
+            type: "table",
+            columns: ["Acorde", "3ª (guide tone)", "7ª (guide tone)", "Funcion"],
+            rows: [
+              ["Cmaj7", "E (3ª mayor)", "B (7ª mayor)", "Tonica estable"],
+              ["Dm7", "F (3ª menor)", "C (7ª menor)", "Subdominante / ii"],
+              ["G7", "B (3ª mayor)", "F (7ª menor)", "Dominante con tension"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "En G7 -> Cmaj7 (V7->I), la 3ª de G7 (B) resuelve subiendo a C, y la 7ª de G7 (F) resuelve bajando a E. Eso es la resolucion de guide tones en accion.",
+          },
+        ],
+      },
+      {
+        title: "Extensiones: 9ª, 11ª y 13ª",
+        blocks: [
+          {
+            type: "paragraph",
+            text:
+              "Las extensiones son las notas que se agregan mas alla de la septima. Se nombran con numeros mayores que 7 para indicar que estan una octava mas arriba que los intervalos basicos.",
+          },
+          {
+            type: "table",
+            columns: ["Extension", "Equivale a", "Semitonos desde raiz", "Ejemplo sobre C"],
+            rows: [
+              ["9ª", "2ª + octava", "14 semitonos", "D (una octava arriba)"],
+              ["11ª", "4ª + octava", "17 semitonos", "F (una octava arriba)"],
+              ["13ª", "6ª + octava", "21 semitonos", "A (una octava arriba)"],
+            ],
+          },
+          {
+            type: "paragraph",
+            text:
+              "Un acorde Dm9 tiene: D-F-A-C-E (triada menor + septima menor + novena mayor). En la app de arpegios de bajo los grupos 'Novenas y Trecenas' cubren estas extensiones en la practica.",
+          },
+        ],
+      },
+    ],
+    commonMistakes: [
+      "Confundir maj7 (7ª mayor) con 7 (dominante, 7ª menor).",
+      "Pensar que la 9ª y la 2ª son lo mismo sin entender la octava de diferencia.",
+      "Olvidar que el semidisminuido tiene 5ª disminuida (diferente al dominante que tiene 5ª justa).",
+    ],
+    reviewSummary: [
+      "Un arpegio son las notas de un acorde tocadas en sucesion.",
+      "Las 4 triadas: mayor (1-3-5), menor (1-b3-5), disminuida (1-b3-b5), aumentada (1-3-#5).",
+      "Los 4 acordes de septima principales: maj7, m7, 7 (dominante), m7b5.",
+      "Las guide tones (3ª y 7ª) definen la calidad del acorde.",
+      "9ª = 2ª + octava. 11ª = 4ª + octava. 13ª = 6ª + octava.",
+    ],
+    checklistItems: [
+      { id: "arp-1", text: "Puedo distinguir arpegio de acorde." },
+      { id: "arp-2", text: "Puedo escribir las notas de un arpegio mayor, menor y dominante." },
+      { id: "arp-3", text: "Se que la 3a y la 7a son las guide tones que definen la calidad." },
+    ],
+    microExercises: [
+      { prompt: "Que diferencia hay entre Cmaj7 y C7?", answer: "Cmaj7 tiene septima mayor (B); C7 tiene septima menor (Bb)." },
+      { prompt: "Escribe las notas del arpegio de Gm7.", answer: "G - Bb - D - F (1-b3-5-b7)." },
+      { prompt: "Que es una guide tone?", answer: "La 3ª o la 7ª del acorde; las notas que mejor definen su calidad." },
+      { prompt: "Una novena es lo mismo que una segunda?", answer: "Son la misma nota de referencia pero la novena esta una octava mas arriba." },
+      { prompt: "Que formula tiene el arpegio semidisminuido?", answer: "1-b3-b5-b7." },
+    ],
+    glossary: [
+      { term: "Arpegio", definition: "Las notas de un acorde ejecutadas en sucesion en lugar de simultaneamente." },
+      { term: "Guide tones", definition: "La 3ª y la 7ª de un acorde; las notas que definen su calidad con mayor claridad." },
+      { term: "Dominante", definition: "Acorde con formula 1-3-5-b7; el V7 de la tonalidad con maxima tension hacia la tonica." },
+      { term: "Semidisminuido (ø)", definition: "Acorde con formula 1-b3-b5-b7." },
+      { term: "Extension", definition: "Nota agregada mas alla de la 7ª: 9ª, 11ª o 13ª." },
+      { term: "Novena", definition: "Segunda un octava arriba; agrega color sin cambiar la funcion armonica basica." },
+    ],
+  },
 ];
+
+
