@@ -18,12 +18,13 @@ import {
   ArrowBack,
   CheckCircleOutline,
   MenuBook,
+  FormatListBulleted,
   NavigateBefore,
   NavigateNext,
   RadioButtonUnchecked,
   School,
 } from "@mui/icons-material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   WORKBOOK_THEORY_BLOCKS,
   WORKBOOK_THEORY_CHAPTERS,
@@ -38,6 +39,7 @@ type WorkbookProgress = {
 };
 
 const STORAGE_KEY = "dictados-react-theory-workbook-progress";
+const CONTENT_PAGE_ID = "contenido";
 
 function defaultProgress(): WorkbookProgress {
   return {
@@ -345,12 +347,14 @@ function ChapterSidebar({
   activeChapterId,
   reviewedChapterIds,
   onOpenChapter,
+  onOpenContent,
 }: {
   blocks: WorkbookBlock[];
   chapters: WorkbookChapter[];
   activeChapterId: string;
   reviewedChapterIds: string[];
   onOpenChapter: (chapterId: string) => void;
+  onOpenContent: () => void;
 }) {
   return (
     <Paper
@@ -377,6 +381,14 @@ function ChapterSidebar({
           Navega por bloques y sigue tu avance con una vista editorial del plan
           completo.
         </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<FormatListBulleted />}
+          onClick={onOpenContent}
+          sx={{ alignSelf: "flex-start", borderRadius: 999, mx: 0.5 }}
+        >
+          Contenido
+        </Button>
       </Stack>
       <Stack spacing={1} sx={{ pt: 0.5 }}>
         {blocks.map((block, blockIndex) => (
@@ -563,12 +575,14 @@ function WorkbookIndex({
   reviewedChapterIds,
   lastVisitedChapterId,
   onOpenChapter,
+  onOpenContent,
 }: {
   blocks: WorkbookBlock[];
   chapters: WorkbookChapter[];
   reviewedChapterIds: string[];
   lastVisitedChapterId: string | null;
   onOpenChapter: (chapterId: string) => void;
+  onOpenContent: () => void;
 }) {
   const reviewedCount = reviewedChapterIds.length;
   const lastVisitedChapter =
@@ -757,6 +771,14 @@ function WorkbookIndex({
                     onClick={() => onOpenChapter(chapters[0]?.chapterId || "")}
                   >
                     Empezar ruta
+                  </Button>
+                  <Button
+                    variant="text"
+                    size="large"
+                    sx={{ color: "#fff" }}
+                    onClick={onOpenContent}
+                  >
+                    Ver contenido
                   </Button>
                 </Stack>
               ) : null}
@@ -1117,12 +1139,251 @@ function WorkbookIndex({
   );
 }
 
+function WorkbookContentsView({
+  blocks,
+  chapters,
+  reviewedChapterIds,
+  onOpenChapter,
+  onOpenSection,
+}: {
+  blocks: WorkbookBlock[];
+  chapters: WorkbookChapter[];
+  reviewedChapterIds: string[];
+  onOpenChapter: (chapterId: string) => void;
+  onOpenSection: (chapterId: string, sectionTitle: string) => void;
+}) {
+  return (
+    <Stack spacing={2.5}>
+      <Paper
+        sx={{
+          p: { xs: 2.5, sm: 4 },
+          borderRadius: 5,
+          color: "#fff",
+          background:
+            "linear-gradient(135deg, rgba(10,28,50,0.98), rgba(18,90,134,0.92))",
+          boxShadow: "0 28px 80px rgba(8, 33, 62, 0.28)",
+        }}
+      >
+        <Stack spacing={1.25}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <FormatListBulleted />
+            <Typography variant="overline" sx={{ letterSpacing: 2 }}>
+              Mapa completo
+            </Typography>
+          </Stack>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 900,
+              lineHeight: 1.04,
+              fontSize: { xs: "2.2rem", md: "3.2rem" },
+            }}
+          >
+            Contenido
+          </Typography>
+          <Typography variant="body1" sx={{ maxWidth: 860, opacity: 0.9 }}>
+            Esta vista se genera automaticamente desde el mismo arbol del menu:
+            bloques, capitulos y subcapitulos. Si actualizas el workbook, este
+            contenido se actualiza tambien.
+          </Typography>
+        </Stack>
+      </Paper>
+
+      <Stack spacing={2}>
+        {blocks.map((block, blockIndex) => {
+          const theme = chapterTheme(blockIndex);
+          const reviewedInBlock = block.chapters.filter((chapter) =>
+            reviewedChapterIds.includes(chapter.chapterId),
+          ).length;
+
+          return (
+            <Paper
+              key={block.blockId}
+              variant="outlined"
+              sx={{
+                p: { xs: 2, sm: 2.5 },
+                borderRadius: 5,
+                borderColor: theme.border,
+                background: theme.panel,
+                boxShadow: `0 22px 55px ${theme.glow}`,
+              }}
+            >
+              <Stack spacing={2}>
+                <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  justifyContent="space-between"
+                  spacing={1.5}
+                >
+                  <Box sx={{ maxWidth: 900 }}>
+                    <Typography
+                      variant="overline"
+                      sx={{
+                        letterSpacing: 1.6,
+                        color: theme.accent,
+                        fontWeight: 800,
+                      }}
+                    >
+                      {block.title}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      {block.summary}
+                    </Typography>
+                  </Box>
+                  <Stack spacing={0.75} sx={{ minWidth: { md: 220 } }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {reviewedInBlock}/{block.chapters.length} revisados
+                    </Typography>
+                    <LinearProgress
+                      variant="determinate"
+                      value={blockProgress(block, reviewedChapterIds)}
+                      sx={{
+                        height: 8,
+                        borderRadius: 999,
+                        bgcolor: "rgba(15, 23, 42, 0.06)",
+                        "& .MuiLinearProgress-bar": {
+                          borderRadius: 999,
+                          background: `linear-gradient(90deg, ${theme.accent}, ${theme.deep})`,
+                        },
+                      }}
+                    />
+                  </Stack>
+                </Stack>
+
+                <Stack spacing={1.5}>
+                  {block.chapters.map((chapter) => {
+                    const chapterIndex = chapters.findIndex(
+                      (item) => item.chapterId === chapter.chapterId,
+                    );
+                    const reviewed = reviewedChapterIds.includes(
+                      chapter.chapterId,
+                    );
+
+                    return (
+                      <Paper
+                        key={chapter.chapterId}
+                        variant="outlined"
+                        sx={{
+                          p: 1.5,
+                          borderRadius: 3,
+                          borderColor: `${theme.accent}22`,
+                          background: "rgba(255,255,255,0.84)",
+                        }}
+                      >
+                        <Stack spacing={1.25}>
+                          <Stack
+                            direction={{ xs: "column", sm: "row" }}
+                            justifyContent="space-between"
+                            spacing={1}
+                          >
+                            <Box>
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                flexWrap="wrap"
+                                useFlexGap
+                                sx={{ mb: 0.5 }}
+                              >
+                                <Chip
+                                  size="small"
+                                  label={`Capitulo ${chapterIndex + 1}`}
+                                  sx={{ backgroundColor: `${theme.accent}14` }}
+                                />
+                                <Chip
+                                  size="small"
+                                  label={reviewed ? "Revisado" : "Pendiente"}
+                                  color={reviewed ? "success" : "default"}
+                                  variant={reviewed ? "filled" : "outlined"}
+                                />
+                              </Stack>
+                              <Typography
+                                variant="h6"
+                                sx={{ fontWeight: 800, lineHeight: 1.15 }}
+                              >
+                                {chapter.title}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mt: 0.5 }}
+                              >
+                                {chapter.summary}
+                              </Typography>
+                            </Box>
+                            <Button
+                              variant="outlined"
+                              sx={{ borderRadius: 999, alignSelf: "flex-start" }}
+                              onClick={() => onOpenChapter(chapter.chapterId)}
+                            >
+                              Abrir capitulo
+                            </Button>
+                          </Stack>
+
+                          <Stack spacing={0.75}>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: theme.accent, fontWeight: 700 }}
+                            >
+                              Subcapitulos
+                            </Typography>
+                            <Grid container spacing={1}>
+                              {chapter.sections.map((section, sectionIndex) => (
+                                <Grid
+                                  item
+                                  xs={12}
+                                  md={6}
+                                  key={`${chapter.chapterId}-${section.title}`}
+                                >
+                                  <Button
+                                    variant="text"
+                                    onClick={() =>
+                                      onOpenSection(
+                                        chapter.chapterId,
+                                        section.title,
+                                      )
+                                    }
+                                    sx={{
+                                      justifyContent: "flex-start",
+                                      width: "100%",
+                                      px: 1.2,
+                                      py: 0.8,
+                                      borderRadius: 2.5,
+                                      textTransform: "none",
+                                      color: "text.primary",
+                                      backgroundColor: "rgba(255,255,255,0.7)",
+                                      border:
+                                        "1px solid rgba(15, 23, 42, 0.05)",
+                                      "&:hover": {
+                                        backgroundColor: `${theme.accent}10`,
+                                      },
+                                    }}
+                                  >
+                                    {sectionIndex + 1}. {section.title}
+                                  </Button>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </Stack>
+                        </Stack>
+                      </Paper>
+                    );
+                  })}
+                </Stack>
+              </Stack>
+            </Paper>
+          );
+        })}
+      </Stack>
+    </Stack>
+  );
+}
+
 function WorkbookChapterView({
   blocks,
   chapter,
   chapters,
   reviewedChapterIds,
   onOpenChapter,
+  onOpenContent,
   onToggleReviewed,
 }: {
   blocks: WorkbookBlock[];
@@ -1130,6 +1391,7 @@ function WorkbookChapterView({
   chapters: WorkbookChapter[];
   reviewedChapterIds: string[];
   onOpenChapter: (chapterId: string) => void;
+  onOpenContent: () => void;
   onToggleReviewed: (chapterId: string) => void;
 }) {
   const chapterIndex = chapters.findIndex(
@@ -1169,6 +1431,7 @@ function WorkbookChapterView({
           activeChapterId={chapter.chapterId}
           reviewedChapterIds={reviewedChapterIds}
           onOpenChapter={onOpenChapter}
+          onOpenContent={onOpenContent}
         />
       </Grid>
       <Grid item xs={12} md={9}>
@@ -1738,6 +2001,7 @@ function WorkbookChapterView({
 
 export default function WorkbookTheory() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { chapterId } = useParams();
   const [progress, setProgress] = useState<WorkbookProgress>(defaultProgress);
   const blocks = WORKBOOK_THEORY_BLOCKS;
@@ -1768,15 +2032,30 @@ export default function WorkbookTheory() {
 
   const activeChapter = useMemo(
     () =>
-      chapterId
+      chapterId && chapterId !== CONTENT_PAGE_ID
         ? chapters.find((chapter) => chapter.chapterId === chapterId) || null
         : null,
     [chapterId, chapters],
   );
+  const isContentsPage = chapterId === CONTENT_PAGE_ID;
 
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, [chapterId]);
+
+    if (!location.hash) return;
+
+    const targetId = location.hash.replace("#", "");
+
+    window.requestAnimationFrame(() => {
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "auto",
+          block: "start",
+        });
+      }
+    });
+  }, [chapterId, location.hash]);
 
   useEffect(() => {
     if (!activeChapter) return;
@@ -1792,6 +2071,19 @@ export default function WorkbookTheory() {
       return;
     }
     navigate(`/workbook-teoria/${nextChapterId}`);
+  }
+
+  function openContent() {
+    navigate(`/workbook-teoria/${CONTENT_PAGE_ID}`);
+  }
+
+  function openSection(chapterIdToOpen: string, sectionTitle: string) {
+    navigate(
+      `/workbook-teoria/${chapterIdToOpen}#${sectionAnchorId(
+        chapterIdToOpen,
+        sectionTitle,
+      )}`,
+    );
   }
 
   function toggleReviewed(chapterIdToToggle: string) {
@@ -1828,14 +2120,30 @@ export default function WorkbookTheory() {
             flexWrap: "wrap",
           }}
         >
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBack />}
-            sx={{ borderRadius: 999, backgroundColor: "rgba(255,255,255,0.7)" }}
-            onClick={() => navigate("/")}
-          >
-            Volver al menu
-          </Button>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              sx={{
+                borderRadius: 999,
+                backgroundColor: "rgba(255,255,255,0.7)",
+              }}
+              onClick={() => navigate("/")}
+            >
+              Volver al menu
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<FormatListBulleted />}
+              sx={{
+                borderRadius: 999,
+                backgroundColor: "rgba(255,255,255,0.7)",
+              }}
+              onClick={openContent}
+            >
+              Contenido
+            </Button>
+          </Stack>
           <Stack spacing={0.2} sx={{ ml: { sm: "auto" }, textAlign: "right" }}>
             <Typography
               variant="overline"
@@ -1851,7 +2159,7 @@ export default function WorkbookTheory() {
 
         <Divider sx={{ borderColor: "rgba(15, 23, 42, 0.08)" }} />
 
-        {chapterId && !activeChapter ? (
+        {chapterId && !activeChapter && !isContentsPage ? (
           <Paper sx={{ p: { xs: 2, sm: 3 } }}>
             <Stack spacing={2}>
               <Alert severity="warning">
@@ -1871,7 +2179,16 @@ export default function WorkbookTheory() {
             chapters={chapters}
             reviewedChapterIds={progress.reviewedChapterIds}
             onOpenChapter={openChapter}
+            onOpenContent={openContent}
             onToggleReviewed={toggleReviewed}
+          />
+        ) : isContentsPage ? (
+          <WorkbookContentsView
+            blocks={blocks}
+            chapters={chapters}
+            reviewedChapterIds={progress.reviewedChapterIds}
+            onOpenChapter={openChapter}
+            onOpenSection={openSection}
           />
         ) : (
           <WorkbookIndex
@@ -1880,6 +2197,7 @@ export default function WorkbookTheory() {
             reviewedChapterIds={progress.reviewedChapterIds}
             lastVisitedChapterId={progress.lastVisitedChapterId}
             onOpenChapter={openChapter}
+            onOpenContent={openContent}
           />
         )}
       </Stack>
