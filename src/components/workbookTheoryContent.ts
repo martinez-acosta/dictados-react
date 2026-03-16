@@ -123,6 +123,23 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         ],
       },
       {
+        title: "El material sonoro: Tonos y Semitonos",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "La distancia mas pequeña entre dos notas en nuestro sistema musical es el 'Semitono' (o medio tono). Dos semitonos suman un 'Tono'. En un piano, un semitono es la distancia entre cualquier tecla y la inmediatamente vecina (sea blanca o negra).",
+          },
+          {
+            type: "list",
+            items: [
+              "Semitono: la distancia minima (ej. de E a F, o de B a C).",
+              "Tono: equivale a dos semitonos (ej. de C a D).",
+              "Alteraciones: Simbolos que suben o bajan la nota un semitono.",
+            ],
+          },
+        ],
+      },
+      {
         title: "El pentagrama y las claves",
         blocks: [
           {
@@ -324,6 +341,11 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
         definition: "Signo que cambia una nota dentro del compas actual.",
       },
       {
+        term: "Enarmonia",
+        definition:
+          "Notas con distinto nombre pero mismo sonido (ej. C# y Db).",
+      },
+      {
         term: "Linea adicional",
         definition:
           "Linea corta que extiende el pentagrama para escribir notas fuera de sus cinco lineas.",
@@ -336,6 +358,15 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       {
         term: "Tonica",
         definition: "La nota que funciona como centro de gravedad y punto de reposo principal.",
+      },
+      {
+        term: "Semitono",
+        definition:
+          "La distancia mas pequeña entre dos notas consecutivas en el sistema temperado (ej. E-F).",
+      },
+      {
+        term: "Tono",
+        definition: "Distancia musical que equivale a dos semitonos (ej. C-D).",
       },
       {
         term: "Nota de referencia",
@@ -375,6 +406,15 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       "Aplicar intervalos al leer formulas de acordes.",
     ],
     sections: [
+      {
+        title: "Conceptos previos: Escalas y Grados",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Para nombrar un intervalo correctamente, solemos usar un modelo de referencia llamado 'Escala Mayor'. Por ahora, piensa en una escala como una escalera de notas con un patron fijo. Cada peldaño de esa escalera es un 'Grado' (I, II, III...). Por ejemplo, en la escala de Do, el 3er grado es E. Usamos estos grados para comparar si un intervalo es 'Mayor' o 'Justo' de forma rapida.",
+          },
+        ],
+      },
       {
         title: "Numero y calidad: el sistema de dos pasos",
         blocks: [
@@ -694,6 +734,22 @@ const LEGACY_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
       },
     ],
     glossary: [
+      {
+        term: "Escala",
+        definition: "Sucesion de notas ordenadas por intervalos especificos.",
+      },
+      {
+        term: "Grado",
+        definition: "Posicion de una nota dentro de una escala (I, II, III...).",
+      },
+      {
+        term: "Grado conjunto",
+        definition: "Movimiento a la nota inmediatamente vecina en la escala (2a).",
+      },
+      {
+        term: "Salto",
+        definition: "Movimiento melodico mayor a una segunda (3a, 4a, etc.).",
+      },
       {
         term: "Intervalo armonico",
         definition: "Dos notas que suenan al mismo tiempo.",
