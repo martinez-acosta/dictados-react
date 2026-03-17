@@ -6356,6 +6356,183 @@ const NEW_WORKBOOK_THEORY_CHAPTERS: WorkbookChapter[] = [
     ],
   }),
   createChapter({
+    chapterId: "escala-blues-para-bajo",
+    unit: "Bloque 4. Armonia cromatica",
+    focusBadge: "Aplicacion practica",
+    title: "Escala blues para bajo",
+    summary:
+      "Uso de la escala blues, arpegios dominantes e inversiones como vocabulario basico para lineas de bajo con color blues.",
+    objective:
+      "Relacionar la blue note, los arpegios I7-IV7-V7 e Im7 y sus inversiones con una practica concreta de lectura y ejecucion en clave de Fa.",
+    prerequisites: [
+      "lectura-musical",
+      "intervalos",
+      "escalas-mayores-menores",
+      "arpegios-y-extensiones",
+      "acordes-de-septima",
+    ],
+    studyFlow: [
+      "Empieza por la escala blues menor y localiza su blue note.",
+      "Despues construye los arpegios I7, IV7, V7 e Im7 desde la misma tonalidad.",
+      "Por ultimo practica inversiones y pequenas lineas de bajo enlazando escala y arpegio.",
+    ],
+    memoryHooks: [
+      "La escala blues no reemplaza a la pentatonica: la tensiona.",
+      "La blue note colorea; no siempre conviene descansar en ella.",
+      "En bajo, la funcion se escucha mucho por la fundamental y la conduccion entre arpegios.",
+    ],
+    examFocus: [
+      "Escribir la escala blues menor y mayor desde una raiz dada.",
+      "Construir I7, IV7, V7 e Im7 con sus notas correctas.",
+      "Reconocer y tocar inversiones sin perder la funcion del acorde.",
+      "Explicar por que la blue note actua como color cromatico y no como reposo principal.",
+    ],
+    sections: [
+      section("Que hace 'blues' a la escala", [
+        paragraph(
+          "La escala blues nace del cruce entre pentatonica, inflexion vocal y cromatismo expresivo. En version menor, la formula mas usada es 1 - b3 - 4 - b5 - 5 - b7. Esa b5, llamada blue note, no suele funcionar como reposo estable: se siente como una tension que empuja hacia 4 o 5.",
+        ),
+        table(
+          ["Version", "Formula", "Ejemplo en C", "Color principal"],
+          [
+            ["Blues menor", "1 - b3 - 4 - b5 - 5 - b7", "C - Eb - F - Gb - G - Bb", "Oscuro, crudo, expresivo"],
+            ["Blues mayor", "1 - 2 - b3 - 3 - 5 - 6", "C - D - Eb - E - G - A", "Mezcla mayor/menor tipica del blues"],
+          ],
+        ),
+        list([
+          "La b3 y la 3 natural pueden convivir en un mismo lenguaje.",
+          "La blue note no se analiza como 'error': es una tension estilistica.",
+          "En bajo electrico o contrabajo conviene escucharla como nota de paso o acento expresivo.",
+        ]),
+      ]),
+      section("Arpegios basicos del blues", [
+        paragraph(
+          "Aunque la escala aporta color, la linea de bajo necesita dejar clara la funcion armonica. Por eso el estudio del blues para bajo no se limita a la escala: exige arpegios de dominante y menor con septima. En un blues en C, los acordes mas importantes son C7, F7 y G7; en un color menor, tambien aparece Cm7 como referencia util.",
+        ),
+        table(
+          ["Funcion", "Formula", "Ejemplo en C", "Uso en la linea de bajo"],
+          [
+            ["I7", "1 - 3 - 5 - b7", "C - E - G - Bb", "Centro tonal del blues mayor"],
+            ["IV7", "1 - 3 - 5 - b7", "F - A - C - Eb", "Subdominante con color dominante"],
+            ["V7", "1 - 3 - 5 - b7", "G - B - D - F", "Maxima tension antes del regreso"],
+            ["Im7", "1 - b3 - 5 - b7", "C - Eb - G - Bb", "Referencia para blues menor y mezcla modal"],
+          ],
+        ),
+        example("Lectura rapida de funciones en C", [
+          "C7 = I7: define el centro del blues.",
+          "F7 = IV7: no suena 'clasico'; conserva color dominante.",
+          "G7 = V7: prepara la resolucion o el turnaround.",
+          "Cm7 = Im7: util para color menor, intros y variantes de blues menor.",
+        ]),
+      ]),
+      section("Inversiones y conduccion para bajo", [
+        paragraph(
+          "Una inversion no cambia la identidad del acorde, pero si cambia la nota del bajo y por tanto la sensacion de direccion. En blues para bajo, practicar inversiones sirve para conectar acordes sin saltos innecesarios y para construir lineas mas fluidas sobre uno o dos compases.",
+        ),
+        table(
+          ["Disposicion", "Orden de notas en C7", "Que escuchas en el bajo"],
+          [
+            ["Estado fundamental", "C - E - G - Bb", "La raiz afirma funcion"],
+            ["1a inversion", "E - G - Bb - C", "Empuje hacia F o regreso a C"],
+            ["2a inversion", "G - Bb - C - E", "Color abierto, util para enlace"],
+            ["3a inversion", "Bb - C - E - G", "Tension dominante y sabor de turnaround"],
+          ],
+        ),
+        list([
+          "Primero toca cada inversion aislada hasta reconocer su sonido.",
+          "Despues enlaza C7 -> F7 -> G7 buscando el movimiento mas corto.",
+          "Si la linea pierde pulso, vuelve a negras con una nota por tiempo.",
+        ]),
+        paragraph(
+          "En la practica, una buena linea de bajo mezcla tres materiales: fundamental clara en tiempos fuertes, arpegio para confirmar funcion y escala blues para color. Si todo son blue notes, la armonia se borra; si todo son fundamentales, la linea se vuelve pobre.",
+        ),
+      ]),
+      section("Rutina de estudio en clave de Fa", [
+        paragraph(
+          "Para que el estudio sirva realmente al bajo, conviene mantener el rango dentro del pentagrama de Fa y sus lineas adicionales mas cercanas. El objetivo inicial no es exhibir registro extremo, sino reconocer con rapidez posiciones estables y conectar formulas sin dudar.",
+        ),
+        list([
+          "Practica primero 3 notas fijas del arpegio y nombralas en voz alta.",
+          "Añade una cuarta y una quinta nota cuando la lectura ya sea segura.",
+          "Alterna lectura pura, ejecucion con metrónomo y reproduccion auditiva.",
+          "Usa la pantalla /bajo-blues como laboratorio de ejecucion despues de estudiar esta teoria.",
+        ], "Secuencia sugerida"),
+        example("Mini rutina de 10 minutos", [
+          "2 min: escala blues menor ascendente y descendente en una tonalidad.",
+          "3 min: I7, IV7 y V7 en estado fundamental.",
+          "3 min: mismas funciones con inversiones.",
+          "2 min: pequena linea de 4 tiempos mezclando arpegio y blue note.",
+        ]),
+      ]),
+    ],
+    commonMistakes: [
+      "Pensar que la blue note es una nota de reposo principal.",
+      "Tocar escala blues sin dejar clara la funcion del acorde debajo.",
+      "Estudiar inversiones como digitaciones aisladas sin escuchar la conduccion.",
+      "Confundir blues menor con blues mayor solo por una nota cromatica.",
+    ],
+    reviewSummary: [
+      "La escala blues aporta color, pero los arpegios sostienen la funcion.",
+      "I7, IV7 y V7 son el nucleo armonico del blues mayor; Im7 amplia el color menor.",
+      "Las inversiones ayudan a construir lineas de bajo conectadas y con menos saltos.",
+      "La lectura en clave de Fa debe priorizar claridad de posicion antes que registro extremo.",
+    ],
+    checklistItems: [
+      {
+        id: "ebb-1",
+        text: "Puedo escribir la escala blues menor y mayor desde una raiz concreta.",
+      },
+      {
+        id: "ebb-2",
+        text: "Construyo I7, IV7, V7 e Im7 sin perder la formula de cada acorde.",
+      },
+      {
+        id: "ebb-3",
+        text: "Reconozco las cuatro disposiciones basicas de un acorde de septima.",
+      },
+      {
+        id: "ebb-4",
+        text: "Puedo mezclar arpegio y blue note en una linea sencilla de bajo.",
+      },
+    ],
+    microExercises: [
+      {
+        prompt: "Cual es la formula de la escala blues menor?",
+        answer: "1 - b3 - 4 - b5 - 5 - b7.",
+      },
+      {
+        prompt: "Que funcion cumple la b5 en la escala blues?",
+        answer: "Blue note: tension expresiva que suele resolver por cercania.",
+      },
+      {
+        prompt: "Que acorde define la maxima tension en un blues en C?",
+        answer: "G7, el V7.",
+      },
+      {
+        prompt: "Para que sirven las inversiones en bajo?",
+        answer: "Para enlazar acordes con mejor conduccion y menos saltos.",
+      },
+    ],
+    glossary: [
+      {
+        term: "Blue note",
+        definition: "Nota cromatica expresiva, sobre todo la b5, que intensifica el color del blues.",
+      },
+      {
+        term: "I7 / IV7 / V7",
+        definition: "Funciones dominantes caracteristicas del blues mayor.",
+      },
+      {
+        term: "Inversion",
+        definition: "Disposicion del acorde donde una nota distinta de la fundamental queda en el bajo.",
+      },
+      {
+        term: "Turnaround",
+        definition: "Giro final que prepara el regreso al inicio del ciclo de blues.",
+      },
+    ],
+  }),
+  createChapter({
     chapterId: "modulacion-avanzada",
     unit: "Bloque 4. Armonia cromatica",
     focusBadge: "Cambio tonal profundo",
@@ -7875,6 +8052,7 @@ export const WORKBOOK_THEORY_BLOCKS: WorkbookBlock[] = [
       "acorde-napolitano",
       "sextas-aumentadas",
       "dominantes-alteradas",
+      "escala-blues-para-bajo",
       "modulacion-avanzada",
     ],
   ),

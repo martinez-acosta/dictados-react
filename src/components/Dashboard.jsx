@@ -92,6 +92,19 @@ const EXERCISE_SECTIONS = [
         icon: QueueMusic,
         iconColor: "#4caf50",
       },
+      {
+        route: "/bajo-blues",
+        title: "Blues para Bajo",
+        description:
+          "Practica escala blues menor/mayor, funciones I7-IV7-V7 e inversiones de arpegios en clave de Fa.",
+        buttonLabel: "Abrir Blues",
+        buttonSx: {
+          backgroundColor: "#1e40af",
+          "&:hover": { backgroundColor: "#1d4ed8" },
+        },
+        icon: LibraryMusic,
+        iconColor: "#1e40af",
+      },
     ],
   },
   {

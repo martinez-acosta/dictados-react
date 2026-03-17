@@ -21,6 +21,7 @@ import DictadosIntervalos from "./components/DictadosIntervalos.tsx";
 import TunerPage from "./components/TunerPage.tsx";
 import CancionesMenu from "./components/CancionesMenu.jsx";
 import BassArpeggiosPage from "./components/BassArpeggiosPage.tsx";
+import BassBluesPage from "./components/BassBluesPage.tsx";
 import RelativeMinorScalesStudy from "./components/RelativeMinorScalesStudy.tsx";
 import ChordInversionsStudy from "./components/ChordInversionsStudy.tsx";
 import MajorScaleChordTableStudy from "./components/MajorScaleChordTableStudy.tsx";
@@ -48,6 +49,7 @@ createRoot(document.getElementById("root")).render(
           element={<BassCircleOfFifthsPage />}
         />
         <Route path="/arpegios-bajo" element={<BassArpeggiosPage />} />
+        <Route path="/bajo-blues" element={<BassBluesPage />} />
         <Route path="/vocal" element={<VocalTrainer />} />
         <Route path="/triadas" element={<TriadTrainer />} />
         <Route path="/intervalos-trainer" element={<IntervalsTrainer />} />
