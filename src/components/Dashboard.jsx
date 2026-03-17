@@ -196,6 +196,19 @@ const EXERCISE_SECTIONS = [
         iconColor: "#4caf50",
       },
       {
+        route: "/lectura-gran-pentagrama",
+        title: "Lectura Gran Pentagrama",
+        description:
+          "Lee por compases en gran pentagrama, combinando clave de Sol y Fa con presets independientes por clave.",
+        buttonLabel: "Abrir Lectura",
+        buttonSx: {
+          backgroundColor: "#0f766e",
+          "&:hover": { backgroundColor: "#115e59" },
+        },
+        icon: MenuBook,
+        iconColor: "#0f766e",
+      },
+      {
         route: "/escalas-relativas",
         title: "Escalas Relativas (6º grado)",
         description:

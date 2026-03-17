@@ -72,8 +72,8 @@ async function ensureAudio() {
 }
 
 // ---------------- Utilidades ----------------
-const DURATIONS = ["w", "h", "q", "8"] as const; // Redonda, blanca, negra, corchea
-type DurationSym = (typeof DURATIONS)[number];
+export const DURATIONS = ["w", "h", "q", "8"] as const; // Redonda, blanca, negra, corchea
+export type DurationSym = (typeof DURATIONS)[number];
 
 function randInt(n: number): number {
   if (typeof window !== "undefined" && window.crypto?.getRandomValues) {
@@ -88,7 +88,7 @@ function pick<T>(arr: readonly T[]): T {
 }
 
 // VexFlow key ('c/4') -> Scientific Pitch ('C4' / 'F#4'…)
-function keyToSPN(key: string): string {
+export function keyToSPN(key: string): string {
   const [l, oct] = key.split("/");
   const letter = l[0].toUpperCase();
   const sharp = l.includes("#") ? "#" : "";
@@ -96,16 +96,16 @@ function keyToSPN(key: string): string {
 }
 
 // beats por figura en 4/4
-function beatsFromDur(d: DurationSym): number {
+export function beatsFromDur(d: DurationSym): number {
   return d === "w" ? 4 : d === "h" ? 2 : d === "q" ? 1 : 0.5;
 }
 // notación musical para Tone
-function toneDur(d: DurationSym): string {
+export function toneDur(d: DurationSym): string {
   return d === "w" ? "1n" : d === "h" ? "2n" : d === "q" ? "4n" : "8n";
 }
 
 // convertir beats acumulados a "bars:beats:sixteenths" (4/4)
-function beatsToBBS(totalBeats: number): string {
+export function beatsToBBS(totalBeats: number): string {
   const bar = Math.floor(totalBeats / 4);
   const beat = totalBeats % 4;
   return `${bar}:${beat}:0`;
@@ -159,7 +159,7 @@ const RANGE_2OCT_CHROMATIC: string[] = [
 ];
 
 // Nombres en español
-const NOTE_NAMES: Record<string, string> = {
+export const NOTE_NAMES: Record<string, string> = {
   "b/1": "Si1",
   "c/2": "Do2",
   "d/2": "Re2",
@@ -205,7 +205,7 @@ const NOTE_NAMES: Record<string, string> = {
 };
 
 // Mapeo de nota escrita vs nota que suena (para bajo con 8vb)
-const NOTE_WRITTEN: Record<string, string> = {
+export const NOTE_WRITTEN: Record<string, string> = {
   "b/1": "Si1",
   "c/2": "Do2",
   "d/2": "Re2",
@@ -232,7 +232,7 @@ const NOTE_WRITTEN: Record<string, string> = {
   "b/4": "Si4",
 };
 
-const NOTE_SOUNDS: Record<string, string> = {
+export const NOTE_SOUNDS: Record<string, string> = {
   "b/1": "Si0",
   "c/2": "Do1",
   "d/2": "Re1",
@@ -259,15 +259,15 @@ const NOTE_SOUNDS: Record<string, string> = {
   "b/4": "Si3",
 };
 
-type ClefType = "treble" | "bass";
-type ClefNotesMap = Readonly<Record<ClefType, readonly string[]>>;
+export type ClefType = "treble" | "bass";
+export type ClefNotesMap = Readonly<Record<ClefType, readonly string[]>>;
 
-const CLEF_LINE_REFERENCES: Record<ClefType, readonly string[]> = {
+export const CLEF_LINE_REFERENCES: Record<ClefType, readonly string[]> = {
   treble: ["e/4", "g/4", "b/4", "d/5", "f/5"], // Mi4, Sol4, Si4, Re5, Fa5
   bass: ["g/2", "b/2", "d/3", "f/3", "a/3"], // Sol2, Si2, Re3, Fa3, La3
 } as const;
 
-type ExerciseConfig = {
+export type ExerciseConfig = {
   readonly name: string;
   readonly notes: readonly string[];
   readonly description: string;
@@ -275,7 +275,7 @@ type ExerciseConfig = {
 };
 
 // ---------------- Configuración de ejercicios ----------------
-const TREBLE_EXERCISES = {
+export const TREBLE_EXERCISES = {
   // ========== DANDELOT (LECTURA DIRIGIDA) ==========
   "dandelot-sol-la": {
     name: "📖 Dandelot: Sol-La-Sol-Do-Re-Fa-Si",
@@ -330,7 +330,7 @@ const TREBLE_EXERCISES = {
       "Lectura integral en clave de Sol con todas las notas naturales, incluyendo las líneas adicionales inferiores y superiores (Si3 y Si5).",
   },
 } as const;
-const BASS_EXERCISES = {
+export const BASS_EXERCISES = {
   // ========== DANDELOT (LECTURA DIRIGIDA) ==========
   "fa-dandelot-sol-la": {
     name: "📖 Dandelot: Fa (línea) y Do (cuarta descendente)",
@@ -411,16 +411,16 @@ const BASS_EXERCISES = {
   },
 } as const;
 
-const EXERCISES_BY_CLEF = {
+export const EXERCISES_BY_CLEF = {
   treble: TREBLE_EXERCISES,
   bass: BASS_EXERCISES,
 } as const;
 
 type ExerciseCollections = typeof EXERCISES_BY_CLEF;
-type ExerciseKeyByClef<C extends ClefType> = keyof ExerciseCollections[C];
-type ExerciseKey = ExerciseKeyByClef<"treble"> | ExerciseKeyByClef<"bass">;
+export type ExerciseKeyByClef<C extends ClefType> = keyof ExerciseCollections[C];
+export type ExerciseKey = ExerciseKeyByClef<"treble"> | ExerciseKeyByClef<"bass">;
 
-function resolveExerciseConfig(
+export function resolveExerciseConfig(
   clef: ClefType,
   key: ExerciseKey,
 ): ExerciseConfig {
@@ -432,7 +432,7 @@ function resolveExerciseConfig(
   return map[firstKey];
 }
 
-function getNotePool(
+export function getNotePool(
   config: ExerciseConfig,
   clef: ClefType,
 ): readonly string[] {
@@ -441,7 +441,7 @@ function getNotePool(
   return config.notes;
 }
 
-function generateExercise(
+export function generateExercise(
   notePool: readonly string[],
   length: number = 30,
 ): string[] {
@@ -470,7 +470,7 @@ function generateExercise(
   }
   return out;
 }
-function randomDurations(len: number): DurationSym[] {
+export function randomDurations(len: number): DurationSym[] {
   const out: DurationSym[] = [];
   for (let i = 0; i < len; i++) out.push(pick(DURATIONS));
   return out;
