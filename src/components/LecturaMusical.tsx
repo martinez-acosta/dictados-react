@@ -372,6 +372,37 @@ export const BASS_EXERCISES = {
     description:
       "Lectura integral en clave de Fa con todas las notas naturales equivalentes al rango Si3-Si5 de la clave de sol.",
   },
+  // ========== PROGRESION ACUMULATIVA ==========
+  "fa-progresivo-do-re-mi": {
+    name: "Progresivo Fa 3: Do-Re-Mi",
+    notes: ["c/3", "d/3", "e/3"],
+    description:
+      "Inicio acumulativo en la zona central de la clave de Fa: Do, Re y Mi. Ideal para fijar lectura continua por grado conjunto.",
+  },
+  "fa-progresivo-do-re-mi-fa": {
+    name: "Progresivo Fa 4: Do-Re-Mi-Fa",
+    notes: ["c/3", "d/3", "e/3", "f/3"],
+    description:
+      "Añade Fa al patron inicial para extender la lectura sin salir del ambito mas estable del pentagrama de Fa.",
+  },
+  "fa-progresivo-do-re-mi-fa-sol": {
+    name: "Progresivo Fa 5: Do-Re-Mi-Fa-Sol",
+    notes: ["c/3", "d/3", "e/3", "f/3", "g/3"],
+    description:
+      "Secuencia acumulativa de cinco notas que recorre lineas y espacios superiores del pentagrama de Fa sin saltos.",
+  },
+  "fa-progresivo-do-re-mi-fa-sol-la": {
+    name: "Progresivo Fa 6: Do-Re-Mi-Fa-Sol-La",
+    notes: ["c/3", "d/3", "e/3", "f/3", "g/3", "a/3"],
+    description:
+      "Amplia el patron hasta La para consolidar lectura ascendente completa dentro del pentagrama de Fa.",
+  },
+  "fa-progresivo-do-re-mi-fa-sol-la-si": {
+    name: "Progresivo Fa 7: Do-Re-Mi-Fa-Sol-La-Si",
+    notes: ["c/3", "d/3", "e/3", "f/3", "g/3", "a/3", "b/3"],
+    description:
+      "Version final de siete notas acumuladas. Llega hasta Si con una sola linea adicional superior para cerrar el recorrido de forma pedagógica.",
+  },
   // ========== PATRONES FIJOS DE 3 NOTAS ==========
   "fa-tres-notas-do-fa-la": {
     name: "3 notas fijas: Do-Fa-La",

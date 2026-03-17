@@ -136,6 +136,10 @@ function createDefaultClefs(count: number): ClefType[] {
   return Array(count).fill("treble");
 }
 
+function randomClef(): ClefType {
+  return Math.random() < 0.5 ? "treble" : "bass";
+}
+
 export default function LecturaGranPentagrama() {
   const navigate = useNavigate();
   const trebleExerciseEntries = useMemo(
@@ -154,7 +158,7 @@ export default function LecturaGranPentagrama() {
   );
 
   const [measureCount, setMeasureCount] = useState(4);
-  const [notesPerMeasure, setNotesPerMeasure] = useState(4);
+  const [notesPerMeasure, setNotesPerMeasure] = useState(8);
   const [measureClefs, setMeasureClefs] = useState<ClefType[]>(
     createDefaultClefs(4),
   );
@@ -542,6 +546,14 @@ export default function LecturaGranPentagrama() {
     [bassExerciseKey],
   );
 
+  function randomizeMeasureClefs() {
+    setMeasureClefs(Array.from({ length: measureCount }, () => randomClef()));
+  }
+
+  function fillMeasureClefs(clef: ClefType) {
+    setMeasureClefs(Array.from({ length: measureCount }, () => clef));
+  }
+
   return (
     <Box sx={{ width: "100%", px: 2 }}>
       <Stack spacing={3}>
@@ -774,9 +786,39 @@ export default function LecturaGranPentagrama() {
         </Paper>
 
         <Paper sx={{ p: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-            Clave por compas
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 2,
+              mb: 1,
+              flexWrap: "wrap",
+            }}
+          >
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              Clave por compas
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => fillMeasureClefs("treble")}
+              >
+                Solo clave de Sol
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => fillMeasureClefs("bass")}
+              >
+                Solo clave de Fa
+              </Button>
+              <Button variant="outlined" size="small" onClick={randomizeMeasureClefs}>
+                Aleatorio
+              </Button>
+            </Stack>
+          </Box>
           <Grid container spacing={1.5}>
             {measureClefs.map((clef, index) => (
               <Grid item xs={12} sm={6} md={3} key={`measure-clef-${index}`}>
@@ -868,6 +910,26 @@ export default function LecturaGranPentagrama() {
             Cada sistema muestra hasta 4 compases. Cada compas usa su propia clave
             y toma las alturas desde el preset global de Sol o Fa.
           </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              minHeight: 40,
+              mb: 1,
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showNoteLabels}
+                  onChange={(event) => setShowNoteLabels(event.target.checked)}
+                />
+              }
+              label="Mostrar nombres"
+              sx={{ mr: 0 }}
+            />
+          </Box>
 
           {(metronomeActive || isPlaying) && (
             <Box
