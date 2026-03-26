@@ -403,6 +403,15 @@ function qualityDistanceText(qualityId: SeventhQualityId) {
   return "1→3 = 3 st (tono y medio) · 1→5 = 6 st (3 tonos) · 1→7 = 10 st (5 tonos)";
 }
 
+function qualityReasonLines(qualityId: SeventhQualityId) {
+  const [intervals, formula] = qualityReasonText(qualityId).split(" = ");
+  return [intervals, `= ${formula}`];
+}
+
+function qualityDistanceLines(qualityId: SeventhQualityId) {
+  return qualityDistanceText(qualityId).split(" · ");
+}
+
 function degreeMeaningText(row: SeventhChordRow) {
   const ordinalLabels = [
     "primer",
@@ -1196,22 +1205,32 @@ export default function SeventhChordHarmonicFieldStudy() {
                           )}
                         </TableCell>
                         <TableCell sx={{ minWidth: 240, verticalAlign: "top" }}>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ whiteSpace: "normal" }}
-                          >
-                            {qualityReasonText(row.qualityId)}
-                          </Typography>
+                          <Stack spacing={0.25}>
+                            {qualityReasonLines(row.qualityId).map((line) => (
+                              <Typography
+                                key={`${row.degreeRoman}-reason-${line}`}
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ whiteSpace: "normal" }}
+                              >
+                                {line}
+                              </Typography>
+                            ))}
+                          </Stack>
                         </TableCell>
                         <TableCell sx={{ minWidth: 330, verticalAlign: "top" }}>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ whiteSpace: "normal" }}
-                          >
-                            {qualityDistanceText(row.qualityId)}
-                          </Typography>
+                          <Stack spacing={0.25}>
+                            {qualityDistanceLines(row.qualityId).map((line) => (
+                              <Typography
+                                key={`${row.degreeRoman}-distance-${line}`}
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ whiteSpace: "normal" }}
+                              >
+                                {line}
+                              </Typography>
+                            ))}
+                          </Stack>
                         </TableCell>
                         <TableCell sx={{ minWidth: 140, verticalAlign: "top" }}>
                           {practiceMode ? (
