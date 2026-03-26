@@ -195,7 +195,7 @@ const POZZOLI_2_PRESET: FixedGrandStaffPreset = {
   description:
     "Transcripción manual fija en 2/2 basada en la imagen proporcionada por el usuario.",
   timeSignature: [2, 2],
-  systemMeasureCounts: [11, 13, 11],
+  systemMeasureCounts: [11, 13, 12],
   measures: [
     measure(note("c/3"), note("d/3")),
     measure(note("e/3"), note("f/3")),
@@ -224,6 +224,7 @@ const POZZOLI_2_PRESET: FixedGrandStaffPreset = {
     measure(note("c/3", "h", "bass"), note("c/3", "h", "bass")),
     measure(note("d/3", "h", "bass"), note("e/3", "h", "bass")),
     measure(note("f/3", "h", "bass"), note("g/3", "h", "bass")),
+    measure(note("a/3", "h", "bass"), note("b/3", "h", "bass")),
     measure(note("c/4", "h", "bass"), note("c/4", "h", "bass")),
     measure(note("d/4", "h", "treble"), note("e/4", "h", "treble")),
     measure(note("f/4", "h", "treble"), note("g/4", "h", "treble")),
