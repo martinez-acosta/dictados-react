@@ -405,7 +405,8 @@ function qualityDistanceText(qualityId: SeventhQualityId) {
 
 function qualityReasonLines(qualityId: SeventhQualityId) {
   const [intervals, formula] = qualityReasonText(qualityId).split(" = ");
-  return [intervals, `= ${formula}`];
+  const intervalLines = intervals.split(" + ");
+  return [...intervalLines, `= ${formula}`];
 }
 
 function qualityDistanceLines(qualityId: SeventhQualityId) {
@@ -449,6 +450,14 @@ function degreeMeaningText(row: SeventhChordRow) {
   return `${ordinalLabels[row.degreeNumber - 1]} grado ${qualityMeaning[row.qualityId]}`;
 }
 
+function degreeMeaningLines(row: SeventhChordRow) {
+  const fullText = degreeMeaningText(row);
+  const separator = " grado ";
+  if (!fullText.includes(separator)) return [fullText];
+  const [ordinal, quality] = fullText.split(separator);
+  return [`${ordinal} grado`, quality];
+}
+
 function TrebleChordPreview({ notes }: { notes: string[] }) {
   const holderRef = useRef<HTMLDivElement | null>(null);
   const holderId = useRef(
@@ -462,7 +471,7 @@ function TrebleChordPreview({ notes }: { notes: string[] }) {
     if (notes.length === 0) return;
 
     const renderedNotes = buildTrebleKeys(notes);
-    const width = 240;
+    const width = 200;
     const height = 110;
     const vf = new Factory({
       renderer: {
@@ -498,7 +507,7 @@ function TrebleChordPreview({ notes }: { notes: string[] }) {
       <Box
         ref={holderRef}
         id={holderId.current}
-        sx={{ width: 240, minHeight: 90 }}
+        sx={{ width: 200, minHeight: 90 }}
       />
     </Box>
   );
@@ -508,7 +517,7 @@ export default function SeventhChordHarmonicFieldStudy() {
   const navigate = useNavigate();
   const [scaleMode, setScaleMode] = useState<ScaleMode>("major");
   const [selectedKey, setSelectedKey] = useState("C");
-  const [practiceMode, setPracticeMode] = useState(true);
+  const [practiceMode, setPracticeMode] = useState(false);
   const [showHints, setShowHints] = useState(true);
   const [validateLabels, setValidateLabels] = useState(false);
   const [answersByConfig, setAnswersByConfig] = useState<
@@ -536,9 +545,6 @@ export default function SeventhChordHarmonicFieldStudy() {
       }
       if (typeof saved.selectedKey === "string") {
         setSelectedKey(saved.selectedKey);
-      }
-      if (typeof saved.practiceMode === "boolean") {
-        setPracticeMode(saved.practiceMode);
       }
       if (typeof saved.showHints === "boolean") {
         setShowHints(saved.showHints);
@@ -572,7 +578,6 @@ export default function SeventhChordHarmonicFieldStudy() {
       JSON.stringify({
         scaleMode,
         selectedKey,
-        practiceMode,
         showHints,
         validateLabels,
         answersByConfig,
@@ -582,7 +587,6 @@ export default function SeventhChordHarmonicFieldStudy() {
   }, [
     answersByConfig,
     hintLevelsByConfig,
-    practiceMode,
     scaleMode,
     selectedKey,
     showHints,
@@ -1130,21 +1134,30 @@ export default function SeventhChordHarmonicFieldStudy() {
                 borderRadius: 1,
               }}
             >
-              <Table size="small" sx={{ minWidth: 2500 }}>
+              <Table
+                size="small"
+                sx={{
+                  minWidth: practiceMode ? 1950 : 1540,
+                  "& .MuiTableCell-root": {
+                    px: 0.75,
+                    py: 0.75,
+                  },
+                }}
+              >
                 <TableHead>
                   <TableRow>
                     <TableCell>Grado</TableCell>
                     <TableCell>Qué significa</TableCell>
                     <TableCell>Nota base</TableCell>
                     <TableCell>1-3-5-7</TableCell>
-                    <TableCell>Notas del acorde</TableCell>
+                    {practiceMode ? <TableCell>Notas del acorde</TableCell> : null}
                     <TableCell>Clave de Sol</TableCell>
                     <TableCell>Calidad</TableCell>
                     <TableCell>Por qué</TableCell>
                     <TableCell>Distancias</TableCell>
                     <TableCell>Tercera a tercera</TableCell>
                     <TableCell>Símbolo</TableCell>
-                    <TableCell>Pistas / revisión</TableCell>
+                    {practiceMode ? <TableCell>Pistas / revisión</TableCell> : null}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -1162,17 +1175,29 @@ export default function SeventhChordHarmonicFieldStudy() {
                         <TableCell sx={{ fontWeight: 700, verticalAlign: "top" }}>
                           {row.degreeRoman}
                         </TableCell>
-                        <TableCell sx={{ minWidth: 210, verticalAlign: "top" }}>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ whiteSpace: "normal" }}
-                          >
-                            {degreeMeaningText(row)}
-                          </Typography>
+                        <TableCell sx={{ minWidth: 125, verticalAlign: "top" }}>
+                          <Stack spacing={0.2}>
+                            {degreeMeaningLines(row).map((line) => (
+                              <Typography
+                                key={`${row.degreeRoman}-meaning-${line}`}
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ whiteSpace: "normal", lineHeight: 1.25 }}
+                              >
+                                {line}
+                              </Typography>
+                            ))}
+                          </Stack>
                         </TableCell>
                         <TableCell sx={{ verticalAlign: "top" }}>{row.rootNote}</TableCell>
-                        <TableCell sx={{ verticalAlign: "top", whiteSpace: "nowrap" }}>
+                        <TableCell
+                          sx={{
+                            minWidth: practiceMode ? 115 : 100,
+                            verticalAlign: "top",
+                            whiteSpace: practiceMode ? "nowrap" : "normal",
+                            lineHeight: 1.3,
+                          }}
+                        >
                           {!practiceMode
                             ? row.stackNotes.join(" - ")
                             : showHints &&
@@ -1182,8 +1207,8 @@ export default function SeventhChordHarmonicFieldStudy() {
                             ? row.stackNotes.join(" - ")
                             : row.stackFormula}
                         </TableCell>
-                        <TableCell sx={{ minWidth: 220, verticalAlign: "top" }}>
-                          {practiceMode ? (
+                        {practiceMode ? (
+                          <TableCell sx={{ minWidth: 170, verticalAlign: "top" }}>
                             <TextField
                               size="small"
                               fullWidth
@@ -1193,11 +1218,9 @@ export default function SeventhChordHarmonicFieldStudy() {
                                 updateRowAnswer(rowKey, "notes", event.target.value)
                               }
                             />
-                          ) : (
-                            row.stackNotes.join(" - ")
-                          )}
-                        </TableCell>
-                        <TableCell sx={{ minWidth: 240, verticalAlign: "top" }}>
+                          </TableCell>
+                        ) : null}
+                        <TableCell sx={{ minWidth: 170, verticalAlign: "top" }}>
                           {displayNotes.length > 0 ? (
                             <TrebleChordPreview notes={displayNotes} />
                           ) : (
@@ -1206,7 +1229,7 @@ export default function SeventhChordHarmonicFieldStudy() {
                             </Typography>
                           )}
                         </TableCell>
-                        <TableCell sx={{ minWidth: 170, verticalAlign: "top" }}>
+                        <TableCell sx={{ minWidth: 110, verticalAlign: "top" }}>
                           {practiceMode ? (
                             <TextField
                               size="small"
@@ -1222,49 +1245,49 @@ export default function SeventhChordHarmonicFieldStudy() {
                             row.qualityLabel
                           )}
                         </TableCell>
-                        <TableCell sx={{ minWidth: 240, verticalAlign: "top" }}>
+                        <TableCell sx={{ minWidth: 150, verticalAlign: "top" }}>
                           <Stack spacing={0.25}>
                             {qualityReasonLines(row.qualityId).map((line) => (
                               <Typography
                                 key={`${row.degreeRoman}-reason-${line}`}
                                 variant="body2"
                                 color="text.secondary"
-                                sx={{ whiteSpace: "normal" }}
+                                sx={{ whiteSpace: "normal", lineHeight: 1.3 }}
                               >
                                 {line}
                               </Typography>
                             ))}
                           </Stack>
                         </TableCell>
-                        <TableCell sx={{ minWidth: 330, verticalAlign: "top" }}>
+                        <TableCell sx={{ minWidth: 205, verticalAlign: "top" }}>
                           <Stack spacing={0.25}>
                             {qualityDistanceLines(row.qualityId).map((line) => (
                               <Typography
                                 key={`${row.degreeRoman}-distance-${line}`}
                                 variant="body2"
                                 color="text.secondary"
-                                sx={{ whiteSpace: "normal" }}
+                                sx={{ whiteSpace: "normal", lineHeight: 1.3 }}
                               >
                                 {line}
                               </Typography>
                             ))}
                           </Stack>
                         </TableCell>
-                        <TableCell sx={{ minWidth: 330, verticalAlign: "top" }}>
+                        <TableCell sx={{ minWidth: 205, verticalAlign: "top" }}>
                           <Stack spacing={0.25}>
                             {qualityStackedThirdsLines(row.qualityId).map((line) => (
                               <Typography
                                 key={`${row.degreeRoman}-stacked-thirds-${line}`}
                                 variant="body2"
                                 color="text.secondary"
-                                sx={{ whiteSpace: "normal" }}
+                                sx={{ whiteSpace: "normal", lineHeight: 1.3 }}
                               >
                                 {line}
                               </Typography>
                             ))}
                           </Stack>
                         </TableCell>
-                        <TableCell sx={{ minWidth: 140, verticalAlign: "top" }}>
+                        <TableCell sx={{ minWidth: 90, verticalAlign: "top" }}>
                           {practiceMode ? (
                             <TextField
                               size="small"
@@ -1280,8 +1303,8 @@ export default function SeventhChordHarmonicFieldStudy() {
                             row.symbol
                           )}
                         </TableCell>
-                        <TableCell sx={{ minWidth: 300, verticalAlign: "top" }}>
-                          {practiceMode ? (
+                        {practiceMode ? (
+                          <TableCell sx={{ minWidth: 220, verticalAlign: "top" }}>
                             <Stack spacing={1}>
                               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                                 {showHints ? (
@@ -1345,12 +1368,8 @@ export default function SeventhChordHarmonicFieldStudy() {
                                 </Stack>
                               ) : null}
                             </Stack>
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              Tabla resuelta
-                            </Typography>
-                          )}
-                        </TableCell>
+                          </TableCell>
+                        ) : null}
                       </TableRow>
                     );
                   })}
