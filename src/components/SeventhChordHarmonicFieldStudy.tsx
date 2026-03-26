@@ -412,6 +412,23 @@ function qualityDistanceLines(qualityId: SeventhQualityId) {
   return qualityDistanceText(qualityId).split(" · ");
 }
 
+function qualityStackedThirdsText(qualityId: SeventhQualityId) {
+  if (qualityId === "maj7") {
+    return "1→3 = 4 st (2 tonos) · 3→5 = 3 st (tono y medio) · 5→7 = 4 st (2 tonos)";
+  }
+  if (qualityId === "m7") {
+    return "1→3 = 3 st (tono y medio) · 3→5 = 4 st (2 tonos) · 5→7 = 3 st (tono y medio)";
+  }
+  if (qualityId === "7") {
+    return "1→3 = 4 st (2 tonos) · 3→5 = 3 st (tono y medio) · 5→7 = 3 st (tono y medio)";
+  }
+  return "1→3 = 3 st (tono y medio) · 3→5 = 3 st (tono y medio) · 5→7 = 4 st (2 tonos)";
+}
+
+function qualityStackedThirdsLines(qualityId: SeventhQualityId) {
+  return qualityStackedThirdsText(qualityId).split(" · ");
+}
+
 function degreeMeaningText(row: SeventhChordRow) {
   const ordinalLabels = [
     "primer",
@@ -1113,7 +1130,7 @@ export default function SeventhChordHarmonicFieldStudy() {
                 borderRadius: 1,
               }}
             >
-              <Table size="small" sx={{ minWidth: 2160 }}>
+              <Table size="small" sx={{ minWidth: 2500 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Grado</TableCell>
@@ -1125,6 +1142,7 @@ export default function SeventhChordHarmonicFieldStudy() {
                     <TableCell>Calidad</TableCell>
                     <TableCell>Por qué</TableCell>
                     <TableCell>Distancias</TableCell>
+                    <TableCell>Tercera a tercera</TableCell>
                     <TableCell>Símbolo</TableCell>
                     <TableCell>Pistas / revisión</TableCell>
                   </TableRow>
@@ -1223,6 +1241,20 @@ export default function SeventhChordHarmonicFieldStudy() {
                             {qualityDistanceLines(row.qualityId).map((line) => (
                               <Typography
                                 key={`${row.degreeRoman}-distance-${line}`}
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ whiteSpace: "normal" }}
+                              >
+                                {line}
+                              </Typography>
+                            ))}
+                          </Stack>
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 330, verticalAlign: "top" }}>
+                          <Stack spacing={0.25}>
+                            {qualityStackedThirdsLines(row.qualityId).map((line) => (
+                              <Typography
+                                key={`${row.degreeRoman}-stacked-thirds-${line}`}
                                 variant="body2"
                                 color="text.secondary"
                                 sx={{ whiteSpace: "normal" }}
