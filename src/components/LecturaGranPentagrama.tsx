@@ -104,7 +104,7 @@ type FixedGrandStaffPreset = {
   name: string;
   description: string;
   timeSignature: TimeSignatureValue;
-  measuresPerSystem: number;
+  systemMeasureCounts: number[];
   measures: MeasureReading[];
 };
 
@@ -195,7 +195,7 @@ const POZZOLI_2_PRESET: FixedGrandStaffPreset = {
   description:
     "Transcripción manual fija en 2/2 basada en la imagen proporcionada por el usuario.",
   timeSignature: [2, 2],
-  measuresPerSystem: 11,
+  systemMeasureCounts: [11, 13, 9],
   measures: [
     measure(note("c/3"), note("d/3")),
     measure(note("e/3"), note("f/3")),
@@ -216,11 +216,11 @@ const POZZOLI_2_PRESET: FixedGrandStaffPreset = {
     measure(note("f/4"), note("d/4")),
     measure(note("b/3"), note("g/3")),
     measure(note("e/3"), note("c/3")),
-    measure(note("e/2"), note("g/2")),
-    measure(note("b/2"), note("d/3")),
+    measure(note("a/2"), note("f/2")),
+    measure(note("d/2"), note("c/2")),
+    measure(note("d/2"), note("e/2")),
+    measure(note("f/2"), note("g/2")),
     measure(note("a/2", "h", "bass"), note("b/2", "h", "bass")),
-    measure(note("b/2"), note("a/2")),
-    measure(note("d/3"), note("d/3")),
     measure(note("f/3"), note("a/3")),
     measure(note("g/3"), note("b/3")),
     measure(note("a/4"), note("g/4")),
@@ -233,10 +233,16 @@ const POZZOLI_2_PRESET: FixedGrandStaffPreset = {
   ],
 };
 
-function chunkMeasures(measures: MeasureReading[], size: number) {
+function chunkMeasuresByCounts(measures: MeasureReading[], counts: number[]) {
   const out: MeasureReading[][] = [];
-  for (let index = 0; index < measures.length; index += size) {
-    out.push(measures.slice(index, index + size));
+  let cursor = 0;
+  counts.forEach((count) => {
+    if (count <= 0) return;
+    out.push(measures.slice(cursor, cursor + count));
+    cursor += count;
+  });
+  if (cursor < measures.length) {
+    out.push(measures.slice(cursor));
   }
   return out;
 }
@@ -294,7 +300,7 @@ export default function LecturaGranPentagrama() {
   const metronomeIdRef = useRef<number | null>(null);
   const fixedPreset = scorePresetId === "pozzoli_2" ? POZZOLI_2_PRESET : null;
   const activeTimeSignature = fixedPreset?.timeSignature ?? ([4, 4] as const);
-  const activeMeasuresPerSystem = fixedPreset?.measuresPerSystem ?? 4;
+  const activeSystemMeasureCounts = fixedPreset?.systemMeasureCounts ?? [4];
   const isFixedPreset = fixedPreset !== null;
   const activeMeasures = fixedPreset?.measures ?? measures;
 
@@ -533,7 +539,7 @@ export default function LecturaGranPentagrama() {
     if (!staffRef.current) return;
 
     staffRef.current.innerHTML = "";
-    const systems = chunkMeasures(activeMeasures, activeMeasuresPerSystem);
+    const systems = chunkMeasuresByCounts(activeMeasures, activeSystemMeasureCounts);
     const systemCount = Math.max(1, systems.length);
     const width = Math.max(
       Math.floor(staffRef.current.getBoundingClientRect().width),
@@ -552,6 +558,9 @@ export default function LecturaGranPentagrama() {
     const timeSignatureLabel = `${activeTimeSignature[0]}/${activeTimeSignature[1]}`;
 
     systems.forEach((systemMeasures, systemIndex) => {
+      const systemStartMeasureIndex = activeSystemMeasureCounts
+        .slice(0, systemIndex)
+        .reduce((sum, count) => sum + count, 0);
       const yOffset = systemIndex * SYSTEM_STEP;
       const trebleStave = new Stave(STAFF_X, TREBLE_Y + yOffset, width - 40);
       const bassStave = new Stave(STAFF_X, BASS_Y + yOffset, width - 40);
@@ -581,8 +590,7 @@ export default function LecturaGranPentagrama() {
       const measureWidth = usableWidth / systemMeasures.length;
 
       systemMeasures.forEach((measure, localMeasureIndex) => {
-        const globalMeasureIndex =
-          systemIndex * activeMeasuresPerSystem + localMeasureIndex;
+        const globalMeasureIndex = systemStartMeasureIndex + localMeasureIndex;
         const measureStartX = usableStartX + localMeasureIndex * measureWidth;
         const measureEndX = measureStartX + measureWidth;
         const labelX = (measureStartX + measureEndX) / 2;
@@ -678,7 +686,7 @@ export default function LecturaGranPentagrama() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeMeasures,
-    activeMeasuresPerSystem,
+    activeSystemMeasureCounts,
     activeTimeSignature,
     currentHighlightedNote,
     showNoteLabels,
@@ -949,7 +957,7 @@ export default function LecturaGranPentagrama() {
                 <Chip
                   label={
                     isFixedPreset
-                      ? `${activeMeasuresPerSystem} compases por sistema`
+                      ? `${activeSystemMeasureCounts.join(" · ")} compases por sistema`
                       : `${notesPerMeasure} notas por compas`
                   }
                   size="small"
@@ -1066,7 +1074,7 @@ export default function LecturaGranPentagrama() {
                 />
                 <Chip
                   size="small"
-                  label={`${POZZOLI_2_PRESET.measuresPerSystem} por sistema`}
+                  label={POZZOLI_2_PRESET.systemMeasureCounts.join(" · ")}
                   variant="outlined"
                   color="secondary"
                 />
