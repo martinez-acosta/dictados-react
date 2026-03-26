@@ -26,8 +26,6 @@ import * as Tone from "tone";
 import { useNavigate } from "react-router-dom";
 import {
   BASS_EXERCISES,
-  beatsFromDur,
-  beatsToBBS,
   type ClefType,
   DURATIONS,
   EXERCISES_BY_CLEF,
@@ -89,11 +87,28 @@ async function ensureAudio() {
   }
 }
 
-type MeasureReading = {
+type TimeSignatureValue = readonly [2 | 4, 2 | 4];
+
+type ReadingNote = {
+  key: string;
+  dur: DurationSym;
   clef: ClefType;
-  notes: string[];
-  durs: DurationSym[];
 };
+
+type MeasureReading = {
+  notes: ReadingNote[];
+};
+
+type FixedGrandStaffPreset = {
+  id: "pozzoli_2";
+  name: string;
+  description: string;
+  timeSignature: TimeSignatureValue;
+  measuresPerSystem: number;
+  measures: MeasureReading[];
+};
+
+type ScorePresetId = "generated" | "pozzoli_2";
 
 type HighlightedNote = {
   measureIndex: number;
@@ -123,6 +138,100 @@ const STAFF_HEIGHT = 204;
 const STAFF_X = 20;
 const TREBLE_Y = 38;
 const BASS_Y = 138;
+
+function clefForKey(key: string): ClefType {
+  const [, octaveText] = key.split("/");
+  const octave = Number(octaveText);
+  return octave >= 4 ? "treble" : "bass";
+}
+
+function note(key: string, dur: DurationSym = "h", clef?: ClefType): ReadingNote {
+  return { key, dur, clef: clef ?? clefForKey(key) };
+}
+
+function measure(...notes: ReadingNote[]): MeasureReading {
+  return { notes };
+}
+
+function beatsFromDurForSignature(
+  duration: DurationSym,
+  timeSignature: TimeSignatureValue,
+) {
+  if (timeSignature[1] === 2) {
+    return duration === "w"
+      ? 2
+      : duration === "h"
+      ? 1
+      : duration === "q"
+      ? 0.5
+      : 0.25;
+  }
+  return duration === "w" ? 4 : duration === "h" ? 2 : duration === "q" ? 1 : 0.5;
+}
+
+function beatsToTransportPosition(
+  totalBeats: number,
+  timeSignature: TimeSignatureValue,
+) {
+  const beatsPerBar = timeSignature[0];
+  const bar = Math.floor(totalBeats / beatsPerBar);
+  const beat = totalBeats % beatsPerBar;
+  return `${bar}:${beat}:0`;
+}
+
+function metronomeSubdivision(timeSignature: TimeSignatureValue) {
+  return timeSignature[1] === 2 ? "2n" : "4n";
+}
+
+function measureClefLabel(measure: MeasureReading) {
+  const clefs = Array.from(new Set(measure.notes.map((item) => item.clef)));
+  if (clefs.length === 1) return CLEF_LONG_LABELS[clefs[0]];
+  return "Mixto";
+}
+
+const POZZOLI_2_PRESET: FixedGrandStaffPreset = {
+  id: "pozzoli_2",
+  name: "Ejercicio 2 Pozzoli",
+  description:
+    "Transcripción manual fija en 2/2 basada en la imagen proporcionada por el usuario.",
+  timeSignature: [2, 2],
+  measuresPerSystem: 11,
+  measures: [
+    measure(note("c/3"), note("d/3")),
+    measure(note("e/3"), note("f/3")),
+    measure(note("g/3"), note("a/3")),
+    measure(note("b/3"), note("d/4")),
+    measure(note("c/4"), note("c/4")),
+    measure(note("d/4"), note("e/4")),
+    measure(note("f/4"), note("f/4")),
+    measure(note("g/4"), note("a/4")),
+    measure(note("b/4"), note("b/4")),
+    measure(note("d/5"), note("c/5")),
+    measure(note("e/5"), note("d/5")),
+    measure(note("f/5"), note("e/5")),
+    measure(note("g/5"), note("f/5")),
+    measure(note("e/5"), note("d/5")),
+    measure(note("d/5"), note("b/4")),
+    measure(note("c/5"), note("a/4")),
+    measure(note("f/4"), note("d/4")),
+    measure(note("f/4"), note("e/4")),
+    measure(note("b/3"), note("g/3")),
+    measure(note("e/3"), note("c/3")),
+    measure(note("e/3"), note("g/3")),
+    measure(note("b/3"), note("d/4")),
+    measure(note("b/2"), note("a/2")),
+    measure(note("d/3"), note("d/3")),
+    measure(note("f/3"), note("a/3")),
+    measure(note("g/3"), note("b/3")),
+    measure(note("a/4"), note("g/4")),
+    measure(note("f/4"), note("e/4")),
+    measure(note("d/5"), note("c/5")),
+    measure(note("b/4"), note("a/4")),
+    measure(note("g/5"), note("f/5")),
+    measure(note("e/5"), note("d/5")),
+    measure(note("c/6", "w")),
+  ],
+};
 
 function chunkMeasures(measures: MeasureReading[], size: number) {
   const out: MeasureReading[][] = [];
@@ -162,6 +271,7 @@ export default function LecturaGranPentagrama() {
   const [measureClefs, setMeasureClefs] = useState<ClefType[]>(
     createDefaultClefs(4),
   );
+  const [scorePresetId, setScorePresetId] = useState<ScorePresetId>("generated");
   const [trebleExerciseKey, setTrebleExerciseKey] =
     useState<ExerciseKeyByClef<"treble">>(trebleExerciseEntries[0][0]);
   const [bassExerciseKey, setBassExerciseKey] = useState<ExerciseKeyByClef<"bass">>(
@@ -182,8 +292,14 @@ export default function LecturaGranPentagrama() {
 
   const staffRef = useRef<HTMLDivElement | null>(null);
   const metronomeIdRef = useRef<number | null>(null);
+  const fixedPreset = scorePresetId === "pozzoli_2" ? POZZOLI_2_PRESET : null;
+  const activeTimeSignature = fixedPreset?.timeSignature ?? ([4, 4] as const);
+  const activeMeasuresPerSystem = fixedPreset?.measuresPerSystem ?? 4;
+  const isFixedPreset = fixedPreset !== null;
+  const activeMeasures = fixedPreset?.measures ?? measures;
 
   useEffect(() => {
+    if (isFixedPreset) return;
     setMeasureClefs((prev) => {
       const next = prev.slice(0, measureCount);
       while (next.length < measureCount) next.push("treble");
@@ -192,7 +308,7 @@ export default function LecturaGranPentagrama() {
         ? prev
         : next;
     });
-  }, [measureCount]);
+  }, [isFixedPreset, measureCount]);
 
   const flattenedSequence = useMemo(() => {
     const out: Array<{
@@ -203,12 +319,12 @@ export default function LecturaGranPentagrama() {
       noteIndex: number;
     }> = [];
 
-    measures.forEach((measure, measureIndex) => {
-      measure.notes.forEach((key, noteIndex) => {
+    activeMeasures.forEach((measure, measureIndex) => {
+      measure.notes.forEach((readingNote, noteIndex) => {
         out.push({
-          key,
-          dur: measure.durs[noteIndex] ?? duration,
-          clef: measure.clef,
+          key: readingNote.key,
+          dur: readingNote.dur,
+          clef: readingNote.clef,
           measureIndex,
           noteIndex,
         });
@@ -216,7 +332,7 @@ export default function LecturaGranPentagrama() {
     });
 
     return out;
-  }, [duration, measures]);
+  }, [activeMeasures]);
 
   const displaySequence = useMemo(
     () =>
@@ -254,15 +370,21 @@ export default function LecturaGranPentagrama() {
   }
 
   function generateNewExercise() {
+    if (isFixedPreset) {
+      hardStop();
+      return;
+    }
     const nextMeasures = measureClefs.slice(0, measureCount).map((clef) => {
       const exerciseKey = clef === "treble" ? trebleExerciseKey : bassExerciseKey;
       const pool = getNotePool(resolveExerciseConfig(clef, exerciseKey), clef);
       const notes = generateExercise(pool, notesPerMeasure);
-      const durs = randomFigure
+      const durations = randomFigure
         ? randomDurations(notes.length)
         : Array(notes.length).fill(duration);
 
-      return { clef, notes, durs };
+      return {
+        notes: notes.map((key, index) => note(key, durations[index], clef)),
+      };
     });
 
     setMeasures(nextMeasures);
@@ -270,23 +392,40 @@ export default function LecturaGranPentagrama() {
   }
 
   useEffect(() => {
+    if (isFixedPreset) {
+      hardStop();
+      return;
+    }
     generateNewExercise();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [measureClefs, measureCount, notesPerMeasure, trebleExerciseKey, bassExerciseKey]);
+  }, [
+    bassExerciseKey,
+    isFixedPreset,
+    measureClefs,
+    measureCount,
+    notesPerMeasure,
+    trebleExerciseKey,
+  ]);
 
   useEffect(() => {
-    if (measures.length === 0) return;
+    if (isFixedPreset || measures.length === 0) return;
     setMeasures((prev) =>
-      prev.map((measure) => ({
-        ...measure,
-        durs: randomFigure
+      prev.map((measure) => {
+        const nextDurations = randomFigure
           ? randomDurations(measure.notes.length)
-          : Array(measure.notes.length).fill(duration),
-      })),
+          : Array(measure.notes.length).fill(duration);
+        return {
+          ...measure,
+          notes: measure.notes.map((readingNote, index) => ({
+            ...readingNote,
+            dur: nextDurations[index],
+          })),
+        };
+      }),
     );
     hardStop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [randomFigure, duration]);
+  }, [duration, isFixedPreset, randomFigure]);
 
   useEffect(() => () => hardStop(), []);
 
@@ -305,7 +444,12 @@ export default function LecturaGranPentagrama() {
           beat = parseInt(parts[1] ?? "0", 10) || 0;
         } catch {}
 
-        const isStrongBeat = jazzStyle ? beat === 1 || beat === 3 : beat === 0;
+        const isStrongBeat =
+          jazzStyle && activeTimeSignature[0] >= 4
+            ? beat === 1 || beat === 3
+            : jazzStyle
+            ? beat === 1
+            : beat === 0;
         if (clickSynthRef) {
           const freq = isStrongBeat ? 1200 : 800;
           clickSynthRef.volume.value = isStrongBeat ? -6 : -12;
@@ -313,7 +457,7 @@ export default function LecturaGranPentagrama() {
         }
         setCurrentBeat(beat);
       },
-      "4n",
+      metronomeSubdivision(activeTimeSignature),
       "0:0:0",
     );
 
@@ -330,7 +474,7 @@ export default function LecturaGranPentagrama() {
     await ensureAudio();
     Tone.Transport.cancel(0);
     Tone.Transport.bpm.value = bpm;
-    Tone.Transport.timeSignature = [4, 4];
+    Tone.Transport.timeSignature = [...activeTimeSignature];
     Tone.Transport.loop = false;
     scheduleMetronome();
     setMetronomeActive(true);
@@ -349,14 +493,14 @@ export default function LecturaGranPentagrama() {
     await ensureAudio();
     Tone.Transport.cancel(0);
     Tone.Transport.bpm.value = bpm;
-    Tone.Transport.timeSignature = [4, 4];
+    Tone.Transport.timeSignature = [...activeTimeSignature];
     Tone.Transport.position = "0:0:0";
 
     const totalBeats = displaySequence.reduce(
-      (sum, note) => sum + beatsFromDur(note.dur),
+      (sum, note) => sum + beatsFromDurForSignature(note.dur, activeTimeSignature),
       0,
     );
-    const loopEnd = beatsToBBS(totalBeats);
+    const loopEnd = beatsToTransportPosition(totalBeats, activeTimeSignature);
 
     scheduleMetronome();
     setMetronomeActive(true);
@@ -364,7 +508,7 @@ export default function LecturaGranPentagrama() {
 
     let accBeats = 0;
     displaySequence.forEach((note) => {
-      const startAt = beatsToBBS(accBeats);
+      const startAt = beatsToTransportPosition(accBeats, activeTimeSignature);
       Tone.Transport.schedule((time) => {
         setCurrentHighlightedNote({
           measureIndex: note.measureIndex,
@@ -376,7 +520,7 @@ export default function LecturaGranPentagrama() {
           time,
         );
       }, startAt);
-      accBeats += beatsFromDur(note.dur);
+      accBeats += beatsFromDurForSignature(note.dur, activeTimeSignature);
     });
 
     Tone.Transport.setLoopPoints("0:0:0", loopEnd);
@@ -389,7 +533,7 @@ export default function LecturaGranPentagrama() {
     if (!staffRef.current) return;
 
     staffRef.current.innerHTML = "";
-    const systems = chunkMeasures(measures, 4);
+    const systems = chunkMeasures(activeMeasures, activeMeasuresPerSystem);
     const systemCount = Math.max(1, systems.length);
     const width = Math.max(
       Math.floor(staffRef.current.getBoundingClientRect().width),
@@ -405,13 +549,15 @@ export default function LecturaGranPentagrama() {
     });
     const context = vf.getContext();
 
+    const timeSignatureLabel = `${activeTimeSignature[0]}/${activeTimeSignature[1]}`;
+
     systems.forEach((systemMeasures, systemIndex) => {
       const yOffset = systemIndex * SYSTEM_STEP;
       const trebleStave = new Stave(STAFF_X, TREBLE_Y + yOffset, width - 40);
       const bassStave = new Stave(STAFF_X, BASS_Y + yOffset, width - 40);
 
-      trebleStave.addClef("treble").addTimeSignature("4/4");
-      bassStave.addClef("bass").addTimeSignature("4/4");
+      trebleStave.addClef("treble").addTimeSignature(timeSignatureLabel);
+      bassStave.addClef("bass").addTimeSignature(timeSignatureLabel);
 
       trebleStave.setContext(context).draw();
       bassStave.setContext(context).draw();
@@ -435,25 +581,15 @@ export default function LecturaGranPentagrama() {
       const measureWidth = usableWidth / systemMeasures.length;
 
       systemMeasures.forEach((measure, localMeasureIndex) => {
-        const globalMeasureIndex = systemIndex * 4 + localMeasureIndex;
+        const globalMeasureIndex =
+          systemIndex * activeMeasuresPerSystem + localMeasureIndex;
         const measureStartX = usableStartX + localMeasureIndex * measureWidth;
         const measureEndX = measureStartX + measureWidth;
         const labelX = (measureStartX + measureEndX) / 2;
 
-        if (typeof context.save === "function") context.save();
-        context.fillStyle = "#475569";
-        context.font = "13px Georgia";
-        context.textAlign = "center";
-        context.fillText(
-          `Compas ${globalMeasureIndex + 1} · ${CLEF_LONG_LABELS[measure.clef]}`,
-          labelX,
-          TREBLE_Y + yOffset - 12,
-        );
-        if (typeof context.restore === "function") context.restore();
-
         const leftInset = 12;
         const rightInset = 22;
-        measure.notes.forEach((key, noteIndex) => {
+        measure.notes.forEach((readingNote, noteIndex) => {
           const noteCenterX =
             measure.notes.length === 1
               ? labelX
@@ -462,9 +598,9 @@ export default function LecturaGranPentagrama() {
                 (noteIndex / (measure.notes.length - 1)) *
                   (measureWidth - leftInset - rightInset);
           const note = new StaveNote({
-            clef: measure.clef,
-            keys: [key],
-            duration: measure.durs[noteIndex] ?? duration,
+            clef: readingNote.clef,
+            keys: [readingNote.key],
+            duration: readingNote.dur,
           });
           const isHighlighted =
             currentHighlightedNote?.measureIndex === globalMeasureIndex &&
@@ -475,7 +611,8 @@ export default function LecturaGranPentagrama() {
             strokeStyle: isHighlighted ? ACTIVE_COLOR : NOTE_COLOR,
           });
 
-          const targetStave = measure.clef === "treble" ? trebleStave : bassStave;
+          const targetStave =
+            readingNote.clef === "treble" ? trebleStave : bassStave;
           note.setStave(targetStave);
           note.setContext(context);
           const tickContext = new TickContext();
@@ -495,16 +632,20 @@ export default function LecturaGranPentagrama() {
           note.draw();
 
           if (showNoteLabels) {
-            const baseY = targetStave.getYForLine(4) + (measure.clef === "bass" ? 40 : 24);
+            const baseY =
+              targetStave.getYForLine(4) + (readingNote.clef === "bass" ? 40 : 24);
             context.fillStyle = LABEL_COLOR;
             context.font = "10px Arial";
 
-            if (measure.clef === "bass") {
-              const written = NOTE_WRITTEN[key] ?? NOTE_NAMES[key] ?? key;
+            if (readingNote.clef === "bass") {
+              const written =
+                NOTE_WRITTEN[readingNote.key] ??
+                NOTE_NAMES[readingNote.key] ??
+                readingNote.key;
               const w1 = context.measureText(written).width;
               context.fillText(written, noteCenterX - w1 / 2, baseY);
 
-              const sounds = NOTE_SOUNDS[key];
+              const sounds = NOTE_SOUNDS[readingNote.key];
               if (sounds) {
                 const soundText = `(${sounds})`;
                 context.font = "9px Arial";
@@ -513,7 +654,7 @@ export default function LecturaGranPentagrama() {
                 context.fillText(soundText, noteCenterX - w2 / 2, baseY + 11);
               }
             } else {
-              const label = NOTE_NAMES[key] ?? key;
+              const label = NOTE_NAMES[readingNote.key] ?? readingNote.key;
               const w = context.measureText(label).width;
               context.fillText(label, noteCenterX - w / 2, baseY);
             }
@@ -535,7 +676,13 @@ export default function LecturaGranPentagrama() {
   useEffect(() => {
     drawGrandStaff();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [measures, currentHighlightedNote, showNoteLabels]);
+  }, [
+    activeMeasures,
+    activeMeasuresPerSystem,
+    activeTimeSignature,
+    currentHighlightedNote,
+    showNoteLabels,
+  ]);
 
   const trebleConfig = useMemo(
     () => resolveExerciseConfig("treble", trebleExerciseKey),
@@ -575,83 +722,109 @@ export default function LecturaGranPentagrama() {
 
         <Paper sx={{ p: 2 }}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Compases</InputLabel>
-                <Select
-                  value={measureCount}
-                  onChange={(event) => setMeasureCount(Number(event.target.value))}
-                  label="Compases"
-                >
-                  {MEASURE_COUNT_OPTIONS.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Notas por compas</InputLabel>
-                <Select
-                  value={notesPerMeasure}
-                  onChange={(event) =>
-                    setNotesPerMeasure(Number(event.target.value))
-                  }
-                  label="Notas por compas"
-                >
-                  {NOTES_PER_MEASURE_OPTIONS.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
             <Grid item xs={12} sm={6} md={4}>
               <FormControl fullWidth size="small">
-                <InputLabel>Preset de Sol</InputLabel>
+                <InputLabel>Partitura</InputLabel>
                 <Select
-                  value={trebleExerciseKey}
+                  value={scorePresetId}
                   onChange={(event) =>
-                    setTrebleExerciseKey(
-                      event.target.value as ExerciseKeyByClef<"treble">,
-                    )
+                    setScorePresetId(event.target.value as ScorePresetId)
                   }
-                  label="Preset de Sol"
+                  label="Partitura"
                 >
-                  {trebleExerciseEntries.map(([key, cfg]) => (
-                    <MenuItem key={String(key)} value={String(key)}>
-                      {cfg.name}
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="generated">Generado por presets</MenuItem>
+                  <MenuItem value="pozzoli_2">Ejercicio 2 Pozzoli</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Preset de Fa</InputLabel>
-                <Select
-                  value={bassExerciseKey}
-                  onChange={(event) =>
-                    setBassExerciseKey(
-                      event.target.value as ExerciseKeyByClef<"bass">,
-                    )
-                  }
-                  label="Preset de Fa"
-                >
-                  {bassExerciseEntries.map(([key, cfg]) => (
-                    <MenuItem key={String(key)} value={String(key)}>
-                      {cfg.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+            {!isFixedPreset ? (
+              <>
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Compases</InputLabel>
+                    <Select
+                      value={measureCount}
+                      onChange={(event) => setMeasureCount(Number(event.target.value))}
+                      label="Compases"
+                    >
+                      {MEASURE_COUNT_OPTIONS.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Notas por compas</InputLabel>
+                    <Select
+                      value={notesPerMeasure}
+                      onChange={(event) =>
+                        setNotesPerMeasure(Number(event.target.value))
+                      }
+                      label="Notas por compas"
+                    >
+                      {NOTES_PER_MEASURE_OPTIONS.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Preset de Sol</InputLabel>
+                    <Select
+                      value={trebleExerciseKey}
+                      onChange={(event) =>
+                        setTrebleExerciseKey(
+                          event.target.value as ExerciseKeyByClef<"treble">,
+                        )
+                      }
+                      label="Preset de Sol"
+                    >
+                      {trebleExerciseEntries.map(([key, cfg]) => (
+                        <MenuItem key={String(key)} value={String(key)}>
+                          {cfg.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Preset de Fa</InputLabel>
+                    <Select
+                      value={bassExerciseKey}
+                      onChange={(event) =>
+                        setBassExerciseKey(
+                          event.target.value as ExerciseKeyByClef<"bass">,
+                        )
+                      }
+                      label="Preset de Fa"
+                    >
+                      {bassExerciseEntries.map(([key, cfg]) => (
+                        <MenuItem key={String(key)} value={String(key)}>
+                          {cfg.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </>
+            ) : (
+              <Grid item xs={12} md={8}>
+                <Typography variant="body2" color="text.secondary">
+                  {POZZOLI_2_PRESET.description}
+                </Typography>
+              </Grid>
+            )}
 
             <Grid item xs={12} sm={6} md={2}>
               <FormControl fullWidth size="small">
@@ -670,33 +843,35 @@ export default function LecturaGranPentagrama() {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={randomFigure}
-                    onChange={(event) => setRandomFigure(event.target.checked)}
-                  />
-                }
-                label="Figuras aleatorias"
-              />
-              <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-                <InputLabel>Duracion fija</InputLabel>
-                <Select
-                  value={duration}
-                  onChange={(event) =>
-                    setDuration(event.target.value as DurationSym)
+            {!isFixedPreset ? (
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={randomFigure}
+                      onChange={(event) => setRandomFigure(event.target.checked)}
+                    />
                   }
-                  label="Duracion fija"
-                  disabled={randomFigure}
-                >
-                  <MenuItem value="w">Redonda</MenuItem>
-                  <MenuItem value="h">Blanca</MenuItem>
-                  <MenuItem value="q">Negra</MenuItem>
-                  <MenuItem value="8">Corchea</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+                  label="Figuras aleatorias"
+                />
+                <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+                  <InputLabel>Duracion fija</InputLabel>
+                  <Select
+                    value={duration}
+                    onChange={(event) =>
+                      setDuration(event.target.value as DurationSym)
+                    }
+                    label="Duracion fija"
+                    disabled={randomFigure}
+                  >
+                    <MenuItem value="w">Redonda</MenuItem>
+                    <MenuItem value="h">Blanca</MenuItem>
+                    <MenuItem value="q">Negra</MenuItem>
+                    <MenuItem value="8">Corchea</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            ) : null}
 
             <Grid item xs={12} sm={6} md={3}>
               <FormControlLabel
@@ -757,6 +932,7 @@ export default function LecturaGranPentagrama() {
                   variant="outlined"
                   onClick={generateNewExercise}
                   startIcon={<Refresh />}
+                  disabled={isFixedPreset}
                 >
                   Nuevo
                 </Button>
@@ -765,9 +941,17 @@ export default function LecturaGranPentagrama() {
 
             <Grid item xs={12}>
               <Stack direction="row" spacing={1} flexWrap="wrap">
-                <Chip label={`${measureCount} compases`} size="small" color="primary" />
                 <Chip
-                  label={`${notesPerMeasure} notas por compas`}
+                  label={`${activeMeasures.length} compases`}
+                  size="small"
+                  color="primary"
+                />
+                <Chip
+                  label={
+                    isFixedPreset
+                      ? `${activeMeasuresPerSystem} compases por sistema`
+                      : `${notesPerMeasure} notas por compas`
+                  }
                   size="small"
                   color="secondary"
                 />
@@ -776,7 +960,13 @@ export default function LecturaGranPentagrama() {
                   size="small"
                 />
                 <Chip
-                  label={randomFigure ? "Figuras aleatorias" : `Figura fija: ${duration.toUpperCase()}`}
+                  label={
+                    isFixedPreset
+                      ? `${activeTimeSignature[0]}/${activeTimeSignature[1]} fijo`
+                      : randomFigure
+                      ? "Figuras aleatorias"
+                      : `Figura fija: ${duration.toUpperCase()}`
+                  }
                   size="small"
                   variant="outlined"
                 />
@@ -785,110 +975,144 @@ export default function LecturaGranPentagrama() {
           </Grid>
         </Paper>
 
-        <Paper sx={{ p: 2 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: 2,
-              mb: 1,
-              flexWrap: "wrap",
-            }}
-          >
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-              Clave por compas
-            </Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap">
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => fillMeasureClefs("treble")}
-              >
-                Solo clave de Sol
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => fillMeasureClefs("bass")}
-              >
-                Solo clave de Fa
-              </Button>
-              <Button variant="outlined" size="small" onClick={randomizeMeasureClefs}>
-                Aleatorio
-              </Button>
+        {!isFixedPreset ? (
+          <Paper sx={{ p: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 2,
+                mb: 1,
+                flexWrap: "wrap",
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                Clave por compas
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => fillMeasureClefs("treble")}
+                >
+                  Solo clave de Sol
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => fillMeasureClefs("bass")}
+                >
+                  Solo clave de Fa
+                </Button>
+                <Button variant="outlined" size="small" onClick={randomizeMeasureClefs}>
+                  Aleatorio
+                </Button>
+              </Stack>
+            </Box>
+            <Grid container spacing={1.5}>
+              {measureClefs.map((clef, index) => (
+                <Grid item xs={12} sm={6} md={3} key={`measure-clef-${index}`}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>{`Compas ${index + 1}`}</InputLabel>
+                    <Select
+                      value={clef}
+                      onChange={(event) => {
+                        const next = [...measureClefs];
+                        next[index] = event.target.value as ClefType;
+                        setMeasureClefs(next);
+                      }}
+                      label={`Compas ${index + 1}`}
+                    >
+                      <MenuItem value="treble">Clave de Sol</MenuItem>
+                      <MenuItem value="bass">Clave de Fa</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              ))}
+            </Grid>
+            <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
+              {measureClefs.map((clef, index) => (
+                <Chip
+                  key={`summary-clef-${index}`}
+                  size="small"
+                  label={`Compas ${index + 1}: ${CLEF_LABELS[clef]}`}
+                  color={clef === "treble" ? "primary" : "secondary"}
+                  variant="outlined"
+                />
+              ))}
             </Stack>
-          </Box>
-          <Grid container spacing={1.5}>
-            {measureClefs.map((clef, index) => (
-              <Grid item xs={12} sm={6} md={3} key={`measure-clef-${index}`}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>{`Compas ${index + 1}`}</InputLabel>
-                  <Select
-                    value={clef}
-                    onChange={(event) => {
-                      const next = [...measureClefs];
-                      next[index] = event.target.value as ClefType;
-                      setMeasureClefs(next);
-                    }}
-                    label={`Compas ${index + 1}`}
-                  >
-                    <MenuItem value="treble">Clave de Sol</MenuItem>
-                    <MenuItem value="bass">Clave de Fa</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            ))}
-          </Grid>
-          <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
-            {measureClefs.map((clef, index) => (
-              <Chip
-                key={`summary-clef-${index}`}
-                size="small"
-                label={`Compas ${index + 1}: ${CLEF_LABELS[clef]}`}
-                color={clef === "treble" ? "primary" : "secondary"}
-                variant="outlined"
-              />
-            ))}
-          </Stack>
-        </Paper>
+          </Paper>
+        ) : null}
 
         <Paper sx={{ p: 2, bgcolor: "rgba(25, 118, 210, 0.05)" }}>
           <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main", mb: 1 }}>
             Presets activos
           </Typography>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Sol: {trebleConfig.name}
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            Fa: {bassConfig.name}
-          </Typography>
-          <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1.5 }}>
-            {Array.from(new Set(treblePool)).map((note) => (
-              <Chip
-                key={`treble-pool-${note}`}
-                size="small"
-                label={NOTE_NAMES[note] ?? note}
-                variant="outlined"
-                color="primary"
-              />
-            ))}
-          </Stack>
-          <Stack direction="row" spacing={1} flexWrap="wrap">
-            {Array.from(new Set(bassPool)).map((note) => {
-              const written = NOTE_WRITTEN[note] ?? NOTE_NAMES[note] ?? note;
-              const sounds = NOTE_SOUNDS[note];
-              return (
+          {isFixedPreset ? (
+            <>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Partitura fija: {POZZOLI_2_PRESET.name}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                {POZZOLI_2_PRESET.description}
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
                 <Chip
-                  key={`bass-pool-${note}`}
                   size="small"
-                  label={sounds ? `${written} (${sounds})` : written}
+                  label={`${POZZOLI_2_PRESET.measures.length} compases`}
+                  variant="outlined"
+                  color="primary"
+                />
+                <Chip
+                  size="small"
+                  label={`${POZZOLI_2_PRESET.measuresPerSystem} por sistema`}
                   variant="outlined"
                   color="secondary"
                 />
-              );
-            })}
-          </Stack>
+                <Chip
+                  size="small"
+                  label={`${POZZOLI_2_PRESET.timeSignature[0]}/${POZZOLI_2_PRESET.timeSignature[1]}`}
+                  variant="outlined"
+                />
+              </Stack>
+            </>
+          ) : (
+            <>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Sol: {trebleConfig.name}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Fa: {bassConfig.name}
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1.5 }}>
+                {Array.from(new Set(treblePool)).map((note) => (
+                  <Chip
+                    key={`treble-pool-${note}`}
+                    size="small"
+                    label={NOTE_NAMES[note] ?? note}
+                    variant="outlined"
+                    color="primary"
+                  />
+                ))}
+              </Stack>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                {Array.from(new Set(bassPool)).map((note) => {
+                  const written = NOTE_WRITTEN[note] ?? NOTE_NAMES[note] ?? note;
+                  const sounds = NOTE_SOUNDS[note];
+                  return (
+                    <Chip
+                      key={`bass-pool-${note}`}
+                      size="small"
+                      label={sounds ? `${written} (${sounds})` : written}
+                      variant="outlined"
+                      color="secondary"
+                    />
+                  );
+                })}
+              </Stack>
+            </>
+          )}
         </Paper>
 
         <Paper sx={{ p: 2 }}>
@@ -907,8 +1131,9 @@ export default function LecturaGranPentagrama() {
             variant="body2"
             sx={{ mb: 2, color: "text.secondary", textAlign: "center" }}
           >
-            Cada sistema muestra hasta 4 compases. Cada compas usa su propia clave
-            y toma las alturas desde el preset global de Sol o Fa.
+            {isFixedPreset
+              ? "Partitura fija en gran pentagrama. Conserva ayudas del componente, pero bloquea los controles que alterarían el ejercicio."
+              : "Cada sistema muestra hasta 4 compases. Cada compas usa su propia clave y toma las alturas desde el preset global de Sol o Fa."}
           </Typography>
           <Box
             sx={{
@@ -949,9 +1174,11 @@ export default function LecturaGranPentagrama() {
               <Typography variant="body2" sx={{ fontWeight: "bold", mr: 1 }}>
                 {bpm} BPM:
               </Typography>
-              {[0, 1, 2, 3].map((beat) => {
+              {Array.from({ length: activeTimeSignature[0] }, (_, beat) => {
                 const isStrongBeat = jazzStyle
-                  ? beat === 1 || beat === 3
+                  ? activeTimeSignature[0] >= 4
+                    ? beat === 1 || beat === 3
+                    : beat === 1
                   : beat === 0;
                 const isActive = currentBeat === beat;
                 return (
@@ -996,7 +1223,7 @@ export default function LecturaGranPentagrama() {
             <Box
               sx={{
                 width: "100%",
-                maxWidth: 1180,
+                maxWidth: isFixedPreset ? 1880 : 1180,
                 border: "1px solid #e2e8f0",
                 borderRadius: 2,
                 bgcolor: "rgba(248,250,252,0.8)",
@@ -1009,7 +1236,7 @@ export default function LecturaGranPentagrama() {
                 ref={staffRef}
                 sx={{
                   width: "100%",
-                  minWidth: 920,
+                  minWidth: isFixedPreset ? 1680 : 920,
                   minHeight: STAFF_HEIGHT,
                 }}
               />
