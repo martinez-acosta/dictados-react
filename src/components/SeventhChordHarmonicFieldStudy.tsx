@@ -390,6 +390,19 @@ function qualityReasonText(qualityId: SeventhQualityId) {
   return "3ra menor + 5ta disminuida + 7ma menor = 1 - b3 - b5 - b7";
 }
 
+function qualityDistanceText(qualityId: SeventhQualityId) {
+  if (qualityId === "maj7") {
+    return "1→3 = 4 st (2 tonos) · 1→5 = 7 st (3 tonos y medio) · 1→7 = 11 st (5 tonos y medio)";
+  }
+  if (qualityId === "m7") {
+    return "1→3 = 3 st (tono y medio) · 1→5 = 7 st (3 tonos y medio) · 1→7 = 10 st (5 tonos)";
+  }
+  if (qualityId === "7") {
+    return "1→3 = 4 st (2 tonos) · 1→5 = 7 st (3 tonos y medio) · 1→7 = 10 st (5 tonos)";
+  }
+  return "1→3 = 3 st (tono y medio) · 1→5 = 6 st (3 tonos) · 1→7 = 10 st (5 tonos)";
+}
+
 function degreeMeaningText(row: SeventhChordRow) {
   const ordinalLabels = [
     "primer",
@@ -1091,7 +1104,7 @@ export default function SeventhChordHarmonicFieldStudy() {
                 borderRadius: 1,
               }}
             >
-              <Table size="small" sx={{ minWidth: 1820 }}>
+              <Table size="small" sx={{ minWidth: 2160 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Grado</TableCell>
@@ -1102,6 +1115,7 @@ export default function SeventhChordHarmonicFieldStudy() {
                     <TableCell>Clave de Sol</TableCell>
                     <TableCell>Calidad</TableCell>
                     <TableCell>Por qué</TableCell>
+                    <TableCell>Distancias</TableCell>
                     <TableCell>Símbolo</TableCell>
                     <TableCell>Pistas / revisión</TableCell>
                   </TableRow>
@@ -1188,6 +1202,15 @@ export default function SeventhChordHarmonicFieldStudy() {
                             sx={{ whiteSpace: "normal" }}
                           >
                             {qualityReasonText(row.qualityId)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ minWidth: 330, verticalAlign: "top" }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ whiteSpace: "normal" }}
+                          >
+                            {qualityDistanceText(row.qualityId)}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ minWidth: 140, verticalAlign: "top" }}>
