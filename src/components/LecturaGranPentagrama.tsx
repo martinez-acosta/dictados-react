@@ -99,8 +99,10 @@ type MeasureReading = {
   notes: ReadingNote[];
 };
 
+type FixedGrandStaffPresetId = "pozzoli_2" | "pozzoli_4";
+
 type FixedGrandStaffPreset = {
-  id: "pozzoli_2";
+  id: FixedGrandStaffPresetId;
   name: string;
   description: string;
   timeSignature: TimeSignatureValue;
@@ -108,7 +110,7 @@ type FixedGrandStaffPreset = {
   measures: MeasureReading[];
 };
 
-type ScorePresetId = "generated" | "pozzoli_2";
+type ScorePresetId = "generated" | FixedGrandStaffPresetId;
 
 type HighlightedNote = {
   measureIndex: number;
@@ -236,6 +238,87 @@ const POZZOLI_2_PRESET: FixedGrandStaffPreset = {
   ],
 };
 
+const POZZOLI_4_PRESET: FixedGrandStaffPreset = {
+  id: "pozzoli_4",
+  name: "Ejercicio 4 Pozzoli",
+  description:
+    "Transcripción manual fija en 2/2 basada en la captura completa proporcionada por el usuario, incluyendo los sistemas visibles debajo de ERA 1151.",
+  timeSignature: [2, 2],
+  systemMeasureCounts: [13, 13, 12, 11, 11],
+  measures: [
+    measure(note("g/3", "h", "bass"), note("e/3", "h", "bass")),
+    measure(note("a/3", "h", "bass"), note("f/3", "h", "bass")),
+    measure(note("b/3", "h", "bass"), note("g/3", "h", "bass")),
+    measure(note("c/4", "w", "bass")),
+    measure(note("d/4", "h", "bass"), note("c/4", "h", "bass")),
+    measure(note("d/4", "h", "bass"), note("a/3", "h", "bass")),
+    measure(note("e/4", "h", "treble"), note("g/3", "h", "bass")),
+    measure(note("d/4", "w", "bass")),
+    measure(note("e/4", "h", "treble"), note("d/4", "h", "bass")),
+    measure(note("c/4", "h", "bass"), note("e/4", "h", "treble")),
+    measure(note("b/3", "h", "bass"), note("d/4", "h", "bass")),
+    measure(note("a/3", "w", "bass")),
+    measure(note("g/3", "w", "bass")),
+
+    measure(note("f/3", "h", "bass"), note("d/3", "h", "bass")),
+    measure(note("c/3", "h", "bass"), note("b/2", "h", "bass")),
+    measure(note("a/2", "w", "bass")),
+    measure(note("e/4", "w", "treble")),
+    measure(note("d/4", "h", "bass"), note("c/4", "h", "bass")),
+    measure(),
+    measure(note("c/3", "h", "bass"), note("d/3", "h", "bass")),
+    measure(note("f/3", "h", "bass"), note("g/3", "h", "bass")),
+    measure(),
+    measure(note("a/4", "w", "treble")),
+    measure(note("g/4", "h", "treble"), note("f/4", "h", "treble")),
+    measure(note("e/2", "h", "bass")),
+    measure(note("f/2", "h", "bass"), note("g/2", "h", "bass")),
+    measure(note("a/4", "w", "treble")),
+
+    measure(note("d/2", "h", "bass"), note("c/2", "h", "bass")),
+    measure(note("f/2", "w", "bass")),
+    measure(note("g/2", "h", "bass"), note("a/2", "h", "bass")),
+    measure(note("c/3", "w", "bass")),
+    measure(note("b/2", "w", "bass")),
+    measure(),
+    measure(note("a/2", "w", "bass")),
+    measure(note("b/2", "h", "bass"), note("c/3", "h", "bass")),
+    measure(note("d/3", "h", "bass"), note("e/3", "h", "bass")),
+    measure(note("g/3", "w", "bass")),
+    measure(note("e/5", "w", "treble")),
+    measure(note("d/5", "h", "treble"), note("c/5", "h", "treble")),
+
+    measure(note("b/3", "h", "bass"), note("a/3", "h", "bass")),
+    measure(note("g/3", "h", "bass"), note("f/3", "h", "bass")),
+    measure(note("e/3", "h", "bass"), note("d/3", "h", "bass")),
+    measure(note("c/2", "h", "bass"), note("d/2", "h", "bass")),
+    measure(note("e/2", "h", "bass"), note("f/2", "h", "bass")),
+    measure(note("g/2", "h", "bass"), note("a/2", "h", "bass")),
+    measure(note("b/2", "w", "bass")),
+    measure(note("d/3", "w", "bass")),
+    measure(note("f/3", "h", "treble"), note("g/3", "h", "bass")),
+    measure(note("a/4", "h", "treble"), note("b/4", "h", "treble")),
+    measure(note("c/5", "w", "treble")),
+
+    measure(),
+    measure(note("d/5", "h", "treble"), note("b/4", "h", "treble")),
+    measure(note("g/4", "w", "treble")),
+    measure(note("d/4", "h", "bass"), note("b/3", "h", "bass")),
+    measure(note("g/3", "w", "bass")),
+    measure(note("e/3", "h", "bass"), note("d/3", "h", "bass")),
+    measure(note("c/3", "h", "bass"), note("b/2", "h", "bass")),
+    measure(note("a/2", "h", "bass"), note("g/2", "h", "bass")),
+    measure(note("f/2", "w", "bass")),
+    measure(note("e/3", "h", "bass"), note("c/3", "h", "bass")),
+    measure(note("a/2", "w", "bass")),
+  ],
+};
+
+const FIXED_PRESETS: Record<FixedGrandStaffPresetId, FixedGrandStaffPreset> = {
+  pozzoli_2: POZZOLI_2_PRESET,
+  pozzoli_4: POZZOLI_4_PRESET,
+};
+
 function chunkMeasuresByCounts(measures: MeasureReading[], counts: number[]) {
   const out: MeasureReading[][] = [];
   let cursor = 0;
@@ -301,7 +384,7 @@ export default function LecturaGranPentagrama() {
 
   const staffRef = useRef<HTMLDivElement | null>(null);
   const metronomeIdRef = useRef<number | null>(null);
-  const fixedPreset = scorePresetId === "pozzoli_2" ? POZZOLI_2_PRESET : null;
+  const fixedPreset = scorePresetId === "generated" ? null : FIXED_PRESETS[scorePresetId];
   const activeTimeSignature = fixedPreset?.timeSignature ?? ([4, 4] as const);
   const activeSystemMeasureCounts = fixedPreset?.systemMeasureCounts ?? [4];
   const isFixedPreset = fixedPreset !== null;
@@ -745,6 +828,7 @@ export default function LecturaGranPentagrama() {
                 >
                   <MenuItem value="generated">Generado por presets</MenuItem>
                   <MenuItem value="pozzoli_2">Ejercicio 2 Pozzoli</MenuItem>
+                  <MenuItem value="pozzoli_4">Ejercicio 4 Pozzoli</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -832,7 +916,7 @@ export default function LecturaGranPentagrama() {
             ) : (
               <Grid item xs={12} md={8}>
                 <Typography variant="body2" color="text.secondary">
-                  {POZZOLI_2_PRESET.description}
+                  {fixedPreset.description}
                 </Typography>
               </Grid>
             )}
@@ -1063,27 +1147,27 @@ export default function LecturaGranPentagrama() {
           {isFixedPreset ? (
             <>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                Partitura fija: {POZZOLI_2_PRESET.name}
+                Partitura fija: {fixedPreset.name}
               </Typography>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                {POZZOLI_2_PRESET.description}
+                {fixedPreset.description}
               </Typography>
               <Stack direction="row" spacing={1} flexWrap="wrap">
                 <Chip
                   size="small"
-                  label={`${POZZOLI_2_PRESET.measures.length} compases`}
+                  label={`${fixedPreset.measures.length} compases`}
                   variant="outlined"
                   color="primary"
                 />
                 <Chip
                   size="small"
-                  label={POZZOLI_2_PRESET.systemMeasureCounts.join(" · ")}
+                  label={fixedPreset.systemMeasureCounts.join(" · ")}
                   variant="outlined"
                   color="secondary"
                 />
                 <Chip
                   size="small"
-                  label={`${POZZOLI_2_PRESET.timeSignature[0]}/${POZZOLI_2_PRESET.timeSignature[1]}`}
+                  label={`${fixedPreset.timeSignature[0]}/${fixedPreset.timeSignature[1]}`}
                   variant="outlined"
                 />
               </Stack>

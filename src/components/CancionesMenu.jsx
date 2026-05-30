@@ -25,6 +25,22 @@ export default function CancionesMenu() {
       archivo: "/dictados-react/src/Sopla.html",
       color: "#4ecdc4",
     },
+    {
+      id: "gloria-shekhina",
+      titulo: "Gloria Shekhiná",
+      artista: "Modo teatro",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/GloriaShekhina.html",
+      color: "#5c7cfa",
+    },
+    {
+      id: "hermoso-no-volvere-atras-db",
+      titulo: "Hermoso / No volveré atrás",
+      artista: "Toma Tu Lugar",
+      tonalidad: "Db",
+      archivo: "/dictados-react/src/HermosoNoVolvereAtrasDb.html",
+      color: "#2f9e44",
+    },
   ];
 
   const abrirCancion = (archivo) => {
@@ -104,18 +120,20 @@ export default function CancionesMenu() {
                   >
                     {cancion.tonalidad}
                   </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      bgcolor: "rgba(0,0,0,0.05)",
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {cancion.bpm} BPM
-                  </Typography>
+                  {cancion.bpm ? (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        bgcolor: "rgba(0,0,0,0.05)",
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 1,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {cancion.bpm} BPM
+                    </Typography>
+                  ) : null}
                 </Box>
                 <Button
                   variant="contained"
