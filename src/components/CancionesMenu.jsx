@@ -41,6 +41,14 @@ export default function CancionesMenu() {
       archivo: "/dictados-react/src/HermosoNoVolvereAtrasDb.html",
       color: "#2f9e44",
     },
+    {
+      id: "alaba-a-dios-e",
+      titulo: "Alaba a Dios",
+      artista: "Gladys Muñoz",
+      tonalidad: "E",
+      archivo: "/dictados-react/src/AlabaADiosE.html",
+      color: "#f08c00",
+    },
   ];
 
   const abrirCancion = (archivo) => {
