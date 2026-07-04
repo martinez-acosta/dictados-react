@@ -50,6 +50,14 @@ export default function CancionesMenu() {
       color: "#f08c00",
     },
     {
+      id: "danzare-e",
+      titulo: "Danzaré",
+      artista: "Conquistando Fronteras",
+      tonalidad: "E",
+      archivo: "/dictados-react/src/DanzareE.html",
+      color: "#e67700",
+    },
+    {
       id: "testigo-soy",
       titulo: "Testigo Soy",
       artista: "Passion / Conquistando Fronteras",
@@ -64,6 +72,14 @@ export default function CancionesMenu() {
       tonalidad: "C",
       archivo: "/dictados-react/src/LaSangreDeCristo.html",
       color: "#c92a2a",
+    },
+    {
+      id: "la-sangre-de-cristo-db",
+      titulo: "La Sangre de Cristo",
+      artista: "Conquistando Fronteras",
+      tonalidad: "Db",
+      archivo: "/dictados-react/src/LaSangreDeCristoDb.html",
+      color: "#862e9c",
     },
   ];
 
