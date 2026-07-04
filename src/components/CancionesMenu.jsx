@@ -49,6 +49,22 @@ export default function CancionesMenu() {
       archivo: "/dictados-react/src/AlabaADiosE.html",
       color: "#f08c00",
     },
+    {
+      id: "testigo-soy",
+      titulo: "Testigo Soy",
+      artista: "Passion / Conquistando Fronteras",
+      tonalidad: "C",
+      archivo: "/dictados-react/src/TestigoSoy.html",
+      color: "#12b886",
+    },
+    {
+      id: "la-sangre-de-cristo",
+      titulo: "La Sangre de Cristo",
+      artista: "Conquistando Fronteras",
+      tonalidad: "C",
+      archivo: "/dictados-react/src/LaSangreDeCristo.html",
+      color: "#c92a2a",
+    },
   ];
 
   const abrirCancion = (archivo) => {
