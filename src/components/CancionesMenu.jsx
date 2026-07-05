@@ -34,6 +34,14 @@ export default function CancionesMenu() {
       color: "#5c7cfa",
     },
     {
+      id: "gloria-y-majestad-e",
+      titulo: "Gloria y Majestad",
+      artista: "Conquistando Fronteras",
+      tonalidad: "E",
+      archivo: "/dictados-react/src/GloriaYMajestadE.html",
+      color: "#7048e8",
+    },
+    {
       id: "hermoso-no-volvere-atras-db",
       titulo: "Hermoso / No volveré atrás",
       artista: "Toma Tu Lugar",
