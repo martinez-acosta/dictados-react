@@ -42,6 +42,14 @@ export default function CancionesMenu() {
       color: "#7048e8",
     },
     {
+      id: "muestranos-tu-rostro-d",
+      titulo: "Muéstranos Tu Rostro",
+      artista: "Conquistando Fronteras",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/MuestranosTuRostroD.html",
+      color: "#1971c2",
+    },
+    {
       id: "hermoso-no-volvere-atras-db",
       titulo: "Hermoso / No volveré atrás",
       artista: "Toma Tu Lugar",
