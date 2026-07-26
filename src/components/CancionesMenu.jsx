@@ -74,6 +74,23 @@ export default function CancionesMenu() {
       color: "#e67700",
     },
     {
+      id: "hay-libertad-em",
+      titulo: "Hay Libertad",
+      artista: "Art Aguilera",
+      tonalidad: "Em",
+      archivo: "/dictados-react/src/HayLibertadEm.html",
+      color: "#0b7285",
+    },
+    {
+      id: "fiel-f",
+      titulo: "Fiel",
+      artista: "Majo y Dan",
+      tonalidad: "F",
+      bpm: 145,
+      archivo: "/dictados-react/src/FielF.html",
+      color: "#d9480f",
+    },
+    {
       id: "testigo-soy",
       titulo: "Testigo Soy",
       artista: "Passion / Conquistando Fronteras",

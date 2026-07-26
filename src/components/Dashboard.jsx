@@ -105,6 +105,19 @@ const EXERCISE_SECTIONS = [
         icon: LibraryMusic,
         iconColor: "#1e40af",
       },
+      {
+        route: "/equinox-cm",
+        title: "Equinox en Cm",
+        description:
+          "Partitura fija de John Coltrane con melodía, cifrado y línea de bajo en clave de Fa.",
+        buttonLabel: "Abrir Partitura",
+        buttonSx: {
+          backgroundColor: "#b45309",
+          "&:hover": { backgroundColor: "#92400e" },
+        },
+        icon: QueueMusic,
+        iconColor: "#b45309",
+      },
     ],
   },
   {

@@ -27,6 +27,7 @@ import ChordInversionsStudy from "./components/ChordInversionsStudy.tsx";
 import MajorScaleChordTableStudy from "./components/MajorScaleChordTableStudy.tsx";
 import SeventhChordHarmonicFieldStudy from "./components/SeventhChordHarmonicFieldStudy.tsx";
 import WorkbookTheory from "./components/WorkbookTheory.tsx";
+import EquinoxStudy from "./components/EquinoxStudy.tsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
@@ -50,6 +51,7 @@ createRoot(document.getElementById("root")).render(
         />
         <Route path="/arpegios-bajo" element={<BassArpeggiosPage />} />
         <Route path="/bajo-blues" element={<BassBluesPage />} />
+        <Route path="/equinox-cm" element={<EquinoxStudy />} />
         <Route path="/vocal" element={<VocalTrainer />} />
         <Route path="/triadas" element={<TriadTrainer />} />
         <Route path="/intervalos-trainer" element={<IntervalsTrainer />} />
