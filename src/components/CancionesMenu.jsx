@@ -58,6 +58,14 @@ export default function CancionesMenu() {
       color: "#2f9e44",
     },
     {
+      id: "hermoso-no-volvere-atras-c",
+      titulo: "Hermoso / No volveré atrás",
+      artista: "Toma Tu Lugar",
+      tonalidad: "C",
+      archivo: "/dictados-react/src/HermosoNoVolvereAtrasC.html",
+      color: "#099268",
+    },
+    {
       id: "alaba-a-dios-e",
       titulo: "Alaba a Dios",
       artista: "Gladys Muñoz",
