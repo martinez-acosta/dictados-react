@@ -92,6 +92,18 @@
   }
 
   function parseChordToken(token) {
+    const directMatch = token.match(CHORD_PATTERN);
+    if (directMatch) {
+      return {
+        leading: "",
+        core: token,
+        trailing: "",
+        root: normalizeNote(directMatch[1]),
+        suffix: directMatch[2] || "",
+        bass: directMatch[3] ? normalizeNote(directMatch[3]) : "",
+      };
+    }
+
     const wrapped = splitWrappedToken(token);
     if (!wrapped.core) return null;
 
