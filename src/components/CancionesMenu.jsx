@@ -133,6 +133,14 @@ export default function CancionesMenu() {
       color: "#c2255c",
     },
     {
+      id: "grande-eres-dios-g",
+      titulo: "Grande Eres Dios",
+      artista: "Bethel Music",
+      tonalidad: "G",
+      archivo: "/dictados-react/src/GrandeEresDiosG.html",
+      color: "#1864ab",
+    },
+    {
       id: "testigo-soy",
       titulo: "Testigo Soy",
       artista: "Passion / Conquistando Fronteras",
