@@ -398,12 +398,15 @@
       const preferFlats = shouldPreferFlats(parts.root, originalKey.minorSuffix);
 
       records.forEach((record) => {
-        record.node.nodeValue = transposeText(
-          record.original,
-          semitones,
-          preferFlats,
-          record.forceChordText,
-        );
+        record.node.nodeValue =
+          target === originalKey.full
+            ? record.original
+            : transposeText(
+                record.original,
+                semitones,
+                preferFlats,
+                record.forceChordText,
+              );
       });
 
       heading.textContent = originalHeading.replace(

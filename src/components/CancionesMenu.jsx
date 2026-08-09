@@ -124,6 +124,15 @@ export default function CancionesMenu() {
       color: "#e8590c",
     },
     {
+      id: "esa-es-la-razon-db",
+      titulo: "Esa Es La Razón",
+      artista: "Gateway Worship Español",
+      tonalidad: "Db",
+      bpm: 118,
+      archivo: "/dictados-react/src/EsaEsLaRazonDb.html",
+      color: "#c2255c",
+    },
+    {
       id: "testigo-soy",
       titulo: "Testigo Soy",
       artista: "Passion / Conquistando Fronteras",
