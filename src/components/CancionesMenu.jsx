@@ -141,6 +141,14 @@ export default function CancionesMenu() {
       color: "#1864ab",
     },
     {
+      id: "mi-fundamento-d",
+      titulo: "Mi Fundamento (Firm Foundation)",
+      artista: "The Belonging Co · Más Vida",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/MiFundamentoD.html",
+      color: "#5f3dc4",
+    },
+    {
       id: "testigo-soy",
       titulo: "Testigo Soy",
       artista: "Passion / Conquistando Fronteras",
