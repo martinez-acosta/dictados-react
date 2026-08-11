@@ -13,6 +13,10 @@ import {
   Remove,
   Add,
   RestartAlt,
+  CheckCircle,
+  RadioButtonUnchecked,
+  NavigateBefore,
+  NavigateNext,
 } from "@mui/icons-material";
 import {
   Box,
@@ -23,6 +27,7 @@ import {
   FormControlLabel,
   IconButton,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Paper,
   Select,
@@ -36,16 +41,31 @@ import * as Tone from "tone";
 
 type MeterId = "4/4" | "3/4" | "6/8";
 type Level = "Inicio" | "Intermedio" | "Reto";
-type PatternToken = "R" | "2" | "3" | "4" | "5" | "6" | "b7" | "8" | "G" | "-";
+type StageId = "fundamentos" | "control" | "compases" | "grooves";
+type PatternToken =
+  | "R"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "b7"
+  | "8"
+  | "G"
+  | "H"
+  | "-";
 
 type Groove = {
   id: string;
   name: string;
   feel: string;
+  stage: StageId;
   meter: MeterId;
   level: Level;
   description: string;
   tip: string;
+  counting: string;
+  recommendedBpm: number;
   subdivisionsPerPulse: number;
   stepUnit: "16n" | "8n" | "8t";
   bars: [PatternToken[], PatternToken[]];
@@ -54,31 +74,170 @@ type Groove = {
 const splitPattern = (pattern: string) =>
   pattern.trim().split(/\s+/) as PatternToken[];
 
+const STAGES: Array<{
+  id: StageId;
+  label: string;
+  shortLabel: string;
+  description: string;
+  color: string;
+}> = [
+  {
+    id: "fundamentos",
+    label: "Nivel 1 · Fundamentos",
+    shortLabel: "Fundamentos",
+    description: "Pulso, duración, silencios y subdivisión.",
+    color: "#0f766e",
+  },
+  {
+    id: "control",
+    label: "Nivel 2 · Control rítmico",
+    shortLabel: "Control",
+    description: "Contratiempos, anticipaciones y precisión.",
+    color: "#b45309",
+  },
+  {
+    id: "compases",
+    label: "Nivel 3 · Otros compases",
+    shortLabel: "Compases",
+    description: "Aprende a sentir 3/4 y 6/8 sin perder el pulso.",
+    color: "#2563eb",
+  },
+  {
+    id: "grooves",
+    label: "Nivel 4 · Grooves",
+    shortLabel: "Grooves",
+    description: "Aplica las bases en rock, blues, jazz y funk.",
+    color: "#be123c",
+  },
+];
+
 const GROOVES: Groove[] = [
   {
-    id: "rock-eighths",
-    name: "Corcheas firmes",
-    feel: "Rock",
+    id: "quarter-pulse",
+    name: "Pulso en negras",
+    feel: "Base 1",
+    stage: "fundamentos",
     meter: "4/4",
     level: "Inicio",
-    description: "Ocho ataques parejos por compás para fijar pulso y sonido.",
-    tip: "Alterna índice y medio. Busca que todas las notas duren y pesen igual.",
+    description:
+      "Una nota en cada pulso. Esta es la base para no correr ni quedarse atrás.",
+    tip: "Cuenta en voz alta y mueve el pie. Toca exactamente al mismo tiempo que el click.",
+    counting: "1 · 2 · 3 · 4",
+    recommendedBpm: 60,
     subdivisionsPerPulse: 4,
     stepUnit: "16n",
     bars: [
-      splitPattern("R - R - R - R - R - R - R - R -"),
-      splitPattern("R - R - 5 - R - 8 - 5 - R - R -"),
+      splitPattern("R H H H R H H H R H H H R H H H"),
+      splitPattern("R H H H R H H H R H H H R H H H"),
+    ],
+  },
+  {
+    id: "long-note-values",
+    name: "Redonda y blancas",
+    feel: "Base 2",
+    stage: "fundamentos",
+    meter: "4/4",
+    level: "Inicio",
+    description:
+      "Sostén primero una redonda de cuatro pulsos y después dos blancas de dos pulsos.",
+    tip: "No vuelvas a atacar mientras aparece la línea verde: deja sonar la nota completa.",
+    counting: "Redonda: 1–2–3–4 · Blancas: 1–2, 3–4",
+    recommendedBpm: 56,
+    subdivisionsPerPulse: 4,
+    stepUnit: "16n",
+    bars: [
+      splitPattern("R H H H H H H H H H H H H H H H"),
+      splitPattern("R H H H H H H H R H H H H H H H"),
+    ],
+  },
+  {
+    id: "quarter-rests",
+    name: "Negras y silencios",
+    feel: "Base 3",
+    stage: "fundamentos",
+    meter: "4/4",
+    level: "Inicio",
+    description:
+      "Aprende que el silencio también tiene duración y debe sentirse por dentro.",
+    tip: "Sigue contando durante los espacios grises. Silencio no significa perder el pulso.",
+    counting: "1 (toca) · 2 (silencio) · 3 (toca) · 4 (silencio)",
+    recommendedBpm: 60,
+    subdivisionsPerPulse: 4,
+    stepUnit: "16n",
+    bars: [
+      splitPattern("R H H H - - - - R H H H - - - -"),
+      splitPattern("- - - - R H H H - - - - R H H H"),
+    ],
+  },
+  {
+    id: "eighth-subdivision",
+    name: "Subdivisión en corcheas",
+    feel: "Base 4",
+    stage: "fundamentos",
+    meter: "4/4",
+    level: "Inicio",
+    description:
+      "Divide cada pulso en dos partes iguales y toca ocho notas por compás.",
+    tip: "La palabra «y» debe caer justo a la mitad entre dos números.",
+    counting: "1 y 2 y 3 y 4 y",
+    recommendedBpm: 64,
+    subdivisionsPerPulse: 4,
+    stepUnit: "16n",
+    bars: [
+      splitPattern("R H R H R H R H R H R H R H R H"),
+      splitPattern("R H R H 5 H R H R H 8 H 5 H R H"),
+    ],
+  },
+  {
+    id: "sixteenth-subdivision",
+    name: "Subdivisión en semicorcheas",
+    feel: "Base 5",
+    stage: "fundamentos",
+    meter: "4/4",
+    level: "Intermedio",
+    description:
+      "Divide cada pulso en cuatro partes iguales antes de entrar a las síncopas.",
+    tip: "Empieza muy lento. Si las cuatro notas no caben parejas, baja el tempo.",
+    counting: "1 e y a · 2 e y a · 3 e y a · 4 e y a",
+    recommendedBpm: 50,
+    subdivisionsPerPulse: 4,
+    stepUnit: "16n",
+    bars: [
+      splitPattern("R R R R R R R R R R R R R R R R"),
+      splitPattern("R R 5 R R R 5 R 8 R 5 R R 5 R R"),
+    ],
+  },
+  {
+    id: "eighth-offbeats",
+    name: "Contratiempos de corchea",
+    feel: "Control 1",
+    stage: "control",
+    meter: "4/4",
+    level: "Intermedio",
+    description:
+      "Toca en las «y» mientras mantienes los números únicamente en tu conteo.",
+    tip: "No adivines el contratiempo: siente primero el número y coloca la nota después.",
+    counting: "1 Y 2 Y 3 Y 4 Y · toca solamente las Y",
+    recommendedBpm: 58,
+    subdivisionsPerPulse: 4,
+    stepUnit: "16n",
+    bars: [
+      splitPattern("- - R H - - R H - - R H - - R H"),
+      splitPattern("R H - - - - R H R H - - - - R H"),
     ],
   },
   {
     id: "rock-push",
-    name: "Empuje de rock",
-    feel: "Rock",
+    name: "Anticipaciones y síncopa",
+    feel: "Control 2",
+    stage: "control",
     meter: "4/4",
     level: "Intermedio",
     description:
-      "Negras sólidas con anticipaciones que empujan al siguiente pulso.",
+      "Combina pulsos fuertes con notas que se adelantan al siguiente tiempo.",
     tip: "Haz cortas las notas antes de cada anticipación; deja respirar el silencio.",
+    counting: "1 e y a · localiza cada ataque antes de tocar",
+    recommendedBpm: 66,
     subdivisionsPerPulse: 4,
     stepUnit: "16n",
     bars: [
@@ -87,46 +246,71 @@ const GROOVES: Groove[] = [
     ],
   },
   {
-    id: "funk-pocket",
-    name: "Síncopa con ghost notes",
-    feel: "Funk",
-    meter: "4/4",
-    level: "Reto",
+    id: "waltz-bass",
+    name: "Sentir el 3/4",
+    feel: "Vals",
+    stage: "compases",
+    meter: "3/4",
+    level: "Inicio",
     description:
-      "Contratiempos y notas fantasma para trabajar precisión y pocket.",
-    tip: "Las × son ghost notes: apaga las cuerdas con la mano izquierda y ataca suave.",
+      "Tres pulsos por compás: fundamental fuerte y dos apoyos ligeros.",
+    tip: "Acentúa el 1 y siente 2–3 más ligeros. No agregues un cuarto pulso.",
+    counting: "1 · 2 · 3",
+    recommendedBpm: 66,
     subdivisionsPerPulse: 4,
     stepUnit: "16n",
     bars: [
-      splitPattern("R - - G - R - - 8 - G - 5 - R -"),
-      splitPattern("R - 5 - - G R - - R - G 5 - - R"),
+      splitPattern("R H H H 5 H H H 5 H H H"),
+      splitPattern("R H R H 5 H H H 3 H H H"),
     ],
   },
   {
-    id: "walking-line",
-    name: "Walking esencial",
-    feel: "Jazz",
-    meter: "4/4",
-    level: "Intermedio",
+    id: "six-eight-drive",
+    name: "Sentir el 6/8",
+    feel: "Balada",
+    stage: "compases",
+    meter: "6/8",
+    level: "Inicio",
     description:
-      "Una nota por pulso con dirección melódica hacia la siguiente vuelta.",
-    tip: "Deja caminar cada negra hasta la siguiente, sin cortar el sonido demasiado pronto.",
+      "Seis corcheas agrupadas en dos pulsos grandes: 1-2-3 y 4-5-6.",
+    tip: "Marca con el pie solo 1 y 4, aunque cuentes las seis corcheas.",
+    counting: "UNO 2 3 · CUATRO 5 6",
+    recommendedBpm: 58,
+    subdivisionsPerPulse: 3,
+    stepUnit: "8n",
+    bars: [splitPattern("R H R 5 H R"), splitPattern("R 5 H 8 H 5")],
+  },
+  {
+    id: "rock-eighths",
+    name: "Rock en corcheas",
+    feel: "Rock",
+    stage: "grooves",
+    meter: "4/4",
+    level: "Inicio",
+    description:
+      "Aplica las corcheas con cambios de fundamental, quinta y octava.",
+    tip: "Alterna índice y medio. Busca que todas las notas duren y pesen igual.",
+    counting: "1 y 2 y 3 y 4 y",
+    recommendedBpm: 78,
     subdivisionsPerPulse: 4,
     stepUnit: "16n",
     bars: [
-      splitPattern("R - - - 3 - - - 5 - - - 6 - - -"),
-      splitPattern("b7 - - - 6 - - - 5 - - - 2 - - -"),
+      splitPattern("R - R - R - R - R - R - R - R -"),
+      splitPattern("R - R - 5 - R - 8 - 5 - R - R -"),
     ],
   },
   {
     id: "shuffle-blues",
     name: "Shuffle de blues",
     feel: "Blues",
+    stage: "grooves",
     meter: "4/4",
     level: "Intermedio",
     description:
       "Cada pulso se divide en tres: largo–corto, con sensación ternaria.",
-    tip: "Cuenta «1-la-li, 2-la-li» y siente el espacio central antes del segundo ataque.",
+    tip: "Siente el espacio central antes del segundo ataque de cada pulso.",
+    counting: "1-la-li · 2-la-li · 3-la-li · 4-la-li",
+    recommendedBpm: 72,
     subdivisionsPerPulse: 3,
     stepUnit: "8t",
     bars: [
@@ -135,31 +319,42 @@ const GROOVES: Groove[] = [
     ],
   },
   {
-    id: "waltz-bass",
-    name: "Vals: bajo y apoyo",
-    feel: "Vals",
-    meter: "3/4",
-    level: "Inicio",
-    description: "Tres pulsos por compás: fundamental fuerte y apoyos ligeros.",
-    tip: "Acentúa el 1 y siente 2–3 más ligeros. No conviertas el vals en 4/4.",
+    id: "walking-line",
+    name: "Walking esencial",
+    feel: "Jazz",
+    stage: "grooves",
+    meter: "4/4",
+    level: "Intermedio",
+    description:
+      "Una nota por pulso con dirección melódica hacia la siguiente vuelta.",
+    tip: "Deja caminar cada negra hasta la siguiente, sin cortar el sonido demasiado pronto.",
+    counting: "1 · 2 · 3 · 4",
+    recommendedBpm: 76,
     subdivisionsPerPulse: 4,
     stepUnit: "16n",
     bars: [
-      splitPattern("R - - - 5 - - - 5 - - -"),
-      splitPattern("R - R - 5 - - - 3 - - -"),
+      splitPattern("R H H H 3 H H H 5 H H H 6 H H H"),
+      splitPattern("b7 H H H 6 H H H 5 H H H 2 H H H"),
     ],
   },
   {
-    id: "six-eight-drive",
-    name: "Impulso en 6/8",
-    feel: "Balada",
-    meter: "6/8",
-    level: "Inicio",
-    description: "Seis corcheas agrupadas en dos pulsos grandes: 1-2-3, 4-5-6.",
-    tip: "Siente dos pulsos grandes. Acentúa 1 y 4, aunque cuentes las seis corcheas.",
-    subdivisionsPerPulse: 3,
-    stepUnit: "8n",
-    bars: [splitPattern("R - R 5 - R"), splitPattern("R 5 - 8 - 5")],
+    id: "funk-pocket",
+    name: "Síncopa con ghost notes",
+    feel: "Funk",
+    stage: "grooves",
+    meter: "4/4",
+    level: "Reto",
+    description:
+      "Contratiempos y notas fantasma para trabajar precisión y pocket.",
+    tip: "Las × son ghost notes: apaga las cuerdas con la mano izquierda y ataca suave.",
+    counting: "1 e y a · cuenta las 16 subdivisiones",
+    recommendedBpm: 72,
+    subdivisionsPerPulse: 4,
+    stepUnit: "16n",
+    bars: [
+      splitPattern("R - - G - R - - 8 - G - 5 - R -"),
+      splitPattern("R - 5 - - G R - - R - G 5 - - R"),
+    ],
   },
 ];
 
@@ -241,22 +436,29 @@ const LEVEL_COLOR: Record<Level, string> = {
 };
 
 const countLabel = (index: number, groove: Groove) => {
+  if (groove.meter === "6/8") return String(index + 1);
   const part = index % groove.subdivisionsPerPulse;
   const beat = Math.floor(index / groove.subdivisionsPerPulse) + 1;
   if (part === 0) return String(beat);
-  if (groove.subdivisionsPerPulse === 4) return ["", "e", "+", "a"][part];
+  if (groove.subdivisionsPerPulse === 4) return ["", "e", "y", "a"][part];
   if (groove.subdivisionsPerPulse === 3) return ["", "la", "li"][part];
   return "+";
 };
 
 const tokenLabel = (token: PatternToken, root: string) => {
-  if (token === "-") return "";
+  if (token === "-" || token === "H") return "";
   if (token === "G") return "×";
   const semitones = TOKEN_TO_SEMITONES[token] ?? 0;
   const useFlats = root.includes("b") || root === "F";
   const labels = useFlats ? NOTE_LABELS_FLAT : NOTE_LABELS_SHARP;
   const label = labels[(ROOT_SEMITONES[root] + semitones) % 12];
   return semitones >= 12 ? `${label}↑` : label;
+};
+
+const sustainedStepCount = (bar: PatternToken[], startIndex: number) => {
+  let steps = 1;
+  while (bar[startIndex + steps] === "H") steps += 1;
+  return steps;
 };
 
 function MeterBadge({ meter }: { meter: MeterId }) {
@@ -353,6 +555,7 @@ function RhythmBar({
             isPlaying && activeBar === barIndex && activeStep === stepIndex;
           const isGhost = token === "G";
           const isRest = token === "-";
+          const isHold = token === "H";
           return (
             <Box
               key={`${barIndex}-${stepIndex}`}
@@ -391,14 +594,17 @@ function RhythmBar({
               </Typography>
               <Box
                 sx={{
-                  width: isRest ? 8 : isGhost ? 22 : 28,
-                  height: isRest ? 2 : isGhost ? 22 : 28,
+                  width: isRest ? 8 : isHold ? 22 : isGhost ? 22 : 28,
+                  height: isRest || isHold ? 3 : isGhost ? 22 : 28,
                   borderRadius: isGhost ? 1 : "50%",
-                  bgcolor: isRest
-                    ? "#c6d1d3"
-                    : isGhost
-                      ? "transparent"
-                      : "#0b3c45",
+                  bgcolor:
+                    isRest || isHold
+                      ? isHold
+                        ? "#0f8a78"
+                        : "#c6d1d3"
+                      : isGhost
+                        ? "transparent"
+                        : "#0b3c45",
                   border: isGhost ? "2px solid #bb5e36" : "none",
                   color: "#bb5e36",
                   display: "grid",
@@ -436,12 +642,27 @@ export default function BassRhythmLab() {
   const [selectedId, setSelectedId] = useState(GROOVES[0].id);
   const [meterFilter, setMeterFilter] = useState<"Todos" | MeterId>("Todos");
   const [root, setRoot] = useState("E");
-  const [bpm, setBpm] = useState(84);
+  const [bpm, setBpm] = useState(GROOVES[0].recommendedBpm);
   const [bassGuide, setBassGuide] = useState(true);
   const [metronome, setMetronome] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playhead, setPlayhead] = useState(-1);
   const [loops, setLoops] = useState(0);
+  const [completedIds, setCompletedIds] = useState<string[]>(() => {
+    try {
+      const saved = window.localStorage.getItem("bass-rhythm-progress");
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed)
+        ? Array.from(
+            new Set(
+              parsed.filter((id) => GROOVES.some((item) => item.id === id)),
+            ),
+          )
+        : [];
+    } catch {
+      return [];
+    }
+  });
   const bassSynthRef = useRef<Tone.MonoSynth | null>(null);
   const clickSynthRef = useRef<Tone.Synth | null>(null);
   const scheduleIdRef = useRef<number | null>(null);
@@ -463,6 +684,10 @@ export default function BassRhythmLab() {
   const totalSteps = stepsPerBar * groove.bars.length;
   const activeBar = playhead >= 0 ? Math.floor(playhead / stepsPerBar) : -1;
   const activeStep = playhead >= 0 ? playhead % stepsPerBar : -1;
+  const currentIndex = GROOVES.findIndex((item) => item.id === groove.id);
+  const currentStage =
+    STAGES.find((stage) => stage.id === groove.stage) ?? STAGES[0];
+  const completionPercent = (completedIds.length / GROOVES.length) * 100;
 
   const stop = useCallback(() => {
     Tone.Transport.stop();
@@ -537,15 +762,21 @@ export default function BassRhythmLab() {
         );
       }
 
-      if (bassGuide && token !== "-") {
+      if (bassGuide && token !== "-" && token !== "H") {
         const ghost = token === "G";
         const semitones = ghost ? 0 : (TOKEN_TO_SEMITONES[token] ?? 0);
         const note = Tone.Frequency(ROOT_TO_BASS_NOTE[root])
           .transpose(semitones)
           .toNote();
+        const durationSteps = ghost
+          ? 1
+          : sustainedStepCount(groove.bars[barIndex], stepIndex);
+        const duration = ghost
+          ? "64n"
+          : Tone.Time(groove.stepUnit).toSeconds() * durationSteps * 0.92;
         bassSynthRef.current?.triggerAttackRelease(
           note,
-          ghost ? "64n" : groove.stepUnit === "16n" ? "16n" : "8n",
+          duration,
           time,
           ghost ? 0.16 : stepIndex === 0 ? 0.88 : 0.66,
         );
@@ -600,6 +831,15 @@ export default function BassRhythmLab() {
   }, [togglePlayback]);
 
   useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "bass-rhythm-progress",
+        JSON.stringify(completedIds),
+      );
+    } catch {}
+  }, [completedIds]);
+
+  useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
@@ -616,7 +856,22 @@ export default function BassRhythmLab() {
     if (id === selectedId) return;
     stop();
     setSelectedId(id);
+    const selected = GROOVES.find((item) => item.id === id);
+    if (selected) setBpm(selected.recommendedBpm);
     setLoops(0);
+  };
+
+  const toggleCompleted = () => {
+    setCompletedIds((current) =>
+      current.includes(groove.id)
+        ? current.filter((id) => id !== groove.id)
+        : [...current, groove.id],
+    );
+  };
+
+  const goToRelativeExercise = (offset: number) => {
+    const next = GROOVES[currentIndex + offset];
+    if (next) selectGroove(next.id);
   };
 
   const meterExplanation =
@@ -656,7 +911,7 @@ export default function BassRhythmLab() {
             <Box sx={{ maxWidth: 760 }}>
               <Chip
                 icon={<GraphicEq />}
-                label="LABORATORIO DE GROOVE"
+                label="RUTA PROGRESIVA DE RITMO"
                 sx={{
                   mb: 2,
                   bgcolor: "rgba(255,255,255,.12)",
@@ -690,8 +945,8 @@ export default function BassRhythmLab() {
                   maxWidth: 650,
                 }}
               >
-                Escucha, lee y toca líneas de bajo en 4/4, 3/4 y 6/8. El cursor
-                te muestra exactamente dónde cae cada ataque.
+                Empieza con pulso y figuras básicas. Avanza paso a paso hasta
+                tocar líneas de bajo en rock, blues, jazz y funk.
               </Typography>
             </Box>
             <Stack direction="row" spacing={1} sx={{ pb: 0.5 }}>
@@ -757,6 +1012,12 @@ export default function BassRhythmLab() {
                 <Typography variant="caption" sx={{ color: "#70878b" }}>
                   BPM ={" "}
                   {groove.meter === "6/8" ? "pulso con puntillo" : "negra"}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#0f766e", display: "block", fontWeight: 800 }}
+                >
+                  Recomendado: {groove.recommendedBpm} BPM
                 </Typography>
               </Box>
             </Stack>
@@ -854,6 +1115,107 @@ export default function BassRhythmLab() {
           </Stack>
         </Paper>
 
+        <Paper
+          elevation={0}
+          sx={{
+            mt: 2,
+            p: { xs: 2, md: 2.5 },
+            borderRadius: 4,
+            border: "1px solid #d8e5e2",
+            bgcolor: "#fff",
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            alignItems={{ xs: "stretch", md: "center" }}
+          >
+            <Box sx={{ flex: 1 }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 1 }}
+              >
+                <Box>
+                  <Typography
+                    variant="overline"
+                    sx={{ color: currentStage.color, fontWeight: 900 }}
+                  >
+                    {currentStage.label}
+                  </Typography>
+                  <Typography sx={{ color: "#173f46", fontWeight: 900 }}>
+                    Ejercicio {currentIndex + 1} de {GROOVES.length}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "#637b7f", fontWeight: 800 }}
+                >
+                  {completedIds.length} completados
+                </Typography>
+              </Stack>
+              <LinearProgress
+                variant="determinate"
+                value={completionPercent}
+                aria-label="Progreso de la ruta de ritmo"
+                sx={{
+                  height: 9,
+                  borderRadius: 99,
+                  bgcolor: "#e4eeec",
+                  "& .MuiLinearProgress-bar": {
+                    bgcolor: "#0f766e",
+                    borderRadius: 99,
+                  },
+                }}
+              />
+            </Box>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              sx={{ minWidth: { md: 460 } }}
+            >
+              <Button
+                variant="outlined"
+                startIcon={<NavigateBefore />}
+                disabled={currentIndex === 0}
+                onClick={() => goToRelativeExercise(-1)}
+                sx={{ textTransform: "none" }}
+              >
+                Anterior
+              </Button>
+              <Button
+                variant={
+                  completedIds.includes(groove.id) ? "outlined" : "contained"
+                }
+                color="success"
+                startIcon={
+                  completedIds.includes(groove.id) ? (
+                    <CheckCircle />
+                  ) : (
+                    <RadioButtonUnchecked />
+                  )
+                }
+                onClick={toggleCompleted}
+                sx={{ textTransform: "none", fontWeight: 800 }}
+              >
+                {completedIds.includes(groove.id)
+                  ? "Completado"
+                  : "Marcar completado"}
+              </Button>
+              <Button
+                variant="outlined"
+                endIcon={<NavigateNext />}
+                disabled={currentIndex === GROOVES.length - 1}
+                onClick={() => goToRelativeExercise(1)}
+                sx={{ textTransform: "none" }}
+              >
+                Siguiente
+              </Button>
+            </Stack>
+          </Stack>
+        </Paper>
+
         <Box
           sx={{
             display: "grid",
@@ -875,12 +1237,15 @@ export default function BassRhythmLab() {
               variant="overline"
               sx={{ color: "#5e777b", fontWeight: 900, letterSpacing: 1.2 }}
             >
-              ELIGE UN GROOVE
+              RUTA DE APRENDIZAJE
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#6a8084", mt: 0.25 }}>
+              Sigue el orden para construir una base rítmica sólida.
             </Typography>
             <Stack
               direction="row"
               spacing={0.75}
-              sx={{ mt: 1, mb: 2, flexWrap: "wrap", gap: 0.75 }}
+              sx={{ mt: 1.5, mb: 2.5, flexWrap: "wrap", gap: 0.75 }}
             >
               {(["Todos", "4/4", "3/4", "6/8"] as const).map((meter) => (
                 <Chip
@@ -894,64 +1259,117 @@ export default function BassRhythmLab() {
                 />
               ))}
             </Stack>
-            <Stack spacing={1.25}>
-              {visibleGrooves.map((item) => {
-                const selected = item.id === groove.id;
+            <Stack spacing={2.5}>
+              {STAGES.map((stage) => {
+                const stageGrooves = visibleGrooves.filter(
+                  (item) => item.stage === stage.id,
+                );
+                if (!stageGrooves.length) return null;
                 return (
-                  <Button
-                    key={item.id}
-                    onClick={() => selectGroove(item.id)}
-                    aria-pressed={selected}
-                    sx={{
-                      p: 1.5,
-                      justifyContent: "flex-start",
-                      textAlign: "left",
-                      textTransform: "none",
-                      borderRadius: 2.5,
-                      border: selected
-                        ? "2px solid #0f766e"
-                        : "1px solid #dce6e4",
-                      bgcolor: selected ? "#e7f5f1" : "white",
-                      color: "#173f46",
-                      "&:hover": { bgcolor: selected ? "#e0f2ed" : "#f6faf9" },
-                    }}
-                  >
-                    <Box sx={{ width: "100%" }}>
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        spacing={1}
-                      >
-                        <Typography sx={{ fontWeight: 900, lineHeight: 1.2 }}>
-                          {item.name}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontFamily: "Georgia, serif",
-                            fontWeight: 900,
-                            color: "#0f766e",
-                          }}
-                        >
-                          {item.meter}
-                        </Typography>
-                      </Stack>
-                      <Stack direction="row" spacing={0.75} sx={{ mt: 0.75 }}>
-                        <Typography variant="caption" sx={{ color: "#6a8084" }}>
-                          {item.feel}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: LEVEL_COLOR[item.level],
-                            fontWeight: 800,
-                          }}
-                        >
-                          · {item.level}
-                        </Typography>
-                      </Stack>
-                    </Box>
-                  </Button>
+                  <Box key={stage.id}>
+                    <Typography
+                      sx={{
+                        color: stage.color,
+                        fontWeight: 900,
+                        fontSize: 14,
+                      }}
+                    >
+                      {stage.label}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#7a8d90", display: "block", mb: 1 }}
+                    >
+                      {stage.description}
+                    </Typography>
+                    <Stack spacing={0.8}>
+                      {stageGrooves.map((item) => {
+                        const selected = item.id === groove.id;
+                        const itemIndex = GROOVES.findIndex(
+                          (candidate) => candidate.id === item.id,
+                        );
+                        const completed = completedIds.includes(item.id);
+                        return (
+                          <Button
+                            key={item.id}
+                            onClick={() => selectGroove(item.id)}
+                            aria-pressed={selected}
+                            sx={{
+                              p: 1.2,
+                              justifyContent: "flex-start",
+                              textAlign: "left",
+                              textTransform: "none",
+                              borderRadius: 2.5,
+                              border: selected
+                                ? `2px solid ${stage.color}`
+                                : "1px solid #dce6e4",
+                              bgcolor: selected ? `${stage.color}12` : "white",
+                              color: "#173f46",
+                              "&:hover": {
+                                bgcolor: selected
+                                  ? `${stage.color}18`
+                                  : "#f6faf9",
+                              },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 28,
+                                minWidth: 28,
+                                height: 28,
+                                borderRadius: "50%",
+                                mr: 1.1,
+                                display: "grid",
+                                placeItems: "center",
+                                bgcolor: completed ? stage.color : "#edf3f2",
+                                color: completed ? "white" : "#647b7f",
+                                fontSize: 12,
+                                fontWeight: 900,
+                              }}
+                            >
+                              {completed ? (
+                                <CheckCircle sx={{ fontSize: 18 }} />
+                              ) : (
+                                itemIndex + 1
+                              )}
+                            </Box>
+                            <Box sx={{ width: "100%" }}>
+                              <Stack
+                                direction="row"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                spacing={1}
+                              >
+                                <Typography
+                                  sx={{ fontWeight: 900, lineHeight: 1.2 }}
+                                >
+                                  {item.name}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontFamily: "Georgia, serif",
+                                    fontWeight: 900,
+                                    color: stage.color,
+                                  }}
+                                >
+                                  {item.meter}
+                                </Typography>
+                              </Stack>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: LEVEL_COLOR[item.level],
+                                  fontWeight: 800,
+                                }}
+                              >
+                                {item.feel} · {item.level}
+                              </Typography>
+                            </Box>
+                          </Button>
+                        );
+                      })}
+                    </Stack>
+                  </Box>
                 );
               })}
             </Stack>
@@ -980,13 +1398,19 @@ export default function BassRhythmLab() {
                     sx={{ mb: 0.75 }}
                   >
                     <Chip
-                      label={groove.feel}
+                      label={currentStage.shortLabel}
                       size="small"
                       sx={{
-                        bgcolor: "#173f46",
+                        bgcolor: currentStage.color,
                         color: "white",
                         fontWeight: 800,
                       }}
+                    />
+                    <Chip
+                      label={groove.feel}
+                      size="small"
+                      variant="outlined"
+                      sx={{ color: "#173f46", fontWeight: 800 }}
                     />
                     <Chip
                       label={groove.level}
@@ -1012,6 +1436,12 @@ export default function BassRhythmLab() {
                   </Typography>
                   <Typography sx={{ color: "#61787d", mt: 0.5 }}>
                     {groove.description}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#829397", fontWeight: 800 }}
+                  >
+                    Paso {currentIndex + 1} de {GROOVES.length}
                   </Typography>
                 </Box>
                 <Stack direction="row" spacing={1} alignItems="center">
@@ -1053,6 +1483,31 @@ export default function BassRhythmLab() {
                 borderBottom: "1px solid #eee6d6",
               }}
             >
+              <Box
+                sx={{
+                  mb: 2.5,
+                  p: 1.75,
+                  borderRadius: 2.5,
+                  bgcolor: "#fff",
+                  border: "1px solid #eadfca",
+                }}
+              >
+                <Typography
+                  variant="overline"
+                  sx={{ color: "#a65d00", fontWeight: 900 }}
+                >
+                  CUENTA EN VOZ ALTA
+                </Typography>
+                <Typography
+                  sx={{
+                    color: "#173f46",
+                    fontWeight: 900,
+                    fontSize: { xs: 16, md: 19 },
+                  }}
+                >
+                  {groove.counting}
+                </Typography>
+              </Box>
               <Box
                 sx={{
                   overflowX: "auto",
@@ -1110,6 +1565,15 @@ export default function BassRhythmLab() {
                     —
                   </Box>{" "}
                   espacio / silencio
+                </Typography>
+                <Typography variant="caption" sx={{ color: "#536c70" }}>
+                  <Box
+                    component="span"
+                    sx={{ color: "#0f8a78", fontWeight: 900 }}
+                  >
+                    ━
+                  </Box>{" "}
+                  sostener la nota
                 </Typography>
               </Stack>
             </Box>
