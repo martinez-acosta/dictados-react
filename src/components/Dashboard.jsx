@@ -51,6 +51,19 @@ const EXERCISE_SECTIONS = [
     icon: MusicNote,
     items: [
       {
+        route: "/bajo-ritmo",
+        title: "Laboratorio de Ritmo",
+        description:
+          "Practica grooves de bajo en 4/4, 3/4 y 6/8 con pulso visual, tempo y acompañamiento.",
+        buttonLabel: "Practicar Ritmo",
+        buttonSx: {
+          backgroundColor: "#0f766e",
+          "&:hover": { backgroundColor: "#0b5c55" },
+        },
+        icon: AccessTime,
+        iconColor: "#0f766e",
+      },
+      {
         route: "/bajo-suite",
         title: "Suite Bajo (Escala + Arpegios)",
         description:
