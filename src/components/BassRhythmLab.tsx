@@ -522,29 +522,29 @@ function RhythmBar({
   isPlaying: boolean;
 }) {
   return (
-    <Box sx={{ minWidth: { xs: 560, md: 0 } }}>
+    <Box sx={{ minWidth: 0, width: "100%" }}>
       <Stack
         direction="row"
         justifyContent="space-between"
         alignItems="center"
-        sx={{ mb: 1 }}
+        sx={{ mb: 0.75 }}
       >
         <Typography
-          variant="overline"
-          sx={{ color: "#527078", fontWeight: 800, letterSpacing: 1.2 }}
+          variant="caption"
+          sx={{ color: "#527078", fontWeight: 900 }}
         >
-          Compás {barIndex + 1}
+          {barIndex === 0 ? "A" : "B"} · Compás {barIndex + 1}
         </Typography>
         <Typography variant="caption" sx={{ color: "#6b7f84" }}>
-          {barIndex === 0 ? "Pregunta" : "Respuesta"}
+          {barIndex === 0 ? "Escucha" : "Repite"}
         </Typography>
       </Stack>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: `repeat(${bar.length}, minmax(28px, 1fr))`,
-          border: "2px solid #173f46",
-          borderRadius: 2,
+          gridTemplateColumns: `repeat(${bar.length}, minmax(0, 1fr))`,
+          border: "1px solid #bfd0cd",
+          borderRadius: 1.5,
           overflow: "hidden",
           bgcolor: "#fffdf7",
         }}
@@ -560,32 +560,33 @@ function RhythmBar({
             <Box
               key={`${barIndex}-${stepIndex}`}
               sx={{
-                minHeight: 98,
+                minWidth: 0,
+                minHeight: { xs: 70, sm: 82, md: 90 },
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "space-between",
-                py: 1,
+                py: { xs: 0.7, sm: 0.9 },
                 borderLeft:
                   stepIndex === 0
                     ? 0
                     : isBeat
-                      ? "2px solid #7d999e"
+                      ? "1.5px solid #7d999e"
                       : "1px solid #dce7e8",
                 bgcolor: isActive
                   ? "#ffe5a8"
                   : isBeat
                     ? "rgba(8, 116, 106, 0.045)"
                     : "transparent",
-                boxShadow: isActive ? "inset 0 -5px 0 #f59e0b" : "none",
+                boxShadow: isActive ? "inset 0 -4px 0 #f59e0b" : "none",
                 transition: "background-color 80ms ease",
               }}
             >
               <Typography
                 aria-hidden="true"
                 sx={{
-                  fontSize: 11,
+                  fontSize: { xs: 9, sm: 10 },
                   color: isBeat ? "#0f766e" : "#819398",
                   fontWeight: isBeat ? 900 : 700,
                 }}
@@ -594,8 +595,19 @@ function RhythmBar({
               </Typography>
               <Box
                 sx={{
-                  width: isRest ? 8 : isHold ? 22 : isGhost ? 22 : 28,
-                  height: isRest || isHold ? 3 : isGhost ? 22 : 28,
+                  width: isRest
+                    ? 6
+                    : isHold
+                      ? { xs: 12, sm: 18 }
+                      : isGhost
+                        ? { xs: 16, sm: 20 }
+                        : { xs: 17, sm: 23 },
+                  height:
+                    isRest || isHold
+                      ? 3
+                      : isGhost
+                        ? { xs: 16, sm: 20 }
+                        : { xs: 17, sm: 23 },
                   borderRadius: isGhost ? 1 : "50%",
                   bgcolor:
                     isRest || isHold
@@ -610,7 +622,7 @@ function RhythmBar({
                   display: "grid",
                   placeItems: "center",
                   fontWeight: 900,
-                  fontSize: 18,
+                  fontSize: { xs: 13, sm: 16 },
                   transform: isGhost ? "rotate(45deg)" : "none",
                 }}
               >
@@ -620,8 +632,10 @@ function RhythmBar({
               </Box>
               <Typography
                 sx={{
-                  minHeight: 17,
-                  fontSize: 11,
+                  minHeight: 13,
+                  maxWidth: "100%",
+                  overflow: "hidden",
+                  fontSize: { xs: 8, sm: 10 },
                   lineHeight: 1,
                   color: isGhost ? "#a54d2b" : "#34555c",
                   fontWeight: 800,
@@ -878,6 +892,649 @@ export default function BassRhythmLab() {
     groove.meter === "6/8"
       ? "6 corcheas · 2 pulsos grandes"
       : `${groove.meter[0]} pulsos · la negra vale 1`;
+
+  const selectStage = (stageId: StageId) => {
+    const firstExercise = GROOVES.find((item) => item.stage === stageId);
+    if (firstExercise) selectGroove(firstExercise.id);
+  };
+
+  return (
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f7faf9", color: "#173f46" }}>
+      <Box
+        component="header"
+        sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          bgcolor: "rgba(255,255,255,.96)",
+          backdropFilter: "blur(14px)",
+          borderBottom: "1px solid #dce7e5",
+        }}
+      >
+        <Container maxWidth="xl" sx={{ px: { xs: 1.25, sm: 2.5 } }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={{ xs: 1, sm: 1.5 }}
+            sx={{ minHeight: { xs: 60, sm: 68 } }}
+          >
+            <IconButton
+              aria-label="Volver al inicio"
+              onClick={() => navigate("/")}
+              size="small"
+            >
+              <ArrowBack />
+            </IconButton>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                component="h1"
+                sx={{
+                  fontSize: { xs: 17, sm: 20 },
+                  lineHeight: 1.1,
+                  fontWeight: 900,
+                  letterSpacing: "-.02em",
+                }}
+              >
+                Ritmo para bajo
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "#6c8184", display: { xs: "none", sm: "block" } }}
+              >
+                De pulso básico a groove
+              </Typography>
+            </Box>
+            <Box sx={{ width: { xs: 92, sm: 180 } }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                sx={{ mb: 0.5 }}
+              >
+                <Typography variant="caption" sx={{ color: "#61777a" }}>
+                  Progreso
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                  {completedIds.length}/{GROOVES.length}
+                </Typography>
+              </Stack>
+              <LinearProgress
+                variant="determinate"
+                value={completionPercent}
+                sx={{
+                  height: 5,
+                  borderRadius: 99,
+                  bgcolor: "#e4ecea",
+                  "& .MuiLinearProgress-bar": { bgcolor: "#0f766e" },
+                }}
+              />
+            </Box>
+          </Stack>
+        </Container>
+      </Box>
+
+      <Container
+        maxWidth="xl"
+        sx={{ px: { xs: 1.25, sm: 2.5 }, pt: { xs: 1.5, sm: 2.5 }, pb: 4 }}
+      >
+        <Box
+          component="nav"
+          aria-label="Niveles de la ruta"
+          sx={{
+            display: "flex",
+            gap: { xs: 0.5, sm: 1 },
+            overflowX: "auto",
+            borderBottom: "1px solid #dce7e5",
+            mb: { xs: 1.5, sm: 2.5 },
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
+          {STAGES.map((stage, index) => {
+            const active = stage.id === groove.stage;
+            return (
+              <Button
+                key={stage.id}
+                onClick={() => selectStage(stage.id)}
+                aria-current={active ? "step" : undefined}
+                sx={{
+                  flexShrink: 0,
+                  minWidth: 0,
+                  px: { xs: 1, sm: 1.5 },
+                  pb: 1.15,
+                  borderRadius: 0,
+                  borderBottom: active
+                    ? `3px solid ${stage.color}`
+                    : "3px solid transparent",
+                  color: active ? stage.color : "#6a7e81",
+                  textTransform: "none",
+                  fontWeight: active ? 900 : 700,
+                  fontSize: { xs: 12, sm: 14 },
+                }}
+              >
+                {index + 1}. {stage.shortLabel}
+              </Button>
+            );
+          })}
+        </Box>
+
+        <FormControl
+          fullWidth
+          size="small"
+          sx={{ display: { xs: "block", lg: "none" }, mb: 2 }}
+        >
+          <InputLabel id="rhythm-exercise-label">Ejercicio</InputLabel>
+          <Select
+            labelId="rhythm-exercise-label"
+            value={selectedId}
+            label="Ejercicio"
+            onChange={(event) => selectGroove(event.target.value)}
+          >
+            {GROOVES.map((item, index) => (
+              <MenuItem key={item.id} value={item.id}>
+                {index + 1}. {item.name} · {item.meter}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", lg: "250px minmax(0, 1fr)" },
+            gap: { lg: 3.5, xl: 5 },
+            alignItems: "start",
+          }}
+        >
+          <Box
+            component="aside"
+            sx={{
+              display: { xs: "none", lg: "block" },
+              position: "sticky",
+              top: 94,
+              maxHeight: "calc(100vh - 112px)",
+              overflowY: "auto",
+              pr: 2.5,
+              borderRight: "1px solid #dce7e5",
+            }}
+          >
+            {STAGES.map((stage) => (
+              <Box key={stage.id} sx={{ mb: 2.25 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: stage.color,
+                    fontWeight: 900,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.7,
+                  }}
+                >
+                  {stage.shortLabel}
+                </Typography>
+                <Box sx={{ mt: 0.6 }}>
+                  {GROOVES.filter((item) => item.stage === stage.id).map(
+                    (item) => {
+                      const itemIndex = GROOVES.findIndex(
+                        (candidate) => candidate.id === item.id,
+                      );
+                      const active = item.id === groove.id;
+                      const complete = completedIds.includes(item.id);
+                      return (
+                        <Button
+                          key={item.id}
+                          fullWidth
+                          onClick={() => selectGroove(item.id)}
+                          sx={{
+                            justifyContent: "flex-start",
+                            gap: 1,
+                            minHeight: 38,
+                            px: 0.75,
+                            py: 0.65,
+                            borderRadius: 1,
+                            borderLeft: active
+                              ? `3px solid ${stage.color}`
+                              : "3px solid transparent",
+                            bgcolor: active
+                              ? `${stage.color}0d`
+                              : "transparent",
+                            color: active ? "#173f46" : "#667b7e",
+                            textAlign: "left",
+                            textTransform: "none",
+                            "&:hover": { bgcolor: "#edf4f2" },
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 21,
+                              minWidth: 21,
+                              height: 21,
+                              borderRadius: "50%",
+                              display: "grid",
+                              placeItems: "center",
+                              bgcolor: complete ? stage.color : "#e7efed",
+                              color: complete ? "white" : "#6b7f82",
+                              fontSize: 10,
+                              fontWeight: 900,
+                            }}
+                          >
+                            {complete ? (
+                              <CheckCircle sx={{ fontSize: 15 }} />
+                            ) : (
+                              itemIndex + 1
+                            )}
+                          </Box>
+                          <Typography sx={{ fontSize: 13, fontWeight: 750 }}>
+                            {item.name}
+                          </Typography>
+                        </Button>
+                      );
+                    },
+                  )}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+
+          <Box component="main" sx={{ minWidth: 0 }}>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              spacing={2}
+            >
+              <Box sx={{ minWidth: 0 }}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{ mb: 0.75 }}
+                >
+                  <Typography
+                    variant="overline"
+                    sx={{ color: currentStage.color, fontWeight: 900 }}
+                  >
+                    Paso {currentIndex + 1} de {GROOVES.length}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "#a8b8b5",
+                      display: { xs: "none", sm: "block" },
+                    }}
+                  >
+                    /
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "#657a7d",
+                      display: { xs: "none", sm: "block" },
+                    }}
+                  >
+                    {currentStage.label}
+                  </Typography>
+                </Stack>
+                <Typography
+                  component="h2"
+                  sx={{
+                    fontSize: { xs: 27, sm: 34, md: 40 },
+                    lineHeight: 1.04,
+                    fontWeight: 900,
+                    letterSpacing: "-.04em",
+                  }}
+                >
+                  {groove.name}
+                </Typography>
+              </Box>
+              <Box
+                aria-label={`Compás ${groove.meter}`}
+                sx={{
+                  flexShrink: 0,
+                  px: { xs: 1, sm: 1.4 },
+                  py: 0.6,
+                  border: "1px solid #b9cbc8",
+                  borderRadius: 1.5,
+                  fontFamily: "Georgia, serif",
+                  fontSize: { xs: 19, sm: 23 },
+                  fontWeight: 900,
+                }}
+              >
+                {groove.meter}
+              </Box>
+            </Stack>
+
+            <Typography
+              sx={{
+                mt: 1,
+                color: "#63777a",
+                fontSize: { xs: 14, sm: 16 },
+                maxWidth: 780,
+              }}
+            >
+              {groove.description}
+            </Typography>
+
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={{ xs: 0.4, sm: 2 }}
+              sx={{ mt: 1.1 }}
+            >
+              <Typography variant="caption" sx={{ color: "#708386" }}>
+                {meterExplanation}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "#0f766e", fontWeight: 900 }}
+              >
+                Tempo sugerido: {groove.recommendedBpm} BPM
+              </Typography>
+            </Stack>
+
+            <Box
+              sx={{
+                mt: { xs: 2, sm: 2.5 },
+                py: 1.4,
+                borderTop: "1px solid #d9e5e2",
+                borderBottom: "1px solid #d9e5e2",
+                display: { xs: "block", sm: "flex" },
+                alignItems: "baseline",
+                gap: 1.5,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "#9a6300",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                }}
+              >
+                Cuenta
+              </Typography>
+              <Typography
+                sx={{ fontSize: { xs: 16, sm: 18 }, fontWeight: 900 }}
+              >
+                {groove.counting}
+              </Typography>
+            </Box>
+
+            <Stack spacing={{ xs: 1.75, sm: 2.25 }} sx={{ mt: 2.5 }}>
+              {groove.bars.map((bar, index) => (
+                <RhythmBar
+                  key={`${groove.id}-${index}`}
+                  groove={groove}
+                  bar={bar}
+                  barIndex={index}
+                  root={root}
+                  activeBar={activeBar}
+                  activeStep={activeStep}
+                  isPlaying={isPlaying}
+                />
+              ))}
+            </Stack>
+
+            <Box
+              sx={{
+                mt: 2,
+                display: "flex",
+                flexWrap: "wrap",
+                columnGap: 2,
+                rowGap: 0.5,
+                color: "#667b7e",
+              }}
+            >
+              <Typography variant="caption">
+                <b style={{ color: "#0b3c45" }}>●</b> tocar
+              </Typography>
+              <Typography variant="caption">
+                <b style={{ color: "#0f8a78" }}>━</b> sostener
+              </Typography>
+              <Typography variant="caption">
+                <b style={{ color: "#a8b5b6" }}>—</b> silencio
+              </Typography>
+              <Typography variant="caption">
+                <b style={{ color: "#a54d2b" }}>×</b> ghost note
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                mt: 2.25,
+                pl: 1.5,
+                borderLeft: "3px solid #e8a31a",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#9a6300", fontWeight: 900 }}
+              >
+                CONSEJO
+              </Typography>
+              <Typography sx={{ color: "#5f7376", fontSize: 14 }}>
+                {groove.tip}
+              </Typography>
+            </Box>
+
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              spacing={1}
+              sx={{ mt: 2.5, mb: 2 }}
+            >
+              <IconButton
+                aria-label="Ejercicio anterior"
+                disabled={currentIndex === 0}
+                onClick={() => goToRelativeExercise(-1)}
+                sx={{ border: "1px solid #d3e0de" }}
+              >
+                <NavigateBefore />
+              </IconButton>
+              <Button
+                variant={completedIds.includes(groove.id) ? "text" : "outlined"}
+                color="success"
+                startIcon={
+                  completedIds.includes(groove.id) ? (
+                    <CheckCircle />
+                  ) : (
+                    <RadioButtonUnchecked />
+                  )
+                }
+                onClick={toggleCompleted}
+                sx={{ textTransform: "none", fontWeight: 900 }}
+              >
+                {completedIds.includes(groove.id)
+                  ? "Completado"
+                  : "Marcar completado"}
+              </Button>
+              <IconButton
+                aria-label="Siguiente ejercicio"
+                disabled={currentIndex === GROOVES.length - 1}
+                onClick={() => goToRelativeExercise(1)}
+                sx={{ border: "1px solid #d3e0de" }}
+              >
+                <NavigateNext />
+              </IconButton>
+            </Stack>
+
+            <Box
+              sx={{
+                position: "sticky",
+                bottom: { xs: 0, sm: 10 },
+                zIndex: 15,
+                mx: { xs: -1.25, sm: 0 },
+                mt: 2,
+                p: { xs: 1.25, sm: 1.5 },
+                bgcolor: "rgba(255,255,255,.97)",
+                backdropFilter: "blur(16px)",
+                border: "1px solid #cbdad7",
+                borderRadius: { xs: "12px 12px 0 0", sm: 2.5 },
+                boxShadow: "0 -8px 26px rgba(18,57,64,.09)",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr auto",
+                    sm: "minmax(260px, 1fr) 105px auto",
+                  },
+                  gap: { xs: 1, sm: 1.5 },
+                  alignItems: "center",
+                }}
+              >
+                <Box sx={{ minWidth: 0 }}>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                      Tempo
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#0f766e", fontWeight: 900 }}
+                    >
+                      {bpm} BPM
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={0.4} alignItems="center">
+                    <IconButton
+                      aria-label="Bajar 5 BPM"
+                      size="small"
+                      onClick={() => setBpm((value) => Math.max(45, value - 5))}
+                    >
+                      <Remove fontSize="small" />
+                    </IconButton>
+                    <Slider
+                      value={bpm}
+                      min={45}
+                      max={180}
+                      step={1}
+                      onChange={(_, value) => setBpm(value as number)}
+                      aria-label="Tempo en BPM"
+                      sx={{ color: "#0f766e", py: 1 }}
+                    />
+                    <IconButton
+                      aria-label="Subir 5 BPM"
+                      size="small"
+                      onClick={() =>
+                        setBpm((value) => Math.min(180, value + 5))
+                      }
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                </Box>
+
+                <FormControl size="small" sx={{ minWidth: 88 }}>
+                  <InputLabel id="minimal-rhythm-root">Tono</InputLabel>
+                  <Select
+                    labelId="minimal-rhythm-root"
+                    value={root}
+                    label="Tono"
+                    onChange={(event) => {
+                      stop();
+                      setRoot(event.target.value);
+                    }}
+                  >
+                    {ROOTS.map((note) => (
+                      <MenuItem key={note} value={note}>
+                        {note}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  alignItems="center"
+                  sx={{
+                    gridColumn: { xs: "1 / -1", sm: "auto" },
+                    justifyContent: { xs: "space-between", sm: "flex-end" },
+                  }}
+                >
+                  <Stack direction="row" spacing={0.25}>
+                    <FormControlLabel
+                      sx={{
+                        mr: 0.5,
+                        "& .MuiFormControlLabel-label": { fontSize: 12 },
+                      }}
+                      control={
+                        <Switch
+                          size="small"
+                          checked={bassGuide}
+                          onChange={(event) => {
+                            stop();
+                            setBassGuide(event.target.checked);
+                          }}
+                          color="success"
+                        />
+                      }
+                      label="Guía"
+                    />
+                    <FormControlLabel
+                      sx={{
+                        mr: 0.5,
+                        "& .MuiFormControlLabel-label": { fontSize: 12 },
+                      }}
+                      control={
+                        <Switch
+                          size="small"
+                          checked={metronome}
+                          onChange={(event) => {
+                            stop();
+                            setMetronome(event.target.checked);
+                          }}
+                          color="warning"
+                        />
+                      }
+                      label="Click"
+                    />
+                  </Stack>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "#6d8083",
+                      display: { xs: "none", md: "block" },
+                    }}
+                  >
+                    Vuelta {loops}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    aria-label="Reiniciar vueltas"
+                    onClick={() => setLoops(0)}
+                    sx={{ display: { xs: "none", sm: "inline-flex" } }}
+                  >
+                    <RestartAlt fontSize="small" />
+                  </IconButton>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    startIcon={isPlaying ? <Pause /> : <PlayArrow />}
+                    onClick={togglePlayback}
+                    sx={{
+                      minWidth: { xs: 132, sm: 150 },
+                      bgcolor: isPlaying ? "#b45309" : "#0f766e",
+                      boxShadow: "none",
+                      textTransform: "none",
+                      fontWeight: 900,
+                      "&:hover": {
+                        bgcolor: isPlaying ? "#92400e" : "#0b5c55",
+                      },
+                    }}
+                  >
+                    {isPlaying ? "Detener" : "Practicar"}
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
+  );
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f1f7f5", pb: 7 }}>
