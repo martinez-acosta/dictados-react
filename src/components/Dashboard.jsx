@@ -24,23 +24,9 @@ import {
   QueueMusic,
   ExpandMore,
   ExpandLess,
+  ChevronRight,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
-const CARD_BASE_SX = {
-  p: { xs: 2, sm: 3 },
-  textAlign: "center",
-  cursor: "pointer",
-  transition: "all 0.25s ease",
-  border: "1px solid rgba(11, 42, 80, 0.06)",
-  height: "100%",
-  display: "flex",
-  flexDirection: "column",
-  "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: 6,
-  },
-};
 
 const EXERCISE_SECTIONS = [
   {
@@ -404,43 +390,74 @@ function ExerciseCard({ item, navigate }) {
   const Icon = item.icon;
 
   return (
-    <Paper sx={CARD_BASE_SX} onClick={() => navigate(item.route)}>
-      <Icon sx={{ fontSize: 64, color: item.iconColor, mb: 2 }} />
-      <Typography
-        variant="h5"
+    <Box
+      component="button"
+      type="button"
+      onClick={() => navigate(item.route)}
+      sx={{
+        width: "100%",
+        minHeight: { xs: 76, sm: 88 },
+        px: { xs: 1, sm: 1.5 },
+        py: { xs: 1.25, sm: 1.5 },
+        display: "grid",
+        gridTemplateColumns: "36px minmax(0, 1fr) 28px",
+        gap: { xs: 1, sm: 1.25 },
+        alignItems: "center",
+        textAlign: "left",
+        border: 0,
+        borderBottom: "1px solid #e4e9e8",
+        bgcolor: "transparent",
+        color: "#172b2d",
+        font: "inherit",
+        cursor: "pointer",
+        WebkitTapHighlightColor: "transparent",
+        "&:hover": { bgcolor: "#f2f7f5" },
+        "&:focus-visible": {
+          outline: "2px solid #0f766e",
+          outlineOffset: -2,
+        },
+      }}
+    >
+      <Box
         sx={{
-          fontWeight: 600,
-          mb: 1.5,
-          fontSize: { xs: "1.05rem", sm: "1.25rem", md: "1.35rem" },
-          lineHeight: 1.15,
+          width: 34,
+          height: 34,
+          borderRadius: "50%",
+          display: "grid",
+          placeItems: "center",
+          bgcolor: "#e8f1ef",
+          color: "#0f766e",
         }}
       >
-        {item.title}
-      </Typography>
-      <Typography
-        variant="body1"
-        sx={{
-          color: "text.secondary",
-          mb: 2.5,
-          flexGrow: 1,
-          fontSize: { xs: "0.9rem", sm: "1rem" },
-        }}
-      >
-        {item.description}
-      </Typography>
-      <Button
-        variant="contained"
-        color={item.buttonColor}
-        fullWidth
-        onClick={(event) => {
-          event.stopPropagation();
-          navigate(item.route);
-        }}
-        sx={{ py: 1.5, ...(item.buttonSx || {}) }}
-      >
-        {item.buttonLabel}
-      </Button>
-    </Paper>
+        <Icon sx={{ fontSize: 19 }} />
+      </Box>
+      <Box sx={{ minWidth: 0 }}>
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: { xs: 14, sm: 15 },
+            lineHeight: 1.25,
+          }}
+        >
+          {item.title}
+        </Typography>
+        <Typography
+          sx={{
+            mt: 0.35,
+            color: "#697779",
+            fontSize: { xs: 12, sm: 13 },
+            lineHeight: 1.35,
+            display: "-webkit-box",
+            WebkitBoxOrient: "vertical",
+            WebkitLineClamp: 2,
+            overflow: "hidden",
+          }}
+        >
+          {item.description}
+        </Typography>
+      </Box>
+      <ChevronRight sx={{ color: "#91a09e", fontSize: 22 }} />
+    </Box>
   );
 }
 
@@ -448,46 +465,50 @@ function SectionPanel({ section, navigate, isCollapsed, onToggle }) {
   const SectionIcon = section.icon;
 
   return (
-    <Paper
+    <Box
+      component="section"
       id={section.id}
-      variant="outlined"
       sx={{
-        p: { xs: 2, sm: 3 },
-        borderRadius: 3,
-        scrollMarginTop: "16px",
-        background:
-          "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,251,255,0.98) 100%)",
+        scrollMarginTop: "76px",
+        borderTop: "1px solid #dce3e1",
+        bgcolor: "#fff",
       }}
     >
       <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={1.5}
+        direction="row"
+        spacing={1}
         justifyContent="space-between"
-        alignItems={{ xs: "flex-start", sm: "center" }}
-        sx={{ mb: 2.5 }}
+        alignItems="center"
+        sx={{ py: { xs: 1.75, sm: 2.25 }, px: { xs: 1, sm: 1.5 } }}
       >
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1.25}
+          alignItems="center"
+          sx={{ minWidth: 0 }}
+        >
           <Box
             sx={{
-              width: 42,
-              height: 42,
-              borderRadius: 2,
+              width: 34,
+              minWidth: 34,
+              height: 34,
+              borderRadius: "50%",
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: `${section.accent}14`,
-              color: section.accent,
+              bgcolor: "#e8f1ef",
+              color: "#0f766e",
             }}
           >
-            <SectionIcon />
+            <SectionIcon sx={{ fontSize: 19 }} />
           </Box>
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Typography
-              variant="h5"
               sx={{
-                fontWeight: 700,
-                color: "#0b2a50",
-                fontSize: { xs: "1.05rem", sm: "1.3rem" },
+                fontWeight: 900,
+                color: "#172b2d",
+                fontSize: { xs: 16, sm: 19 },
+                lineHeight: 1.2,
               }}
             >
               {section.title}
@@ -496,23 +517,23 @@ function SectionPanel({ section, navigate, isCollapsed, onToggle }) {
               variant="body2"
               sx={{
                 color: "text.secondary",
-                fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                fontSize: { xs: 12, sm: 13 },
+                whiteSpace: { xs: "nowrap", sm: "normal" },
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               {section.subtitle}
             </Typography>
           </Box>
         </Stack>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Chip
-            label={`${section.items.length} ejercicios`}
-            sx={{
-              fontWeight: 600,
-              border: `1px solid ${section.accent}33`,
-              backgroundColor: `${section.accent}10`,
-              color: section.accent,
-            }}
-          />
+        <Stack direction="row" spacing={0.25} alignItems="center">
+          <Typography
+            variant="caption"
+            sx={{ color: "#6e7d7f", fontWeight: 800, whiteSpace: "nowrap" }}
+          >
+            {section.items.length}
+          </Typography>
           <IconButton
             onClick={onToggle}
             aria-label={
@@ -522,9 +543,7 @@ function SectionPanel({ section, navigate, isCollapsed, onToggle }) {
             }
             size="small"
             sx={{
-              border: `1px solid ${section.accent}33`,
-              color: section.accent,
-              backgroundColor: "white",
+              color: "#0f766e",
             }}
           >
             {isCollapsed ? (
@@ -537,20 +556,23 @@ function SectionPanel({ section, navigate, isCollapsed, onToggle }) {
       </Stack>
 
       <Collapse in={!isCollapsed}>
-        <Grid container spacing={2.5}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+            columnGap: { md: 3 },
+            px: { xs: 0, sm: 0.5 },
+            borderTop: "1px solid #e4e9e8",
+          }}
+        >
           {section.items.map((item) => (
-            <Grid item xs={12} sm={6} xl={4} key={item.route}>
+            <Box key={item.route} sx={{ minWidth: 0 }}>
               <ExerciseCard item={item} navigate={navigate} />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Collapse>
-      {isCollapsed && (
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Sección colapsada. Usa el botón para mostrar sus tarjetas.
-        </Typography>
-      )}
-    </Paper>
+    </Box>
   );
 }
 
@@ -599,6 +621,148 @@ export default function Dashboard() {
       }, {}),
     );
   };
+
+  return (
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f7f9f8", color: "#172b2d" }}>
+      <Box
+        component="header"
+        sx={{ bgcolor: "#fff", borderBottom: "1px solid #dce3e1" }}
+      >
+        <Container maxWidth="lg" sx={{ px: { xs: 1.5, sm: 3 } }}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            spacing={2}
+            sx={{ py: { xs: 3, sm: 4 } }}
+          >
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Box
+                sx={{
+                  width: { xs: 40, sm: 46 },
+                  height: { xs: 40, sm: 46 },
+                  borderRadius: "50%",
+                  bgcolor: "#e8f1ef",
+                  color: "#0f766e",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                <Home sx={{ fontSize: { xs: 21, sm: 24 } }} />
+              </Box>
+              <Box>
+                <Typography
+                  component="h1"
+                  sx={{
+                    fontSize: { xs: 24, sm: 32 },
+                    fontWeight: 900,
+                    lineHeight: 1.05,
+                    letterSpacing: "-.035em",
+                  }}
+                >
+                  Centro de práctica
+                </Typography>
+                <Typography
+                  sx={{
+                    mt: 0.5,
+                    color: "#687779",
+                    fontSize: { xs: 13, sm: 15 },
+                  }}
+                >
+                  Bajo, oído, lectura y ritmo en un solo lugar.
+                </Typography>
+              </Box>
+            </Stack>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Typography sx={{ color: "#667678", fontSize: 13 }}>
+                <Box
+                  component="span"
+                  sx={{ color: "#0f766e", fontWeight: 900 }}
+                >
+                  {totalExercises}
+                </Box>{" "}
+                ejercicios
+              </Typography>
+              <Button
+                size="small"
+                onClick={toggleAllSections}
+                sx={{
+                  color: "#0f766e",
+                  textTransform: "none",
+                  fontWeight: 800,
+                }}
+              >
+                {allCollapsed ? "Mostrar todo" : "Cerrar todo"}
+              </Button>
+            </Stack>
+          </Stack>
+
+          <Box
+            component="nav"
+            aria-label="Secciones"
+            sx={{
+              display: "flex",
+              gap: { xs: 0.25, sm: 1 },
+              overflowX: "auto",
+              scrollbarWidth: "none",
+              "&::-webkit-scrollbar": { display: "none" },
+            }}
+          >
+            {EXERCISE_SECTIONS.map((section) => (
+              <Button
+                key={`simple-nav-${section.id}`}
+                component="a"
+                href={`#${section.id}`}
+                onClick={() => expandSection(section.id)}
+                sx={{
+                  flexShrink: 0,
+                  minWidth: 0,
+                  px: { xs: 1, sm: 1.25 },
+                  pb: 1.25,
+                  color: "#526467",
+                  borderRadius: 0,
+                  borderBottom: "2px solid transparent",
+                  textTransform: "none",
+                  fontSize: { xs: 12, sm: 13 },
+                  fontWeight: 800,
+                  "&:hover": {
+                    color: "#0f766e",
+                    borderBottomColor: "#0f766e",
+                    bgcolor: "transparent",
+                  },
+                }}
+              >
+                {section.title}
+              </Button>
+            ))}
+          </Box>
+        </Container>
+      </Box>
+
+      <Container
+        component="main"
+        maxWidth="lg"
+        sx={{ px: { xs: 1.5, sm: 3 }, py: { xs: 2, sm: 3.5 } }}
+      >
+        <Box
+          sx={{
+            bgcolor: "#fff",
+            borderBottom: "1px solid #dce3e1",
+          }}
+        >
+          {EXERCISE_SECTIONS.map((section) => (
+            <SectionPanel
+              key={section.id}
+              section={section}
+              navigate={navigate}
+              isCollapsed={collapsedSections[section.id]}
+              onToggle={() => toggleSection(section.id)}
+            />
+          ))}
+        </Box>
+      </Container>
+    </Box>
+  );
 
   return (
     <Container
