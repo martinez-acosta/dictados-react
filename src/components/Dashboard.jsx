@@ -386,6 +386,13 @@ const EXERCISE_SECTIONS = [
   },
 ];
 
+const SECTION_SHORT_LABELS = {
+  bajo: "Bajo",
+  "solfeo-auditivo": "Oído y lectura",
+  ritmica: "Ritmo",
+  utilidades: "Herramientas",
+};
+
 function ExerciseCard({ item, navigate }) {
   const Icon = item.icon;
 
@@ -578,6 +585,7 @@ function SectionPanel({ section, navigate, isCollapsed, onToggle }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [activeSectionId, setActiveSectionId] = React.useState("bajo");
   const [collapsedSections, setCollapsedSections] = React.useState(() =>
     EXERCISE_SECTIONS.reduce((acc, section) => {
       acc[section.id] = false;
@@ -588,6 +596,9 @@ export default function Dashboard() {
     (acc, section) => acc + section.items.length,
     0,
   );
+  const activeSection =
+    EXERCISE_SECTIONS.find((section) => section.id === activeSectionId) ??
+    EXERCISE_SECTIONS[0];
   const collapsedCount = EXERCISE_SECTIONS.reduce(
     (acc, section) => acc + (collapsedSections[section.id] ? 1 : 0),
     0,
@@ -673,68 +684,83 @@ export default function Dashboard() {
                 </Typography>
               </Box>
             </Stack>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Typography sx={{ color: "#667678", fontSize: 13 }}>
-                <Box
-                  component="span"
-                  sx={{ color: "#0f766e", fontWeight: 900 }}
-                >
-                  {totalExercises}
-                </Box>{" "}
-                ejercicios
-              </Typography>
-              <Button
-                size="small"
-                onClick={toggleAllSections}
-                sx={{
-                  color: "#0f766e",
-                  textTransform: "none",
-                  fontWeight: 800,
-                }}
-              >
-                {allCollapsed ? "Mostrar todo" : "Cerrar todo"}
-              </Button>
-            </Stack>
+            <Typography sx={{ color: "#667678", fontSize: 13 }}>
+              <Box component="span" sx={{ color: "#0f766e", fontWeight: 900 }}>
+                {totalExercises}
+              </Box>{" "}
+              ejercicios en 4 áreas
+            </Typography>
           </Stack>
 
           <Box
             component="nav"
-            aria-label="Secciones"
+            aria-label="Áreas de práctica"
+            role="tablist"
             sx={{
-              display: "flex",
-              gap: { xs: 0.25, sm: 1 },
-              overflowX: "auto",
-              scrollbarWidth: "none",
-              "&::-webkit-scrollbar": { display: "none" },
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(2, 1fr)",
+                sm: "repeat(4, 1fr)",
+              },
+              border: "1px solid #cfdad8",
+              borderBottom: 0,
             }}
           >
-            {EXERCISE_SECTIONS.map((section) => (
-              <Button
-                key={`simple-nav-${section.id}`}
-                component="a"
-                href={`#${section.id}`}
-                onClick={() => expandSection(section.id)}
-                sx={{
-                  flexShrink: 0,
-                  minWidth: 0,
-                  px: { xs: 1, sm: 1.25 },
-                  pb: 1.25,
-                  color: "#526467",
-                  borderRadius: 0,
-                  borderBottom: "2px solid transparent",
-                  textTransform: "none",
-                  fontSize: { xs: 12, sm: 13 },
-                  fontWeight: 800,
-                  "&:hover": {
-                    color: "#0f766e",
-                    borderBottomColor: "#0f766e",
-                    bgcolor: "transparent",
-                  },
-                }}
-              >
-                {section.title}
-              </Button>
-            ))}
+            {EXERCISE_SECTIONS.map((section, index) => {
+              const isActive = activeSectionId === section.id;
+              return (
+                <Button
+                  key={`area-${section.id}`}
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveSectionId(section.id)}
+                  sx={{
+                    minWidth: 0,
+                    minHeight: { xs: 58, sm: 64 },
+                    px: 1,
+                    py: 1,
+                    borderRadius: 0,
+                    borderRight: {
+                      xs: index % 2 === 0 ? "1px solid #cfdad8" : 0,
+                      sm:
+                        index < EXERCISE_SECTIONS.length - 1
+                          ? "1px solid #cfdad8"
+                          : 0,
+                    },
+                    borderBottom: {
+                      xs: index < 2 ? "1px solid #cfdad8" : 0,
+                      sm: 0,
+                    },
+                    bgcolor: isActive ? "#0f766e" : "#fff",
+                    color: isActive ? "#fff" : "#45585b",
+                    textTransform: "none",
+                    "&:hover": {
+                      bgcolor: isActive ? "#0f766e" : "#edf4f2",
+                    },
+                  }}
+                >
+                  <Box sx={{ textAlign: "left", width: "100%" }}>
+                    <Typography
+                      sx={{
+                        fontSize: { xs: 13, sm: 14 },
+                        fontWeight: 900,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {SECTION_SHORT_LABELS[section.id]}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: isActive ? "rgba(255,255,255,.75)" : "#7b8a8c",
+                      }}
+                    >
+                      {section.items.length} ejercicios
+                    </Typography>
+                  </Box>
+                </Button>
+              );
+            })}
           </Box>
         </Container>
       </Box>
@@ -744,21 +770,73 @@ export default function Dashboard() {
         maxWidth="lg"
         sx={{ px: { xs: 1.5, sm: 3 }, py: { xs: 2, sm: 3.5 } }}
       >
-        <Box
-          sx={{
-            bgcolor: "#fff",
-            borderBottom: "1px solid #dce3e1",
-          }}
-        >
-          {EXERCISE_SECTIONS.map((section) => (
-            <SectionPanel
-              key={section.id}
-              section={section}
-              navigate={navigate}
-              isCollapsed={collapsedSections[section.id]}
-              onToggle={() => toggleSection(section.id)}
-            />
-          ))}
+        <Box sx={{ bgcolor: "#fff", border: "1px solid #dce3e1" }}>
+          <Box sx={{ px: { xs: 1.5, sm: 2.5 }, py: { xs: 2, sm: 2.5 } }}>
+            <Typography
+              variant="overline"
+              sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
+            >
+              Área seleccionada
+            </Typography>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              spacing={2}
+            >
+              <Box>
+                <Typography
+                  component="h2"
+                  sx={{
+                    mt: 0.25,
+                    fontSize: { xs: 22, sm: 27 },
+                    fontWeight: 900,
+                    lineHeight: 1.1,
+                    letterSpacing: "-.025em",
+                  }}
+                >
+                  {activeSection.title}
+                </Typography>
+                <Typography
+                  sx={{
+                    mt: 0.75,
+                    color: "#687779",
+                    fontSize: { xs: 13, sm: 14 },
+                  }}
+                >
+                  {activeSection.subtitle}
+                </Typography>
+              </Box>
+              <Typography
+                sx={{
+                  color: "#0f766e",
+                  fontSize: 13,
+                  fontWeight: 900,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {activeSection.items.length} ejercicios
+              </Typography>
+            </Stack>
+          </Box>
+
+          <Box
+            role="tabpanel"
+            aria-label={activeSection.title}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "repeat(2, minmax(0, 1fr))",
+              },
+              columnGap: { md: 3 },
+              borderTop: "1px solid #dce3e1",
+            }}
+          >
+            {activeSection.items.map((item) => (
+              <ExerciseCard key={item.route} item={item} navigate={navigate} />
+            ))}
+          </Box>
         </Box>
       </Container>
     </Box>
