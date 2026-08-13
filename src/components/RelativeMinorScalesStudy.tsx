@@ -2829,22 +2829,12 @@ export default function RelativeMinorScalesStudy() {
     resetFlashcardAttempt();
   }, [majorOnlyMode]);
 
-  const isMultipleChoice =
-    question.type === "majorToMinor" ||
-    question.type === "minorToMajor" ||
-    question.type === "countAccidentals" ||
-    question.type === "identifyKeyByAccidentals" ||
-    question.type === "identifyAccidentalType" ||
-    question.type === "orderOfAccidentals" ||
-    question.type === "identifyKeyBySignatureType";
-  const isWriteScale =
-    question.type === "writeMajor" ||
-    question.type === "writeMinor" ||
-    question.type === "writeMinorFromMajor";
-  const isIdentifyDegree =
-    question.type === "identifySixth" ||
-    question.type === "identifyNthDegree" ||
-    question.type === "identifyNthDegreeMinor";
+  // The answer UI follows the data carried by each question. This keeps every
+  // question answerable even when two prompts share a type but need different
+  // controls (for example, one note versus a complete seven-note scale).
+  const isMultipleChoice = Boolean(question.options?.length);
+  const isWriteScale = Boolean(question.answerArray?.length);
+  const isTextAnswer = Boolean(question.answer) && !isMultipleChoice;
 
   const answered = isEvaluated;
   let isCorrect = false;
@@ -2858,7 +2848,7 @@ export default function RelativeMinorScalesStudy() {
           val.trim().toLowerCase() ===
           (question.answerArray?.[i] || "").toLowerCase(),
       );
-    } else if (isIdentifyDegree) {
+    } else if (isTextAnswer) {
       isCorrect =
         textInput.trim().toLowerCase() ===
         (question.answer || "").toLowerCase();
@@ -5899,7 +5889,7 @@ export default function RelativeMinorScalesStudy() {
             </Stack>
           )}
 
-          {isIdentifyDegree && (
+          {isTextAnswer && (
             <Stack spacing={2} direction="row" alignItems="center">
               <TextField
                 size="small"
@@ -5958,7 +5948,7 @@ export default function RelativeMinorScalesStudy() {
                           {question.answer}
                         </Typography>
                       )}
-                      {isIdentifyDegree && (
+                      {isTextAnswer && (
                         <Typography variant="body2" sx={{ ml: 0.5 }}>
                           {question.answer}
                         </Typography>
