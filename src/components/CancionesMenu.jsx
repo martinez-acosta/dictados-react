@@ -83,6 +83,14 @@ export default function CancionesMenu() {
       color: "#d6336c",
     },
     {
+      id: "lo-haras-otra-vez-b",
+      titulo: "Lo Harás Otra Vez",
+      artista: "Elevation Worship",
+      tonalidad: "B",
+      archivo: "/dictados-react/src/LoHarasOtraVezB.html",
+      color: "#1c7ed6",
+    },
+    {
       id: "alaba-a-dios-e",
       titulo: "Alaba a Dios",
       artista: "Gladys Muñoz",
