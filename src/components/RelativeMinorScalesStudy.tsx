@@ -73,15 +73,66 @@ function normalizeAccidentals(text: string) {
     .trim();
 }
 
+const SOLFEGE_TO_AMERICAN: Record<string, string> = {
+  do: "C",
+  re: "D",
+  mi: "E",
+  fa: "F",
+  sol: "G",
+  la: "A",
+  si: "B",
+};
+
+function normalizeMusicalToken(value: string) {
+  return normalizeAccidentals(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/sostenidos?/g, "#")
+    .replace(/bemol(?:es)?/g, "b")
+    .replace(/\s+/g, "");
+}
+
 function normalizeAmericanScaleNote(note: string) {
-  return normalizeAccidentals(note).replace(/\s+/g, "").toLowerCase();
+  const compact = normalizeMusicalToken(note);
+  const match = compact.match(/^(do|re|mi|fa|sol|la|si|[a-g])([b#])?$/);
+
+  if (!match) return compact;
+
+  const root = SOLFEGE_TO_AMERICAN[match[1]] || match[1].toUpperCase();
+  return `${root}${match[2] || ""}`;
+}
+
+function normalizeMusicalKey(key: string) {
+  let compact = normalizeMusicalToken(key);
+  const isMinor = /(menor|minor|m)$/.test(compact);
+
+  compact = compact
+    .replace(/(menor|minor|m)$/, "")
+    .replace(/(mayor|major)$/, "");
+
+  const root = normalizeAmericanScaleNote(compact);
+  return `${root}${isMinor ? "m" : ""}`;
 }
 
 function normalizeAmericanMinorKey(key: string) {
-  const compact = normalizeAccidentals(key).replace(/\s+/g, "");
-  const match = compact.match(/^([a-g])(b|#)?(m|minor)$/i);
-  if (!match) return compact.toLowerCase();
-  return `${match[1].toUpperCase()}${match[2] || ""}m`;
+  return normalizeMusicalKey(key);
+}
+
+function normalizeNoteSequence(value: string) {
+  const symbolicNames = normalizeAccidentals(value)
+    .replace(/\s+sostenido\b/gi, "#")
+    .replace(/\s+bemol\b/gi, "b")
+    .trim();
+
+  if (symbolicNames === "-") return "-";
+
+  return symbolicNames
+    .replace(/[;,/]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(normalizeAmericanScaleNote)
+    .join(" ");
 }
 
 function gradePracticeRowState(
@@ -142,6 +193,8 @@ type QuizQuestionType =
   | "minorToMajor"
   | "writeMajor"
   | "writeMinor"
+  | "writeFlatScale"
+  | "writeSharpScale"
   | "identifySixth"
   | "identifyNthDegree"
   | "countAccidentals"
@@ -157,6 +210,8 @@ const ALL_QUIZ_TYPES: QuizQuestionType[] = [
   "minorToMajor",
   "writeMajor",
   "writeMinor",
+  "writeFlatScale",
+  "writeSharpScale",
   "identifySixth",
   "identifyNthDegree",
   "countAccidentals",
@@ -560,7 +615,29 @@ function createQuizQuestion(
   const pickedType =
     enabledTypes[Math.floor(Math.random() * enabledTypes.length)];
 
-  if (pickedType === "writeMajor") {
+  if (pickedType === "writeFlatScale") {
+    const flatScale =
+      FLAT_SUBTABLE[Math.floor(Math.random() * FLAT_SUBTABLE.length)];
+    const accidentalLabel =
+      flatScale.count === 1 ? "1 bemol" : `${flatScale.count} bemoles`;
+
+    return {
+      type: "writeFlatScale",
+      questionText: `Escribe las 7 notas de ${flatScale.tonalityEn} mayor (${accidentalLabel}):`,
+      answerArray: flatScale.majorScale.slice(0, 7),
+    };
+  } else if (pickedType === "writeSharpScale") {
+    const sharpScale =
+      SHARP_SUBTABLE[Math.floor(Math.random() * SHARP_SUBTABLE.length)];
+    const accidentalLabel =
+      sharpScale.count === 1 ? "1 sostenido" : `${sharpScale.count} sostenidos`;
+
+    return {
+      type: "writeSharpScale",
+      questionText: `Escribe las 7 notas de ${sharpScale.tonalityEn} mayor (${accidentalLabel}):`,
+      answerArray: sharpScale.majorScale.slice(0, 7),
+    };
+  } else if (pickedType === "writeMajor") {
     return {
       type: "writeMajor",
       questionText: `Escribe las 7 notas de la escala de ${target.major} en orden:`,
@@ -726,6 +803,30 @@ function createQuizQuestion(
   }
 }
 
+function isQuizScaleAnswerCorrect(question: QuizQuestion, inputs: string[]) {
+  return inputs.every(
+    (value, index) =>
+      normalizeAmericanScaleNote(value) ===
+      normalizeAmericanScaleNote(question.answerArray?.[index] || ""),
+  );
+}
+
+function isQuizTextAnswerCorrect(question: QuizQuestion, input: string) {
+  if (!question.answer) return false;
+
+  if (question.type === "writeMajor") {
+    return (
+      normalizeAmericanMajorKey(input) ===
+      normalizeAmericanMajorKey(question.answer)
+    );
+  }
+
+  return (
+    normalizeAmericanScaleNote(input) ===
+    normalizeAmericanScaleNote(question.answer)
+  );
+}
+
 type MajorOnlyQuestionType =
   | "majorNotes"
   | "majorKeyByAccidentals"
@@ -882,7 +983,7 @@ function normalizeBasicAnswer(value: string) {
 }
 
 function normalizeAmericanMajorKey(value: string) {
-  return normalizeAccidentals(value).replace(/\s+/g, "").toUpperCase();
+  return normalizeMusicalKey(value);
 }
 
 function normalizeAccidentalFamily(value: string) {
@@ -1405,32 +1506,27 @@ function handleMemorizationRowGrade(
 ) {
   const currentState = getMemoPracticeState(tablePracticeAnswers, rowKey);
 
-  const normalize = (str: string = "") =>
-    (str || "")
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-
   const expectedSharpsParsed = parseMajorMinorPair(expectedSharps);
   const expectedFlatsParsed = parseMajorMinorPair(expectedFlats);
 
   const sharpsMajorCorrect =
-    normalize(currentState.sharpsMajorInput) ===
-    normalize(expectedSharpsParsed.major);
+    normalizeAmericanMajorKey(currentState.sharpsMajorInput) ===
+    normalizeAmericanMajorKey(expectedSharpsParsed.major);
   const sharpsMinorCorrect =
-    normalize(currentState.sharpsMinorInput) ===
-    normalize(expectedSharpsParsed.minor);
+    normalizeAmericanMinorKey(currentState.sharpsMinorInput) ===
+    normalizeAmericanMinorKey(expectedSharpsParsed.minor);
   const flatsMajorCorrect =
-    normalize(currentState.flatsMajorInput) ===
-    normalize(expectedFlatsParsed.major);
+    normalizeAmericanMajorKey(currentState.flatsMajorInput) ===
+    normalizeAmericanMajorKey(expectedFlatsParsed.major);
   const flatsMinorCorrect =
-    normalize(currentState.flatsMinorInput) ===
-    normalize(expectedFlatsParsed.minor);
+    normalizeAmericanMinorKey(currentState.flatsMinorInput) ===
+    normalizeAmericanMinorKey(expectedFlatsParsed.minor);
   const sharpsAccCorrect =
-    normalize(currentState.sharpsAccInput) === normalize(expectedSharpsAcc);
+    normalizeNoteSequence(currentState.sharpsAccInput) ===
+    normalizeNoteSequence(expectedSharpsAcc);
   const flatsAccCorrect =
-    normalize(currentState.flatsAccInput) === normalize(expectedFlatsAcc);
+    normalizeNoteSequence(currentState.flatsAccInput) ===
+    normalizeNoteSequence(expectedFlatsAcc);
 
   setTablePracticeAnswers((prev) => ({
     ...prev,
@@ -2843,15 +2939,9 @@ export default function RelativeMinorScalesStudy() {
     if (isMultipleChoice) {
       isCorrect = selectedOption === question.answer;
     } else if (isWriteScale) {
-      isCorrect = scaleInputs.every(
-        (val, i) =>
-          val.trim().toLowerCase() ===
-          (question.answerArray?.[i] || "").toLowerCase(),
-      );
+      isCorrect = isQuizScaleAnswerCorrect(question, scaleInputs);
     } else if (isTextAnswer) {
-      isCorrect =
-        textInput.trim().toLowerCase() ===
-        (question.answer || "").toLowerCase();
+      isCorrect = isQuizTextAnswerCorrect(question, textInput);
     }
   }
 
@@ -5671,6 +5761,44 @@ export default function RelativeMinorScalesStudy() {
                 control={
                   <Checkbox
                     size="small"
+                    checked={enabledQuizTypes.includes("writeFlatScale")}
+                    onChange={(e) => {
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, "writeFlatScale" as const])]
+                          : prev.filter((type) => type !== "writeFlatScale"),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">Escalas con bemoles</Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={enabledQuizTypes.includes("writeSharpScale")}
+                    onChange={(e) => {
+                      setEnabledQuizTypes((prev) =>
+                        e.target.checked
+                          ? [...new Set([...prev, "writeSharpScale" as const])]
+                          : prev.filter((type) => type !== "writeSharpScale"),
+                      );
+                    }}
+                  />
+                }
+                label={
+                  <Typography variant="body2">
+                    Escalas con sostenidos
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
                     checked={enabledQuizTypes.includes("writeMinorFromMajor")}
                     onChange={(e) => {
                       const tgts: QuizQuestionType[] = ["writeMinorFromMajor"];
@@ -5812,6 +5940,15 @@ export default function RelativeMinorScalesStudy() {
             </FormGroup>
           </Stack>
 
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mb: 1.5 }}
+          >
+            Puedes responder en notación americana (E, Bb, F#) o en solfeo (Mi,
+            Sib, Fa#).
+          </Typography>
+
           <Typography sx={{ mb: 1.5 }}>{question.questionText}</Typography>
 
           {isMultipleChoice && (
@@ -5858,8 +5995,10 @@ export default function RelativeMinorScalesStudy() {
                     }}
                     color={
                       isEvaluated
-                        ? scaleInputs[i].trim().toLowerCase() ===
-                          (question.answerArray?.[i] || "").toLowerCase()
+                        ? normalizeAmericanScaleNote(scaleInputs[i]) ===
+                          normalizeAmericanScaleNote(
+                            question.answerArray?.[i] || "",
+                          )
                           ? "success"
                           : "error"
                         : "primary"
@@ -5873,10 +6012,9 @@ export default function RelativeMinorScalesStudy() {
                   variant="contained"
                   onClick={() => {
                     setIsEvaluated(true);
-                    const correct = scaleInputs.every(
-                      (val, i) =>
-                        val.trim().toLowerCase() ===
-                        (question.answerArray?.[i] || "").toLowerCase(),
+                    const correct = isQuizScaleAnswerCorrect(
+                      question,
+                      scaleInputs,
                     );
                     setScoreTotal((prev) => prev + 1);
                     if (correct) setScoreCorrect((prev) => prev + 1);
@@ -5899,8 +6037,7 @@ export default function RelativeMinorScalesStudy() {
                 InputProps={{ readOnly: isEvaluated }}
                 color={
                   isEvaluated
-                    ? textInput.trim().toLowerCase() ===
-                      (question.answer || "").toLowerCase()
+                    ? isQuizTextAnswerCorrect(question, textInput)
                       ? "success"
                       : "error"
                     : "primary"
@@ -5912,9 +6049,10 @@ export default function RelativeMinorScalesStudy() {
                   variant="contained"
                   onClick={() => {
                     setIsEvaluated(true);
-                    const correct =
-                      textInput.trim().toLowerCase() ===
-                      (question.answer || "").toLowerCase();
+                    const correct = isQuizTextAnswerCorrect(
+                      question,
+                      textInput,
+                    );
                     setScoreTotal((prev) => prev + 1);
                     if (correct) setScoreCorrect((prev) => prev + 1);
                   }}
