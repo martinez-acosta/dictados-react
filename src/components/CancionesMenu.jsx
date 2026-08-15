@@ -66,6 +66,14 @@ export default function CancionesMenu() {
       color: "#099268",
     },
     {
+      id: "toda-lengua-y-toda-nacion-b",
+      titulo: "Toda Lengua y Toda Nación",
+      artista: "Toma Tu Lugar",
+      tonalidad: "B",
+      archivo: "/dictados-react/src/TodaLenguaYTodaNacionB.html",
+      color: "#6741d9",
+    },
+    {
       id: "alaba-a-dios-e",
       titulo: "Alaba a Dios",
       artista: "Gladys Muñoz",
