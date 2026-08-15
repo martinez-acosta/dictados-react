@@ -74,6 +74,15 @@ export default function CancionesMenu() {
       color: "#6741d9",
     },
     {
+      id: "thas-rindo-todo-e",
+      titulo: "THAS (Rindo Todo)",
+      artista: "Música ICF",
+      tonalidad: "E",
+      bpm: 125,
+      archivo: "/dictados-react/src/ThasRindoTodoE.html",
+      color: "#d6336c",
+    },
+    {
       id: "alaba-a-dios-e",
       titulo: "Alaba a Dios",
       artista: "Gladys Muñoz",
