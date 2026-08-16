@@ -91,6 +91,14 @@ export default function CancionesMenu() {
       color: "#1c7ed6",
     },
     {
+      id: "dios-ha-sido-bueno-b",
+      titulo: "Dios Ha Sido Bueno",
+      artista: "Marcos Witt",
+      tonalidad: "B",
+      archivo: "/dictados-react/src/DiosHaSidoBuenoB.html",
+      color: "#2f9e44",
+    },
+    {
       id: "alaba-a-dios-e",
       titulo: "Alaba a Dios",
       artista: "Gladys Muñoz",

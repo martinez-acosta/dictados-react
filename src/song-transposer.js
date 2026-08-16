@@ -74,7 +74,7 @@
   ];
 
   const CHORD_PATTERN =
-    /^([A-G](?:#|b|♯|♭)?)((?:(?:m(?:aj)?|maj|min|dim|aug|sus|add|omit|no)?\d*(?:\/\d+)?(?:\([^)]+\))?)?)(?:\/([A-G](?:#|b|♯|♭)?))?$/;
+    /^([A-G](?:#|b|♯|♭)?)((?:(?:m(?:aj)?|maj|min|dim|aug|sus|add|omit|no)?\d*(?:(?:sus|add)\d*)?(?:\/\d+)?(?:\([^)]+\))?)?)(?:\/([A-G](?:#|b|♯|♭)?))?$/;
 
   function normalizeNote(note) {
     return note.replace("♯", "#").replace("♭", "b");
