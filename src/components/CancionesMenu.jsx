@@ -99,11 +99,11 @@ export default function CancionesMenu() {
       color: "#2f9e44",
     },
     {
-      id: "visitanos-avivanos-d",
+      id: "visitanos-avivanos-b",
       titulo: "Visítanos / Avívanos",
       artista: "Maranatha · Un Nuevo Amanecer",
-      tonalidad: "D",
-      archivo: "/dictados-react/src/VisitanosAvivanosD.html",
+      tonalidad: "B",
+      archivo: "/dictados-react/src/VisitanosAvivanosB.html",
       color: "#0b7285",
     },
     {
