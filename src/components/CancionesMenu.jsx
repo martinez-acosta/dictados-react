@@ -99,6 +99,14 @@ export default function CancionesMenu() {
       color: "#2f9e44",
     },
     {
+      id: "visitanos-avivanos-d",
+      titulo: "Visítanos / Avívanos",
+      artista: "Maranatha · Un Nuevo Amanecer",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/VisitanosAvivanosD.html",
+      color: "#0b7285",
+    },
+    {
       id: "alaba-a-dios-e",
       titulo: "Alaba a Dios",
       artista: "Gladys Muñoz",
