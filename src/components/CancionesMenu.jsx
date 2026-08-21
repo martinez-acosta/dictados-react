@@ -26,6 +26,15 @@ export default function CancionesMenu() {
       color: "#1864ab",
     },
     {
+      id: "mi-socorro-esta-en-ti-d",
+      titulo: "Mi Socorro Está en Ti",
+      artista: "Conquistando Fronteras",
+      tonalidad: "D",
+      bpm: 82,
+      archivo: "/dictados-react/src/MiSocorroEstaEnTiD.html",
+      color: "#2b8a3e",
+    },
+    {
       id: "sopla",
       titulo: "Sopla",
       artista: "Conquistando Fronteras",
