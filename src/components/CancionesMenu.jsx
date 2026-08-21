@@ -17,6 +17,15 @@ export default function CancionesMenu() {
       color: "#ff6b35",
     },
     {
+      id: "salmo-27-d",
+      titulo: "Salmo 27",
+      artista: "Música ICF",
+      tonalidad: "D",
+      bpm: 138,
+      archivo: "/dictados-react/src/Salmo27D.html",
+      color: "#1864ab",
+    },
+    {
       id: "sopla",
       titulo: "Sopla",
       artista: "Conquistando Fronteras",
