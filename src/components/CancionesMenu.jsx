@@ -11,7 +11,7 @@ export default function CancionesMenu() {
       id: "rompe-el-cielo",
       titulo: "Rompe el Cielo",
       artista: "Conquistando Fronteras",
-      tonalidad: "E",
+      tonalidad: "D",
       bpm: 143,
       archivo: "/dictados-react/src/RompeElCielo.html",
       color: "#ff6b35",
