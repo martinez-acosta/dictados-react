@@ -125,11 +125,11 @@ export default function CancionesMenu() {
       color: "#0b7285",
     },
     {
-      id: "alaba-a-dios-e",
+      id: "alaba-a-dios-d",
       titulo: "Alaba a Dios",
-      artista: "Gladys Muñoz",
-      tonalidad: "E",
-      archivo: "/dictados-react/src/AlabaADiosE.html",
+      artista: "Danny Berrios",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/AlabaADiosD.html",
       color: "#f08c00",
     },
     {
