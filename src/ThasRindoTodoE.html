@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>THAS (Rindo Todo) — Música ICF [E]</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { background:#fff; color:#000; margin:0; padding:0; }
+    body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; line-height:1.2; }
+    .wrap { max-width: 1120px; margin: 10px auto 24px; padding: 0 14px; }
+    h1 { font-size: 27px; margin: 0 0 4px; }
+    .meta { font-size: 15px; color:#444; margin-bottom: 8px; }
+    .flow { font-size: 13px; margin: 5px 0 12px; color:#222; }
+    .sheet-grid { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:52px; align-items:start; }
+    section { margin: 0 0 20px; }
+    h2 { font-size:19px; margin:0 0 12px; text-transform:uppercase; font-weight:800; }
+    .lyric-line { display:flex; align-items:flex-end; flex-wrap:nowrap; min-height:42px; font-size:18px; white-space:pre; }
+    .phrase { position:relative; display:inline-block; padding-top:18px; white-space:pre; }
+    .chords { position:absolute; top:0; left:0; color:#0000e8; font-size:16px; font-weight:800; line-height:1; white-space:pre; }
+    .boundary-chord { width:0; }
+    .boundary-chord .chords { transform:translateX(-50%); }
+    .plain { display:inline-block; white-space:pre; }
+    .spacer { height:14px; }
+    .progression { position:static; display:block; margin:5px 0 14px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:17px; line-height:1.45; }
+    .pickup { min-height:28px; font-size:18px; display:flex; align-items:flex-end; }
+
+    @media (max-width: 850px) {
+      .sheet-grid { grid-template-columns:1fr; gap:0; }
+      .lyric-line { font-size:16px; min-height:39px; }
+      .chords { font-size:14px; }
+      .progression { font-size:15px; }
+    }
+
+    @media (max-width: 560px) {
+      .wrap { padding:0 8px; }
+      h1 { font-size:23px; }
+      .lyric-line { font-size:14px; min-height:36px; }
+      .chords { font-size:13px; }
+      h2 { font-size:17px; }
+    }
+
+    @media print {
+      @page { size:landscape; margin:6mm; }
+      html, body { margin:0; padding:0; }
+      .wrap { max-width:100%; margin:0; padding:0; }
+      h1 { font-size:20px; margin:0 0 2px; }
+      .meta { font-size:12px; margin-bottom:3px; }
+      .flow { font-size:10px; margin:2px 0 6px; }
+      .sheet-grid { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:8mm; }
+      section { margin-bottom:8px; }
+      h2 { font-size:13px; margin-bottom:5px; }
+      .lyric-line { min-height:26px; font-size:11px; }
+      .phrase { padding-top:11px; }
+      .chords { font-size:10px; }
+      .progression { font-size:10px; margin:2px 0 5px; }
+      .pickup { min-height:18px; font-size:11px; }
+      .spacer { height:6px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>THAS (Rindo Todo) [E, 125 bpm, 4/4]</h1>
+  <div class="meta">Música ICF · Tono original: E</div>
+  <div class="flow">Flujo: Coro → Intro → Verso 1 → Verso 2 → Verso 3 → Intro → Pre-coro → Coro ×2 → Instrumental → Puente ×3 → Coro → Puente ×2 → Final</div>
+
+  <div class="sheet-grid">
+    <div class="column column-left">
+      <section id="coro-entrada">
+        <h2>Coro</h2>
+        <div class="lyric-line"><span class="plain">Lo viejo bor</span><span class="phrase"><span class="chords">A</span>ras</span><span class="phrase"><span class="chords">E</span>te</span></div>
+        <div class="lyric-line"><span class="plain">En Tus manos</span><span class="phrase"><span class="chords">A</span> me hiciste una vez más</span></div>
+        <div class="lyric-line"><span class="plain">Por gracia he </span><span class="phrase"><span class="chords">C#m</span>vue</span><span class="plain">lto a nacer</span></div>
+        <div class="lyric-line"><span class="plain">Desde el prin</span><span class="phrase"><span class="chords">B</span>ci</span><span class="plain">pio comenzar</span></div>
+        <div class="spacer"></div>
+        <div class="lyric-line"><span class="plain">Moriste </span><span class="phrase"><span class="chords">E</span>por </span><span class="plain">mí</span></div>
+        <div class="lyric-line"><span class="plain">Y yo vivi</span><span class="phrase"><span class="chords">F#m</span>ré</span><span class="plain"> para adorar</span></div>
+        <div class="lyric-line"><span class="plain">Cristo Je</span><span class="phrase"><span class="chords">C#m</span>sús </span><span class="plain">tu</span><span class="phrase boundary-chord"><span class="chords">B</span>&#8203;</span><span class="plain">yo soy</span><span class="phrase"><span class="chords">A</span>&nbsp;</span></div>
+      </section>
+
+      <section id="intro-1">
+        <h2>Intro</h2>
+        <div class="chords progression">E   C#m   A   E</div>
+      </section>
+
+      <section id="verso">
+        <h2>Verso</h2>
+        <div class="lyric-line"><span class="phrase"><span class="chords">E</span>Cristo Jesús mo</span><span class="phrase"><span class="chords">Esus4</span>ris</span><span class="plain">te en la cruz por </span><span class="phrase"><span class="chords">A</span>mí</span></div>
+        <div class="lyric-line"><span class="plain">Y hoy </span><span class="phrase"><span class="chords">E</span>yo </span><span class="plain">sé que mi pas</span><span class="phrase"><span class="chords">Esus4</span>ado </span><span class="plain">clavado f</span><span class="phrase"><span class="chords">A</span>ue</span></div>
+        <div class="lyric-line"><span class="plain">Ya no vivo </span><span class="phrase"><span class="chords">E</span>yo, </span><span class="plain">vive tu</span><span class="phrase"><span class="chords">F#m</span> </span><span class="plain">Santo Espíritu en </span><span class="phrase"><span class="chords">E/G#  A</span>mí</span></div>
+      </section>
+
+      <section id="intro-2">
+        <h2>Intro</h2>
+        <div class="chords progression">E   C#m   A   E</div>
+      </section>
+
+      <section id="pre-coro">
+        <h2>Pre-coro</h2>
+        <div class="lyric-line"><span class="phrase"><span class="chords">A</span>Estaba muerto y en pecado</span></div>
+        <div class="lyric-line"><span class="plain">Mas Tu misericordia me alcan</span><span class="phrase"><span class="chords">B</span>zó</span></div>
+        <div class="lyric-line"><span class="phrase"><span class="chords">A</span>Hoy conozco Tu realidad</span></div>
+        <div class="lyric-line"><span class="plain">Nada se te puede compa</span><span class="phrase"><span class="chords">B</span>rar</span></div>
+      </section>
+    </div>
+
+    <div class="column column-right">
+      <section id="coro">
+        <h2>Coro</h2>
+        <div class="lyric-line"><span class="plain">Lo viejo </span><span class="phrase"><span class="chords">E</span>borraste</span></div>
+        <div class="lyric-line"><span class="plain">En Tus manos</span><span class="phrase"><span class="chords">A</span> me hiciste una vez más</span></div>
+        <div class="lyric-line"><span class="plain">Por gracia he </span><span class="phrase"><span class="chords">C#m</span>vue</span><span class="plain">lto a nacer</span></div>
+        <div class="lyric-line"><span class="plain">Desde el prin</span><span class="phrase"><span class="chords">B</span>ci</span><span class="plain">pio comenzar</span></div>
+        <div class="spacer"></div>
+        <div class="lyric-line"><span class="plain">Moriste </span><span class="phrase"><span class="chords">E</span>por </span><span class="plain">mí</span></div>
+        <div class="lyric-line"><span class="plain">Y yo vivi</span><span class="phrase"><span class="chords">F#m</span>ré</span><span class="plain"> para adorar</span></div>
+        <div class="lyric-line"><span class="plain">Cristo Je</span><span class="phrase"><span class="chords">C#m</span>sús </span><span class="plain">tu</span><span class="phrase boundary-chord"><span class="chords">B</span>&#8203;</span><span class="plain">yo soy</span><span class="phrase"><span class="chords">A</span>&nbsp;</span></div>
+      </section>
+
+      <section id="instrumental">
+        <h2>Instrumental</h2>
+        <div class="chords progression">E/G#   A   E/G#   A</div>
+        <div class="chords progression">C#m    B   C#m    G#m   A</div>
+      </section>
+
+      <section id="puente">
+        <h2>Puente</h2>
+        <div class="pickup">Rindo</div>
+        <div class="lyric-line"><span class="phrase"><span class="chords">E/G#</span>Todo lo que </span><span class="phrase"><span class="chords">A</span>tengo</span></div>
+        <div class="lyric-line"><span class="phrase"><span class="chords">E/G#</span>Todo lo </span><span class="phrase"><span class="chords">A</span>hago</span></div>
+        <div class="lyric-line"><span class="phrase"><span class="chords">C#m</span>Todos mis </span><span class="phrase"><span class="chords">B</span>afectos</span></div>
+        <div class="lyric-line"><span class="phrase"><span class="chords">C#m</span>Todo </span><span class="phrase"><span class="chords">B</span>lo que </span><span class="phrase"><span class="chords">A</span>soy</span></div>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="./song-transposer.js"></script>
+</body>
+</html>
