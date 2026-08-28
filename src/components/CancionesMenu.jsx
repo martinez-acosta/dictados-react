@@ -133,6 +133,14 @@ export default function CancionesMenu() {
       color: "#f08c00",
     },
     {
+      id: "dios-el-mas-grande-bb",
+      titulo: "Dios el Más Grande",
+      artista: "Juan Carlos Alvarado",
+      tonalidad: "Bb",
+      archivo: "/dictados-react/src/DiosElMasGrandeBb.html",
+      color: "#fcc419",
+    },
+    {
       id: "danzare-e",
       titulo: "Danzaré",
       artista: "Conquistando Fronteras",
