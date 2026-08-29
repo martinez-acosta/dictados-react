@@ -35,6 +35,14 @@ export default function CancionesMenu() {
       color: "#2b8a3e",
     },
     {
+      id: "voy-cantando-d",
+      titulo: "Voy Cantando",
+      artista: "Conquistando Fronteras",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/VoyCantandoD.html",
+      color: "#f59f00",
+    },
+    {
       id: "sopla",
       titulo: "Sopla",
       artista: "Conquistando Fronteras",
