@@ -2,121 +2,90 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Sopla — Conquistando Fronteras (hoja de acordes simple)</title>
+  <title>Sopla — Conquistando Fronteras [E]</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* Hoja simple, fondo blanco para imprimir o exportar a PDF */
-    html, body { background:#fff; color:#000; margin:0; padding:0; }
-    body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; line-height:1.2; }
-    .wrap { max-width: 980px; margin: 10px auto 20px; padding: 0 10px; }
-    h1 { font-size: 27px; margin: 0 0 4px; }
-    .meta { font-size: 15px; color:#444; margin-bottom: 8px; }
-    .flow { font-size: 13px; margin: 5px 0 12px; color:#222; }
-    .sheet { column-count: 2; column-gap: 28px; }
-    section { break-inside: avoid; margin: 10px 0 12px; }
-    h2 { font-size: 15px; letter-spacing:.02em; margin: 5px 0 4px; text-transform: uppercase; font-weight: bold; }
-    .line { margin: 3px 0 4px; font-size: 15px; }
-    /* Línea para escribir los acordes encima del verso */
-    .chords { height: 12px; margin-bottom: 1px; }
-    .lyrics { white-space: pre-wrap; }
-    @media print {
-      @page { margin: 6mm; }
-      html, body { margin: 0; padding: 0; }
-      .wrap { margin: 0; padding: 0; max-width: 100%; }
-      .sheet { column-count: 2; column-gap: 8mm; }
-      h1 { font-size: 21px; margin: 0 0 2px; }
-      .meta { font-size: 13px; margin-bottom: 4px; }
-      .flow { font-size: 12px; margin: 2px 0 6px; }
-      h2 { font-size: 13px; margin: 3px 0 3px; }
-      .line { margin: 2px 0 3px; font-size: 13px; }
-      section { margin: 6px 0 8px; }
-    }
+    html,body{background:#fff;color:#000;margin:0;padding:0}
+    body{font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.2}
+    .wrap{max-width:1080px;margin:10px auto 22px;padding:0 12px}
+    h1{font-size:27px;margin:0 0 4px}.meta{font-size:15px;color:#444;margin-bottom:8px}
+    .flow{font-size:13px;margin:5px 0 12px;color:#222}
+    .sheet{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+    section{break-inside:avoid;margin:10px 0 16px}
+    h2{font-size:16px;margin:5px 0;text-transform:uppercase}
+    .note{font-size:12px;color:#555;font-style:italic;margin:0 0 4px}
+    .cifra{margin:3px 0 4px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;line-height:1.35;white-space:pre;overflow-x:auto}
+    @media(max-width:780px){.sheet{grid-template-columns:1fr}.cifra{font-size:12px}}
+    @media print{@page{margin:6mm}.wrap{margin:0;padding:0;max-width:100%}.sheet{grid-template-columns:1fr 1fr;gap:8mm}.cifra{font-size:10.5px;overflow:visible}}
   </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Sopla [E, 95 bpm, 4/4]</h1>
-  <div class="meta">Conquistando Fronteras</div>
-  <div class="flow">Flujo sugerido: Intro → Verso 1 → Verso 2 → Coro → Verso 3 → Coro → Puente → Coro ×2 → Final</div>
-
+  <div class="meta">Conquistando Fronteras · Tono original de esta hoja: E</div>
+  <div class="flow">Flujo: Verso 1 → Intro → Verso 2 → Coro → Verso 2 → Coro → Puente ×2 → Coro final</div>
   <div class="sheet">
-    <!-- INTRO -->
-    <section id="intro">
-      <h2>Intro</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">[Instrumental]</div></div>
-    </section>
-
-    <!-- VERSO 1 -->
-    <section id="verso-1">
-      <h2>Verso 1</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">Salvador del mundo</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Ven y sopla</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">De tu verdad y de tu vida sopla</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Fuego consumidor</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Resplandece en mi</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Oh oh oh/</div></div>
-    </section>
-
-    <!-- VERSO 2 -->
-    <section id="verso-2">
-      <h2>Verso 2</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">Redentor del mundo</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Ven y sopla</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu verdad y de tu vida sopla</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Siñenos con tu poder</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Llenanos de santidad</div></div>
-    </section>
-
-    <!-- CORO -->
-    <section id="coro-1">
-      <h2>Coro</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu gloria y poder</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Reinaran para siempre</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu verdad brillara</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu presencia incomparable es</div></div>
-    </section>
-
-    <!-- VERSO 3 -->
-    <section id="verso-3">
-      <h2>Verso 3</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">Redentor del mundo</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Ven y sopla</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">De tu verdad y de tu vida sopla</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Siñenos con tu poder</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Llenanos de santidad</div></div>
-    </section>
-
-    <!-- CORO (repite) -->
-    <section id="coro-2">
-      <h2>Coro (repite)</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu gloria y poder</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu reinaras para siempre</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu verdad brillara</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu presencia incomparable es</div></div>
-    </section>
-
-    <!-- PUENTE -->
-    <section id="puente">
-      <h2>Puente</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">Aleluya santo eres tu</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Salvación y gloria son de ti</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Aleluya santo eres Jesus</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Trea tu reino tu reino Tu gloria y poder</div></div>
-    </section>
-
-    <!-- CORO (final) -->
-    <section id="coro-final">
-      <h2>Coro (final)</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">Reinaran para siempre</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu verdad brillara</div></div>
-      <div class="line"><div class="chords"></div><div class="lyrics">Tu presencia incomparable es</div></div>
-    </section>
-
-    <!-- FINAL -->
-    <section id="final">
-      <h2>Final</h2>
-      <div class="line"><div class="chords"></div><div class="lyrics">[Instrumental / Ad lib]</div></div>
-    </section>
+    <div class="column">
+      <section id="verso-1">
+        <h2>Verso 1</h2>
+        <pre class="cifra">E                            A
+Salvador del mundo ven y sopla
+E                          A
+Tu verdad y de tu vida sopla
+B               A
+Fuego consumidor
+B               A
+Resplandece en mí</pre>
+      </section>
+      <section id="intro">
+        <h2>Intro</h2>
+        <pre class="cifra">E   A
+E   A
+B   A
+B   A</pre>
+      </section>
+      <section id="verso-2">
+        <h2>Verso 2</h2>
+        <div class="note">Repetir antes del segundo coro</div>
+        <pre class="cifra">E                            A
+Redentor del mundo ven y sopla
+E                          A
+Tu verdad y de tu vida sopla
+B                  A
+Ciñenos con tu poder
+B                  A  B
+Llénanos de santidad</pre>
+      </section>
+      <section id="coro">
+        <h2>Coro</h2>
+        <div class="note">Repetir después de la segunda vuelta del verso 2</div>
+        <pre class="cifra">E               B       A        C#m  B
+Tu gloria y poder reinará para siempre
+        E        B         A         B        E
+Tu verdad brillará, Tu presencia incomparable es</pre>
+      </section>
+    </div>
+    <div class="column">
+      <section id="puente">
+        <h2>Puente ×2</h2>
+        <div class="note">Primera vuelta: terminar en A. Segunda vuelta: añadir B para entrar al coro.</div>
+        <pre class="cifra">C#m
+Aleluya, santo eres Tú
+A
+Salvación y gloria son de Ti
+C#m
+Aleluya, santo eres Jesús
+A               B
+Trae Tu reino, Tu reino</pre>
+      </section>
+      <section id="coro-final">
+        <h2>Coro final</h2>
+        <pre class="cifra">E               B       A        C#m  B
+Tu gloria y poder reinará para siempre
+        E        B         A         B        E
+Tu verdad brillará, Tu presencia incomparable es</pre>
+      </section>
+    </div>
   </div>
 </div>
 <script src="./song-transposer.js"></script>
