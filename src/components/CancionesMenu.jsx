@@ -52,6 +52,14 @@ export default function CancionesMenu() {
       color: "#4ecdc4",
     },
     {
+      id: "revelacion-a",
+      titulo: "Revelación",
+      artista: "Danilo Montero y Kari Jobe",
+      tonalidad: "A",
+      archivo: "/dictados-react/src/RevelacionA.html",
+      color: "#7950f2",
+    },
+    {
       id: "gloria-shekhina",
       titulo: "Gloria Shekhiná",
       artista: "Modo teatro",
