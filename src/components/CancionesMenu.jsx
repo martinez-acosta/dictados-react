@@ -69,7 +69,7 @@ export default function CancionesMenu() {
     },
     {
       id: "revelacion-a",
-      titulo: "Revelación",
+      titulo: "Revelación (Revelation Song)",
       artista: "Danilo Montero y Kari Jobe",
       tonalidad: "A",
       archivo: "/dictados-react/src/RevelacionA.html",
@@ -101,7 +101,7 @@ export default function CancionesMenu() {
     },
     {
       id: "hermoso-no-volvere-atras-d",
-      titulo: "Hermoso / No volveré atrás",
+      titulo: "Hermoso / No volveré atrás (Most Beautiful / Never Going Back)",
       artista: "Toma Tu Lugar feat. Damaris Calviño y Lucas Conslie",
       tonalidad: "D",
       archivo: "/dictados-react/src/HermosoNoVolvereAtrasDb.html",
@@ -126,7 +126,7 @@ export default function CancionesMenu() {
     },
     {
       id: "lo-haras-otra-vez-bb",
-      titulo: "Lo Harás Otra Vez",
+      titulo: "Lo Harás Otra Vez (Do It Again)",
       artista: "Elevation Worship",
       tonalidad: "Bb",
       archivo: "/dictados-react/src/LoHarasOtraVezB.html",
@@ -208,7 +208,7 @@ export default function CancionesMenu() {
     },
     {
       id: "como-nos-ama-c",
-      titulo: "Cómo Nos Ama",
+      titulo: "Cómo Nos Ama (How He Loves)",
       artista: "Conquistando Fronteras",
       tonalidad: "C",
       archivo: "/dictados-react/src/ComoNosAmaG.html",
@@ -216,7 +216,7 @@ export default function CancionesMenu() {
     },
     {
       id: "esa-es-la-razon-db",
-      titulo: "Esa Es La Razón",
+      titulo: "Esa Es La Razón (Ask Me Why)",
       artista: "Gateway Worship Español",
       tonalidad: "Db",
       bpm: 118,
@@ -225,7 +225,7 @@ export default function CancionesMenu() {
     },
     {
       id: "grande-eres-dios-a",
-      titulo: "Grande Eres Dios",
+      titulo: "Grande Eres Dios (Great Are You Lord)",
       artista: "All Sons & Daughters · adaptación en español",
       tonalidad: "A",
       archivo: "/dictados-react/src/GrandeEresDiosG.html",
@@ -233,7 +233,7 @@ export default function CancionesMenu() {
     },
     {
       id: "mi-fundamento-bb",
-      titulo: "Mi Fundamento (Firm Foundation)",
+      titulo: "Mi Fundamento (Firm Foundation / He Won't)",
       artista: "The Belonging Co / Cody Carnes · traducción Más Vida",
       tonalidad: "Bb",
       archivo: "/dictados-react/src/MiFundamentoD.html",
@@ -241,7 +241,7 @@ export default function CancionesMenu() {
     },
     {
       id: "testigo-soy-db",
-      titulo: "Testigo Soy",
+      titulo: "Testigo Soy (I've Witnessed It)",
       artista: "Passion · versión Conquistando Fronteras",
       tonalidad: "Db",
       archivo: "/dictados-react/src/TestigoSoy.html",
