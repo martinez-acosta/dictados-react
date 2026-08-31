@@ -1,10 +1,26 @@
-import React from "react";
-import { Container, Paper, Typography, Box, Button, Grid } from "@mui/material";
-import { MusicNote, ArrowBack } from "@mui/icons-material";
+import React, { useState } from "react";
+import {
+  Container,
+  Paper,
+  Typography,
+  Box,
+  Button,
+  Grid,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
+import { MusicNote, ArrowBack, Search } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+
+const normalizarTexto = (texto) =>
+  texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es");
 
 export default function CancionesMenu() {
   const navigate = useNavigate();
+  const [busqueda, setBusqueda] = useState("");
 
   const canciones = [
     {
@@ -262,6 +278,15 @@ export default function CancionesMenu() {
     window.open(archivo, "_blank");
   };
 
+  const terminoNormalizado = normalizarTexto(busqueda.trim());
+  const cancionesFiltradas = canciones.filter((cancion) => {
+    if (!terminoNormalizado) return true;
+
+    return normalizarTexto(`${cancion.titulo} ${cancion.artista}`).includes(
+      terminoNormalizado,
+    );
+  });
+
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Paper sx={{ p: 4 }}>
@@ -287,8 +312,32 @@ export default function CancionesMenu() {
           </Box>
         </Box>
 
+        <TextField
+          fullWidth
+          label="Buscar por canción o artista"
+          placeholder="Ej. Revelación o Conquistando Fronteras"
+          value={busqueda}
+          onChange={(event) => setBusqueda(event.target.value)}
+          sx={{ mb: 3 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        {busqueda.trim() ? (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {cancionesFiltradas.length === 1
+              ? "1 canción encontrada"
+              : `${cancionesFiltradas.length} canciones encontradas`}
+          </Typography>
+        ) : null}
+
         <Grid container spacing={3}>
-          {canciones.map((cancion) => (
+          {cancionesFiltradas.map((cancion) => (
             <Grid item xs={12} sm={6} key={cancion.id}>
               <Paper
                 sx={{
@@ -368,6 +417,16 @@ export default function CancionesMenu() {
             </Grid>
           ))}
         </Grid>
+
+        {cancionesFiltradas.length === 0 ? (
+          <Box sx={{ py: 6, textAlign: "center" }}>
+            <MusicNote sx={{ fontSize: 44, color: "text.disabled", mb: 1 }} />
+            <Typography variant="h6">No encontramos canciones</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Prueba con otro nombre o artista.
+            </Typography>
+          </Box>
+        ) : null}
       </Paper>
     </Container>
   );
