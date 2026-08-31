@@ -137,6 +137,7 @@ export default function CancionesMenu() {
       titulo: "Dios Ha Sido Bueno",
       artista: "Marcos Witt",
       tonalidad: "F → G",
+      tonoOriginal: "F",
       archivo: "/dictados-react/src/DiosHaSidoBuenoB.html",
       color: "#2f9e44",
     },
@@ -257,9 +258,15 @@ export default function CancionesMenu() {
     },
   ];
 
-  const abrirCancion = (archivo) => {
-    // Abrir el archivo HTML en una nueva pestaña
-    window.open(archivo, "_blank");
+  const abrirCancion = (cancion) => {
+    const tonoOriginal =
+      cancion.tonoOriginal ||
+      (/^[A-G](?:#|b)?m?$/.test(cancion.tonalidad) ? cancion.tonalidad : null);
+    const destino = tonoOriginal
+      ? `${cancion.archivo}?original=${encodeURIComponent(tonoOriginal)}`
+      : cancion.archivo;
+
+    window.open(destino, "_blank");
   };
 
   const terminoNormalizado = normalizarTexto(busqueda.trim());
@@ -335,7 +342,7 @@ export default function CancionesMenu() {
                     boxShadow: 3,
                   },
                 }}
-                onClick={() => abrirCancion(cancion.archivo)}
+                onClick={() => abrirCancion(cancion)}
               >
                 <MusicNote sx={{ fontSize: 48, color: cancion.color, mb: 2 }} />
                 <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
@@ -385,7 +392,10 @@ export default function CancionesMenu() {
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={() => abrirCancion(cancion.archivo)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    abrirCancion(cancion);
+                  }}
                   sx={{
                     py: 1.5,
                     backgroundColor: cancion.color,
