@@ -142,6 +142,15 @@ export default function CancionesMenu() {
       color: "#2f9e44",
     },
     {
+      id: "tu-fidelidad-d",
+      titulo: "Tu Fidelidad",
+      artista: "Marcos Witt",
+      tonalidad: "D → Eb → E → F → G",
+      tonoOriginal: "D",
+      archivo: "/dictados-react/src/TuFidelidadD.html",
+      color: "#1971c2",
+    },
+    {
       id: "visitanos-avivanos",
       titulo: "Visítanos / Avívanos",
       artista: "Maranatha · Un Nuevo Amanecer",
