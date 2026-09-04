@@ -142,6 +142,14 @@ export default function CancionesMenu() {
       color: "#2f9e44",
     },
     {
+      id: "dame-de-beber-d",
+      titulo: "Dame de Beber",
+      artista: "Marco Barrientos",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/DameDeBeberD.html",
+      color: "#087f8c",
+    },
+    {
       id: "tu-fidelidad-d",
       titulo: "Tu Fidelidad",
       artista: "Marcos Witt",
