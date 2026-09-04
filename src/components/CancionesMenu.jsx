@@ -218,8 +218,8 @@ export default function CancionesMenu() {
     },
     {
       id: "agradecido-estoy-e",
-      titulo: "Agradecido Estoy",
-      artista: "Elevation Español",
+      titulo: "Agradecido Estoy (God I’m Just Grateful)",
+      artista: "Elevation Worship / Elevation Español",
       tonalidad: "E",
       bpm: 72,
       archivo: "/dictados-react/src/AgradecidoEstoyEb.html",
