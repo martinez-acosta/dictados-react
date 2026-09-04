@@ -59,6 +59,14 @@ export default function CancionesMenu() {
       color: "#f59f00",
     },
     {
+      id: "en-pos-de-ti-c",
+      titulo: "En Pos de Ti",
+      artista: "Conquistando Fronteras",
+      tonalidad: "C",
+      archivo: "/dictados-react/src/EnPosDeTiC.html",
+      color: "#087f8c",
+    },
+    {
       id: "sopla",
       titulo: "Sopla",
       artista: "Conquistando Fronteras",
