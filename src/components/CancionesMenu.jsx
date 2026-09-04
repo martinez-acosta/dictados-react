@@ -63,6 +63,7 @@ export default function CancionesMenu() {
       titulo: "En Pos de Ti",
       artista: "Conquistando Fronteras",
       tonalidad: "C",
+      bpm: 66,
       archivo: "/dictados-react/src/EnPosDeTiC.html",
       color: "#087f8c",
     },
