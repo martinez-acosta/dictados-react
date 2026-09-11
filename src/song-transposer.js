@@ -248,6 +248,26 @@
     };
   }
 
+  function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function replaceDisplayedKey(label, sourceKey, targetKey) {
+    const bracketedKey = /\[([A-G](?:#|b|♯|♭)?m?)(?=[,\]])/;
+    if (bracketedKey.test(label)) {
+      return label.replace(bracketedKey, "[" + targetKey);
+    }
+
+    const trailingKey = new RegExp(
+      "(\\s+[—-]\\s+)" + escapeRegExp(sourceKey) + "\\s*$",
+    );
+    if (trailingKey.test(label)) {
+      return label.replace(trailingKey, "$1" + targetKey);
+    }
+
+    return label + " [" + targetKey + "]";
+  }
+
   function shouldPreferFlats(targetRoot, minorSuffix) {
     if (targetRoot.includes("b")) return true;
     if (targetRoot.includes("#")) return false;
@@ -465,13 +485,15 @@
               );
       });
 
-      heading.textContent = originalHeading.replace(
-        /\[([A-G](?:#|b|♯|♭)?m?)/,
-        "[" + target,
+      heading.textContent = replaceDisplayedKey(
+        originalHeading,
+        originalKey.full,
+        target,
       );
-      document.title = originalTitle.replace(
-        /\[([A-G](?:#|b|♯|♭)?m?)/,
-        "[" + target,
+      document.title = replaceDisplayedKey(
+        originalTitle,
+        originalKey.full,
+        target,
       );
 
       currentTarget = target;
