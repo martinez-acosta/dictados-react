@@ -134,6 +134,14 @@ export default function CancionesMenu() {
       color: "#6741d9",
     },
     {
+      id: "hay-un-rey-f",
+      titulo: "Hay un Rey",
+      artista: "Toma Tu Lugar",
+      tonalidad: "F",
+      archivo: "/dictados-react/src/HayUnReyF.html",
+      color: "#d9480f",
+    },
+    {
       id: "thas-rindo-todo-e",
       titulo: "THAS (Rindo Todo)",
       artista: "Música ICF / Conquistando Fronteras",
