@@ -68,6 +68,15 @@ export default function CancionesMenu() {
       color: "#087f8c",
     },
     {
+      id: "danza-entre-nosotros-c",
+      titulo: "Danza Entre Nosotros",
+      artista: "Conquistando Fronteras",
+      tonalidad: "C",
+      bpm: 126,
+      archivo: "/dictados-react/src/DanzaEntreNosotrosC.html",
+      color: "#e8590c",
+    },
+    {
       id: "sopla",
       titulo: "Sopla",
       artista: "Conquistando Fronteras",
