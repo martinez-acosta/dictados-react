@@ -151,6 +151,15 @@ export default function CancionesMenu() {
       color: "#1c7ed6",
     },
     {
+      id: "como-en-el-cielo-d",
+      titulo: "Como en el Cielo (Here as in Heaven)",
+      artista: "Elevation Worship",
+      tonalidad: "D",
+      bpm: 69.5,
+      archivo: "/dictados-react/src/ComoEnElCieloD.html",
+      color: "#7048e8",
+    },
+    {
       id: "dios-ha-sido-bueno-f",
       titulo: "Dios Ha Sido Bueno",
       artista: "Marcos Witt",
