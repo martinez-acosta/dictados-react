@@ -329,7 +329,7 @@ const DANDELOT_EXERCISE_16_PLAYBACK = DANDELOT_SERIES_EXERCISE_16.flatMap(
     row.flatMap((group) =>
       group.map((key) => ({
         key,
-        beats: 1,
+        beats: group.length === 1 ? 1 : 0.5,
       })),
     ),
 );
