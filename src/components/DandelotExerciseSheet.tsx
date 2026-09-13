@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import {
+  Annotation,
   BarlineType,
   Beam,
   Factory,
@@ -15,19 +16,34 @@ export type DandelotExerciseRow = readonly DandelotNoteGroup[];
 export type DandelotExerciseSheetProps = {
   exerciseNumber: number | string;
   rows: readonly DandelotExerciseRow[];
+  activeNoteIndex?: number | null;
+  showNoteLabels?: boolean;
 };
 
 const MIN_SHEET_WIDTH = 760;
 const ROW_HEIGHT = 112;
+const ROW_HEIGHT_WITH_LABELS = 128;
+const SPANISH_NOTE_NAMES: Record<string, string> = {
+  c: "Do",
+  d: "Re",
+  e: "Mi",
+  f: "Fa",
+  g: "Sol",
+  a: "La",
+  b: "Si",
+};
 
 export default function DandelotExerciseSheet({
   exerciseNumber,
   rows,
+  activeNoteIndex = null,
+  showNoteLabels = false,
 }: DandelotExerciseSheetProps) {
   const reactId = useId().replace(/:/g, "");
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const rowRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [sheetWidth, setSheetWidth] = useState(MIN_SHEET_WIDTH);
+  const rowHeight = showNoteLabels ? ROW_HEIGHT_WITH_LABELS : ROW_HEIGHT;
 
   useEffect(() => {
     const sheet = sheetRef.current;
@@ -45,6 +61,8 @@ export default function DandelotExerciseSheet({
   }, []);
 
   useEffect(() => {
+    let noteOffset = 0;
+
     rows.forEach((row, rowIndex) => {
       const container = rowRefs.current[rowIndex];
       if (!container) return;
@@ -58,7 +76,7 @@ export default function DandelotExerciseSheet({
         renderer: {
           elementId: container.id,
           width: sheetWidth,
-          height: ROW_HEIGHT,
+          height: rowHeight,
         },
       });
       const context = factory.getContext();
@@ -72,16 +90,35 @@ export default function DandelotExerciseSheet({
       stave.setContext(context).draw();
       if (row.length === 0) return;
 
-      const noteGroups = row.map((group) =>
-        group.map(
-          (key) =>
-            new StaveNote({
-              clef: "treble",
-              keys: [key],
-              duration: group.length === 1 ? "q" : "8",
-            }),
-        ),
-      );
+      let groupOffset = noteOffset;
+      const noteGroups = row.map((group) => {
+        const groupNotes = group.map((key, groupNoteIndex) => {
+          const note = new StaveNote({
+            clef: "treble",
+            keys: [key],
+            duration: group.length === 1 ? "q" : "8",
+          });
+          const noteIndex = groupOffset + groupNoteIndex;
+
+          if (noteIndex === activeNoteIndex) {
+            note.setStyle({ fillStyle: "#1976d2", strokeStyle: "#1976d2" });
+          }
+
+          if (showNoteLabels) {
+            const noteName = SPANISH_NOTE_NAMES[key.split("/")[0]] ?? key;
+            note.addModifier(
+              new Annotation(noteName)
+                .setFont("Arial", 10)
+                .setVerticalJustification(Annotation.VerticalJustify.BOTTOM),
+              0,
+            );
+          }
+
+          return note;
+        });
+        groupOffset += group.length;
+        return groupNotes;
+      });
       const notes = noteGroups.flat();
       const beams = noteGroups
         .filter((group) => group.length > 1)
@@ -89,8 +126,9 @@ export default function DandelotExerciseSheet({
 
       Formatter.FormatAndDraw(context, stave, notes);
       beams.forEach((beam) => beam.setContext(context).draw());
+      noteOffset = groupOffset;
     });
-  }, [rows, sheetWidth]);
+  }, [activeNoteIndex, rowHeight, rows, sheetWidth, showNoteLabels]);
 
   return (
     <Box
@@ -116,7 +154,7 @@ export default function DandelotExerciseSheet({
         {rows.map((_, rowIndex) => (
           <Box
             key={`${reactId}-row-${rowIndex}`}
-            sx={{ position: "relative", height: ROW_HEIGHT }}
+            sx={{ position: "relative", height: rowHeight }}
           >
             {rowIndex === 0 && (
               <Box
@@ -146,7 +184,7 @@ export default function DandelotExerciseSheet({
               ref={(element: HTMLDivElement | null) => {
                 rowRefs.current[rowIndex] = element;
               }}
-              sx={{ width: "100%", height: ROW_HEIGHT }}
+              sx={{ width: "100%", height: rowHeight }}
             />
           </Box>
         ))}

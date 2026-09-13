@@ -11,6 +11,7 @@ import {
   Button,
   Stack,
   Chip,
+  Slider,
   Switch,
   FormControlLabel,
 } from "@mui/material";
@@ -107,9 +108,12 @@ export function toneDur(d: DurationSym): string {
 
 // convertir beats acumulados a "bars:beats:sixteenths" (4/4)
 export function beatsToBBS(totalBeats: number): string {
-  const bar = Math.floor(totalBeats / 4);
-  const beat = totalBeats % 4;
-  return `${bar}:${beat}:0`;
+  const totalSixteenths = Math.round(totalBeats * 4);
+  const bar = Math.floor(totalSixteenths / 16);
+  const withinBar = totalSixteenths % 16;
+  const beat = Math.floor(withinBar / 4);
+  const sixteenth = withinBar % 4;
+  return `${bar}:${beat}:${sixteenth}`;
 }
 
 // Rango 2 octavas naturales: C4..B5
@@ -319,6 +323,16 @@ export const DANDELOT_SERIES_EXERCISE_16 = [
     ["c/6"],
   ],
 ] as const;
+
+const DANDELOT_EXERCISE_16_PLAYBACK = DANDELOT_SERIES_EXERCISE_16.flatMap(
+  (row) =>
+    row.flatMap((group) =>
+      group.map((key) => ({
+        key,
+        beats: 1,
+      })),
+    ),
+);
 
 // ---------------- Configuración de ejercicios ----------------
 export const TREBLE_EXERCISES = {
@@ -577,6 +591,11 @@ export default function LecturaMusical() {
   const [metronomeActive, setMetronomeActive] = useState(false); // true durante reproducción o metrónomo solo
   const [currentBeat, setCurrentBeat] = useState(0); // 0..3
   const [currentNoteIndex, setCurrentNoteIndex] = useState<number | null>(null);
+  const [dandelotPlaying, setDandelotPlaying] = useState(false);
+  const [dandelotNoteIndex, setDandelotNoteIndex] = useState<number | null>(
+    null,
+  );
+  const [showDandelotNoteLabels, setShowDandelotNoteLabels] = useState(true);
 
   const staff1Ref = useRef<HTMLDivElement | null>(null);
   const metronomeIdRef = useRef<number | null>(null);
@@ -654,10 +673,17 @@ export default function LecturaMusical() {
   }
   function softStopUI() {
     setIsPlaying(false);
+    setDandelotPlaying(false);
     setMetronomeActive(false);
     setCurrentBeat(0);
     setCurrentNoteIndex(null);
+    setDandelotNoteIndex(null);
   }
+
+  useEffect(() => {
+    if (!isPlaying && !metronomeActive && !dandelotPlaying) return;
+    Tone.Transport.bpm.rampTo(bpm, 0.08);
+  }, [bpm, dandelotPlaying, isPlaying, metronomeActive]);
 
   // --------- Metrónomo con Tone.Transport (cuartos) ----------
   function scheduleMetronome() {
@@ -694,7 +720,7 @@ export default function LecturaMusical() {
   }
 
   async function toggleMetronomeOnly() {
-    if (isPlaying) return; // durante reproducción ya está el metrónomo
+    if (isPlaying || dandelotPlaying) return; // durante reproducción ya está el metrónomo
     if (metronomeActive) {
       hardStop();
       return;
@@ -863,6 +889,8 @@ export default function LecturaMusical() {
     }
     if (currentExercise.length === 0) return;
 
+    if (dandelotPlaying) hardStop();
+
     await ensureAudio();
     // preparar tempo/compás y limpiar programación previa
     Tone.Transport.cancel(0);
@@ -907,6 +935,42 @@ export default function LecturaMusical() {
     Tone.Transport.start("+0.05");
   }
 
+  async function playDandelotExercise() {
+    if (dandelotPlaying) {
+      hardStop();
+      return;
+    }
+
+    hardStop();
+    await ensureAudio();
+    Tone.Transport.cancel(0);
+    Tone.Transport.bpm.value = bpm;
+    Tone.Transport.timeSignature = [4, 4];
+    Tone.Transport.position = "0:0:0";
+
+    scheduleMetronome();
+    setMetronomeActive(true);
+    setCurrentBeat(0);
+
+    let accumulatedBeats = 0;
+    DANDELOT_EXERCISE_16_PLAYBACK.forEach((note, noteIndex) => {
+      Tone.Transport.schedule((time) => {
+        Tone.Draw.schedule(() => setDandelotNoteIndex(noteIndex), time);
+        samplerRef!.triggerAttackRelease(
+          keyToSPN(note.key),
+          note.beats === 1 ? "4n" : "8n",
+          time,
+        );
+      }, beatsToBBS(accumulatedBeats));
+      accumulatedBeats += note.beats;
+    });
+
+    Tone.Transport.setLoopPoints("0:0:0", beatsToBBS(accumulatedBeats));
+    Tone.Transport.loop = true;
+    setDandelotPlaying(true);
+    Tone.Transport.start("+0.05");
+  }
+
   // -------------------- UI --------------------
   return (
     <Box sx={{ width: "100%", px: 2 }}>
@@ -944,12 +1008,99 @@ export default function LecturaMusical() {
                 Lectura continua en tres renglones, como en la edición impresa.
               </Typography>
             </Box>
-            <Chip label="Notas cargadas" size="small" variant="outlined" />
+            <Stack direction="row" spacing={1}>
+              <Chip label="4/4" size="small" variant="outlined" />
+              <Chip label={`${bpm} BPM`} size="small" variant="outlined" />
+            </Stack>
           </Stack>
+
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            alignItems={{ xs: "stretch", sm: "center" }}
+            sx={{ mb: 1.5 }}
+          >
+            <Box sx={{ flex: 1, minWidth: { sm: 240 } }}>
+              <Typography
+                id="dandelot-bpm-label"
+                variant="body2"
+                sx={{ fontWeight: 700 }}
+              >
+                Tempo: {bpm} BPM
+              </Typography>
+              <Slider
+                aria-labelledby="dandelot-bpm-label"
+                value={bpm}
+                min={40}
+                max={180}
+                step={5}
+                valueLabelDisplay="auto"
+                onChange={(_, value) => setBpm(value as number)}
+                sx={{ py: 1 }}
+              />
+            </Box>
+            <Button
+              variant="contained"
+              onClick={playDandelotExercise}
+              startIcon={dandelotPlaying ? <Pause /> : <PlayArrow />}
+              sx={{ minWidth: 190 }}
+            >
+              {dandelotPlaying ? "Detener" : "Reproducir en loop"}
+            </Button>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showDandelotNoteLabels}
+                  onChange={(event) =>
+                    setShowDandelotNoteLabels(event.target.checked)
+                  }
+                />
+              }
+              label="Mostrar nombres de notas"
+              sx={{ m: 0, whiteSpace: "nowrap" }}
+            />
+          </Stack>
+
+          {dandelotPlaying && (
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ mb: 1 }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 700, mr: 0.5 }}>
+                Pulso
+              </Typography>
+              {[0, 1, 2, 3].map((beat) => (
+                <Box
+                  key={beat}
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    display: "grid",
+                    placeItems: "center",
+                    bgcolor: currentBeat === beat ? "primary.main" : "grey.200",
+                    color:
+                      currentBeat === beat
+                        ? "primary.contrastText"
+                        : "text.secondary",
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  {beat + 1}
+                </Box>
+              ))}
+            </Stack>
+          )}
 
           <DandelotExerciseSheet
             exerciseNumber={16}
             rows={DANDELOT_SERIES_EXERCISE_16}
+            activeNoteIndex={dandelotNoteIndex}
+            showNoteLabels={showDandelotNoteLabels}
           />
         </Paper>
 
