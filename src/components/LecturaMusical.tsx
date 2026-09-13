@@ -24,6 +24,7 @@ import {
 import { Factory, StaveNote, Stave, TickContext, Formatter } from "vexflow";
 import * as Tone from "tone";
 import { useNavigate } from "react-router-dom";
+import DandelotExerciseSheet from "./DandelotExerciseSheet";
 
 // ---------------- Audio globals (persistentes) ----------------
 let samplerRef: Tone.Sampler | null = null;
@@ -274,6 +275,91 @@ export type ExerciseConfig = {
   readonly clefNotes?: ClefNotesMap;
 };
 
+// Estructura provisional para validar la presentación del primer ejercicio.
+// Se reemplazará con las alturas exactas al recibir la transcripción.
+export const DANDELOT_SERIES_EXERCISE_1_DRAFT = [
+  [
+    "g/4",
+    "c/5",
+    "d/5",
+    "e/5",
+    "f/5",
+    "g/5",
+    "a/5",
+    "b/5",
+    "a/5",
+    "g/5",
+    "f/5",
+    "e/5",
+    "d/5",
+    "c/5",
+    "b/4",
+    "a/4",
+    "g/4",
+    "a/4",
+  ],
+  [
+    "g/4",
+    "b/4",
+    "c/5",
+    "d/5",
+    "e/5",
+    "f/5",
+    "g/5",
+    "f/5",
+    "e/5",
+    "d/5",
+    "c/5",
+    "b/4",
+    "g/4",
+    "c/5",
+    "d/5",
+    "e/5",
+    "c/5",
+    "a/4",
+  ],
+  [
+    "c/5",
+    "d/5",
+    "e/5",
+    "f/5",
+    "c/4",
+    "d/4",
+    "e/4",
+    "f/4",
+    "b/3",
+    "c/4",
+    "d/5",
+    "c/5",
+    "g/4",
+    "a/4",
+    "b/4",
+    "c/5",
+    "d/5",
+    "g/5",
+  ],
+  [
+    "g/5",
+    "f/5",
+    "e/5",
+    "d/5",
+    "c/5",
+    "b/4",
+    "a/4",
+    "g/4",
+    "c/5",
+    "e/5",
+    "d/5",
+    "f/5",
+    "e/5",
+    "g/5",
+    "f/5",
+    "d/5",
+    "c/5",
+    "b/4",
+  ],
+] as const;
+
 // ---------------- Configuración de ejercicios ----------------
 export const TREBLE_EXERCISES = {
   // ========== DANDELOT (LECTURA DIRIGIDA) ==========
@@ -448,8 +534,11 @@ export const EXERCISES_BY_CLEF = {
 } as const;
 
 type ExerciseCollections = typeof EXERCISES_BY_CLEF;
-export type ExerciseKeyByClef<C extends ClefType> = keyof ExerciseCollections[C];
-export type ExerciseKey = ExerciseKeyByClef<"treble"> | ExerciseKeyByClef<"bass">;
+export type ExerciseKeyByClef<C extends ClefType> =
+  keyof ExerciseCollections[C];
+export type ExerciseKey =
+  | ExerciseKeyByClef<"treble">
+  | ExerciseKeyByClef<"bass">;
 
 export function resolveExerciseConfig(
   clef: ClefType,
@@ -878,6 +967,36 @@ export default function LecturaMusical() {
             📖 Lectura Musical — Método Dandelot (Sol · Fa)
           </Typography>
         </Box>
+
+        <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2.5 } }}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            spacing={1}
+            sx={{ mb: 1.5 }}
+          >
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 750 }}>
+                Serie Dandelot · Ejercicio 1
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Lectura continua en cuatro renglones, como en la edición
+                impresa.
+              </Typography>
+            </Box>
+            <Chip
+              label="Borrador visual · notas pendientes"
+              size="small"
+              variant="outlined"
+            />
+          </Stack>
+
+          <DandelotExerciseSheet
+            exerciseNumber={1}
+            rows={DANDELOT_SERIES_EXERCISE_1_DRAFT}
+          />
+        </Paper>
 
         {/* Controles */}
         <Paper sx={{ p: 2 }}>
