@@ -275,88 +275,48 @@ export type ExerciseConfig = {
   readonly clefNotes?: ClefNotesMap;
 };
 
-// Estructura provisional para validar la presentación del primer ejercicio.
-// Se reemplazará con las alturas exactas al recibir la transcripción.
-export const DANDELOT_SERIES_EXERCISE_1_DRAFT = [
+export const DANDELOT_SERIES_EXERCISE_16 = [
   [
-    "g/4",
-    "c/5",
-    "d/5",
-    "e/5",
-    "f/5",
-    "g/5",
-    "a/5",
-    "b/5",
-    "a/5",
-    "g/5",
-    "f/5",
-    "e/5",
-    "d/5",
-    "c/5",
-    "b/4",
-    "a/4",
-    "g/4",
-    "a/4",
+    ["g/4", "a/4"],
+    ["c/5", "d/5"],
+    ["e/5", "f/5"],
+    ["g/5", "a/5"],
+    ["c/5", "d/5"],
+    ["e/5", "f/5"],
+    ["g/5", "a/5"],
+    ["f/5", "e/5"],
+    ["d/5", "c/5"],
+    ["b/4", "a/4"],
+    ["f/4", "e/4"],
+    ["d/4", "c/4"],
+    ["b/3", "c/4"],
   ],
   [
-    "g/4",
-    "b/4",
-    "c/5",
-    "d/5",
-    "e/5",
-    "f/5",
-    "g/5",
-    "f/5",
-    "e/5",
-    "d/5",
-    "c/5",
-    "b/4",
-    "g/4",
-    "c/5",
-    "d/5",
-    "e/5",
-    "c/5",
-    "a/4",
+    ["e/4", "f/4"],
+    ["a/4", "b/4"],
+    ["e/5", "f/5"],
+    ["b/5", "a/5"],
+    ["g/5", "f/5"],
+    ["c/5", "d/5"],
+    ["e/5", "f/5"],
+    ["e/5", "d/5"],
+    ["d/5", "e/5"],
+    ["f/5", "e/5"],
+    ["d/5", "c/5"],
   ],
   [
-    "c/5",
-    "d/5",
-    "e/5",
-    "f/5",
-    "c/4",
-    "d/4",
-    "e/4",
-    "f/4",
-    "b/3",
-    "c/4",
-    "d/5",
-    "c/5",
-    "g/4",
-    "a/4",
-    "b/4",
-    "c/5",
-    "d/5",
-    "g/5",
-  ],
-  [
-    "g/5",
-    "f/5",
-    "e/5",
-    "d/5",
-    "c/5",
-    "b/4",
-    "a/4",
-    "g/4",
-    "c/5",
-    "e/5",
-    "d/5",
-    "f/5",
-    "e/5",
-    "g/5",
-    "f/5",
-    "d/5",
-    "c/5",
-    "b/4",
+    ["b/4", "c/5"],
+    ["e/5", "f/5"],
+    ["c/4", "d/4"],
+    ["a/4", "b/4"],
+    ["c/6", "b/5"],
+    ["b/3", "c/4"],
+    ["d/5", "c/5"],
+    ["a/4", "b/4"],
+    ["c/5", "d/5"],
+    ["g/4", "a/4"],
+    ["b/4", "c/5"],
+    ["c/6"],
   ],
 ] as const;
 
@@ -978,23 +938,18 @@ export default function LecturaMusical() {
           >
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 750 }}>
-                Serie Dandelot · Ejercicio 1
+                Serie Dandelot · Ejercicio 16
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Lectura continua en cuatro renglones, como en la edición
-                impresa.
+                Lectura continua en tres renglones, como en la edición impresa.
               </Typography>
             </Box>
-            <Chip
-              label="Borrador visual · notas pendientes"
-              size="small"
-              variant="outlined"
-            />
+            <Chip label="Notas cargadas" size="small" variant="outlined" />
           </Stack>
 
           <DandelotExerciseSheet
-            exerciseNumber={1}
-            rows={DANDELOT_SERIES_EXERCISE_1_DRAFT}
+            exerciseNumber={16}
+            rows={DANDELOT_SERIES_EXERCISE_16}
           />
         </Paper>
 

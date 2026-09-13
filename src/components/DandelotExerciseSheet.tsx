@@ -9,9 +9,12 @@ import {
   StaveNote,
 } from "vexflow";
 
+export type DandelotNoteGroup = readonly string[];
+export type DandelotExerciseRow = readonly DandelotNoteGroup[];
+
 export type DandelotExerciseSheetProps = {
   exerciseNumber: number | string;
-  rows: readonly (readonly string[])[];
+  rows: readonly DandelotExerciseRow[];
 };
 
 const MIN_SHEET_WIDTH = 760;
@@ -69,15 +72,20 @@ export default function DandelotExerciseSheet({
       stave.setContext(context).draw();
       if (row.length === 0) return;
 
-      const notes = row.map(
-        (key) => new StaveNote({ clef: "treble", keys: [key], duration: "8" }),
+      const noteGroups = row.map((group) =>
+        group.map(
+          (key) =>
+            new StaveNote({
+              clef: "treble",
+              keys: [key],
+              duration: group.length === 1 ? "q" : "8",
+            }),
+        ),
       );
-      const beams: Beam[] = [];
-
-      for (let noteIndex = 0; noteIndex < notes.length; noteIndex += 2) {
-        const pair = notes.slice(noteIndex, noteIndex + 2);
-        if (pair.length === 2) beams.push(new Beam(pair));
-      }
+      const notes = noteGroups.flat();
+      const beams = noteGroups
+        .filter((group) => group.length > 1)
+        .map((group) => new Beam(group));
 
       Formatter.FormatAndDraw(context, stave, notes);
       beams.forEach((beam) => beam.setContext(context).draw());
