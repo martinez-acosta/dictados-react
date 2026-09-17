@@ -139,10 +139,10 @@ const EXERCISE_SECTIONS = [
     ],
   },
   {
-    id: "solfeo-auditivo",
-    title: "Solfeo y Entrenamiento Auditivo",
+    id: "solfeo",
+    title: "Solfeo",
     subtitle:
-      "Dictados, intervalos, tríadas y práctica vocal/visual para afinar oído y lectura.",
+      "Dictado, entrenamiento auditivo, lectura musical y práctica vocal.",
     accent: "#3f51b5",
     icon: MenuBook,
     items: [
@@ -197,16 +197,6 @@ const EXERCISE_SECTIONS = [
         iconColor: "secondary.main",
       },
       {
-        route: "/triadas",
-        title: "Entrenador de Tríadas",
-        description:
-          "Practica tríadas (mayor, menor, disminuida, aumentada) y sus inversiones",
-        buttonLabel: "Comenzar Tríadas",
-        buttonColor: "error",
-        icon: LibraryMusic,
-        iconColor: "error.main",
-      },
-      {
         route: "/vocal",
         title: "Entrenador Vocal",
         description:
@@ -251,6 +241,26 @@ const EXERCISE_SECTIONS = [
         },
         icon: MenuBook,
         iconColor: "#0f766e",
+      },
+    ],
+  },
+  {
+    id: "armonia",
+    title: "Armonía",
+    subtitle:
+      "Tríadas, escalas, inversiones, armonización y fundamentos teóricos.",
+    accent: "#6a1b9a",
+    icon: LibraryMusic,
+    items: [
+      {
+        route: "/triadas",
+        title: "Entrenador de Tríadas",
+        description:
+          "Practica tríadas (mayor, menor, disminuida, aumentada) y sus inversiones",
+        buttonLabel: "Comenzar Tríadas",
+        buttonColor: "error",
+        icon: LibraryMusic,
+        iconColor: "error.main",
       },
       {
         route: "/escalas-relativas",
@@ -408,7 +418,8 @@ const EXERCISE_SECTIONS = [
 const SECTION_SHORT_LABELS = {
   semestre: "Semestre",
   bajo: "Bajo",
-  "solfeo-auditivo": "Oído y lectura",
+  solfeo: "Solfeo",
+  armonia: "Armonía",
   ritmica: "Ritmo",
   utilidades: "Herramientas",
 };
@@ -700,7 +711,7 @@ export default function Dashboard() {
                     fontSize: { xs: 13, sm: 15 },
                   }}
                 >
-                  Bajo, oído, lectura y ritmo en un solo lugar.
+                  Bajo, solfeo, armonía y ritmo en un solo lugar.
                 </Typography>
               </Box>
             </Stack>
@@ -912,7 +923,7 @@ export default function Dashboard() {
             }}
           >
             Menú reorganizado por secciones para navegar más rápido entre bajo,
-            solfeo/auditivo, rítmica y utilidades.
+            solfeo, armonía, rítmica y utilidades.
           </Typography>
         </Box>
 
