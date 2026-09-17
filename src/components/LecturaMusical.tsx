@@ -593,6 +593,7 @@ export default function LecturaMusical() {
     null,
   );
   const [showDandelotNoteLabels, setShowDandelotNoteLabels] = useState(true);
+  const [dandelotReverseOrder, setDandelotReverseOrder] = useState(false);
 
   const staff1Ref = useRef<HTMLDivElement | null>(null);
   const metronomeIdRef = useRef<number | null>(null);
@@ -949,8 +950,13 @@ export default function LecturaMusical() {
     setMetronomeActive(true);
     setCurrentBeat(0);
 
+    const playbackOrder = DANDELOT_EXERCISE_16_PLAYBACK.map(
+      (note, noteIndex) => ({ note, noteIndex }),
+    );
+    if (dandelotReverseOrder) playbackOrder.reverse();
+
     let accumulatedBeats = 0;
-    DANDELOT_EXERCISE_16_PLAYBACK.forEach((note, noteIndex) => {
+    playbackOrder.forEach(({ note, noteIndex }) => {
       Tone.Transport.schedule((time) => {
         Tone.Draw.schedule(() => setDandelotNoteIndex(noteIndex), time);
         samplerRef!.triggerAttackRelease(
@@ -1054,6 +1060,19 @@ export default function LecturaMusical() {
                 />
               }
               label="Mostrar nombres de notas"
+              sx={{ m: 0, whiteSpace: "nowrap" }}
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={dandelotReverseOrder}
+                  onChange={(event) => {
+                    if (dandelotPlaying) hardStop();
+                    setDandelotReverseOrder(event.target.checked);
+                  }}
+                />
+              }
+              label="Fin → inicio"
               sx={{ m: 0, whiteSpace: "nowrap" }}
             />
           </Stack>
