@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
   Button,
+  IconButton,
   Stack,
   Chip,
   Slider,
@@ -21,6 +22,8 @@ import {
   ArrowBack,
   Refresh,
   AccessTime,
+  ChevronLeft,
+  ChevronRight,
 } from "@mui/icons-material";
 import { Factory, StaveNote, Stave, TickContext, Formatter } from "vexflow";
 import * as Tone from "tone";
@@ -321,15 +324,15 @@ export const DANDELOT_SERIES_EXERCISE_16 = [
   ],
 ] as const;
 
-const DANDELOT_EXERCISE_16_PLAYBACK = DANDELOT_SERIES_EXERCISE_16.flatMap(
-  (row) =>
-    row.flatMap((group) =>
-      group.map((key) => ({
-        key,
-        beats: group.length === 1 ? 1 : 0.5,
-      })),
-    ),
-);
+export const DANDELOT_EXERCISES = [
+  {
+    id: "16",
+    number: 16,
+    name: "Ejercicio 16",
+    description: "Lectura continua en tres renglones",
+    rows: DANDELOT_SERIES_EXERCISE_16,
+  },
+] as const;
 
 // ---------------- Configuración de ejercicios ----------------
 export const TREBLE_EXERCISES = {
@@ -594,12 +597,26 @@ export default function LecturaMusical() {
   );
   const [showDandelotNoteLabels, setShowDandelotNoteLabels] = useState(true);
   const [dandelotReverseOrder, setDandelotReverseOrder] = useState(false);
+  const [selectedDandelotIndex, setSelectedDandelotIndex] = useState(0);
 
   const staff1Ref = useRef<HTMLDivElement | null>(null);
   const metronomeIdRef = useRef<number | null>(null);
 
   const clef = selectedClef;
   const currentExerciseMap = EXERCISES_BY_CLEF[clef];
+  const selectedDandelotExercise = DANDELOT_EXERCISES[selectedDandelotIndex];
+  const dandelotPlayback = useMemo(
+    () =>
+      selectedDandelotExercise.rows.flatMap((row) =>
+        row.flatMap((group) =>
+          group.map((key) => ({
+            key,
+            beats: group.length === 1 ? 1 : 0.5,
+          })),
+        ),
+      ),
+    [selectedDandelotExercise],
+  );
 
   useEffect(() => {
     if (
@@ -950,9 +967,10 @@ export default function LecturaMusical() {
     setMetronomeActive(true);
     setCurrentBeat(0);
 
-    const playbackOrder = DANDELOT_EXERCISE_16_PLAYBACK.map(
-      (note, noteIndex) => ({ note, noteIndex }),
-    );
+    const playbackOrder = dandelotPlayback.map((note, noteIndex) => ({
+      note,
+      noteIndex,
+    }));
     if (dandelotReverseOrder) playbackOrder.reverse();
 
     let accumulatedBeats = 0;
@@ -972,6 +990,16 @@ export default function LecturaMusical() {
     Tone.Transport.loop = true;
     setDandelotPlaying(true);
     Tone.Transport.start("+0.05");
+  }
+
+  function selectDandelotExercise(nextIndex: number) {
+    const boundedIndex = Math.max(
+      0,
+      Math.min(DANDELOT_EXERCISES.length - 1, nextIndex),
+    );
+    if (boundedIndex === selectedDandelotIndex) return;
+    hardStop();
+    setSelectedDandelotIndex(boundedIndex);
   }
 
   // -------------------- UI --------------------
@@ -1005,16 +1033,63 @@ export default function LecturaMusical() {
           >
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 750 }}>
-                Serie Dandelot · Ejercicio 16
+                Serie Dandelot
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Lectura continua en tres renglones, como en la edición impresa.
+                {selectedDandelotExercise.description}, como en la edición
+                impresa.
               </Typography>
             </Box>
             <Stack direction="row" spacing={1}>
+              <Chip
+                label={`${selectedDandelotIndex + 1} de ${DANDELOT_EXERCISES.length}`}
+                size="small"
+                variant="outlined"
+              />
               <Chip label="4/4" size="small" variant="outlined" />
               <Chip label={`${bpm} BPM`} size="small" variant="outlined" />
             </Stack>
+          </Stack>
+
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ mb: 2, maxWidth: 420 }}
+          >
+            <IconButton
+              aria-label="Ejercicio anterior"
+              onClick={() => selectDandelotExercise(selectedDandelotIndex - 1)}
+              disabled={selectedDandelotIndex === 0}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <FormControl fullWidth size="small">
+              <InputLabel id="dandelot-exercise-selector-label">
+                Ejercicio
+              </InputLabel>
+              <Select
+                labelId="dandelot-exercise-selector-label"
+                value={selectedDandelotIndex}
+                label="Ejercicio"
+                onChange={(event) =>
+                  selectDandelotExercise(Number(event.target.value))
+                }
+              >
+                {DANDELOT_EXERCISES.map((exercise, index) => (
+                  <MenuItem key={exercise.id} value={index}>
+                    {exercise.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <IconButton
+              aria-label="Ejercicio siguiente"
+              onClick={() => selectDandelotExercise(selectedDandelotIndex + 1)}
+              disabled={selectedDandelotIndex === DANDELOT_EXERCISES.length - 1}
+            >
+              <ChevronRight />
+            </IconButton>
           </Stack>
 
           <Stack
@@ -1113,8 +1188,8 @@ export default function LecturaMusical() {
           )}
 
           <DandelotExerciseSheet
-            exerciseNumber={16}
-            rows={DANDELOT_SERIES_EXERCISE_16}
+            exerciseNumber={selectedDandelotExercise.number}
+            rows={selectedDandelotExercise.rows}
             activeNoteIndex={dandelotNoteIndex}
             showNoteLabels={showDandelotNoteLabels}
           />
