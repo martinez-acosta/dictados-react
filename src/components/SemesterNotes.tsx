@@ -24,7 +24,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 type SubjectId = "solfeo" | "armonia" | "improvisacion";
-type DetailView = "resumen" | "tareas" | "conceptos";
+type DetailView = "resumen" | "tareas" | "conceptos" | "respuestas";
 
 const WEEKS = [
   {
@@ -92,6 +92,14 @@ const HARMONY_BOARD_IMAGES = [
 
 const HARMONY_STUDY_GROUPS = [
   {
+    title: "Tarea · armonización",
+    tasks: [
+      ["harmonize-g", "Armonizar la escala de G mayor"],
+      ["harmonize-d", "Armonizar la escala de D mayor"],
+      ["harmonize-a", "Armonizar la escala de A mayor"],
+    ],
+  },
+  {
     title: "Escalas y tríadas",
     tasks: [
       ["major-formula", "Memorizar T–T–ST–T–T–T–ST"],
@@ -114,6 +122,81 @@ const HARMONY_STUDY_GROUPS = [
       ["symmetry", "Entender la simetría del acorde °7"],
     ],
   },
+] as const;
+
+const HARMONY_HOMEWORK_ANSWERS = [
+  {
+    id: "g",
+    label: "G mayor",
+    scale: "G – A – B – C – D – E – F♯ – G",
+    sequence: "G – Am – Bm – C – D – Em – F♯dim – G",
+    chords: [
+      ["I", "G", "G – B – D"],
+      ["ii", "Am", "A – C – E"],
+      ["iii", "Bm", "B – D – F♯"],
+      ["IV", "C", "C – E – G"],
+      ["V", "D", "D – F♯ – A"],
+      ["vi", "Em", "E – G – B"],
+      ["vii°", "F♯dim", "F♯ – A – C"],
+      ["I", "G", "G – B – D"],
+    ],
+  },
+  {
+    id: "d",
+    label: "D mayor",
+    scale: "D – E – F♯ – G – A – B – C♯ – D",
+    sequence: "D – Em – F♯m – G – A – Bm – C♯dim – D",
+    chords: [
+      ["I", "D", "D – F♯ – A"],
+      ["ii", "Em", "E – G – B"],
+      ["iii", "F♯m", "F♯ – A – C♯"],
+      ["IV", "G", "G – B – D"],
+      ["V", "A", "A – C♯ – E"],
+      ["vi", "Bm", "B – D – F♯"],
+      ["vii°", "C♯dim", "C♯ – E – G"],
+      ["I", "D", "D – F♯ – A"],
+    ],
+  },
+  {
+    id: "a",
+    label: "A mayor",
+    scale: "A – B – C♯ – D – E – F♯ – G♯ – A",
+    sequence: "A – Bm – C♯m – D – E – F♯m – G♯dim – A",
+    chords: [
+      ["I", "A", "A – C♯ – E"],
+      ["ii", "Bm", "B – D – F♯"],
+      ["iii", "C♯m", "C♯ – E – G♯"],
+      ["IV", "D", "D – F♯ – A"],
+      ["V", "E", "E – G♯ – B"],
+      ["vi", "F♯m", "F♯ – A – C♯"],
+      ["vii°", "G♯dim", "G♯ – B – D"],
+      ["I", "A", "A – C♯ – E"],
+    ],
+  },
+] as const;
+
+const JAZZ_BLUES_ANSWERS = [
+  ["1", "C7"],
+  ["2", "F7"],
+  ["3", "C7"],
+  ["4", "C7"],
+  ["5", "F7"],
+  ["6", "F♯dim7"],
+  ["7", "C7"],
+  ["8", "A7"],
+  ["9", "Dm7"],
+  ["10", "G7"],
+  ["11", "C7 – A7"],
+  ["12", "Dm7 – G7"],
+] as const;
+
+const IMPROVISATION_CHORD_ANSWERS = [
+  ["C7", "1 – 3 – 5 – ♭7", "C – E – G – B♭"],
+  ["F7", "1 – 3 – 5 – ♭7", "F – A – C – E♭"],
+  ["F♯dim7", "1 – ♭3 – ♭5 – ♭♭7", "F♯ – A – C – E♭"],
+  ["A7", "1 – 3 – 5 – ♭7", "A – C♯ – E – G"],
+  ["Dm7", "1 – ♭3 – 5 – ♭7", "D – F – A – C"],
+  ["G7", "1 – 3 – 5 – ♭7", "G – B – D – F"],
 ] as const;
 
 const IMPROVISATION_TASK_GROUPS = [
@@ -507,10 +590,10 @@ function HarmonyTasksView() {
       >
         <Box>
           <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
-            Estudio recomendado
+            Tarea y estudio
           </Typography>
           <Typography sx={{ color: "#667678" }}>
-            La grabación no contiene una tarea nueva explícita de Armonía.
+            Armonizar G, D y A mayor y repasar cómo se construye cada acorde.
           </Typography>
         </Box>
         <Chip
@@ -552,11 +635,10 @@ function HarmonyTasksView() {
       ))}
 
       <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
-        <Typography sx={{ fontWeight: 900 }}>Estado de la tarea</Typography>
+        <Typography sx={{ fontWeight: 900 }}>Cómo comprobarla</Typography>
         <Typography sx={{ color: "#667678", mt: 0.5 }}>
-          Se revisó una tarea anterior durante la clase, pero no se escucha una
-          nueva entrega específica. Esta lista funciona como guía de estudio, no
-          como tarea confirmada.
+          Usa el patrón I–ii–iii–IV–V–vi–vii°–I. La sección Respuestas muestra
+          el procedimiento completo para las tres tonalidades.
         </Typography>
       </Box>
     </Stack>
@@ -640,6 +722,107 @@ function HarmonyConceptsView() {
         <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
           La tónica pertenece a la escala. La fundamental es la nota desde la
           que se construye cada acorde.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function HarmonyAnswersView() {
+  const [scaleId, setScaleId] = useState("g");
+  const answer =
+    HARMONY_HOMEWORK_ANSWERS.find((item) => item.id === scaleId) ??
+    HARMONY_HOMEWORK_ANSWERS[0];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Respuestas de la tarea
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Armonización de las escalas de G, D y A mayor con tríadas.
+        </Typography>
+      </Box>
+
+      <FormControl fullWidth size="small">
+        <InputLabel id="harmony-answer-scale-label">Escala</InputLabel>
+        <Select
+          labelId="harmony-answer-scale-label"
+          label="Escala"
+          value={scaleId}
+          onChange={(event) => setScaleId(event.target.value)}
+        >
+          {HARMONY_HOMEWORK_ANSWERS.map((item) => (
+            <MenuItem key={item.id} value={item.id}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <Box>
+        <SectionHeading>Escala de {answer.label}</SectionHeading>
+        <Typography sx={{ color: "#344b4d", fontWeight: 700 }}>
+          {answer.scale}
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Grados, acordes y notas</SectionHeading>
+        <Box sx={{ overflowX: "auto" }}>
+          <Box sx={{ minWidth: 390 }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "64px 100px 1fr",
+                gap: 1,
+                py: 0.8,
+                borderBlock: "1px solid #cbd6d4",
+                color: "#5d6c6e",
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                GRADO
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                ACORDE
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                NOTAS
+              </Typography>
+            </Box>
+            {answer.chords.map(([degree, chord, notes], index) => (
+              <Box
+                key={`${degree}-${index}`}
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "64px 100px 1fr",
+                  gap: 1,
+                  py: 0.9,
+                  borderBottom: "1px solid #dce3e1",
+                }}
+              >
+                <Typography sx={{ fontWeight: 900 }}>{degree}</Typography>
+                <Typography sx={{ fontWeight: 800 }}>{chord}</Typography>
+                <Typography sx={{ color: "#56676a" }}>{notes}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Respuesta corrida</Typography>
+        <Typography sx={{ color: "#344b4d", mt: 0.5, fontWeight: 700 }}>
+          {answer.sequence}
+        </Typography>
+      </Box>
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Fórmula para recordar</Typography>
+        <Typography sx={{ color: "#344b4d", mt: 0.5 }}>
+          I–ii–iii–IV–V–vi–vii°–I · M–m–m–M–M–m–°–M
         </Typography>
       </Box>
     </Stack>
@@ -828,13 +1011,11 @@ function ImprovisationTasksView() {
       ))}
 
       <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
-        <Typography sx={{ fontWeight: 900 }}>
-          Lista exacta de acordes pendiente
-        </Typography>
+        <Typography sx={{ fontWeight: 900 }}>Acordes reconstruidos</Typography>
         <Typography sx={{ color: "#667678", mt: 0.5 }}>
-          La foto muestra los intervalos, pero no la lista de acordes asignada.
-          Falta la foto o el mensaje del grupo para completar esa parte sin
-          inventar información.
+          La sección Respuestas usa la forma de Jazz Blues en C trabajada antes:
+          C7, F7, F♯dim7, A7, Dm7 y G7. Conservamos la advertencia de que el
+          audio no captó la lista escrita completa.
         </Typography>
       </Box>
     </Stack>
@@ -933,6 +1114,113 @@ function ImprovisationConceptsView() {
         <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
           Sonido ≠ función. Una escritura enarmónica puede sonar igual en el
           piano y aun así representar otra función armónica.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function ImprovisationAnswersView() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Respuestas de la tarea
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Construcción de los acordes usados en el Jazz Blues en C.
+        </Typography>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #b7791f", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>
+          Referencia reconstruida
+        </Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          El maestro indicó que estos acordes eran tarea, pero el audio no captó
+          la lista del pizarrón. Esta respuesta parte de la forma de Jazz Blues
+          en C que ya se había trabajado.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Forma de 12 compases</SectionHeading>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(4, 1fr)" },
+            borderTop: "1px solid #cbd6d4",
+            borderLeft: "1px solid #cbd6d4",
+          }}
+        >
+          {JAZZ_BLUES_ANSWERS.map(([measure, chord]) => (
+            <Box
+              key={measure}
+              sx={{
+                minHeight: 72,
+                p: 1.25,
+                borderRight: "1px solid #cbd6d4",
+                borderBottom: "1px solid #cbd6d4",
+              }}
+            >
+              <Typography variant="caption" sx={{ color: "#6a797b" }}>
+                COMPÁS {measure}
+              </Typography>
+              <Typography sx={{ mt: 0.35, fontWeight: 900 }}>
+                {chord}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      <Box>
+        <SectionHeading>Grados</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d", fontWeight: 700 }}>
+          <Typography>I7 – IV7 – I7 – I7</Typography>
+          <Typography>IV7 – ♯IV°7 – I7 – VI7</Typography>
+          <Typography>IIm7 – V7 – I7 VI7 – IIm7 V7</Typography>
+        </Stack>
+      </Box>
+
+      <Box>
+        <SectionHeading>Construcción de acordes</SectionHeading>
+        <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
+          {IMPROVISATION_CHORD_ANSWERS.map(([chord, formula, notes]) => (
+            <Box
+              key={chord}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "82px 1fr",
+                  sm: "100px 180px 1fr",
+                },
+                gap: 1,
+                py: 1.25,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{chord}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{formula}</Typography>
+              <Typography
+                sx={{
+                  gridColumn: { xs: "2", sm: "auto" },
+                  color: "#183638",
+                  fontWeight: 750,
+                }}
+              >
+                {notes}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Procedimiento</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          Escribe nombre del acorde → fórmula → notas. Por ejemplo: C7 →
+          1–3–5–♭7 → C–E–G–B♭.
         </Typography>
       </Box>
     </Stack>
@@ -1071,10 +1359,21 @@ export default function SemesterNotes() {
                       value && setDetailView(value)
                     }
                     aria-label={`Apartado de ${selectedSubject.label}`}
+                    sx={{
+                      width: { xs: "100%", sm: "auto" },
+                      "& .MuiToggleButton-root": {
+                        flex: { xs: 1, sm: "initial" },
+                        px: { xs: 0.75, sm: 1.5 },
+                        fontSize: { xs: 11, sm: 13 },
+                      },
+                    }}
                   >
                     <ToggleButton value="resumen">Resumen</ToggleButton>
                     <ToggleButton value="tareas">Tareas</ToggleButton>
                     <ToggleButton value="conceptos">Conceptos</ToggleButton>
+                    {subject !== "solfeo" && (
+                      <ToggleButton value="respuestas">Respuestas</ToggleButton>
+                    )}
                   </ToggleButtonGroup>
                 </Stack>
 
@@ -1096,6 +1395,9 @@ export default function SemesterNotes() {
                 {subject === "armonia" && detailView === "conceptos" && (
                   <HarmonyConceptsView />
                 )}
+                {subject === "armonia" && detailView === "respuestas" && (
+                  <HarmonyAnswersView />
+                )}
                 {subject === "improvisacion" && detailView === "resumen" && (
                   <ImprovisationSummaryView />
                 )}
@@ -1104,6 +1406,9 @@ export default function SemesterNotes() {
                 )}
                 {subject === "improvisacion" && detailView === "conceptos" && (
                   <ImprovisationConceptsView />
+                )}
+                {subject === "improvisacion" && detailView === "respuestas" && (
+                  <ImprovisationAnswersView />
                 )}
               </>
             ) : (
