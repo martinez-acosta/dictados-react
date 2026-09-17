@@ -36,7 +36,7 @@ const WEEKS = [
 
 const SUBJECTS: Array<{ id: SubjectId; label: string; hasNotes: boolean }> = [
   { id: "solfeo", label: "Solfeo", hasNotes: true },
-  { id: "armonia", label: "Armonía", hasNotes: false },
+  { id: "armonia", label: "Armonía", hasNotes: true },
   { id: "improvisacion", label: "Improvisación", hasNotes: true },
 ];
 
@@ -68,7 +68,53 @@ const TASK_GROUPS = [
 const SOLFEGE_STORAGE_KEY = "semester-notes:2026-09-07:solfeo:tasks";
 const IMPROVISATION_STORAGE_KEY =
   "semester-notes:2026-09-07:improvisacion:tasks";
+const HARMONY_STORAGE_KEY = "semester-notes:2026-09-07:armonia:study";
 const IMPROVISATION_BOARD_IMAGE = `${import.meta.env.BASE_URL}semester-notes/2026-09-07/improvisacion-intervalos.png`;
+
+const HARMONY_BOARD_IMAGES = [
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-07/armonia-campo-armonico.png`,
+    label: "Campo armónico de Re mayor",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-07/armonia-cuatriadas-1.png`,
+    label: "Cuatríadas · acercamiento 1",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-07/armonia-cuatriadas-2.png`,
+    label: "Cuatríadas · acercamiento 2",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-07/armonia-cuatriadas-3.png`,
+    label: "Cuatríadas · vista completa",
+  },
+] as const;
+
+const HARMONY_STUDY_GROUPS = [
+  {
+    title: "Escalas y tríadas",
+    tasks: [
+      ["major-formula", "Memorizar T–T–ST–T–T–T–ST"],
+      ["build-scale", "Construir escalas mayores con la fórmula"],
+      ["harmonize-triads", "Armonizar una escala mayor con tríadas"],
+      ["degree-pattern", "Memorizar I–ii–iii–IV–V–vi–vii°"],
+      ["tonic-root", "Distinguir tónica de fundamental"],
+      ["triad-types", "Construir tríadas mayores, menores y disminuidas"],
+    ],
+  },
+  {
+    title: "Cuatríadas",
+    tasks: [
+      ["maj7", "Construir Maj7"],
+      ["dominant7", "Construir 7 dominante"],
+      ["minor7", "Construir m7 y mMaj7"],
+      ["half-diminished", "Construir m7♭5 / ø7"],
+      ["diminished7", "Construir dim7 / °7"],
+      ["enharmony", "Repasar enarmonía e inversiones"],
+      ["symmetry", "Entender la simetría del acorde °7"],
+    ],
+  },
+] as const;
 
 const IMPROVISATION_TASK_GROUPS = [
   {
@@ -312,6 +358,288 @@ function ConceptsView() {
           Leer, cantar, escuchar, mantener afinación y conservar el tempo deben
           suceder simultáneamente. La coordinación rítmica prepara esa
           independencia.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function HarmonySummaryView() {
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const photo = HARMONY_BOARD_IMAGES[photoIndex];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography
+          variant="overline"
+          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
+        >
+          Idea central
+        </Typography>
+        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
+          De la escala mayor a las tríadas y cuatríadas
+        </Typography>
+        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
+          La clase conectó la fórmula de la escala mayor con la armonización por
+          grados y después añadió la séptima para construir cuatríadas.
+        </Typography>
+      </Box>
+
+      <Box component="figure" sx={{ m: 0 }}>
+        <Box
+          component="img"
+          src={photo.src}
+          alt={`Pizarrón de Armonía: ${photo.label}`}
+          sx={{
+            display: "block",
+            width: "100%",
+            maxHeight: 520,
+            objectFit: "contain",
+            bgcolor: "#eef2f1",
+            border: "1px solid #d6dfdd",
+          }}
+        />
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ mt: 1.25, overflowX: "auto", pb: 0.5 }}
+        >
+          {HARMONY_BOARD_IMAGES.map((item, index) => (
+            <Button
+              key={item.src}
+              size="small"
+              variant={photoIndex === index ? "contained" : "outlined"}
+              onClick={() => setPhotoIndex(index)}
+              sx={{ minWidth: "max-content", textTransform: "none" }}
+            >
+              Foto {index + 1}
+            </Button>
+          ))}
+        </Stack>
+        <Typography
+          component="figcaption"
+          variant="caption"
+          sx={{ display: "block", mt: 0.5, color: "#677779" }}
+        >
+          {photo.label}
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Escala mayor y armonización</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>• Fórmula mayor: T–T–ST–T–T–T–ST.</Typography>
+          <Typography>
+            • Cada grado funciona como fundamental de su propio acorde.
+          </Typography>
+          <Typography>• Patrón de tríadas: M–m–m–M–M–m–°.</Typography>
+          <Typography>
+            • Mayores: I, IV y V · menores: ii, iii y vi · disminuido: vii°.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>De tríada a cuatríada</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>• Tríada: 1–3–5.</Typography>
+          <Typography>• Cuatríada: 1–3–5–7.</Typography>
+          <Typography>
+            • Se trabajaron Maj7, 7, m7, mMaj7, m7♭5/ø7 y dim7/°7.
+          </Typography>
+          <Typography>
+            • La escritura enarmónica debe conservar la función de tercera,
+            quinta o séptima.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Acorde disminuido 7</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          Está formado por terceras menores sucesivas, es simétrico y produce
+          solo tres conjuntos distintos de alturas antes de repetirse por
+          inversión y enarmonía.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function HarmonyTasksView() {
+  const [completed, setCompleted] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(
+        window.localStorage.getItem(HARMONY_STORAGE_KEY) ?? "{}",
+      );
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(HARMONY_STORAGE_KEY, JSON.stringify(completed));
+  }, [completed]);
+
+  const taskCount = HARMONY_STUDY_GROUPS.reduce(
+    (total, group) => total + group.tasks.length,
+    0,
+  );
+  const taskIds = new Set(
+    HARMONY_STUDY_GROUPS.flatMap((group) => group.tasks.map(([id]) => id)),
+  );
+  const completedCount = Object.entries(completed).filter(
+    ([id, isDone]) => isDone && taskIds.has(id),
+  ).length;
+
+  return (
+    <Stack spacing={3}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={1}
+      >
+        <Box>
+          <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+            Estudio recomendado
+          </Typography>
+          <Typography sx={{ color: "#667678" }}>
+            La grabación no contiene una tarea nueva explícita de Armonía.
+          </Typography>
+        </Box>
+        <Chip
+          label={`${completedCount} de ${taskCount}`}
+          variant="outlined"
+          sx={{ fontWeight: 800 }}
+        />
+      </Stack>
+
+      {HARMONY_STUDY_GROUPS.map((group) => (
+        <Box key={group.title}>
+          <SectionHeading>{group.title}</SectionHeading>
+          <Stack spacing={0.25}>
+            {group.tasks.map(([id, label]) => (
+              <FormControlLabel
+                key={id}
+                control={
+                  <Checkbox
+                    checked={Boolean(completed[id])}
+                    onChange={(event) =>
+                      setCompleted((current) => ({
+                        ...current,
+                        [id]: event.target.checked,
+                      }))
+                    }
+                  />
+                }
+                label={label}
+                sx={{
+                  m: 0,
+                  py: 0.25,
+                  color: completed[id] ? "#849092" : "#243d3f",
+                  textDecoration: completed[id] ? "line-through" : "none",
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+      ))}
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Estado de la tarea</Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Se revisó una tarea anterior durante la clase, pero no se escucha una
+          nueva entrega específica. Esta lista funciona como guía de estudio, no
+          como tarea confirmada.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function HarmonyConceptsView() {
+  const dMajorHarmony = [
+    ["I", "D", "Mayor"],
+    ["ii", "Em", "Menor"],
+    ["iii", "F♯m", "Menor"],
+    ["IV", "G", "Mayor"],
+    ["V", "A", "Mayor"],
+    ["vi", "Bm", "Menor"],
+    ["vii°", "C♯°", "Disminuido"],
+  ];
+  const tetrads = [
+    ["Maj7", "Tríada mayor + 7ª mayor"],
+    ["7", "Tríada mayor + 7ª menor"],
+    ["m7", "Tríada menor + 7ª menor"],
+    ["mMaj7", "Tríada menor + 7ª mayor"],
+    ["m7♭5 / ø7", "Tríada disminuida + 7ª menor"],
+    ["dim7 / °7", "Tríada disminuida + 7ª disminuida"],
+  ];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Referencia de armonía
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Fórmulas y ejemplos centrales de la clase.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Armonización de Re mayor</SectionHeading>
+        <Box sx={{ borderTop: "1px solid #dce3e1" }}>
+          {dMajorHarmony.map(([degree, chord, quality]) => (
+            <Box
+              key={degree}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "70px 90px 1fr",
+                py: 0.8,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{degree}</Typography>
+              <Typography>{chord}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{quality}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      <Box>
+        <SectionHeading>Fórmulas de cuatríadas</SectionHeading>
+        <Box sx={{ borderTop: "1px solid #dce3e1" }}>
+          {tetrads.map(([symbol, formula]) => (
+            <Box
+              key={symbol}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "110px 1fr", sm: "150px 1fr" },
+                gap: 1,
+                py: 1,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{symbol}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{formula}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Tónica y fundamental</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          La tónica pertenece a la escala. La fundamental es la nota desde la
+          que se construye cada acorde.
         </Typography>
       </Box>
     </Stack>
@@ -758,6 +1086,15 @@ export default function SemesterNotes() {
                 )}
                 {subject === "solfeo" && detailView === "conceptos" && (
                   <ConceptsView />
+                )}
+                {subject === "armonia" && detailView === "resumen" && (
+                  <HarmonySummaryView />
+                )}
+                {subject === "armonia" && detailView === "tareas" && (
+                  <HarmonyTasksView />
+                )}
+                {subject === "armonia" && detailView === "conceptos" && (
+                  <HarmonyConceptsView />
                 )}
                 {subject === "improvisacion" && detailView === "resumen" && (
                   <ImprovisationSummaryView />
