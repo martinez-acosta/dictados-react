@@ -100,6 +100,14 @@ const HARMONY_STUDY_GROUPS = [
     ],
   },
   {
+    title: "Tarea · acordes disminuidos 7",
+    tasks: [
+      ["g-dim7", "Construir G°7 desde la nota G"],
+      ["ab-dim7", "Construir A♭°7 desde la nota A♭"],
+      ["e-dim7", "Construir E°7 desde la nota E"],
+    ],
+  },
+  {
     title: "Escalas y tríadas",
     tasks: [
       ["major-formula", "Memorizar T–T–ST–T–T–T–ST"],
@@ -172,6 +180,24 @@ const HARMONY_HOMEWORK_ANSWERS = [
       ["vii°", "G♯dim", "G♯ – B – D"],
       ["I", "A", "A – C♯ – E"],
     ],
+  },
+] as const;
+
+const HARMONY_DIMINISHED_ANSWERS = [
+  {
+    chord: "G°7",
+    notes: "G – B♭ – D♭ – F♭",
+    enharmonic: "G – B♭ – D♭ – E",
+  },
+  {
+    chord: "A♭°7",
+    notes: "A♭ – C♭ – E𝄫 – G𝄫",
+    enharmonic: "A♭ – B – D – F",
+  },
+  {
+    chord: "E°7",
+    notes: "E – G – B♭ – D♭",
+    enharmonic: "E – G – B♭ – D♭",
   },
 ] as const;
 
@@ -593,7 +619,7 @@ function HarmonyTasksView() {
             Tarea y estudio
           </Typography>
           <Typography sx={{ color: "#667678" }}>
-            Armonizar G, D y A mayor y repasar cómo se construye cada acorde.
+            Armonizar G, D y A mayor y construir G°7, A♭°7 y E°7.
           </Typography>
         </Box>
         <Chip
@@ -638,7 +664,7 @@ function HarmonyTasksView() {
         <Typography sx={{ fontWeight: 900 }}>Cómo comprobarla</Typography>
         <Typography sx={{ color: "#667678", mt: 0.5 }}>
           Usa el patrón I–ii–iii–IV–V–vi–vii°–I. La sección Respuestas muestra
-          el procedimiento completo para las tres tonalidades.
+          las tres tonalidades y la fórmula 1–♭3–♭5–♭♭7 para los disminuidos.
         </Typography>
       </Box>
     </Stack>
@@ -741,7 +767,7 @@ function HarmonyAnswersView() {
           Respuestas de la tarea
         </Typography>
         <Typography sx={{ color: "#667678", mt: 0.5 }}>
-          Armonización de las escalas de G, D y A mayor con tríadas.
+          Armonización de G, D y A mayor, más los tres acordes disminuidos 7.
         </Typography>
       </Box>
 
@@ -823,6 +849,59 @@ function HarmonyAnswersView() {
         <Typography sx={{ fontWeight: 900 }}>Fórmula para recordar</Typography>
         <Typography sx={{ color: "#344b4d", mt: 0.5 }}>
           I–ii–iii–IV–V–vi–vii°–I · M–m–m–M–M–m–°–M
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <Typography sx={{ fontSize: 20, fontWeight: 900 }}>
+          Acordes disminuidos 7
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Fórmula: 1–♭3–♭5–♭♭7. Se forman apilando terceras menores.
+        </Typography>
+      </Box>
+
+      <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
+        {HARMONY_DIMINISHED_ANSWERS.map((item) => (
+          <Box
+            key={item.chord}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "76px 1fr", sm: "90px 1fr 1fr" },
+              gap: 1,
+              py: 1.25,
+              borderBottom: "1px solid #dce3e1",
+            }}
+          >
+            <Typography sx={{ fontWeight: 900 }}>{item.chord}</Typography>
+            <Box>
+              <Typography variant="caption" sx={{ color: "#6a797b" }}>
+                ESCRITURA TEÓRICA
+              </Typography>
+              <Typography sx={{ color: "#183638", fontWeight: 750 }}>
+                {item.notes}
+              </Typography>
+            </Box>
+            <Box sx={{ gridColumn: { xs: "2", sm: "auto" } }}>
+              <Typography variant="caption" sx={{ color: "#6a797b" }}>
+                SONIDO ENARMÓNICO
+              </Typography>
+              <Typography sx={{ color: "#56676a" }}>
+                {item.enharmonic}
+              </Typography>
+            </Box>
+          </Box>
+        ))}
+      </Stack>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Detalle importante</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          G°7 y E°7 contienen los mismos sonidos en otro orden. La escritura
+          cambia para conservar la construcción por terceras y la función de
+          cada nota.
         </Typography>
       </Box>
     </Stack>
