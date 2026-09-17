@@ -201,6 +201,93 @@ const HARMONY_DIMINISHED_ANSWERS = [
   },
 ] as const;
 
+const TETRAD_DETAILS = [
+  {
+    id: "maj7",
+    symbol: "Maj7",
+    name: "Mayor séptima",
+    formula: "1 – 3 – 5 – 7",
+    construction: "Tríada mayor + 7ª mayor",
+    example: "Cmaj7 = C – E – G – B",
+    notes: [
+      ["1", "C", "Fundamental", "0 semitonos"],
+      ["3", "E", "3ª mayor", "4 semitonos"],
+      ["5", "G", "5ª justa", "7 semitonos"],
+      ["7", "B", "7ª mayor", "11 semitonos"],
+    ],
+  },
+  {
+    id: "7",
+    symbol: "7",
+    name: "Séptima dominante",
+    formula: "1 – 3 – 5 – ♭7",
+    construction: "Tríada mayor + 7ª menor",
+    example: "C7 = C – E – G – B♭",
+    notes: [
+      ["1", "C", "Fundamental", "0 semitonos"],
+      ["3", "E", "3ª mayor", "4 semitonos"],
+      ["5", "G", "5ª justa", "7 semitonos"],
+      ["♭7", "B♭", "7ª menor", "10 semitonos"],
+    ],
+  },
+  {
+    id: "m7",
+    symbol: "m7",
+    name: "Menor séptima",
+    formula: "1 – ♭3 – 5 – ♭7",
+    construction: "Tríada menor + 7ª menor",
+    example: "Cm7 = C – E♭ – G – B♭",
+    notes: [
+      ["1", "C", "Fundamental", "0 semitonos"],
+      ["♭3", "E♭", "3ª menor", "3 semitonos"],
+      ["5", "G", "5ª justa", "7 semitonos"],
+      ["♭7", "B♭", "7ª menor", "10 semitonos"],
+    ],
+  },
+  {
+    id: "mmaj7",
+    symbol: "mMaj7",
+    name: "Menor con séptima mayor",
+    formula: "1 – ♭3 – 5 – 7",
+    construction: "Tríada menor + 7ª mayor",
+    example: "CmMaj7 = C – E♭ – G – B",
+    notes: [
+      ["1", "C", "Fundamental", "0 semitonos"],
+      ["♭3", "E♭", "3ª menor", "3 semitonos"],
+      ["5", "G", "5ª justa", "7 semitonos"],
+      ["7", "B", "7ª mayor", "11 semitonos"],
+    ],
+  },
+  {
+    id: "m7b5",
+    symbol: "m7♭5 / ø7",
+    name: "Semidisminuido",
+    formula: "1 – ♭3 – ♭5 – ♭7",
+    construction: "Tríada disminuida + 7ª menor",
+    example: "Cm7♭5 = C – E♭ – G♭ – B♭",
+    notes: [
+      ["1", "C", "Fundamental", "0 semitonos"],
+      ["♭3", "E♭", "3ª menor", "3 semitonos"],
+      ["♭5", "G♭", "5ª disminuida", "6 semitonos"],
+      ["♭7", "B♭", "7ª menor", "10 semitonos"],
+    ],
+  },
+  {
+    id: "dim7",
+    symbol: "dim7 / °7",
+    name: "Disminuido séptima",
+    formula: "1 – ♭3 – ♭5 – ♭♭7",
+    construction: "Tríada disminuida + 7ª disminuida",
+    example: "C°7 = C – E♭ – G♭ – B𝄫 (suena A)",
+    notes: [
+      ["1", "C", "Fundamental", "0 semitonos"],
+      ["♭3", "E♭", "3ª menor", "3 semitonos"],
+      ["♭5", "G♭", "5ª disminuida", "6 semitonos"],
+      ["♭♭7", "B𝄫", "7ª disminuida", "9 semitonos"],
+    ],
+  },
+] as const;
+
 const JAZZ_BLUES_ANSWERS = [
   ["1", "C7"],
   ["2", "F7"],
@@ -672,6 +759,7 @@ function HarmonyTasksView() {
 }
 
 function HarmonyConceptsView() {
+  const [tetradId, setTetradId] = useState("maj7");
   const dMajorHarmony = [
     ["I", "D", "Mayor"],
     ["ii", "Em", "Menor"],
@@ -681,14 +769,8 @@ function HarmonyConceptsView() {
     ["vi", "Bm", "Menor"],
     ["vii°", "C♯°", "Disminuido"],
   ];
-  const tetrads = [
-    ["Maj7", "Tríada mayor + 7ª mayor"],
-    ["7", "Tríada mayor + 7ª menor"],
-    ["m7", "Tríada menor + 7ª menor"],
-    ["mMaj7", "Tríada menor + 7ª mayor"],
-    ["m7♭5 / ø7", "Tríada disminuida + 7ª menor"],
-    ["dim7 / °7", "Tríada disminuida + 7ª disminuida"],
-  ];
+  const tetrad =
+    TETRAD_DETAILS.find((item) => item.id === tetradId) ?? TETRAD_DETAILS[0];
 
   return (
     <Stack spacing={3}>
@@ -724,22 +806,136 @@ function HarmonyConceptsView() {
 
       <Box>
         <SectionHeading>Fórmulas de cuatríadas</SectionHeading>
+        <Typography sx={{ color: "#56676a", mb: 2 }}>
+          Empieza con la escala mayor. Toma sus grados 1, 3, 5 y 7; después baja
+          un semitono cada grado que tenga ♭. Un ♭♭ baja dos semitonos.
+        </Typography>
+
+        <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, mb: 2.5 }}>
+          <Typography sx={{ fontWeight: 900 }}>
+            Ejemplo base en C mayor
+          </Typography>
+          <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+            Escala: C–D–E–F–G–A–B · Elige 1–3–5–7: C–E–G–B. Como no se bajó
+            ninguna nota, el resultado es Cmaj7.
+          </Typography>
+        </Box>
+
+        <FormControl fullWidth size="small" sx={{ mb: 2.5 }}>
+          <InputLabel id="tetrad-detail-label">Tipo de cuatríada</InputLabel>
+          <Select
+            labelId="tetrad-detail-label"
+            label="Tipo de cuatríada"
+            value={tetradId}
+            onChange={(event) => setTetradId(event.target.value)}
+          >
+            {TETRAD_DETAILS.map((item) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.symbol} · {item.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <Box sx={{ borderTop: "1px solid #dce3e1" }}>
-          {tetrads.map(([symbol, formula]) => (
-            <Box
-              key={symbol}
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "110px 1fr", sm: "150px 1fr" },
-                gap: 1,
-                py: 1,
-                borderBottom: "1px solid #dce3e1",
-              }}
-            >
-              <Typography sx={{ fontWeight: 900 }}>{symbol}</Typography>
-              <Typography sx={{ color: "#56676a" }}>{formula}</Typography>
-            </Box>
-          ))}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "160px 1fr" },
+              gap: { xs: 0.25, sm: 2 },
+              py: 1.2,
+              borderBottom: "1px solid #dce3e1",
+            }}
+          >
+            <Typography sx={{ fontWeight: 900 }}>Nombre</Typography>
+            <Typography sx={{ color: "#56676a" }}>
+              {tetrad.symbol} · {tetrad.name}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "160px 1fr" },
+              gap: { xs: 0.25, sm: 2 },
+              py: 1.2,
+              borderBottom: "1px solid #dce3e1",
+            }}
+          >
+            <Typography sx={{ fontWeight: 900 }}>Fórmula</Typography>
+            <Typography sx={{ color: "#183638", fontWeight: 800 }}>
+              {tetrad.formula}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "160px 1fr" },
+              gap: { xs: 0.25, sm: 2 },
+              py: 1.2,
+              borderBottom: "1px solid #dce3e1",
+            }}
+          >
+            <Typography sx={{ fontWeight: 900 }}>Construcción</Typography>
+            <Typography sx={{ color: "#56676a" }}>
+              {tetrad.construction}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "160px 1fr" },
+              gap: { xs: 0.25, sm: 2 },
+              py: 1.2,
+              borderBottom: "1px solid #dce3e1",
+            }}
+          >
+            <Typography sx={{ fontWeight: 900 }}>Ejemplo desde C</Typography>
+            <Typography sx={{ color: "#183638", fontWeight: 800 }}>
+              {tetrad.example}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{ mt: 2.5 }}>
+          <Typography sx={{ fontWeight: 900, mb: 1 }}>Nota por nota</Typography>
+          <Box sx={{ borderTop: "1px solid #dce3e1" }}>
+            {tetrad.notes.map(([degree, note, interval, distance]) => (
+              <Box
+                key={degree}
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "52px 52px 1fr",
+                    sm: "70px 70px 1fr 120px",
+                  },
+                  gap: 1,
+                  py: 0.9,
+                  borderBottom: "1px solid #dce3e1",
+                }}
+              >
+                <Typography sx={{ fontWeight: 900 }}>{degree}</Typography>
+                <Typography sx={{ fontWeight: 800 }}>{note}</Typography>
+                <Typography sx={{ color: "#56676a" }}>{interval}</Typography>
+                <Typography
+                  sx={{
+                    gridColumn: { xs: "3", sm: "auto" },
+                    color: "#758285",
+                    fontSize: 14,
+                  }}
+                >
+                  {distance}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        <Box sx={{ mt: 2.5, border: "1px solid #d9e2e0", p: 2 }}>
+          <Typography sx={{ fontWeight: 900 }}>La diferencia clave</Typography>
+          <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+            Maj7 conserva la 7 natural. El acorde 7 baja esa nota a ♭7. Por eso
+            Cmaj7 lleva B, mientras C7 lleva B♭.
+          </Typography>
         </Box>
       </Box>
 
