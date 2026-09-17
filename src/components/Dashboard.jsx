@@ -30,6 +30,25 @@ import { useNavigate } from "react-router-dom";
 
 const EXERCISE_SECTIONS = [
   {
+    id: "semestre",
+    title: "Notas del semestre",
+    subtitle:
+      "Segundo año organizado por semana: Solfeo, Armonía e Improvisación.",
+    accent: "#0f766e",
+    icon: MenuBook,
+    items: [
+      {
+        route: "/notas-semestre",
+        title: "Segundo año",
+        description:
+          "Consulta apuntes, conceptos y tareas de cada materia por semana.",
+        buttonLabel: "Abrir notas",
+        icon: MenuBook,
+        iconColor: "#0f766e",
+      },
+    ],
+  },
+  {
     id: "bajo",
     title: "Bajo",
     subtitle: "Técnica, lectura y recursos específicos para bajo eléctrico.",
@@ -387,6 +406,7 @@ const EXERCISE_SECTIONS = [
 ];
 
 const SECTION_SHORT_LABELS = {
+  semestre: "Semestre",
   bajo: "Bajo",
   "solfeo-auditivo": "Oído y lectura",
   ritmica: "Ritmo",
@@ -585,7 +605,7 @@ function SectionPanel({ section, navigate, isCollapsed, onToggle }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [activeSectionId, setActiveSectionId] = React.useState("bajo");
+  const [activeSectionId, setActiveSectionId] = React.useState("semestre");
   const [collapsedSections, setCollapsedSections] = React.useState(() =>
     EXERCISE_SECTIONS.reduce((acc, section) => {
       acc[section.id] = false;
@@ -688,7 +708,7 @@ export default function Dashboard() {
               <Box component="span" sx={{ color: "#0f766e", fontWeight: 900 }}>
                 {totalExercises}
               </Box>{" "}
-              ejercicios en 4 áreas
+              ejercicios en {EXERCISE_SECTIONS.length} áreas
             </Typography>
           </Stack>
 
@@ -700,7 +720,7 @@ export default function Dashboard() {
               display: "grid",
               gridTemplateColumns: {
                 xs: "repeat(2, 1fr)",
-                sm: "repeat(4, 1fr)",
+                sm: `repeat(${EXERCISE_SECTIONS.length}, 1fr)`,
               },
               border: "1px solid #cfdad8",
               borderBottom: 0,
@@ -728,8 +748,21 @@ export default function Dashboard() {
                           : 0,
                     },
                     borderBottom: {
-                      xs: index < 2 ? "1px solid #cfdad8" : 0,
+                      xs:
+                        index <
+                        EXERCISE_SECTIONS.length -
+                          (EXERCISE_SECTIONS.length % 2 === 0 ? 2 : 1)
+                          ? "1px solid #cfdad8"
+                          : 0,
                       sm: 0,
+                    },
+                    gridColumn: {
+                      xs:
+                        index === EXERCISE_SECTIONS.length - 1 &&
+                        EXERCISE_SECTIONS.length % 2 === 1
+                          ? "1 / -1"
+                          : "auto",
+                      sm: "auto",
                     },
                     bgcolor: isActive ? "#0f766e" : "#fff",
                     color: isActive ? "#fff" : "#45585b",

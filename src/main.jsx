@@ -29,6 +29,7 @@ import SeventhChordHarmonicFieldStudy from "./components/SeventhChordHarmonicFie
 import WorkbookTheory from "./components/WorkbookTheory.tsx";
 import EquinoxStudy from "./components/EquinoxStudy.tsx";
 import BassRhythmLab from "./components/BassRhythmLab.tsx";
+import SemesterNotes from "./components/SemesterNotes.tsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
@@ -70,10 +71,7 @@ createRoot(document.getElementById("root")).render(
           path="/escalas-relativas"
           element={<RelativeMinorScalesStudy />}
         />
-        <Route
-          path="/inversiones-acordes"
-          element={<ChordInversionsStudy />}
-        />
+        <Route path="/inversiones-acordes" element={<ChordInversionsStudy />} />
         <Route
           path="/armonizacion-mayor"
           element={<MajorScaleChordTableStudy />}
@@ -83,8 +81,12 @@ createRoot(document.getElementById("root")).render(
           element={<SeventhChordHarmonicFieldStudy />}
         />
         <Route path="/workbook-teoria" element={<WorkbookTheory />} />
-        <Route path="/workbook-teoria/:chapterId" element={<WorkbookTheory />} />
+        <Route
+          path="/workbook-teoria/:chapterId"
+          element={<WorkbookTheory />}
+        />
         <Route path="/canciones" element={<CancionesMenu />} />
+        <Route path="/notas-semestre" element={<SemesterNotes />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
