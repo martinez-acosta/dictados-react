@@ -168,6 +168,14 @@ export default function CancionesMenu() {
       color: "#7048e8",
     },
     {
+      id: "praise-carolina-version-c",
+      titulo: "Praise (Carolina Version) / Alaba a Dios",
+      artista: "Elevation Worship",
+      tonalidad: "C",
+      archivo: "/dictados-react/src/PraiseCarolinaVersionC.html",
+      color: "#f08c00",
+    },
+    {
       id: "dios-ha-sido-bueno-f",
       titulo: "Dios Ha Sido Bueno",
       artista: "Marcos Witt",
