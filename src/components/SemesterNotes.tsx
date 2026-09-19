@@ -1396,86 +1396,230 @@ function ImprovisationWeekTwoConceptsView() {
 }
 
 function ImprovisationWeekTwoAnswersView() {
+  const [answerTopic, setAnswerTopic] = useState("chords");
+
   return (
     <Stack spacing={3}>
       <Box>
         <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
-          Correcciones y ejemplos
+          Respuestas de las tareas
         </Typography>
         <Typography sx={{ color: "#667678", mt: 0.5 }}>
-          Respuestas verificables que se trabajaron durante la clase.
+          Soluciones completas para comprobar cada tema de estudio.
         </Typography>
       </Box>
 
-      <Box>
-        <SectionHeading>Corrección de la tarea anterior</SectionHeading>
-        <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
-          {[
-            ["G7", "1–3–5–♭7", "G – B – D – F", "La 7ª es F, no F♯."],
-            ["Am7", "1–♭3–5–♭7", "A – C – E – G", "Tríada menor + 7ª menor."],
-          ].map(([chord, formula, notes, explanation]) => (
-            <Box
-              key={chord}
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "76px 1fr", sm: "90px 140px 1fr" },
-                gap: 1,
-                py: 1.2,
-                borderBottom: "1px solid #dce3e1",
-              }}
-            >
-              <Typography sx={{ fontWeight: 900 }}>{chord}</Typography>
-              <Typography sx={{ color: "#56676a" }}>{formula}</Typography>
-              <Box sx={{ gridColumn: { xs: "2", sm: "auto" } }}>
-                <Typography sx={{ color: "#183638", fontWeight: 800 }}>
-                  {notes}
-                </Typography>
-                <Typography sx={{ color: "#758285", fontSize: 14 }}>
-                  {explanation}
-                </Typography>
-              </Box>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
+      <FormControl fullWidth size="small">
+        <InputLabel id="improvisation-week-two-answer-label">
+          Respuesta
+        </InputLabel>
+        <Select
+          labelId="improvisation-week-two-answer-label"
+          label="Respuesta"
+          value={answerTopic}
+          onChange={(event) => setAnswerTopic(event.target.value)}
+        >
+          <MenuItem value="chords">Acordes de séptima</MenuItem>
+          <MenuItem value="c7">C7 · completar 2, 4 y 6</MenuItem>
+          <MenuItem value="em7">Em7 · relativa mayor</MenuItem>
+          <MenuItem value="structures">Estructuras mayor y menor</MenuItem>
+        </Select>
+      </FormControl>
 
-      <Box>
-        <SectionHeading>Familia de cuatríadas desde C</SectionHeading>
-        <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
-          {TETRAD_DETAILS.map((item) => (
-            <Box
-              key={item.id}
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "90px 1fr", sm: "130px 150px 1fr" },
-                gap: 1,
-                py: 1.1,
-                borderBottom: "1px solid #dce3e1",
-              }}
-            >
-              <Typography sx={{ fontWeight: 900 }}>{item.symbol}</Typography>
-              <Typography sx={{ color: "#56676a" }}>{item.formula}</Typography>
-              <Typography
+      {answerTopic === "chords" && (
+        <Stack spacing={3}>
+          <Box>
+            <SectionHeading>Corrección de la tarea anterior</SectionHeading>
+            <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
+              {[
+                ["G7", "1–3–5–♭7", "G – B – D – F", "La 7ª es F, no F♯."],
+                [
+                  "Am7",
+                  "1–♭3–5–♭7",
+                  "A – C – E – G",
+                  "Tríada menor + 7ª menor.",
+                ],
+              ].map(([chord, formula, notes, explanation]) => (
+                <Box
+                  key={chord}
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "76px 1fr",
+                      sm: "90px 140px 1fr",
+                    },
+                    gap: 1,
+                    py: 1.2,
+                    borderBottom: "1px solid #dce3e1",
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 900 }}>{chord}</Typography>
+                  <Typography sx={{ color: "#56676a" }}>{formula}</Typography>
+                  <Box sx={{ gridColumn: { xs: "2", sm: "auto" } }}>
+                    <Typography sx={{ color: "#183638", fontWeight: 800 }}>
+                      {notes}
+                    </Typography>
+                    <Typography sx={{ color: "#758285", fontSize: 14 }}>
+                      {explanation}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+
+          <Box>
+            <SectionHeading>Familia de cuatríadas desde C</SectionHeading>
+            <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
+              {TETRAD_DETAILS.map((item) => (
+                <Box
+                  key={item.id}
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "90px 1fr",
+                      sm: "130px 150px 1fr",
+                    },
+                    gap: 1,
+                    py: 1.1,
+                    borderBottom: "1px solid #dce3e1",
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 900 }}>
+                    {item.symbol}
+                  </Typography>
+                  <Typography sx={{ color: "#56676a" }}>
+                    {item.formula}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      gridColumn: { xs: "2", sm: "auto" },
+                      color: "#183638",
+                      fontWeight: 750,
+                    }}
+                  >
+                    {item.example}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+
+          <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+            <Typography sx={{ fontWeight: 900 }}>
+              Cómo distinguir las séptimas
+            </Typography>
+            <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+              7ª mayor: 11 semitonos, medio tono antes de la octava. 7ª menor:
+              10 semitonos, un tono antes. 7ª disminuida: 9 semitonos y se
+              escribe ♭♭7. Desde G: F♯ = 7M, F = 7m y F♭ = 7dim.
+            </Typography>
+          </Box>
+        </Stack>
+      )}
+
+      {answerTopic === "c7" && (
+        <Stack spacing={2.5}>
+          <Box>
+            <SectionHeading>1. Construir el acorde</SectionHeading>
+            <Typography sx={{ color: "#344b4d" }}>
+              C7 = 1–3–5–♭7 = <strong>C – E – G – B♭</strong>.
+            </Typography>
+          </Box>
+          <Box>
+            <SectionHeading>2. Completar los grados faltantes</SectionHeading>
+            <Typography sx={{ color: "#344b4d" }}>
+              2 = D · 4 = F · 6 = A. Al colocarlos una octava arriba se llaman 9
+              = D · 11 = F · 13 = A.
+            </Typography>
+          </Box>
+          <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+            <Typography sx={{ fontWeight: 900 }}>Material completo</Typography>
+            <Typography sx={{ color: "#344b4d", mt: 0.5, fontWeight: 750 }}>
+              C – D – E – F – G – A – B♭
+            </Typography>
+            <Typography sx={{ color: "#667678", mt: 0.5 }}>
+              Fórmula: 1–2–3–4–5–6–♭7. Es material posible para improvisar, pero
+              C7 aislado no confirma por sí solo una tonalidad.
+            </Typography>
+          </Box>
+        </Stack>
+      )}
+
+      {answerTopic === "em7" && (
+        <Stack spacing={2.5}>
+          <Box>
+            <SectionHeading>1. Construir el acorde</SectionHeading>
+            <Typography sx={{ color: "#344b4d" }}>
+              Em7 = 1–♭3–5–♭7 = <strong>E – G – B – D</strong>.
+            </Typography>
+          </Box>
+          <Box>
+            <SectionHeading>2. Encontrar la relativa</SectionHeading>
+            <Typography sx={{ color: "#344b4d" }}>
+              E menor es la relativa menor de G mayor porque E es el VI grado de
+              G. Ambas usan las mismas notas.
+            </Typography>
+          </Box>
+          <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+            <Typography sx={{ fontWeight: 900 }}>Material completo</Typography>
+            <Typography sx={{ color: "#344b4d", mt: 0.5, fontWeight: 750 }}>
+              E – F♯ – G – A – B – C – D
+            </Typography>
+            <Typography sx={{ color: "#667678", mt: 0.5 }}>
+              Faltaban 2 = F♯, 4 = A y ♭6 = C. Fórmula menor natural:
+              1–2–♭3–4–5–♭6–♭7.
+            </Typography>
+          </Box>
+        </Stack>
+      )}
+
+      {answerTopic === "structures" && (
+        <Stack spacing={3}>
+          <Box>
+            <SectionHeading>Estructuras por grados</SectionHeading>
+            {[
+              ["Mayor", "1 – 2 – 3 – 4 – 5 – 6 – 7"],
+              ["Menor natural", "1 – 2 – ♭3 – 4 – 5 – ♭6 – ♭7"],
+            ].map(([name, formula]) => (
+              <Box
+                key={name}
                 sx={{
-                  gridColumn: { xs: "2", sm: "auto" },
-                  color: "#183638",
-                  fontWeight: 750,
+                  display: "grid",
+                  gridTemplateColumns: { xs: "110px 1fr", sm: "150px 1fr" },
+                  gap: 1,
+                  py: 1,
+                  borderBottom: "1px solid #dce3e1",
                 }}
               >
-                {item.example}
-              </Typography>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
+                <Typography sx={{ fontWeight: 900 }}>{name}</Typography>
+                <Typography sx={{ color: "#344b4d", fontWeight: 700 }}>
+                  {formula}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
 
-      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
-        <Typography sx={{ fontWeight: 900 }}>Atajo para la séptima</Typography>
-        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
-          La 7ª mayor está medio tono debajo de la octava. La 7ª menor está un
-          tono debajo. Desde G: F♯ es 7ª mayor y F es 7ª menor.
-        </Typography>
-      </Box>
+          <Box>
+            <SectionHeading>Relativas que comparten notas</SectionHeading>
+            <Typography sx={{ color: "#344b4d" }}>
+              C mayor ↔ A menor · G mayor ↔ E menor · D mayor ↔ B menor · A
+              mayor ↔ F♯ menor · E mayor ↔ C♯ menor.
+            </Typography>
+          </Box>
+
+          <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+            <Typography sx={{ fontWeight: 900 }}>
+              Acorde aislado ≠ tonalidad
+            </Typography>
+            <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+              C7 solo asegura C–E–G–B♭. Puede funcionar como V7 de F mayor, pero
+              únicamente si el contexto armónico lo confirma. Primero se lee el
+              acorde; después se decide la escala o el modo.
+            </Typography>
+          </Box>
+        </Stack>
+      )}
     </Stack>
   );
 }
