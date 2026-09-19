@@ -42,7 +42,7 @@ const WEEKS: Array<{
     id: "2026-09-14",
     label: "14–20 de septiembre de 2026",
     shortLabel: "14–20 sep",
-    subjects: ["solfeo"],
+    subjects: ["solfeo", "improvisacion"],
   },
 ];
 
@@ -108,6 +108,8 @@ const SOLFEGE_WEEK_TWO_TASK_GROUPS = [
 
 const SOLFEGE_STORAGE_KEY = "semester-notes:2026-09-07:solfeo:tasks";
 const SOLFEGE_WEEK_TWO_STORAGE_KEY = "semester-notes:2026-09-14:solfeo:tasks";
+const IMPROVISATION_WEEK_TWO_STORAGE_KEY =
+  "semester-notes:2026-09-14:improvisacion:study";
 const IMPROVISATION_STORAGE_KEY =
   "semester-notes:2026-09-07:improvisacion:tasks";
 const HARMONY_STORAGE_KEY = "semester-notes:2026-09-07:armonia:study";
@@ -375,6 +377,30 @@ const IMPROVISATION_TASK_GROUPS = [
       ["teacher-chords", "Construir los acordes indicados por el maestro"],
       ["no-internet", "Resolverlos sin buscar las respuestas en Internet"],
       ["bring-work", "Llevar el procedimiento aunque pueda estar incorrecto"],
+    ],
+  },
+] as const;
+
+const IMPROVISATION_WEEK_TWO_STUDY_GROUPS = [
+  {
+    title: "Lectura de símbolos",
+    tasks: [
+      ["maj7", "Formar acordes Maj7"],
+      ["dominant7", "Formar acordes 7"],
+      ["minor7", "Formar acordes m7"],
+      ["minor-major7", "Formar acordes mMaj7"],
+      ["half-diminished", "Formar acordes m7♭5"],
+      ["diminished7", "Formar acordes dim7"],
+      ["sevenths", "Diferenciar 7ª mayor, menor y disminuida"],
+    ],
+  },
+  {
+    title: "Acorde y material melódico",
+    tasks: [
+      ["chord-tonality", "No confundir acorde aislado con tonalidad"],
+      ["relatives", "Repasar relativas mayores y menores"],
+      ["major-degrees", "Memorizar los grados de la estructura mayor"],
+      ["minor-degrees", "Repasar los grados de la estructura menor"],
     ],
   },
 ] as const;
@@ -929,6 +955,367 @@ function SolfegeWeekTwoConceptsView() {
           El contratiempo siempre viene después de un silencio. La síncopa no, y
           puede prolongarse desde una parte débil hacia una fuerte. Toda síncopa
           debe acentuarse.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function ImprovisationWeekTwoSummaryView() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography
+          variant="overline"
+          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
+        >
+          Idea central
+        </Typography>
+        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
+          Leer el acorde antes de elegir las notas
+        </Typography>
+        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
+          La clase pasó de construir cuatríadas a interpretar cada parte del
+          símbolo y completar los grados 2, 4 y 6 alrededor de 1, 3, 5 y 7 para
+          obtener material de improvisación.
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Cómo se lee un símbolo</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>
+            • Si no aparece “m”, la tríada se entiende mayor: C7 comienza con
+            C–E–G.
+          </Typography>
+          <Typography>
+            • El 7 solo indica séptima menor; Maj7 indica séptima mayor.
+          </Typography>
+          <Typography>
+            • En CmMaj7, “m” modifica la tríada y “Maj7” modifica la séptima.
+          </Typography>
+          <Typography>
+            • En m7♭5 no debe olvidarse la tercera menor: 1–♭3–♭5–♭7.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Acorde aislado ≠ tonalidad</SectionHeading>
+        <Typography sx={{ color: "#344b4d" }}>
+          C7 asegura C–E–G–B♭, pero no asegura por sí mismo que la tonalidad sea
+          F mayor. Solo con contexto podemos llamarlo V7 de F.
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Del acorde a la improvisación</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>1. Lee el símbolo.</Typography>
+          <Typography>2. Identifica 1–3–5–7.</Typography>
+          <Typography>3. Completa los grados 2–4–6.</Typography>
+          <Typography>4. Obtén siete notas como material melódico.</Typography>
+          <Typography>
+            5. Después se estudiarán modos, notas objetivo y tensiones.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Ejemplo</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          C7 aporta C–E–G–B♭. Al completar D, F y A se obtiene C–D–E–F–G–A–B♭,
+          pero el razonamiento comenzó en el acorde, no en una tonalidad
+          inventada.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function ImprovisationWeekTwoTasksView() {
+  const [completed, setCompleted] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(
+        window.localStorage.getItem(IMPROVISATION_WEEK_TWO_STORAGE_KEY) ?? "{}",
+      );
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      IMPROVISATION_WEEK_TWO_STORAGE_KEY,
+      JSON.stringify(completed),
+    );
+  }, [completed]);
+
+  const taskCount = IMPROVISATION_WEEK_TWO_STUDY_GROUPS.reduce(
+    (total, group) => total + group.tasks.length,
+    0,
+  );
+  const taskIds = new Set(
+    IMPROVISATION_WEEK_TWO_STUDY_GROUPS.flatMap((group) =>
+      group.tasks.map(([id]) => id),
+    ),
+  );
+  const completedCount = Object.entries(completed).filter(
+    ([id, isDone]) => isDone && taskIds.has(id),
+  ).length;
+
+  return (
+    <Stack spacing={3}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={1}
+      >
+        <Box>
+          <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+            Estudio recomendado
+          </Typography>
+          <Typography sx={{ color: "#667678" }}>
+            La grabación no contiene una tarea nueva explícita para entregar.
+          </Typography>
+        </Box>
+        <Chip
+          label={`${completedCount} de ${taskCount}`}
+          variant="outlined"
+          sx={{ fontWeight: 800 }}
+        />
+      </Stack>
+
+      {IMPROVISATION_WEEK_TWO_STUDY_GROUPS.map((group) => (
+        <Box key={group.title}>
+          <SectionHeading>{group.title}</SectionHeading>
+          <Stack spacing={0.25}>
+            {group.tasks.map(([id, label]) => (
+              <FormControlLabel
+                key={id}
+                control={
+                  <Checkbox
+                    checked={Boolean(completed[id])}
+                    onChange={(event) =>
+                      setCompleted((current) => ({
+                        ...current,
+                        [id]: event.target.checked,
+                      }))
+                    }
+                  />
+                }
+                label={label}
+                sx={{
+                  m: 0,
+                  py: 0.25,
+                  color: completed[id] ? "#849092" : "#243d3f",
+                  textDecoration: completed[id] ? "line-through" : "none",
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+      ))}
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>
+          Dónde continúa la clase
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          El audio termina cuando empieza la comparación interválica de las
+          estructuras mayor y menor. Por eso se conserva como estudio y no como
+          entrega confirmada.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function ImprovisationWeekTwoConceptsView() {
+  const symbolParts = [
+    ["Letra", "Fundamental del acorde: C, D, E…"],
+    ["Sin m", "La tríada es mayor"],
+    ["m", "La tercera baja: tríada menor"],
+    ["7", "Séptima menor"],
+    ["Maj7", "Séptima mayor"],
+    ["♭5", "Quinta disminuida"],
+    ["dim7 / °7", "Tríada disminuida + séptima disminuida"],
+  ];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Leer el símbolo por partes
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Cada fragmento modifica una función concreta del acorde.
+        </Typography>
+      </Box>
+
+      <Box sx={{ borderTop: "1px solid #dce3e1" }}>
+        {symbolParts.map(([symbol, meaning]) => (
+          <Box
+            key={symbol}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "90px 1fr", sm: "140px 1fr" },
+              gap: 1,
+              py: 1,
+              borderBottom: "1px solid #dce3e1",
+            }}
+          >
+            <Typography sx={{ fontWeight: 900 }}>{symbol}</Typography>
+            <Typography sx={{ color: "#56676a" }}>{meaning}</Typography>
+          </Box>
+        ))}
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Cómo leer CmMaj7</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          C es la fundamental · m convierte la tríada en menor · Maj7 conserva
+          una séptima mayor. Resultado: C–E♭–G–B.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Grados que rodean al acorde</SectionHeading>
+        <Box sx={{ borderTop: "1px solid #dce3e1" }}>
+          {[
+            ["1", "Fundamental"],
+            ["2", "Normalmente 2ª mayor; será 9ª como extensión"],
+            ["3", "Define si la estructura es mayor o menor"],
+            ["4", "Normalmente 4ª justa"],
+            ["5", "Justa, disminuida ♭5 o aumentada ♯5"],
+            ["6", "Mayor en estructura mayor; menor en menor natural"],
+            ["7", "Mayor, menor o disminuida según el símbolo"],
+          ].map(([degree, role]) => (
+            <Box
+              key={degree}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "50px 1fr",
+                gap: 1,
+                py: 0.9,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{degree}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{role}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      <Box>
+        <SectionHeading>Relativas</SectionHeading>
+        <Typography sx={{ color: "#344b4d" }}>
+          La relativa menor nace en el VI grado de la escala mayor. G mayor y E
+          menor natural comparten G–A–B–C–D–E–F♯; cambia la nota que funciona
+          como centro.
+        </Typography>
+      </Box>
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>
+          Modos: solo introducción
+        </Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          Se mencionaron Jónico, Dórico y Frigio, pero todavía no son el tema
+          principal. Primero hay que leer bien el acorde y sus grados.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function ImprovisationWeekTwoAnswersView() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Correcciones y ejemplos
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Respuestas verificables que se trabajaron durante la clase.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Corrección de la tarea anterior</SectionHeading>
+        <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
+          {[
+            ["G7", "1–3–5–♭7", "G – B – D – F", "La 7ª es F, no F♯."],
+            ["Am7", "1–♭3–5–♭7", "A – C – E – G", "Tríada menor + 7ª menor."],
+          ].map(([chord, formula, notes, explanation]) => (
+            <Box
+              key={chord}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "76px 1fr", sm: "90px 140px 1fr" },
+                gap: 1,
+                py: 1.2,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{chord}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{formula}</Typography>
+              <Box sx={{ gridColumn: { xs: "2", sm: "auto" } }}>
+                <Typography sx={{ color: "#183638", fontWeight: 800 }}>
+                  {notes}
+                </Typography>
+                <Typography sx={{ color: "#758285", fontSize: 14 }}>
+                  {explanation}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+
+      <Box>
+        <SectionHeading>Familia de cuatríadas desde C</SectionHeading>
+        <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
+          {TETRAD_DETAILS.map((item) => (
+            <Box
+              key={item.id}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "90px 1fr", sm: "130px 150px 1fr" },
+                gap: 1,
+                py: 1.1,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{item.symbol}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{item.formula}</Typography>
+              <Typography
+                sx={{
+                  gridColumn: { xs: "2", sm: "auto" },
+                  color: "#183638",
+                  fontWeight: 750,
+                }}
+              >
+                {item.example}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Atajo para la séptima</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          La 7ª mayor está medio tono debajo de la octava. La 7ª menor está un
+          tono debajo. Desde G: F♯ es 7ª mayor y F es 7ª menor.
         </Typography>
       </Box>
     </Stack>
@@ -2053,6 +2440,24 @@ export default function SemesterNotes() {
                 {week.id === "2026-09-14" &&
                   subject === "solfeo" &&
                   detailView === "conceptos" && <SolfegeWeekTwoConceptsView />}
+                {week.id === "2026-09-14" &&
+                  subject === "improvisacion" &&
+                  detailView === "resumen" && (
+                    <ImprovisationWeekTwoSummaryView />
+                  )}
+                {week.id === "2026-09-14" &&
+                  subject === "improvisacion" &&
+                  detailView === "tareas" && <ImprovisationWeekTwoTasksView />}
+                {week.id === "2026-09-14" &&
+                  subject === "improvisacion" &&
+                  detailView === "conceptos" && (
+                    <ImprovisationWeekTwoConceptsView />
+                  )}
+                {week.id === "2026-09-14" &&
+                  subject === "improvisacion" &&
+                  detailView === "respuestas" && (
+                    <ImprovisationWeekTwoAnswersView />
+                  )}
                 {week.id === "2026-09-07" &&
                   subject === "armonia" &&
                   detailView === "resumen" && <HarmonySummaryView />}
