@@ -85,6 +85,14 @@ export default function CancionesMenu() {
       color: "#f59f00",
     },
     {
+      id: "digno-de-adorar-e",
+      titulo: "Digno de Adorar (Worthy of It All)",
+      artista: "Conquistando Fronteras · David Brymer",
+      tonalidad: "E",
+      archivo: "/dictados-react/src/DignoDeAdorarE.html",
+      color: "#7b2cbf",
+    },
+    {
       id: "sopla",
       titulo: "Sopla",
       artista: "Conquistando Fronteras",
