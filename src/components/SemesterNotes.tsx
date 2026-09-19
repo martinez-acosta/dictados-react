@@ -26,18 +26,30 @@ import { useNavigate } from "react-router-dom";
 type SubjectId = "solfeo" | "armonia" | "improvisacion";
 type DetailView = "resumen" | "tareas" | "conceptos" | "respuestas";
 
-const WEEKS = [
+const WEEKS: Array<{
+  id: string;
+  label: string;
+  shortLabel: string;
+  subjects: SubjectId[];
+}> = [
   {
     id: "2026-09-07",
     label: "7–13 de septiembre de 2026",
     shortLabel: "7–13 sep",
+    subjects: ["solfeo", "armonia", "improvisacion"],
   },
-] as const;
+  {
+    id: "2026-09-14",
+    label: "14–20 de septiembre de 2026",
+    shortLabel: "14–20 sep",
+    subjects: ["solfeo"],
+  },
+];
 
-const SUBJECTS: Array<{ id: SubjectId; label: string; hasNotes: boolean }> = [
-  { id: "solfeo", label: "Solfeo", hasNotes: true },
-  { id: "armonia", label: "Armonía", hasNotes: true },
-  { id: "improvisacion", label: "Improvisación", hasNotes: true },
+const SUBJECTS: Array<{ id: SubjectId; label: string }> = [
+  { id: "solfeo", label: "Solfeo" },
+  { id: "armonia", label: "Armonía" },
+  { id: "improvisacion", label: "Improvisación" },
 ];
 
 const TASK_GROUPS = [
@@ -65,7 +77,37 @@ const TASK_GROUPS = [
   },
 ] as const;
 
+const SOLFEGE_WEEK_TWO_TASK_GROUPS = [
+  {
+    title: "Dandelot · Clave de Sol",
+    tasks: [
+      ["dandelot-16", "Lección 16 · última revisión"],
+      ["dandelot-70", "Practicar a 70 BPM"],
+      ["dandelot-body", "Sin marcar pie, cabeza ni chasquidos"],
+      ["dandelot-flow", "Mantener la lectura aunque haya errores"],
+    ],
+  },
+  {
+    title: "Clave de Fa",
+    tasks: [
+      ["bass-4", "Lección 4"],
+      ["bass-5", "Lección 5"],
+      ["bass-60", "Ambas a 60 BPM"],
+      ["bass-directions", "Leer de principio a fin y al revés"],
+    ],
+  },
+  {
+    title: "Baqueiro Foster",
+    tasks: [
+      ["baqueiro-26", "Lección 26"],
+      ["baqueiro-80", "Practicar a 80 BPM"],
+      ["baqueiro-syncopation", "Acentuar correctamente cada síncopa"],
+    ],
+  },
+] as const;
+
 const SOLFEGE_STORAGE_KEY = "semester-notes:2026-09-07:solfeo:tasks";
+const SOLFEGE_WEEK_TWO_STORAGE_KEY = "semester-notes:2026-09-14:solfeo:tasks";
 const IMPROVISATION_STORAGE_KEY =
   "semester-notes:2026-09-07:improvisacion:tasks";
 const HARMONY_STORAGE_KEY = "semester-notes:2026-09-07:armonia:study";
@@ -554,6 +596,339 @@ function ConceptsView() {
           Leer, cantar, escuchar, mantener afinación y conservar el tempo deben
           suceder simultáneamente. La coordinación rítmica prepara esa
           independencia.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function SolfegeWeekTwoSummaryView() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography
+          variant="overline"
+          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
+        >
+          Tema nuevo principal
+        </Typography>
+        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
+          Síncopa y contratiempo
+        </Typography>
+        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
+          La clase avanzó de la lectura continua al desplazamiento del acento:
+          reconocer partes fuertes y débiles, escuchar cuándo aparece el sonido
+          y saber si está precedido por silencio.
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Dandelot · Lección 16</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>
+            • Se repitió de principio a fin, al revés, por sistemas, equipos e
+            individualmente.
+          </Typography>
+          <Typography>• Palmas en los tiempos 2 y 4.</Typography>
+          <Typography>
+            • La siguiente revisión será a 70 BPM y será la última de esta
+            lección.
+          </Typography>
+          <Typography>
+            • El pulso debe pasar del metrónomo al oído interno, sin apoyarse en
+            movimientos del cuerpo.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Clave de Fa · Lección 4</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>
+            • Se trabajó con lectura guiada, solos, hacia adelante, al revés y
+            por sistemas.
+          </Typography>
+          <Typography>
+            • Las lecciones 1–15 se mantienen aproximadamente a 60 BPM.
+          </Typography>
+          <Typography>
+            • Alternar Sol y Fa prepara el cambio rápido de clave de una
+            partitura de piano.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Baqueiro Foster · Lecciones 24–26</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>
+            • Puntillo de aumentación: agrega la mitad del valor de la figura.
+          </Typography>
+          <Typography>
+            • Ligadura de prolongación frente a ligadura de fraseo.
+          </Typography>
+          <Typography>
+            • Tiempos fuertes y débiles, subdivisión binaria, contratiempo y
+            síncopa.
+          </Typography>
+          <Typography>
+            • La síncopa debe acentuarse porque da protagonismo a una posición
+            normalmente débil.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Evolución de tempo</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          Dandelot 16: 60 → 70 BPM · Clave de Fa 4–5: 60 BPM · Baqueiro 26: 80
+          BPM.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function SolfegeWeekTwoTasksView() {
+  const [completed, setCompleted] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(
+        window.localStorage.getItem(SOLFEGE_WEEK_TWO_STORAGE_KEY) ?? "{}",
+      );
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      SOLFEGE_WEEK_TWO_STORAGE_KEY,
+      JSON.stringify(completed),
+    );
+  }, [completed]);
+
+  const taskCount = SOLFEGE_WEEK_TWO_TASK_GROUPS.reduce(
+    (total, group) => total + group.tasks.length,
+    0,
+  );
+  const taskIds = new Set(
+    SOLFEGE_WEEK_TWO_TASK_GROUPS.flatMap((group) =>
+      group.tasks.map(([id]) => id),
+    ),
+  );
+  const completedCount = Object.entries(completed).filter(
+    ([id, isDone]) => isDone && taskIds.has(id),
+  ).length;
+
+  return (
+    <Stack spacing={3}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={1}
+      >
+        <Box>
+          <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+            Tarea para la siguiente clase
+          </Typography>
+          <Typography sx={{ color: "#667678" }}>
+            Tres métodos, cada uno con su tempo específico.
+          </Typography>
+        </Box>
+        <Chip
+          label={`${completedCount} de ${taskCount}`}
+          variant="outlined"
+          sx={{ fontWeight: 800 }}
+        />
+      </Stack>
+
+      {SOLFEGE_WEEK_TWO_TASK_GROUPS.map((group) => (
+        <Box key={group.title}>
+          <SectionHeading>{group.title}</SectionHeading>
+          <Stack spacing={0.25}>
+            {group.tasks.map(([id, label]) => (
+              <FormControlLabel
+                key={id}
+                control={
+                  <Checkbox
+                    checked={Boolean(completed[id])}
+                    onChange={(event) =>
+                      setCompleted((current) => ({
+                        ...current,
+                        [id]: event.target.checked,
+                      }))
+                    }
+                  />
+                }
+                label={label}
+                sx={{
+                  m: 0,
+                  py: 0.25,
+                  color: completed[id] ? "#849092" : "#243d3f",
+                  textDecoration: completed[id] ? "line-through" : "none",
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+      ))}
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Indicación definitiva</Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          El maestro corrigió la indicación al final: la tarea de Baqueiro es la
+          lección 26 a 80 BPM, cuidando los acentos de síncopa.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function SolfegeWeekTwoConceptsView() {
+  const metricAccents = [
+    ["2 tiempos", "1 fuerte · 2 débil"],
+    ["3 tiempos", "1 fuerte · 2 débil · 3 débil"],
+    ["4 tiempos", "1 fuerte · 2 débil · 3 semifuerte · 4 débil"],
+  ];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Conceptos de la semana
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Reglas para distinguir duración, articulación y desplazamiento del
+          acento.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Puntillo y ligaduras</SectionHeading>
+        <Box sx={{ borderTop: "1px solid #dce3e1" }}>
+          {[
+            [
+              "Puntillo",
+              "Agrega la mitad del valor. Una blanca con puntillo dura 3 negras.",
+            ],
+            ["Prolongación", "Une la misma nota y suma sus duraciones."],
+            [
+              "Fraseo",
+              "Une notas de distinta altura para interpretarlas como una frase.",
+            ],
+          ].map(([term, meaning]) => (
+            <Box
+              key={term}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "150px 1fr" },
+                gap: { xs: 0.25, sm: 2 },
+                py: 1.1,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{term}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{meaning}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      <Box>
+        <SectionHeading>Fuerte y débil</SectionHeading>
+        <Box sx={{ borderTop: "1px solid #dce3e1" }}>
+          {metricAccents.map(([meter, accents]) => (
+            <Box
+              key={meter}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "100px 1fr", sm: "150px 1fr" },
+                gap: 1,
+                py: 1,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{meter}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{accents}</Typography>
+            </Box>
+          ))}
+        </Box>
+        <Typography sx={{ color: "#5d6c6e", mt: 1.25 }}>
+          En un compás simple cada pulso se divide en dos. Dentro del pulso, la
+          primera corchea es fuerte y la segunda es débil: 1–y.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Contratiempo vs. síncopa</SectionHeading>
+        <Box sx={{ overflowX: "auto" }}>
+          <Box sx={{ minWidth: 470 }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 120px 120px",
+                gap: 1,
+                py: 0.8,
+                borderBlock: "1px solid #cbd6d4",
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                CARACTERÍSTICA
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                CONTRATIEMPO
+              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 900 }}>
+                SÍNCOPA
+              </Typography>
+            </Box>
+            {[
+              ["Aparece en parte débil", "Sí", "Sí"],
+              ["Desplaza el acento", "Sí", "Sí"],
+              ["Precedido por silencio", "Siempre", "No necesariamente"],
+              ["Puede llegar a parte fuerte", "No", "Sí"],
+            ].map(([feature, offbeat, syncopation]) => (
+              <Box
+                key={feature}
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 120px 120px",
+                  gap: 1,
+                  py: 0.9,
+                  borderBottom: "1px solid #dce3e1",
+                }}
+              >
+                <Typography sx={{ fontWeight: 800 }}>{feature}</Typography>
+                <Typography sx={{ color: "#56676a" }}>{offbeat}</Typography>
+                <Typography sx={{ color: "#56676a" }}>{syncopation}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Tipos de síncopa</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          De tiempo: empieza en la parte débil y se prolonga hacia el siguiente
+          tiempo. De compás: la ligadura atraviesa la barra de compás. Regular:
+          valores iguales; irregular: valores diferentes.
+        </Typography>
+      </Box>
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Regla para memorizar</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          El contratiempo siempre viene después de un silencio. La síncopa no, y
+          puede prolongarse desde una parte débil hacia una fuerte. Toda síncopa
+          debe acentuarse.
         </Typography>
       </Box>
     </Stack>
@@ -1504,11 +1879,12 @@ function ImprovisationAnswersView() {
 
 export default function SemesterNotes() {
   const navigate = useNavigate();
-  const [weekIndex, setWeekIndex] = useState(0);
+  const [weekIndex, setWeekIndex] = useState(WEEKS.length - 1);
   const [subject, setSubject] = useState<SubjectId>("solfeo");
   const [detailView, setDetailView] = useState<DetailView>("resumen");
   const week = WEEKS[weekIndex];
   const selectedSubject = SUBJECTS.find((item) => item.id === subject)!;
+  const hasNotes = week.subjects.includes(subject);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f7f9f8", color: "#172b2d" }}>
@@ -1555,7 +1931,10 @@ export default function SemesterNotes() {
             <IconButton
               aria-label="Semana anterior"
               disabled={weekIndex === 0}
-              onClick={() => setWeekIndex((index) => Math.max(0, index - 1))}
+              onClick={() => {
+                setWeekIndex((index) => Math.max(0, index - 1));
+                setDetailView("resumen");
+              }}
             >
               <ChevronLeft />
             </IconButton>
@@ -1565,7 +1944,10 @@ export default function SemesterNotes() {
                 labelId="semester-week-label"
                 label="Semana"
                 value={weekIndex}
-                onChange={(event) => setWeekIndex(Number(event.target.value))}
+                onChange={(event) => {
+                  setWeekIndex(Number(event.target.value));
+                  setDetailView("resumen");
+                }}
               >
                 {WEEKS.map((item, index) => (
                   <MenuItem key={item.id} value={index}>
@@ -1577,9 +1959,10 @@ export default function SemesterNotes() {
             <IconButton
               aria-label="Semana siguiente"
               disabled={weekIndex === WEEKS.length - 1}
-              onClick={() =>
-                setWeekIndex((index) => Math.min(WEEKS.length - 1, index + 1))
-              }
+              onClick={() => {
+                setWeekIndex((index) => Math.min(WEEKS.length - 1, index + 1));
+                setDetailView("resumen");
+              }}
             >
               <ChevronRight />
             </IconButton>
@@ -1606,7 +1989,7 @@ export default function SemesterNotes() {
           </Tabs>
 
           <Box sx={{ p: { xs: 1.5, sm: 3 } }}>
-            {selectedSubject.hasNotes ? (
+            {hasNotes ? (
               <>
                 <Stack
                   direction={{ xs: "column", sm: "row" }}
@@ -1652,39 +2035,48 @@ export default function SemesterNotes() {
                   </ToggleButtonGroup>
                 </Stack>
 
-                {subject === "solfeo" && detailView === "resumen" && (
-                  <SummaryView />
-                )}
-                {subject === "solfeo" && detailView === "tareas" && (
-                  <TasksView />
-                )}
-                {subject === "solfeo" && detailView === "conceptos" && (
-                  <ConceptsView />
-                )}
-                {subject === "armonia" && detailView === "resumen" && (
-                  <HarmonySummaryView />
-                )}
-                {subject === "armonia" && detailView === "tareas" && (
-                  <HarmonyTasksView />
-                )}
-                {subject === "armonia" && detailView === "conceptos" && (
-                  <HarmonyConceptsView />
-                )}
-                {subject === "armonia" && detailView === "respuestas" && (
-                  <HarmonyAnswersView />
-                )}
-                {subject === "improvisacion" && detailView === "resumen" && (
-                  <ImprovisationSummaryView />
-                )}
-                {subject === "improvisacion" && detailView === "tareas" && (
-                  <ImprovisationTasksView />
-                )}
-                {subject === "improvisacion" && detailView === "conceptos" && (
-                  <ImprovisationConceptsView />
-                )}
-                {subject === "improvisacion" && detailView === "respuestas" && (
-                  <ImprovisationAnswersView />
-                )}
+                {week.id === "2026-09-07" &&
+                  subject === "solfeo" &&
+                  detailView === "resumen" && <SummaryView />}
+                {week.id === "2026-09-07" &&
+                  subject === "solfeo" &&
+                  detailView === "tareas" && <TasksView />}
+                {week.id === "2026-09-07" &&
+                  subject === "solfeo" &&
+                  detailView === "conceptos" && <ConceptsView />}
+                {week.id === "2026-09-14" &&
+                  subject === "solfeo" &&
+                  detailView === "resumen" && <SolfegeWeekTwoSummaryView />}
+                {week.id === "2026-09-14" &&
+                  subject === "solfeo" &&
+                  detailView === "tareas" && <SolfegeWeekTwoTasksView />}
+                {week.id === "2026-09-14" &&
+                  subject === "solfeo" &&
+                  detailView === "conceptos" && <SolfegeWeekTwoConceptsView />}
+                {week.id === "2026-09-07" &&
+                  subject === "armonia" &&
+                  detailView === "resumen" && <HarmonySummaryView />}
+                {week.id === "2026-09-07" &&
+                  subject === "armonia" &&
+                  detailView === "tareas" && <HarmonyTasksView />}
+                {week.id === "2026-09-07" &&
+                  subject === "armonia" &&
+                  detailView === "conceptos" && <HarmonyConceptsView />}
+                {week.id === "2026-09-07" &&
+                  subject === "armonia" &&
+                  detailView === "respuestas" && <HarmonyAnswersView />}
+                {week.id === "2026-09-07" &&
+                  subject === "improvisacion" &&
+                  detailView === "resumen" && <ImprovisationSummaryView />}
+                {week.id === "2026-09-07" &&
+                  subject === "improvisacion" &&
+                  detailView === "tareas" && <ImprovisationTasksView />}
+                {week.id === "2026-09-07" &&
+                  subject === "improvisacion" &&
+                  detailView === "conceptos" && <ImprovisationConceptsView />}
+                {week.id === "2026-09-07" &&
+                  subject === "improvisacion" &&
+                  detailView === "respuestas" && <ImprovisationAnswersView />}
               </>
             ) : (
               <Box sx={{ py: { xs: 5, sm: 8 }, textAlign: "center" }}>
