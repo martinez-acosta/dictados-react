@@ -77,6 +77,14 @@ export default function CancionesMenu() {
       color: "#e8590c",
     },
     {
+      id: "cantos-de-gozo-d",
+      titulo: "Cantos de Gozo",
+      artista: "Música ICF / Conquistando Fronteras",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/CantosDeGozoD.html",
+      color: "#f59f00",
+    },
+    {
       id: "sopla",
       titulo: "Sopla",
       artista: "Conquistando Fronteras",
