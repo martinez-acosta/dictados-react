@@ -135,6 +135,25 @@ const HARMONY_BOARD_IMAGES = [
   },
 ] as const;
 
+const HARMONY_WEEK_TWO_BOARD_IMAGES = [
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/armonia-cuatriadas-1.png`,
+    label: "Armonización de Do mayor con cuatríadas",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/armonia-cuatriadas-2.png`,
+    label: "Armonización de Do mayor · vista completa",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/armonia-formulas-1.png`,
+    label: "Tipos y fórmulas de cuatríadas",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/armonia-formulas-2.png`,
+    label: "Tipos y fórmulas · vista completa",
+  },
+] as const;
+
 const HARMONY_STUDY_GROUPS = [
   {
     title: "Tarea · armonización",
@@ -1384,6 +1403,9 @@ function ImprovisationWeekTwoAnswersView() {
 }
 
 function HarmonyWeekTwoSummaryView() {
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const photo = HARMONY_WEEK_TWO_BOARD_IMAGES[photoIndex];
+
   return (
     <Stack spacing={3}>
       <Box>
@@ -1400,6 +1422,46 @@ function HarmonyWeekTwoSummaryView() {
           Ahora cada grado se construye con 1–3–5–7. El resultado permite
           reconocer el tipo y nombrar el acorde que nace naturalmente de la
           escala.
+        </Typography>
+      </Box>
+
+      <Box component="figure" sx={{ m: 0 }}>
+        <Box
+          component="img"
+          src={photo.src}
+          alt={`Pizarrón de Armonía: ${photo.label}`}
+          sx={{
+            display: "block",
+            width: "100%",
+            maxHeight: 520,
+            objectFit: "contain",
+            bgcolor: "#eef2f1",
+            border: "1px solid #d6dfdd",
+          }}
+        />
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ mt: 1.25, overflowX: "auto", pb: 0.5 }}
+        >
+          {HARMONY_WEEK_TWO_BOARD_IMAGES.map((item, index) => (
+            <Button
+              key={item.src}
+              size="small"
+              variant={photoIndex === index ? "contained" : "outlined"}
+              onClick={() => setPhotoIndex(index)}
+              sx={{ minWidth: "max-content", textTransform: "none" }}
+            >
+              Foto {index + 1}
+            </Button>
+          ))}
+        </Stack>
+        <Typography
+          component="figcaption"
+          variant="caption"
+          sx={{ display: "block", mt: 0.5, color: "#677779" }}
+        >
+          {photo.label}
         </Typography>
       </Box>
 
