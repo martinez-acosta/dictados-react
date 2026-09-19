@@ -115,6 +115,7 @@ const IMPROVISATION_STORAGE_KEY =
   "semester-notes:2026-09-07:improvisacion:tasks";
 const HARMONY_STORAGE_KEY = "semester-notes:2026-09-07:armonia:study";
 const IMPROVISATION_BOARD_IMAGE = `${import.meta.env.BASE_URL}semester-notes/2026-09-07/improvisacion-intervalos.png`;
+const IMPROVISATION_WEEK_TWO_BOARD_IMAGE = `${import.meta.env.BASE_URL}semester-notes/2026-09-14/improvisacion-grados-extensiones.png`;
 
 const SOLFEGE_WEEK_TWO_BOARD_IMAGES = [
   {
@@ -1112,6 +1113,29 @@ function ImprovisationWeekTwoSummaryView() {
           La clase pasó de construir cuatríadas a interpretar cada parte del
           símbolo y completar los grados 2, 4 y 6 alrededor de 1, 3, 5 y 7 para
           obtener material de improvisación.
+        </Typography>
+      </Box>
+
+      <Box component="figure" sx={{ m: 0 }}>
+        <Box
+          component="img"
+          src={IMPROVISATION_WEEK_TWO_BOARD_IMAGE}
+          alt="Pizarrón de Improvisación con grados del acorde y extensiones 9, 11 y 13"
+          sx={{
+            display: "block",
+            width: "100%",
+            maxHeight: 560,
+            objectFit: "contain",
+            bgcolor: "#eef2f1",
+            border: "1px solid #d6dfdd",
+          }}
+        />
+        <Typography
+          component="figcaption"
+          variant="caption"
+          sx={{ display: "block", mt: 0.75, color: "#677779" }}
+        >
+          Grados del acorde y extensiones: 9, 11 y 13.
         </Typography>
       </Box>
 
