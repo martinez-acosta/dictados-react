@@ -116,6 +116,17 @@ const IMPROVISATION_STORAGE_KEY =
 const HARMONY_STORAGE_KEY = "semester-notes:2026-09-07:armonia:study";
 const IMPROVISATION_BOARD_IMAGE = `${import.meta.env.BASE_URL}semester-notes/2026-09-07/improvisacion-intervalos.png`;
 
+const SOLFEGE_WEEK_TWO_BOARD_IMAGES = [
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-sincopa-1.png`,
+    label: "Síncopa y contratiempo · ejemplos completos",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-sincopa-2.png`,
+    label: "Figuras rítmicas en 4/4",
+  },
+] as const;
+
 const HARMONY_BOARD_IMAGES = [
   {
     src: `${import.meta.env.BASE_URL}semester-notes/2026-09-07/armonia-campo-armonico.png`,
@@ -709,6 +720,9 @@ function ConceptsView() {
 }
 
 function SolfegeWeekTwoSummaryView() {
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const photo = SOLFEGE_WEEK_TWO_BOARD_IMAGES[photoIndex];
+
   return (
     <Stack spacing={3}>
       <Box>
@@ -725,6 +739,46 @@ function SolfegeWeekTwoSummaryView() {
           La clase avanzó de la lectura continua al desplazamiento del acento:
           reconocer partes fuertes y débiles, escuchar cuándo aparece el sonido
           y saber si está precedido por silencio.
+        </Typography>
+      </Box>
+
+      <Box component="figure" sx={{ m: 0 }}>
+        <Box
+          component="img"
+          src={photo.src}
+          alt={`Pizarrón de Solfeo: ${photo.label}`}
+          sx={{
+            display: "block",
+            width: "100%",
+            maxHeight: 520,
+            objectFit: "contain",
+            bgcolor: "#eef2f1",
+            border: "1px solid #d6dfdd",
+          }}
+        />
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ mt: 1.25, overflowX: "auto", pb: 0.5 }}
+        >
+          {SOLFEGE_WEEK_TWO_BOARD_IMAGES.map((item, index) => (
+            <Button
+              key={item.src}
+              size="small"
+              variant={photoIndex === index ? "contained" : "outlined"}
+              onClick={() => setPhotoIndex(index)}
+              sx={{ minWidth: "max-content", textTransform: "none" }}
+            >
+              Foto {index + 1}
+            </Button>
+          ))}
+        </Stack>
+        <Typography
+          component="figcaption"
+          variant="caption"
+          sx={{ display: "block", mt: 0.5, color: "#677779" }}
+        >
+          {photo.label}
         </Typography>
       </Box>
 
