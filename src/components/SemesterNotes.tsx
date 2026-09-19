@@ -42,7 +42,7 @@ const WEEKS: Array<{
     id: "2026-09-14",
     label: "14–20 de septiembre de 2026",
     shortLabel: "14–20 sep",
-    subjects: ["solfeo", "improvisacion"],
+    subjects: ["solfeo", "armonia", "improvisacion"],
   },
 ];
 
@@ -110,6 +110,7 @@ const SOLFEGE_STORAGE_KEY = "semester-notes:2026-09-07:solfeo:tasks";
 const SOLFEGE_WEEK_TWO_STORAGE_KEY = "semester-notes:2026-09-14:solfeo:tasks";
 const IMPROVISATION_WEEK_TWO_STORAGE_KEY =
   "semester-notes:2026-09-14:improvisacion:study";
+const HARMONY_WEEK_TWO_STORAGE_KEY = "semester-notes:2026-09-14:armonia:tasks";
 const IMPROVISATION_STORAGE_KEY =
   "semester-notes:2026-09-07:improvisacion:tasks";
 const HARMONY_STORAGE_KEY = "semester-notes:2026-09-07:armonia:study";
@@ -242,6 +243,66 @@ const HARMONY_DIMINISHED_ANSWERS = [
     chord: "E°7",
     notes: "E – G – B♭ – D♭",
     enharmonic: "E – G – B♭ – D♭",
+  },
+] as const;
+
+const HARMONY_WEEK_TWO_TASK_GROUPS = [
+  {
+    title: "Tarea · A mayor",
+    tasks: [
+      ["a-scale", "Construir la escala de A mayor"],
+      ["a-tetrads", "Formar una cuatríada sobre cada grado"],
+      ["a-labels", "Anotar grado, nombre y notas de cada acorde"],
+    ],
+  },
+  {
+    title: "Tarea · E mayor",
+    tasks: [
+      ["e-scale", "Construir la escala de E mayor"],
+      ["e-tetrads", "Formar una cuatríada sobre cada grado"],
+      ["e-labels", "Anotar grado, nombre y notas de cada acorde"],
+    ],
+  },
+  {
+    title: "Preparación de examen",
+    tasks: [
+      ["pattern", "Memorizar Imaj7–iim7–iiim7–IVmaj7–V7–vim7–viim7♭5"],
+      ["piano", "Practicar las cuatríadas en piano"],
+      ["seventh-shortcuts", "Reconocer 7M y 7m desde la octava"],
+    ],
+  },
+] as const;
+
+const HARMONY_WEEK_TWO_ANSWERS = [
+  {
+    id: "a",
+    label: "A mayor",
+    scale: "A – B – C♯ – D – E – F♯ – G♯ – A",
+    sequence: "Amaj7 – Bm7 – C♯m7 – Dmaj7 – E7 – F♯m7 – G♯m7♭5",
+    chords: [
+      ["I", "Amaj7", "A – C♯ – E – G♯"],
+      ["ii", "Bm7", "B – D – F♯ – A"],
+      ["iii", "C♯m7", "C♯ – E – G♯ – B"],
+      ["IV", "Dmaj7", "D – F♯ – A – C♯"],
+      ["V", "E7", "E – G♯ – B – D"],
+      ["vi", "F♯m7", "F♯ – A – C♯ – E"],
+      ["vii", "G♯m7♭5", "G♯ – B – D – F♯"],
+    ],
+  },
+  {
+    id: "e",
+    label: "E mayor",
+    scale: "E – F♯ – G♯ – A – B – C♯ – D♯ – E",
+    sequence: "Emaj7 – F♯m7 – G♯m7 – Amaj7 – B7 – C♯m7 – D♯m7♭5",
+    chords: [
+      ["I", "Emaj7", "E – G♯ – B – D♯"],
+      ["ii", "F♯m7", "F♯ – A – C♯ – E"],
+      ["iii", "G♯m7", "G♯ – B – D♯ – F♯"],
+      ["IV", "Amaj7", "A – C♯ – E – G♯"],
+      ["V", "B7", "B – D♯ – F♯ – A"],
+      ["vi", "C♯m7", "C♯ – E – G♯ – B"],
+      ["vii", "D♯m7♭5", "D♯ – F♯ – A – C♯"],
+    ],
   },
 ] as const;
 
@@ -1316,6 +1377,284 @@ function ImprovisationWeekTwoAnswersView() {
         <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
           La 7ª mayor está medio tono debajo de la octava. La 7ª menor está un
           tono debajo. Desde G: F♯ es 7ª mayor y F es 7ª menor.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function HarmonyWeekTwoSummaryView() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography
+          variant="overline"
+          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
+        >
+          Tema principal
+        </Typography>
+        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
+          Armonizar la escala mayor con cuatríadas
+        </Typography>
+        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
+          Ahora cada grado se construye con 1–3–5–7. El resultado permite
+          reconocer el tipo y nombrar el acorde que nace naturalmente de la
+          escala.
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Patrón de la escala mayor</SectionHeading>
+        <Typography sx={{ color: "#183638", fontWeight: 900, fontSize: 18 }}>
+          Maj7 – m7 – m7 – Maj7 – 7 – m7 – m7♭5
+        </Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 1 }}>
+          Imaj7 · iim7 · iiim7 · IVmaj7 · V7 · vim7 · viim7♭5
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Atajos para la séptima</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>• 7ª mayor: medio tono antes de la octava.</Typography>
+          <Typography>• 7ª menor: un tono antes de la octava.</Typography>
+          <Typography>
+            • En el V grado la tríada es mayor, pero la séptima es menor; por
+            eso se llama 7 y no Maj7.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>
+          Examen escrito y en piano
+        </Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          Habrá que identificar las notas, formar el acorde y tocar las teclas
+          correctas. No se evaluará técnica pianística avanzada.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function HarmonyWeekTwoTasksView() {
+  const [completed, setCompleted] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(
+        window.localStorage.getItem(HARMONY_WEEK_TWO_STORAGE_KEY) ?? "{}",
+      );
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      HARMONY_WEEK_TWO_STORAGE_KEY,
+      JSON.stringify(completed),
+    );
+  }, [completed]);
+
+  const taskCount = HARMONY_WEEK_TWO_TASK_GROUPS.reduce(
+    (total, group) => total + group.tasks.length,
+    0,
+  );
+  const completedCount = HARMONY_WEEK_TWO_TASK_GROUPS.flatMap(
+    (group) => group.tasks,
+  ).filter(([id]) => completed[id]).length;
+
+  return (
+    <Stack spacing={3}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={1}
+      >
+        <Box>
+          <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+            Tarea de Armonía
+          </Typography>
+          <Typography sx={{ color: "#667678" }}>
+            Armonizar A mayor y E mayor con cuatríadas.
+          </Typography>
+        </Box>
+        <Chip
+          label={`${completedCount} de ${taskCount}`}
+          variant="outlined"
+          sx={{ fontWeight: 800 }}
+        />
+      </Stack>
+
+      {HARMONY_WEEK_TWO_TASK_GROUPS.map((group) => (
+        <Box key={group.title}>
+          <SectionHeading>{group.title}</SectionHeading>
+          <Stack spacing={0.25}>
+            {group.tasks.map(([id, label]) => (
+              <FormControlLabel
+                key={id}
+                control={
+                  <Checkbox
+                    checked={Boolean(completed[id])}
+                    onChange={(event) =>
+                      setCompleted((current) => ({
+                        ...current,
+                        [id]: event.target.checked,
+                      }))
+                    }
+                  />
+                }
+                label={label}
+                sx={{
+                  m: 0,
+                  py: 0.25,
+                  color: completed[id] ? "#849092" : "#243d3f",
+                  textDecoration: completed[id] ? "line-through" : "none",
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+      ))}
+    </Stack>
+  );
+}
+
+function HarmonyWeekTwoConceptsView() {
+  const cMajorTetrads = [
+    ["I", "C–E–G–B", "Cmaj7"],
+    ["ii", "D–F–A–C", "Dm7"],
+    ["iii", "E–G–B–D", "Em7"],
+    ["IV", "F–A–C–E", "Fmaj7"],
+    ["V", "G–B–D–F", "G7"],
+    ["vi", "A–C–E–G", "Am7"],
+    ["vii", "B–D–F–A", "Bm7♭5"],
+  ];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Cómo armonizar con cuatríadas
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Sobre cada grado toma una nota sí y una no: 1–3–5–7.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Ejemplo completo · C mayor</SectionHeading>
+        <Box sx={{ overflowX: "auto" }}>
+          <Box sx={{ minWidth: 410 }}>
+            {cMajorTetrads.map(([degree, notes, chord]) => (
+              <Box
+                key={degree}
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "55px 1fr 110px",
+                  gap: 1,
+                  py: 0.9,
+                  borderBottom: "1px solid #dce3e1",
+                }}
+              >
+                <Typography sx={{ fontWeight: 900 }}>{degree}</Typography>
+                <Typography sx={{ color: "#56676a" }}>{notes}</Typography>
+                <Typography sx={{ fontWeight: 800 }}>{chord}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>V grado dominante</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          G–B–D es una tríada mayor, pero F es séptima menor de G. Por eso el
+          acorde es G7, no Gmaj7.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Semidisminuido vs. disminuido 7</SectionHeading>
+        <Typography sx={{ color: "#344b4d" }}>
+          m7♭5 = tríada disminuida + 7ª menor. dim7 = tríada disminuida + 7ª
+          disminuida. El vii grado de la escala mayor produce m7♭5.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function HarmonyWeekTwoAnswersView() {
+  const [scaleId, setScaleId] = useState("a");
+  const answer =
+    HARMONY_WEEK_TWO_ANSWERS.find((item) => item.id === scaleId) ??
+    HARMONY_WEEK_TWO_ANSWERS[0];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Respuestas de la tarea
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Escalas y cuatríadas completas de A mayor y E mayor.
+        </Typography>
+      </Box>
+
+      <FormControl fullWidth size="small">
+        <InputLabel id="harmony-week-two-answer-label">Escala</InputLabel>
+        <Select
+          labelId="harmony-week-two-answer-label"
+          label="Escala"
+          value={scaleId}
+          onChange={(event) => setScaleId(event.target.value)}
+        >
+          {HARMONY_WEEK_TWO_ANSWERS.map((item) => (
+            <MenuItem key={item.id} value={item.id}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <Box>
+        <SectionHeading>Escala</SectionHeading>
+        <Typography sx={{ color: "#344b4d", fontWeight: 700 }}>
+          {answer.scale}
+        </Typography>
+      </Box>
+
+      <Box sx={{ overflowX: "auto" }}>
+        <Box sx={{ minWidth: 420 }}>
+          {answer.chords.map(([degree, chord, notes]) => (
+            <Box
+              key={degree}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "55px 120px 1fr",
+                gap: 1,
+                py: 0.9,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{degree}</Typography>
+              <Typography sx={{ fontWeight: 800 }}>{chord}</Typography>
+              <Typography sx={{ color: "#56676a" }}>{notes}</Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Respuesta corrida</Typography>
+        <Typography sx={{ color: "#344b4d", mt: 0.5, fontWeight: 700 }}>
+          {answer.sequence}
         </Typography>
       </Box>
     </Stack>
@@ -2458,6 +2797,18 @@ export default function SemesterNotes() {
                   detailView === "respuestas" && (
                     <ImprovisationWeekTwoAnswersView />
                   )}
+                {week.id === "2026-09-14" &&
+                  subject === "armonia" &&
+                  detailView === "resumen" && <HarmonyWeekTwoSummaryView />}
+                {week.id === "2026-09-14" &&
+                  subject === "armonia" &&
+                  detailView === "tareas" && <HarmonyWeekTwoTasksView />}
+                {week.id === "2026-09-14" &&
+                  subject === "armonia" &&
+                  detailView === "conceptos" && <HarmonyWeekTwoConceptsView />}
+                {week.id === "2026-09-14" &&
+                  subject === "armonia" &&
+                  detailView === "respuestas" && <HarmonyWeekTwoAnswersView />}
                 {week.id === "2026-09-07" &&
                   subject === "armonia" &&
                   detailView === "resumen" && <HarmonySummaryView />}
