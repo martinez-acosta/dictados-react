@@ -87,7 +87,7 @@ export default function CancionesMenu() {
     {
       id: "cielo-y-tierra-gran-yo-soy-d",
       titulo: "Cielo y Tierra / El Gran Yo Soy (Great I Am)",
-      artista: "Conquistando Fronteras",
+      artista: "Conquistando Fronteras / En Espíritu y En Verdad",
       tonalidad: "D",
       archivo: "/dictados-react/src/CieloYTierraGranYoSoyD.html",
       color: "#0b7285",
