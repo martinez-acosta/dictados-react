@@ -85,6 +85,14 @@ export default function CancionesMenu() {
       color: "#f59f00",
     },
     {
+      id: "cielo-y-tierra-gran-yo-soy-d",
+      titulo: "Cielo y Tierra / El Gran Yo Soy (Great I Am)",
+      artista: "Conquistando Fronteras",
+      tonalidad: "D",
+      archivo: "/dictados-react/src/CieloYTierraGranYoSoyD.html",
+      color: "#0b7285",
+    },
+    {
       id: "digno-de-adorar-e",
       titulo: "Digno de Adorar (Worthy of It All)",
       artista: "Conquistando Fronteras · David Brymer",
