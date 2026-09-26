@@ -18,3 +18,16 @@ Abre el enlace local que imprime Vite.
 - Material UI 5
 - VexFlow 4 (Factory / EasyScore / Formatter)
 - Web Audio API (síntesis simple tipo piano)
+
+## Publicación
+
+Cada push a `main` publica el sitio existente en GitHub Pages mediante
+`.github/workflows/deploy-pages.yml`. Cloudflare Pages también construye desde
+`main` con la integración de GitHub: comando `npm run build`, salida `dist` y
+raíz del repositorio. La variable `CF_PAGES=1`, que Cloudflare inyecta durante
+el build, adapta las rutas a la raíz del dominio y omite el `404.html` de
+GitHub Pages para que funcionen las rutas directas de React.
+
+Para comprobar localmente la variante de Cloudflare, ejecuta
+`CF_PAGES=1 npm run build`. El build normal conserva la ruta
+`/dictados-react/` usada por GitHub Pages.

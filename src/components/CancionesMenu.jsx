@@ -346,9 +346,13 @@ export default function CancionesMenu() {
     const tonoOriginal =
       cancion.tonoOriginal ||
       (/^[A-G](?:#|b)?m?$/.test(cancion.tonalidad) ? cancion.tonalidad : null);
+    const archivo = cancion.archivo.replace(
+      /^\/dictados-react\//,
+      import.meta.env.BASE_URL,
+    );
     const destino = tonoOriginal
-      ? `${cancion.archivo}?original=${encodeURIComponent(tonoOriginal)}`
-      : cancion.archivo;
+      ? `${archivo}?original=${encodeURIComponent(tonoOriginal)}`
+      : archivo;
 
     window.open(destino, "_blank");
   };

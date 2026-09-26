@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
-import { copyFileSync, mkdirSync, readdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
+
+const isCloudflarePages = process.env.CF_PAGES === "1";
 
 function copySongSheets() {
   let config;
@@ -26,11 +28,19 @@ function copySongSheets() {
           resolve(outputDirectory, fileName),
         );
       }
+
+      // Cloudflare Pages serves SPA routes from index.html when no 404.html exists.
+      // GitHub Pages still needs its 404.html redirect for direct route visits.
+      if (isCloudflarePages) {
+        rmSync(resolve(config.root, config.build.outDir, "404.html"), {
+          force: true,
+        });
+      }
     },
   };
 }
 
 export default defineConfig({
-  base: "/dictados-react/",
+  base: isCloudflarePages ? "/" : "/dictados-react/",
   plugins: [copySongSheets()],
 });
