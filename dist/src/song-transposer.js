@@ -74,7 +74,7 @@
   ];
 
   const CHORD_PATTERN =
-    /^([A-G](?:#|b|♯|♭)?)((?:(?:m(?:aj)?|maj|min|dim|aug|sus|add|omit|no)?\d*(?:\/\d+)?(?:\([^)]+\))?)?)(?:\/([A-G](?:#|b|♯|♭)?))?$/;
+    /^([A-G](?:#|b|♯|♭)?)((?:(?:m(?:aj)?|maj|min|dim|aug|sus|add|omit|no)?\d*(?:(?:sus|add)\d*)?(?:\/\d+)?(?:\([^)]+\))?)?)(?:\/([A-G](?:#|b|♯|♭)?))?$/;
 
   function normalizeNote(note) {
     return note.replace("♯", "#").replace("♭", "b");
@@ -122,14 +122,24 @@
     return /^(?:\||\/|\/\/|:|x\d+|×\d+|-)+$/i.test(token);
   }
 
+  function isChordToken(token) {
+    if (parseChordToken(token)) return true;
+    if (!token.includes("-")) return false;
+
+    return token.split("-").every((part) => Boolean(parseChordToken(part)));
+  }
+
   function isChordLine(line) {
     const trimmed = line.trim();
     if (!trimmed || /^[eEADGB]\|/.test(trimmed)) return false;
 
     const tokens = trimmed.split(/\s+/);
-    return tokens.length > 0 && tokens.every((token) => {
-      return isMeasureMarker(token) || Boolean(parseChordToken(token));
-    });
+    return (
+      tokens.length > 0 &&
+      tokens.every((token) => {
+        return isMeasureMarker(token) || isChordToken(token);
+      })
+    );
   }
 
   function preferredNoteName(pitch, preferFlats) {
@@ -139,7 +149,8 @@
 
   function transposeParsedChord(parsed, semitones, preferFlats) {
     const rootPitch = NOTE_TO_PITCH[parsed.root];
-    if (rootPitch === undefined) return parsed.leading + parsed.core + parsed.trailing;
+    if (rootPitch === undefined)
+      return parsed.leading + parsed.core + parsed.trailing;
 
     const root = preferredNoteName(rootPitch + semitones, preferFlats);
     let bass = "";
@@ -157,9 +168,24 @@
   function transposeChordLine(line, semitones, preferFlats) {
     return line.replace(/\S+/g, (token) => {
       const parsed = parseChordToken(token);
-      return parsed
-        ? transposeParsedChord(parsed, semitones, preferFlats)
-        : token;
+      if (parsed) return transposeParsedChord(parsed, semitones, preferFlats);
+
+      if (token.includes("-")) {
+        const parts = token.split("-");
+        if (parts.every((part) => Boolean(parseChordToken(part)))) {
+          return parts
+            .map((part) =>
+              transposeParsedChord(
+                parseChordToken(part),
+                semitones,
+                preferFlats,
+              ),
+            )
+            .join("-");
+        }
+      }
+
+      return token;
     });
   }
 
@@ -220,6 +246,26 @@
       minorSuffix: match[2] || "",
       full: normalizeNote(match[1]) + (match[2] || ""),
     };
+  }
+
+  function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function replaceDisplayedKey(label, sourceKey, targetKey) {
+    const bracketedKey = /\[([A-G](?:#|b|♯|♭)?m?)(?=[,\]])/;
+    if (bracketedKey.test(label)) {
+      return label.replace(bracketedKey, "[" + targetKey);
+    }
+
+    const trailingKey = new RegExp(
+      "(\\s+[—-]\\s+)" + escapeRegExp(sourceKey) + "\\s*$",
+    );
+    if (trailingKey.test(label)) {
+      return label.replace(trailingKey, "$1" + targetKey);
+    }
+
+    return label + " [" + targetKey + "]";
   }
 
   function shouldPreferFlats(targetRoot, minorSuffix) {
@@ -284,14 +330,8 @@
   }
 
   function createToolbar(options) {
-    const {
-      originalKey,
-      hasChords,
-      onStep,
-      onSelect,
-      onReset,
-      onPrint,
-    } = options;
+    const { originalKey, hasChords, onStep, onSelect, onReset, onPrint } =
+      options;
 
     const toolbar = document.createElement("div");
     toolbar.className = "song-transposer";
@@ -362,6 +402,7 @@
 
     const chordElements = [
       ...document.querySelectorAll("pre.cifra:not(.tab)"),
+      ...document.querySelectorAll("pre.lacuerda"),
       ...document.querySelectorAll(".chords"),
     ];
     const records = [];
@@ -381,6 +422,8 @@
     const originalPitch = NOTE_TO_PITCH[originalKey.root];
     const storageKey = "song-transposer:" + window.location.pathname;
     let currentTarget = originalKey.full;
+    let declaredOriginalTarget = originalKey.full;
+    let hasDeclaredOriginal = false;
 
     function targetParts(target) {
       return {
@@ -389,11 +432,29 @@
       };
     }
 
+    try {
+      const candidate = new URL(window.location.href).searchParams.get(
+        "original",
+      );
+      if (candidate) {
+        const parts = targetParts(candidate);
+        if (
+          NOTE_TO_PITCH[parts.root] !== undefined &&
+          candidate === parts.root + originalKey.minorSuffix
+        ) {
+          declaredOriginalTarget = candidate;
+          hasDeclaredOriginal = true;
+        }
+      }
+    } catch (_error) {
+      // La hoja conserva como original el tono en que fue escrita.
+    }
+
     function updateUrl(target) {
       if (!/^https?:$/.test(window.location.protocol)) return;
       try {
         const url = new URL(window.location.href);
-        if (target === originalKey.full) url.searchParams.delete("tono");
+        if (target === declaredOriginalTarget) url.searchParams.delete("tono");
         else url.searchParams.set("tono", target);
         window.history.replaceState({}, "", url);
       } catch (_error) {
@@ -407,7 +468,10 @@
       if (targetPitch === undefined) return;
 
       const semitones = positiveModulo(targetPitch - originalPitch, 12);
-      const preferFlats = shouldPreferFlats(parts.root, originalKey.minorSuffix);
+      const preferFlats = shouldPreferFlats(
+        parts.root,
+        originalKey.minorSuffix,
+      );
 
       records.forEach((record) => {
         record.node.nodeValue =
@@ -421,21 +485,23 @@
               );
       });
 
-      heading.textContent = originalHeading.replace(
-        /\[([A-G](?:#|b|♯|♭)?m?)/,
-        "[" + target,
+      heading.textContent = replaceDisplayedKey(
+        originalHeading,
+        originalKey.full,
+        target,
       );
-      document.title = originalTitle.replace(
-        /\[([A-G](?:#|b|♯|♭)?m?)/,
-        "[" + target,
+      document.title = replaceDisplayedKey(
+        originalTitle,
+        originalKey.full,
+        target,
       );
 
       currentTarget = target;
       controls.select.value = target;
       controls.status.textContent =
-        target === originalKey.full
-          ? "Tono original: " + originalKey.full
-          : "Original " + originalKey.full + " → " + target;
+        target === declaredOriginalTarget
+          ? "Tono original: " + declaredOriginalTarget
+          : "Original " + declaredOriginalTarget + " → " + target;
 
       if (persist) {
         try {
@@ -461,7 +527,7 @@
       hasChords: chordCount > 0,
       onStep: stepTarget,
       onSelect: (target) => applyTarget(target, true),
-      onReset: () => applyTarget(originalKey.full, true),
+      onReset: () => applyTarget(declaredOriginalTarget, true),
       onPrint: () => window.print(),
     });
 
@@ -473,7 +539,9 @@
     try {
       const urlTarget = new URL(window.location.href).searchParams.get("tono");
       const savedTarget = window.localStorage.getItem(storageKey);
-      const candidate = urlTarget || savedTarget;
+      const candidate =
+        urlTarget ||
+        (hasDeclaredOriginal ? declaredOriginalTarget : savedTarget);
       if (
         chordCount > 0 &&
         candidate &&
@@ -489,7 +557,8 @@
 
     window.SongTransposer = {
       applyTarget: (target) => applyTarget(target, true),
-      originalKey: originalKey.full,
+      originalKey: declaredOriginalTarget,
+      sourceKey: originalKey.full,
       transposeChordLine,
     };
   }
