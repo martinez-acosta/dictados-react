@@ -31,3 +31,15 @@ GitHub Pages para que funcionen las rutas directas de React.
 Para comprobar localmente la variante de Cloudflare, ejecuta
 `CF_PAGES=1 npm run build`. El build normal conserva la ruta
 `/dictados-react/` usada por GitHub Pages.
+
+## Estadísticas de visitas
+
+GitHub Pages usa Cloudflare Web Analytics con el mismo token del hostname
+`martinez-acosta.github.io`. El workflow toma el token del secreto
+`CLOUDFLARE_WEB_ANALYTICS_TOKEN` y añade el beacon a la app y a las hojas HTML
+independientes. En el panel de Web Analytics, filtra por la ruta
+`/dictados-react/` para distinguir estas visitas de las de Prédicas.
+
+El proyecto `dictados-react` de Cloudflare Pages tiene Web Analytics habilitado
+en **Metrics**. Cloudflare añade su beacon en el siguiente despliegue; el build
+para Pages no incluye el token de GitHub y evita contar una visita dos veces.
