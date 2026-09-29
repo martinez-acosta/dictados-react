@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-type SubjectId = "solfeo" | "armonia" | "improvisacion";
+type SubjectId = "solfeo" | "armonia" | "improvisacion" | "piano";
 type DetailView = "resumen" | "tareas" | "conceptos" | "respuestas";
 
 const WEEKS: Array<{
@@ -44,12 +44,19 @@ const WEEKS: Array<{
     shortLabel: "14–20 sep",
     subjects: ["solfeo", "armonia", "improvisacion"],
   },
+  {
+    id: "2026-09-21",
+    label: "21–27 de septiembre de 2026",
+    shortLabel: "21–27 sep",
+    subjects: ["piano"],
+  },
 ];
 
 const SUBJECTS: Array<{ id: SubjectId; label: string }> = [
   { id: "solfeo", label: "Solfeo" },
   { id: "armonia", label: "Armonía" },
   { id: "improvisacion", label: "Improvisación" },
+  { id: "piano", label: "Piano" },
 ];
 
 const TASK_GROUPS = [
@@ -106,8 +113,68 @@ const SOLFEGE_WEEK_TWO_TASK_GROUPS = [
   },
 ] as const;
 
+const PIANO_WEEK_TASK_GROUPS = [
+  {
+    title: "Escalas mayores · tres octavas",
+    tasks: [
+      ["c-major", "Do mayor · ida y vuelta"],
+      ["g-major", "Sol mayor · ida y vuelta"],
+      ["d-major", "Re mayor · ida y vuelta"],
+      ["a-major", "La mayor · ida y vuelta"],
+      ["e-major", "Mi mayor · ida y vuelta"],
+    ],
+  },
+  {
+    title: "Control técnico",
+    tasks: [
+      ["fingering", "Mantener la misma digitación en las cinco escalas"],
+      ["hands", "Practicar cada mano por separado antes de unirlas"],
+      ["even", "Conservar pulso y volumen parejos al cruzar los dedos"],
+    ],
+  },
+] as const;
+
+const PIANO_SCALE_ANSWERS = [
+  {
+    id: "c",
+    label: "Do mayor",
+    keySignature: "Sin sostenidos ni bemoles",
+    ascending: "C – D – E – F – G – A – B – C",
+    descending: "C – B – A – G – F – E – D – C",
+  },
+  {
+    id: "g",
+    label: "Sol mayor",
+    keySignature: "1 sostenido: F♯",
+    ascending: "G – A – B – C – D – E – F♯ – G",
+    descending: "G – F♯ – E – D – C – B – A – G",
+  },
+  {
+    id: "d",
+    label: "Re mayor",
+    keySignature: "2 sostenidos: F♯, C♯",
+    ascending: "D – E – F♯ – G – A – B – C♯ – D",
+    descending: "D – C♯ – B – A – G – F♯ – E – D",
+  },
+  {
+    id: "a",
+    label: "La mayor",
+    keySignature: "3 sostenidos: F♯, C♯, G♯",
+    ascending: "A – B – C♯ – D – E – F♯ – G♯ – A",
+    descending: "A – G♯ – F♯ – E – D – C♯ – B – A",
+  },
+  {
+    id: "e",
+    label: "Mi mayor",
+    keySignature: "4 sostenidos: F♯, C♯, G♯, D♯",
+    ascending: "E – F♯ – G♯ – A – B – C♯ – D♯ – E",
+    descending: "E – D♯ – C♯ – B – A – G♯ – F♯ – E",
+  },
+] as const;
+
 const SOLFEGE_STORAGE_KEY = "semester-notes:2026-09-07:solfeo:tasks";
 const SOLFEGE_WEEK_TWO_STORAGE_KEY = "semester-notes:2026-09-14:solfeo:tasks";
+const PIANO_WEEK_STORAGE_KEY = "semester-notes:2026-09-21:piano:tasks";
 const IMPROVISATION_WEEK_TWO_STORAGE_KEY =
   "semester-notes:2026-09-14:improvisacion:study";
 const HARMONY_WEEK_TWO_STORAGE_KEY = "semester-notes:2026-09-14:armonia:tasks";
@@ -2887,14 +2954,318 @@ function ImprovisationAnswersView() {
   );
 }
 
+function PianoWeekSummaryView() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography
+          variant="overline"
+          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
+        >
+          Martes 22 de septiembre
+        </Typography>
+        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
+          Cinco escalas mayores a tres octavas
+        </Typography>
+        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
+          La clase dejó Do, Sol, Re, La y Mi mayor, de ida y vuelta. Las cinco
+          siguen el círculo de quintas y conservan la misma digitación base.
+        </Typography>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>Orden de práctica</Typography>
+        <Typography sx={{ color: "#344b4d", mt: 0.5, fontWeight: 750 }}>
+          C → G → D → A → E · ascendente y descendente
+        </Typography>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Qué cambia entre una escala y otra</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>• Do mayor no tiene alteraciones.</Typography>
+          <Typography>• Cada quinta añade un sostenido.</Typography>
+          <Typography>• El orden acumulado es F♯, C♯, G♯ y D♯.</Typography>
+          <Typography>
+            • La digitación permanece; lo que cambia son las teclas negras.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Divider />
+
+      <Box>
+        <SectionHeading>Proyecto de aplicación</SectionHeading>
+        <Typography sx={{ color: "#344b4d" }}>
+          Se propuso aprender autoacompañamiento para cantar una canción en Re
+          mayor. Quedó como siguiente paso; todavía no hay un arreglo final que
+          memorizar.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function PianoWeekTasksView() {
+  const [completed, setCompleted] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(
+        window.localStorage.getItem(PIANO_WEEK_STORAGE_KEY) ?? "{}",
+      );
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      PIANO_WEEK_STORAGE_KEY,
+      JSON.stringify(completed),
+    );
+  }, [completed]);
+
+  const taskCount = PIANO_WEEK_TASK_GROUPS.reduce(
+    (total, group) => total + group.tasks.length,
+    0,
+  );
+  const completedCount = PIANO_WEEK_TASK_GROUPS.flatMap(
+    (group) => group.tasks,
+  ).filter(([id]) => completed[id]).length;
+
+  return (
+    <Stack spacing={3}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={1}
+      >
+        <Box>
+          <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+            Tarea de Piano
+          </Typography>
+          <Typography sx={{ color: "#667678" }}>
+            Cinco escalas mayores, tres octavas, ida y vuelta.
+          </Typography>
+        </Box>
+        <Chip
+          label={`${completedCount} de ${taskCount}`}
+          variant="outlined"
+          sx={{ fontWeight: 800 }}
+        />
+      </Stack>
+
+      {PIANO_WEEK_TASK_GROUPS.map((group) => (
+        <Box key={group.title}>
+          <SectionHeading>{group.title}</SectionHeading>
+          <Stack spacing={0.25}>
+            {group.tasks.map(([id, label]) => (
+              <FormControlLabel
+                key={id}
+                control={
+                  <Checkbox
+                    checked={Boolean(completed[id])}
+                    onChange={(event) =>
+                      setCompleted((current) => ({
+                        ...current,
+                        [id]: event.target.checked,
+                      }))
+                    }
+                  />
+                }
+                label={label}
+                sx={{
+                  m: 0,
+                  py: 0.25,
+                  color: completed[id] ? "#849092" : "#243d3f",
+                  textDecoration: completed[id] ? "line-through" : "none",
+                }}
+              />
+            ))}
+          </Stack>
+        </Box>
+      ))}
+    </Stack>
+  );
+}
+
+function PianoWeekConceptsView() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Cómo conectar las cinco escalas
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          No son cinco ejercicios aislados: forman una secuencia del círculo de
+          quintas.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Sostenidos acumulados</SectionHeading>
+        {PIANO_SCALE_ANSWERS.map((scale) => (
+          <Box
+            key={scale.id}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "100px 1fr", sm: "140px 1fr" },
+              gap: 1,
+              py: 0.9,
+              borderBottom: "1px solid #dce3e1",
+            }}
+          >
+            <Typography sx={{ fontWeight: 900 }}>{scale.label}</Typography>
+            <Typography sx={{ color: "#56676a" }}>
+              {scale.keySignature}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+
+      <Box>
+        <SectionHeading>Cruces de dedos</SectionHeading>
+        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
+          <Typography>
+            • Mano derecha al subir: el pulgar pasa después del dedo 3.
+          </Typography>
+          <Typography>
+            • Mano izquierda al subir: el dedo 3 pasa sobre el pulgar dentro de
+            la octava; al continuar otra octava entra el dedo 4.
+          </Typography>
+          <Typography>
+            • Al bajar se invierte exactamente el recorrido de cada mano.
+          </Typography>
+        </Stack>
+      </Box>
+
+      <Box sx={{ border: "1px solid #d9e2e0", p: 2 }}>
+        <Typography sx={{ fontWeight: 900 }}>Práctica recomendada</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          Primero una mano lenta y pareja; después la otra. Une ambas solo
+          cuando los cruces no provoquen pausas ni acentos involuntarios.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
+function PianoWeekAnswersView() {
+  const [scaleId, setScaleId] = useState("c");
+  const scale =
+    PIANO_SCALE_ANSWERS.find((item) => item.id === scaleId) ??
+    PIANO_SCALE_ANSWERS[0];
+
+  const fingerings = [
+    ["MD · subir", "1–2–3 | 1–2–3–4 | 1–2–3 | 1–2–3–4 | 1–2–3 | 1–2–3–4–5"],
+    ["MD · bajar", "5–4–3–2–1 | 3–2–1 | 4–3–2–1 | 3–2–1 | 4–3–2–1 | 3–2–1"],
+    ["MI · subir", "5–4–3–2–1 | 3–2–1 | 4–3–2–1 | 3–2–1 | 4–3–2–1 | 3–2–1"],
+    ["MI · bajar", "1–2–3 | 1–2–3–4 | 1–2–3 | 1–2–3–4 | 1–2–3 | 1–2–3–4–5"],
+  ];
+
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+          Respuestas de las escalas
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 0.5 }}>
+          Notas, armadura y digitación completa para comprobar la tarea.
+        </Typography>
+      </Box>
+
+      <FormControl fullWidth size="small">
+        <InputLabel id="piano-scale-answer-label">Escala</InputLabel>
+        <Select
+          labelId="piano-scale-answer-label"
+          label="Escala"
+          value={scaleId}
+          onChange={(event) => setScaleId(event.target.value)}
+        >
+          {PIANO_SCALE_ANSWERS.map((item) => (
+            <MenuItem key={item.id} value={item.id}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <Box>
+        <SectionHeading>{scale.label}</SectionHeading>
+        <Typography sx={{ color: "#0f766e", fontWeight: 850 }}>
+          {scale.keySignature}
+        </Typography>
+        <Typography sx={{ color: "#344b4d", mt: 1 }}>
+          <strong>Subir:</strong> {scale.ascending}
+        </Typography>
+        <Typography sx={{ color: "#344b4d", mt: 0.5 }}>
+          <strong>Bajar:</strong> {scale.descending}
+        </Typography>
+        <Typography sx={{ color: "#667678", mt: 1 }}>
+          Para tres octavas, repite el mismo orden de notas en cada registro y
+          usa los cruces indicados abajo.
+        </Typography>
+      </Box>
+
+      <Box>
+        <SectionHeading>Digitación · tres octavas</SectionHeading>
+        <Stack spacing={0} sx={{ borderTop: "1px solid #dce3e1" }}>
+          {fingerings.map(([hand, fingering]) => (
+            <Box
+              key={hand}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "88px 1fr", sm: "120px 1fr" },
+                gap: 1,
+                py: 1,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>{hand}</Typography>
+              <Typography
+                sx={{ color: "#344b4d", fontWeight: 700, lineHeight: 1.6 }}
+              >
+                {fingering}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+
+      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
+        <Typography sx={{ fontWeight: 900 }}>La respuesta clave</Typography>
+        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
+          Do, Sol, Re, La y Mi usan esta misma digitación. Revisa únicamente
+          cuántos sostenidos lleva cada escala y conserva el movimiento al
+          cambiar de octava.
+        </Typography>
+      </Box>
+    </Stack>
+  );
+}
+
 export default function SemesterNotes() {
   const navigate = useNavigate();
   const [weekIndex, setWeekIndex] = useState(WEEKS.length - 1);
-  const [subject, setSubject] = useState<SubjectId>("solfeo");
+  const [subject, setSubject] = useState<SubjectId>(
+    () => WEEKS[WEEKS.length - 1].subjects[0],
+  );
   const [detailView, setDetailView] = useState<DetailView>("resumen");
   const week = WEEKS[weekIndex];
   const selectedSubject = SUBJECTS.find((item) => item.id === subject)!;
   const hasNotes = week.subjects.includes(subject);
+
+  const changeWeek = (nextIndex: number) => {
+    const boundedIndex = Math.max(0, Math.min(WEEKS.length - 1, nextIndex));
+    const nextWeek = WEEKS[boundedIndex];
+    setWeekIndex(boundedIndex);
+    setSubject((current) =>
+      nextWeek.subjects.includes(current) ? current : nextWeek.subjects[0],
+    );
+    setDetailView("resumen");
+  };
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f7f9f8", color: "#172b2d" }}>
@@ -2922,7 +3293,7 @@ export default function SemesterNotes() {
                 Notas del semestre
               </Typography>
               <Typography sx={{ color: "#687779", mt: 0.25 }}>
-                Segundo año · Solfeo, Armonía e Improvisación
+                Segundo año · Solfeo, Armonía, Improvisación y Piano
               </Typography>
             </Box>
             <Chip label="Segundo año" variant="outlined" />
@@ -2941,10 +3312,7 @@ export default function SemesterNotes() {
             <IconButton
               aria-label="Semana anterior"
               disabled={weekIndex === 0}
-              onClick={() => {
-                setWeekIndex((index) => Math.max(0, index - 1));
-                setDetailView("resumen");
-              }}
+              onClick={() => changeWeek(weekIndex - 1)}
             >
               <ChevronLeft />
             </IconButton>
@@ -2955,8 +3323,7 @@ export default function SemesterNotes() {
                 label="Semana"
                 value={weekIndex}
                 onChange={(event) => {
-                  setWeekIndex(Number(event.target.value));
-                  setDetailView("resumen");
+                  changeWeek(Number(event.target.value));
                 }}
               >
                 {WEEKS.map((item, index) => (
@@ -2969,10 +3336,7 @@ export default function SemesterNotes() {
             <IconButton
               aria-label="Semana siguiente"
               disabled={weekIndex === WEEKS.length - 1}
-              onClick={() => {
-                setWeekIndex((index) => Math.min(WEEKS.length - 1, index + 1));
-                setDetailView("resumen");
-              }}
+              onClick={() => changeWeek(weekIndex + 1)}
             >
               <ChevronRight />
             </IconButton>
@@ -2993,7 +3357,13 @@ export default function SemesterNotes() {
                 key={item.id}
                 value={item.id}
                 label={item.label}
-                sx={{ textTransform: "none", fontWeight: 850 }}
+                sx={{
+                  minWidth: 0,
+                  px: { xs: 0.5, sm: 2 },
+                  fontSize: { xs: 12, sm: 14 },
+                  textTransform: "none",
+                  fontWeight: 850,
+                }}
               />
             ))}
           </Tabs>
@@ -3093,6 +3463,18 @@ export default function SemesterNotes() {
                 {week.id === "2026-09-14" &&
                   subject === "armonia" &&
                   detailView === "respuestas" && <HarmonyWeekTwoAnswersView />}
+                {week.id === "2026-09-21" &&
+                  subject === "piano" &&
+                  detailView === "resumen" && <PianoWeekSummaryView />}
+                {week.id === "2026-09-21" &&
+                  subject === "piano" &&
+                  detailView === "tareas" && <PianoWeekTasksView />}
+                {week.id === "2026-09-21" &&
+                  subject === "piano" &&
+                  detailView === "conceptos" && <PianoWeekConceptsView />}
+                {week.id === "2026-09-21" &&
+                  subject === "piano" &&
+                  detailView === "respuestas" && <PianoWeekAnswersView />}
                 {week.id === "2026-09-07" &&
                   subject === "armonia" &&
                   detailView === "resumen" && <HarmonySummaryView />}
