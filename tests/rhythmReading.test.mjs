@@ -5,12 +5,10 @@ import { transformWithEsbuild } from "vite";
 
 async function typeScriptUrl(path) {
   let source = readFileSync(new URL(path, import.meta.url), "utf8");
-  if (source.includes('from "./rhythmVoiceSustain"')) {
+  if (source.includes('from "../utils/yamahaSamples"')) {
     source = source.replace(
-      '"./rhythmVoiceSustain"',
-      JSON.stringify(
-        await typeScriptUrl("../src/components/rhythmVoiceSustain.ts"),
-      ),
+      '"../utils/yamahaSamples"',
+      JSON.stringify(await typeScriptUrl("../src/utils/yamahaSamples.ts")),
     );
   }
   const { code } = await transformWithEsbuild(source, path, {
@@ -28,11 +26,8 @@ const {
   writtenRhythmNotes,
   rhythmBeats,
 } = await importTypeScript("../src/components/rhythmReading.ts");
-const { RhythmVoicePlayer } = await importTypeScript(
-  "../src/components/rhythmVoice.ts",
-);
-const { stretchRhythmSyllable } = await importTypeScript(
-  "../src/components/rhythmVoiceSustain.ts",
+const { RhythmPianoPlayer } = await importTypeScript(
+  "../src/components/rhythmPiano.ts",
 );
 const allSystems = (exercise) => exercise.systems.map((_, index) => index);
 
@@ -128,7 +123,7 @@ test("Sistemas no consecutivos mantienen el orden, sin sostener figuras omitidas
   assert.equal(finalAttack.beats, 0.5);
 });
 
-test("Selección vacía: no hay voz ni duración de loop", () => {
+test("Selección vacía: no hay ataques ni duración de loop", () => {
   assert.deepEqual(buildRhythmTimeline(exercises[0], []), {
     positions: [],
     attacks: [],
@@ -136,41 +131,17 @@ test("Selección vacía: no hay voz ni duración de loop", () => {
   });
 });
 
-function decodeWav(bytes) {
-  const buffer = Buffer.from(bytes);
-  let rate, data;
-  for (let offset = 12; offset < buffer.length; ) {
-    const type = buffer.toString("ascii", offset, offset + 4);
-    const length = buffer.readUInt32LE(offset + 4);
-    if (type === "fmt ") {
-      assert.equal(buffer.readUInt16LE(offset + 8), 1);
-      assert.equal(buffer.readUInt16LE(offset + 10), 1);
-      assert.equal(buffer.readUInt16LE(offset + 22), 16);
-      rate = buffer.readUInt32LE(offset + 12);
-    }
-    if (type === "data")
-      data = buffer.subarray(offset + 8, offset + 8 + length);
-    offset += 8 + length + (length % 2);
-  }
-  const samples = Float32Array.from(
-    { length: data.length / 2 },
-    (_, index) => data.readInt16LE(index * 2) / 32768,
-  );
-  return {
-    sampleRate: rate,
-    duration: samples.length / rate,
-    getChannelData: () => samples,
-  };
-}
-
-function fakeAudio(t) {
+function fakeAudio(t, { failedLoads = 0 } = {}) {
   const oldContext = globalThis.AudioContext;
   const oldFrame = globalThis.requestAnimationFrame;
   const oldCancel = globalThis.cancelAnimationFrame;
   let context, frameCallback, intervalCallback;
+  const requests = [];
   class Source {
     playbackRate = { value: 1 };
-    connect() {}
+    connect(gain) {
+      this.gain = gain.gain;
+    }
     disconnect() {}
     start(time) {
       this.startTime = time;
@@ -185,22 +156,16 @@ function fakeAudio(t) {
     destination = {};
     voices = [];
     clicks = [];
+    pianoSample = { sampleRate: 48000, duration: 15 };
     constructor() {
       context = this;
     }
     async resume() {}
-    async close() {}
-    async decodeAudioData(bytes) {
-      return decodeWav(bytes);
+    async close() {
+      this.closed = true;
     }
-    createBuffer(channels, length, rate) {
-      assert.equal(channels, 1);
-      const samples = new Float32Array(length);
-      return {
-        sampleRate: rate,
-        duration: length / rate,
-        getChannelData: () => samples,
-      };
+    async decodeAudioData() {
+      return this.pianoSample;
     }
     createBufferSource() {
       const source = new Source();
@@ -218,9 +183,16 @@ function fakeAudio(t) {
         connect() {},
         disconnect() {},
         gain: {
-          setValueAtTime() {},
-          linearRampToValueAtTime() {},
-          exponentialRampToValueAtTime() {},
+          events: [],
+          setValueAtTime(value, time) {
+            this.events.push(["set", value, time]);
+          },
+          linearRampToValueAtTime(value, time) {
+            this.events.push(["linear", value, time]);
+          },
+          exponentialRampToValueAtTime(value, time) {
+            this.events.push(["exponential", value, time]);
+          },
         },
       };
     }
@@ -241,20 +213,11 @@ function fakeAudio(t) {
     intervalCallback = null;
   });
   t.mock.method(globalThis, "fetch", async (url) => {
-    assert.ok(url.startsWith("/dictados-react/audio/lectura-ritmica/"));
-    const asset = readFileSync(
-      new URL(
-        `../public/audio/lectura-ritmica/${url.split("/").at(-1)}`,
-        import.meta.url,
-      ),
-    );
+    assert.equal(url, "https://tonejs.github.io/audio/salamander/C4.mp3");
+    requests.push(url);
     return {
-      ok: true,
-      arrayBuffer: async () =>
-        asset.buffer.slice(
-          asset.byteOffset,
-          asset.byteOffset + asset.byteLength,
-        ),
+      ok: requests.length > failedLoads,
+      arrayBuffer: async () => new ArrayBuffer(8),
     };
   });
   t.after(() => {
@@ -266,12 +229,13 @@ function fakeAudio(t) {
     context: () => context,
     frame: () => frameCallback?.(),
     interval: () => intervalCallback?.(),
+    requests,
   };
 }
 
-test("La voz dura toda la figura y las ligaduras, sin bucles de audio", async (t) => {
+test("El piano usa el mismo Do grabado, dura toda la figura y no reataca ligaduras", async (t) => {
   const fake = fakeAudio(t);
-  const player = new RhythmVoicePlayer();
+  const player = new RhythmPianoPlayer();
   await player.prepare();
   const timeline = buildRhythmTimeline(exercises[0], [0]);
   player.start({
@@ -291,11 +255,10 @@ test("La voz dura toda la figura y las ligaduras, sin bucles de audio", async (t
     const attack = timeline.attacks[index];
     assert.equal(voice.startTime, 0.1 + attack.startBeat);
     assert.equal(voice.loop, false);
-    assert.ok(
-      Math.abs(voice.buffer.duration - attack.beats) <
-        1 / voice.buffer.sampleRate,
-    );
+    assert.equal(voice.buffer, fake.context().pianoSample);
+    assert.equal(voice.playbackRate.value, 1);
     assert.ok(Math.abs(voice.stopTime - voice.startTime - attack.beats) < 1e-9);
+    assert.deepEqual(voice.gain.events.at(-1), ["linear", 0, voice.stopTime]);
   });
   assert.equal(voices[4].stopTime, 3.6);
   assert.ok(!voices.some((voice) => voice.startTime === 3.1));
@@ -306,7 +269,7 @@ test("La voz dura toda la figura y las ligaduras, sin bucles de audio", async (t
 for (const bpm of [40, 72, 160]) {
   test(`A ${bpm} BPM: duración completa, sin solapamientos ni cambiar el tono`, async (t) => {
     const fake = fakeAudio(t);
-    const player = new RhythmVoicePlayer();
+    const player = new RhythmPianoPlayer();
     await player.prepare();
     const timeline = buildRhythmTimeline(exercises[1], [0]);
     player.start({
@@ -331,15 +294,13 @@ for (const bpm of [40, 72, 160]) {
       assert.equal(voice.loop, false);
       assert.equal(voice.playbackRate.value, 1);
       assert.ok(Math.abs(voice.stopTime - voice.startTime - duration) < 1e-9);
-      assert.ok(
-        Math.abs(voice.buffer.duration - duration) <
-          1 / voice.buffer.sampleRate,
-      );
+      assert.equal(voice.buffer, fake.context().pianoSample);
+      assert.deepEqual(voice.gain.events.at(-1), ["linear", 0, voice.stopTime]);
       if (voices[index + 1])
         assert.ok(voice.stopTime <= voices[index + 1].startTime + 1e-9);
     });
     // The opening half note tied to an eighth lasts 2.5 beats both visually
-    // and audibly, with one consonant attack for the whole tie.
+    // and audibly, with one piano attack for the whole tie.
     assert.equal(timeline.attacks[0].beats, 2.5);
     assert.ok(
       Math.abs(voices[0].stopTime - voices[0].startTime - (2.5 * 60) / bpm) <
@@ -349,43 +310,9 @@ for (const bpm of [40, 72, 160]) {
   });
 }
 
-for (const syllable of ["ta", "ka"]) {
-  test(`${syllable}: conserva la consonante y la vocal no tiene cortes al sostenerse`, () => {
-    const sample = decodeWav(
-      readFileSync(
-        new URL(
-          `../public/audio/lectura-ritmica/${syllable}.wav`,
-          import.meta.url,
-        ),
-      ),
-    );
-    const input = sample.getChannelData(0);
-    for (const duration of [0.1875, 0.5, 1.25, 3.75]) {
-      const output = stretchRhythmSyllable(input, sample.sampleRate, duration);
-      assert.equal(output.length, Math.round(duration * sample.sampleRate));
-      assert.ok(output.every(Number.isFinite));
-      assert.ok(output.every((value) => Math.abs(value) <= 1));
-      const attack = Math.round(sample.sampleRate * 0.04);
-      for (let i = 0; i < attack; i++)
-        assert.ok(Math.abs(output[i] - input[i]) < 1e-7);
-      // No artificial silence or repeated amplitude envelope during the vowel.
-      const window = Math.round(sample.sampleRate * 0.02);
-      for (
-        let start = attack;
-        start + window < output.length - window;
-        start += window
-      ) {
-        let energy = 0;
-        for (let i = start; i < start + window; i++) energy += output[i] ** 2;
-        assert.ok(Math.sqrt(energy / window) > 0.012);
-      }
-    }
-  });
-}
-
 test("Entrada de un compás, posición sincronizada y final automático", async (t) => {
   const fake = fakeAudio(t);
-  const player = new RhythmVoicePlayer();
+  const player = new RhythmPianoPlayer();
   await player.prepare();
   const timeline = buildRhythmTimeline(exercises[1], [0]);
   let lastPosition,
@@ -423,9 +350,39 @@ test("Entrada de un compás, posición sincronizada y final automático", async 
   assert.equal(finished, 1);
 });
 
-test("El loop conserva la duración y no añade otra entrada", async (t) => {
+test("La muestra Yamaha solo se carga una vez y se puede reintentar si falla", async (t) => {
+  const fake = fakeAudio(t, { failedLoads: 1 });
+  const player = new RhythmPianoPlayer();
+  await assert.rejects(player.prepare(), /piano Yamaha/);
+  await player.prepare();
+  await player.prepare();
+  assert.equal(fake.requests.length, 2);
+  player.dispose();
+  assert.equal(fake.context().closed, true);
+});
+
+test("Selección vacía: no programa piano ni clics", async (t) => {
   const fake = fakeAudio(t);
-  const player = new RhythmVoicePlayer();
+  const player = new RhythmPianoPlayer();
+  await player.prepare();
+  player.start({
+    timeline: buildRhythmTimeline(exercises[0], []),
+    bpm: 72,
+    beatsPerMeasure: 3,
+    countIn: true,
+    loop: true,
+    metronome: true,
+    onPosition() {},
+    onFinish() {},
+  });
+  assert.equal(fake.context().voices.length, 0);
+  assert.equal(fake.context().clicks.length, 0);
+  player.dispose();
+});
+
+test("El loop conserva la duración, no añade otra entrada y se cancela completo", async (t) => {
+  const fake = fakeAudio(t);
+  const player = new RhythmPianoPlayer();
   await player.prepare();
   const timeline = buildRhythmTimeline(exercises[0], [0]);
   player.start({
@@ -447,4 +404,9 @@ test("El loop conserva la duración y no añade otra entrada", async (t) => {
   assert.equal(context.voices[firstCount].startTime, 13.6);
   assert.equal(context.clicks.length, 3);
   player.stop();
+  assert.ok(context.voices.every((voice) => voice.stopCalls === 2));
+  assert.ok(context.clicks.every((click) => click.stopCalls === 2));
+  context.currentTime = 30;
+  fake.interval();
+  assert.equal(context.voices.length, timeline.attacks.length * 3);
 });

@@ -1,4 +1,5 @@
 import * as Tone from "tone";
+import { YAMAHA_SAMPLE_BASE_URL } from "./yamahaSamples";
 
 let sampler: Tone.Sampler | null = null;
 let samplerPromise: Promise<Tone.Sampler> | null = null;
@@ -31,7 +32,7 @@ async function createSampler() {
       C6: "C6.mp3",
     },
     release: 1,
-    baseUrl: "https://tonejs.github.io/audio/salamander/",
+    baseUrl: YAMAHA_SAMPLE_BASE_URL,
   }).toDestination();
   await Tone.loaded();
   sampler = s;

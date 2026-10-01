@@ -15,12 +15,7 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
-import {
-  ArrowBack,
-  Pause,
-  PlayArrow,
-  RecordVoiceOver,
-} from "@mui/icons-material";
+import { ArrowBack, Pause, PlayArrow, Piano } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import RhythmReadingSheet from "./RhythmReadingSheet";
 import {
@@ -28,7 +23,7 @@ import {
   RHYTHM_READING_EXERCISES,
   type RhythmPosition,
 } from "./rhythmReading";
-import { RhythmVoicePlayer } from "./rhythmVoice";
+import { RhythmPianoPlayer } from "./rhythmPiano";
 
 export default function LecturaRitmica() {
   const navigate = useNavigate();
@@ -47,7 +42,7 @@ export default function LecturaRitmica() {
   const [position, setPosition] = useState<RhythmPosition | null>(null);
   const [entryBeat, setEntryBeat] = useState<number | null>(null);
   const [pulse, setPulse] = useState(0);
-  const playerRef = useRef<RhythmVoicePlayer | null>(null);
+  const playerRef = useRef<RhythmPianoPlayer | null>(null);
   const playbackRequest = useRef(0);
   const exercise = RHYTHM_READING_EXERCISES.find(
     (item) => item.id === exerciseId,
@@ -86,7 +81,7 @@ export default function LecturaRitmica() {
     const request = playbackRequest.current;
     setError("");
     setLoading(true);
-    playerRef.current ??= new RhythmVoicePlayer();
+    playerRef.current ??= new RhythmPianoPlayer();
     try {
       await playerRef.current.prepare();
       if (request !== playbackRequest.current) return;
@@ -110,7 +105,7 @@ export default function LecturaRitmica() {
       if (request === playbackRequest.current) {
         stop();
         setError(
-          "No se pudo preparar la voz. Revisa el audio del navegador e inténtalo de nuevo.",
+          "No se pudo cargar el piano Yamaha. Revisa la conexión y el audio del navegador e inténtalo de nuevo.",
         );
       }
     }
@@ -125,13 +120,11 @@ export default function LecturaRitmica() {
     );
   }
 
-  const spokenLabel = position?.rest
+  const soundLabel = position?.rest
     ? "Silencio"
     : position?.continuation
       ? "Sostén…"
-      : position?.syllable === "ka"
-        ? "Ka"
-        : "Ta";
+      : "Do";
 
   return (
     <Box sx={{ width: "100%", px: 2, py: 2 }}>
@@ -151,7 +144,7 @@ export default function LecturaRitmica() {
             Volver al menú
           </Button>
           <Typography variant="h5" sx={{ fontWeight: 800, color: "#0b2a50" }}>
-            Lectura rítmica — Ta-ka
+            Lectura rítmica — Piano
           </Typography>
         </Stack>
         <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2.5 } }}>
@@ -167,8 +160,7 @@ export default function LecturaRitmica() {
                   Ejercicio {exercise.id}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Escucha y repite la secuencia con «ta-ka», sin alturas
-                  musicales.
+                  Practica el ritmo con un Do central fijo en el piano Yamaha.
                 </Typography>
               </Box>
               <Stack direction="row" spacing={1}>
@@ -238,10 +230,10 @@ export default function LecturaRitmica() {
                 sx={{ minWidth: 190 }}
               >
                 {loading
-                  ? "Preparando voz…"
+                  ? "Cargando piano…"
                   : playing
                     ? "Detener"
-                    : "Reproducir ta-ka"}
+                    : "Reproducir piano"}
               </Button>
             </Stack>
             <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
@@ -308,21 +300,21 @@ export default function LecturaRitmica() {
               }}
             >
               <Stack direction="row" alignItems="center" spacing={2}>
-                <RecordVoiceOver color="primary" />
+                <Piano color="primary" />
                 <Box sx={{ flex: 1 }}>
                   <Typography sx={{ fontWeight: 750, fontSize: 22 }}>
                     {playing
                       ? position
-                        ? spokenLabel
+                        ? soundLabel
                         : entryBeat !== null
                           ? `Entrada: ${entryBeat + 1}`
                           : "Listo…"
-                      : "Ta-ka · ta-ka"}
+                      : "Do central · Piano Yamaha"}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {playing && position
                       ? `Compás ${position.measureIndex + 1} · Sistema ${position.systemIndex + 1}`
-                      : "Cada sílaba dura toda la figura; las ligaduras prolongan la vocal sin repetir el ataque."}
+                      : "Cada figura dura su tiempo; las ligaduras mantienen un solo ataque y los silencios no llevan sonido."}
                   </Typography>
                 </Box>
                 {playing && (

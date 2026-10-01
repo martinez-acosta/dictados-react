@@ -1,5 +1,5 @@
 import type { RhythmPosition, RhythmTimeline } from "./rhythmReading";
-import { stretchRhythmSyllable } from "./rhythmVoiceSustain";
+import { YAMAHA_C4_SAMPLE_URL } from "../utils/yamahaSamples";
 
 type PlaybackOptions = {
   timeline: RhythmTimeline;
@@ -16,25 +16,13 @@ type PlaybackOptions = {
   onFinish: () => void;
 };
 
-// Local Spanish voice samples (macOS Paulina: "ta" and "ca", 190 words/minute).
-// Normalize once; the consonant is preserved when the vowel is time-scaled.
-function prepareVoiceSample(buffer: AudioBuffer): AudioBuffer {
-  const samples = buffer.getChannelData(0);
-  let peak = 0;
-  samples.forEach((sample) => {
-    peak = Math.max(peak, Math.abs(sample));
-  });
-  if (peak > 0) {
-    for (let i = 0; i < samples.length; i += 1) samples[i] *= 0.7 / peak;
-  }
-  return buffer;
-}
-
-export class RhythmVoicePlayer {
+// The same recorded C4 used by the app's Yamaha/Salamander piano bank.
+// Native sources share one clock with the highlighting and can be cancelled
+// individually, including notes already scheduled for a future loop.
+export class RhythmPianoPlayer {
   private context: AudioContext | null = null;
   private loading: Promise<void> | null = null;
-  private samples: Partial<Record<"ta" | "ka", AudioBuffer>> = {};
-  private sustainedSamples = new Map<string, AudioBuffer>();
+  private pianoSample: AudioBuffer | null = null;
   private sources = new Set<AudioScheduledSourceNode>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private frame: number | null = null;
@@ -44,18 +32,14 @@ export class RhythmVoicePlayer {
     const context = this.context;
     await context.resume();
     if (!this.loading) {
-      this.loading = Promise.all(
-        (["ta", "ka"] as const).map(async (syllable) => {
-          const response = await fetch(
-            `${import.meta.env.BASE_URL}audio/lectura-ritmica/${syllable}.wav`,
-          );
-          if (!response.ok) throw new Error("No se pudo cargar la voz ta-ka.");
-          const buffer = await context.decodeAudioData(
+      this.loading = fetch(YAMAHA_C4_SAMPLE_URL)
+        .then(async (response) => {
+          if (!response.ok)
+            throw new Error("No se pudo cargar el piano Yamaha.");
+          this.pianoSample = await context.decodeAudioData(
             await response.arrayBuffer(),
           );
-          this.samples[syllable] = prepareVoiceSample(buffer);
-        }),
-      )
+        })
         .then(() => undefined)
         .catch((error) => {
           this.loading = null;
@@ -76,36 +60,16 @@ export class RhythmVoicePlayer {
     };
   }
 
-  private voiceBuffer(syllable: "ta" | "ka", duration: number) {
-    const context = this.context!;
-    const sample = this.samples[syllable]!;
-    const length = Math.round(duration * sample.sampleRate);
-    const key = `${syllable}:${length}`;
-    const cached = this.sustainedSamples.get(key);
-    if (cached) return cached;
-    const data = stretchRhythmSyllable(
-      sample.getChannelData(0),
-      sample.sampleRate,
-      duration,
-    );
-    const buffer = context.createBuffer(1, data.length, sample.sampleRate);
-    buffer.getChannelData(0).set(data);
-    if (this.sustainedSamples.size >= 24)
-      this.sustainedSamples.delete(this.sustainedSamples.keys().next().value!);
-    this.sustainedSamples.set(key, buffer);
-    return buffer;
-  }
-
-  private speak(syllable: "ta" | "ka", start: number, duration: number) {
+  private playNote(start: number, duration: number) {
     const context = this.context!;
     const source = context.createBufferSource();
-    source.buffer = this.voiceBuffer(syllable, duration);
+    source.buffer = this.pianoSample;
     source.loop = false;
     const end = start + duration;
     const gain = context.createGain();
     gain.gain.setValueAtTime(0, start);
-    gain.gain.linearRampToValueAtTime(0.65, start + 0.004);
-    gain.gain.setValueAtTime(0.65, end - 0.012);
+    gain.gain.linearRampToValueAtTime(0.9, start + 0.002);
+    gain.gain.setValueAtTime(0.9, end - 0.012);
     gain.gain.linearRampToValueAtTime(0, end);
     this.connectSource(source, gain);
     source.start(start);
@@ -129,11 +93,6 @@ export class RhythmVoicePlayer {
     if (!options.timeline.positions.length) return;
     const context = this.context!;
     const secondsPerBeat = 60 / options.bpm;
-    // Render unique lengths before taking the audio clock reference, so even
-    // the first attack is scheduled ahead of time rather than after DSP work.
-    options.timeline.attacks.forEach((attack) =>
-      this.voiceBuffer(attack.syllable, attack.beats * secondsPerBeat),
-    );
     const entryBeats = options.countIn ? options.beatsPerMeasure : 0;
     const entryStart = context.currentTime + 0.1;
     const exerciseStart = entryStart + entryBeats * secondsPerBeat;
@@ -143,8 +102,7 @@ export class RhythmVoicePlayer {
 
     const scheduleCycle = (start: number) => {
       options.timeline.attacks.forEach((attack) => {
-        this.speak(
-          attack.syllable,
+        this.playNote(
           start + attack.startBeat * secondsPerBeat,
           attack.beats * secondsPerBeat,
         );
@@ -221,7 +179,6 @@ export class RhythmVoicePlayer {
 
   dispose() {
     this.stop();
-    this.sustainedSamples.clear();
     void this.context?.close();
   }
 }

@@ -339,9 +339,9 @@ const EXERCISE_SECTIONS = [
     items: [
       {
         route: "/lectura-ritmica",
-        title: "Lectura rítmica — Ta-ka",
+        title: "Lectura rítmica — Piano",
         description:
-          "Practica los ejercicios 25 y 26 con voz ta-ka, silencios, ligaduras y selección por sistemas.",
+          "Practica los ejercicios 25 y 26 con un Do fijo en el piano Yamaha, silencios, ligaduras y selección por sistemas.",
         buttonLabel: "Practicar lectura rítmica",
         buttonSx: {
           backgroundColor: "#1976d2",
