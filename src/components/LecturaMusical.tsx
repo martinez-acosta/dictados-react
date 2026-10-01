@@ -357,9 +357,83 @@ export const DANDELOT_SERIES_EXERCISE_17 = [
   ],
 ] as const;
 
+export const DANDELOT_BASS_EXERCISE_4 = [
+  [
+    ["g/3"],
+    ["f/3"],
+    ["d/3"],
+    ["g/3"],
+    ["d/3"],
+    ["c/3"],
+    ["d/3"],
+    ["f/2"],
+    ["g/2"],
+    ["e/2"],
+    ["f/2"],
+    ["c/4"],
+    ["b/3"],
+    ["d/4"],
+    ["c/4"],
+    ["f/3"],
+    ["e/3"],
+    ["f/2"],
+    ["g/2"],
+    ["d/3"],
+    ["c/3"],
+  ],
+  [
+    ["e/3"],
+    ["f/3"],
+    ["b/3"],
+    ["c/4"],
+    ["c/3"],
+    ["d/3"],
+    ["g/3"],
+    ["f/3"],
+    ["b/2"],
+    ["c/3"],
+    ["e/2"],
+    ["f/2"],
+    ["g/2"],
+    ["f/2"],
+    ["b/2"],
+    ["d/3"],
+    ["c/3"],
+    ["c/4"],
+    ["b/3"],
+    ["g/3"],
+    ["f/3"],
+  ],
+  [
+    ["b/2"],
+    ["c/3"],
+    ["g/2"],
+    ["f/2"],
+    ["d/4"],
+    ["c/4"],
+    ["c/3"],
+    ["f/3"],
+    ["g/3"],
+    ["f/3"],
+    ["f/2"],
+    ["c/3"],
+    ["b/2"],
+    ["g/2"],
+    ["f/2"],
+    ["e/2"],
+    ["g/2"],
+    ["f/2"],
+    ["c/3"],
+    ["f/3"],
+    ["c/4"],
+    ["f/3"],
+  ],
+] as const;
+
 export const DANDELOT_EXERCISES = [
   {
     id: "16",
+    clef: "treble",
     number: 16,
     name: "Ejercicio 16",
     description: "Lectura continua en tres renglones",
@@ -367,12 +441,26 @@ export const DANDELOT_EXERCISES = [
   },
   {
     id: "17",
+    clef: "treble",
     number: 17,
     name: "Ejercicio 17",
     description: "Lectura continua en dos renglones",
     rows: DANDELOT_SERIES_EXERCISE_17,
   },
+  {
+    id: "fa-4",
+    clef: "bass",
+    number: 4,
+    name: "Ejercicio 4",
+    description: "Lectura en clave de fa en tres renglones, con negras",
+    rows: DANDELOT_BASS_EXERCISE_4,
+  },
 ] as const;
+
+export const DANDELOT_EXERCISES_BY_CLEF = {
+  treble: DANDELOT_EXERCISES.filter((exercise) => exercise.clef === "treble"),
+  bass: DANDELOT_EXERCISES.filter((exercise) => exercise.clef === "bass"),
+} as const;
 
 // ---------------- Configuración de ejercicios ----------------
 export const TREBLE_EXERCISES = {
@@ -639,7 +727,8 @@ export default function LecturaMusical() {
   const [dandelotReverseOrder, setDandelotReverseOrder] = useState(false);
   const [selectedDandelotIndex, setSelectedDandelotIndex] = useState(0);
   const [selectedDandelotRows, setSelectedDandelotRows] = useState<number[]>(
-    () => DANDELOT_EXERCISES[0].rows.map((_, rowIndex) => rowIndex),
+    () =>
+      DANDELOT_EXERCISES_BY_CLEF.treble[0].rows.map((_, rowIndex) => rowIndex),
   );
 
   const staff1Ref = useRef<HTMLDivElement | null>(null);
@@ -648,7 +737,8 @@ export default function LecturaMusical() {
 
   const clef = selectedClef;
   const currentExerciseMap = EXERCISES_BY_CLEF[clef];
-  const selectedDandelotExercise = DANDELOT_EXERCISES[selectedDandelotIndex];
+  const dandelotExercises = DANDELOT_EXERCISES_BY_CLEF[clef];
+  const selectedDandelotExercise = dandelotExercises[selectedDandelotIndex];
   const allDandelotRowsSelected =
     selectedDandelotRows.length === selectedDandelotExercise.rows.length;
   const dandelotPlayback = useMemo(() => {
@@ -1047,13 +1137,28 @@ export default function LecturaMusical() {
   function selectDandelotExercise(nextIndex: number) {
     const boundedIndex = Math.max(
       0,
-      Math.min(DANDELOT_EXERCISES.length - 1, nextIndex),
+      Math.min(dandelotExercises.length - 1, nextIndex),
     );
     if (boundedIndex === selectedDandelotIndex) return;
     hardStop();
     setSelectedDandelotIndex(boundedIndex);
     setSelectedDandelotRows(
-      DANDELOT_EXERCISES[boundedIndex].rows.map((_, rowIndex) => rowIndex),
+      dandelotExercises[boundedIndex].rows.map((_, rowIndex) => rowIndex),
+    );
+  }
+
+  function selectClef(nextClef: ClefType) {
+    if (nextClef === clef) return;
+    hardStop();
+    setSelectedClef(nextClef);
+    setSelectedExercise(
+      Object.keys(EXERCISES_BY_CLEF[nextClef])[0] as ExerciseKey,
+    );
+    setSelectedDandelotIndex(0);
+    setSelectedDandelotRows(
+      DANDELOT_EXERCISES_BY_CLEF[nextClef][0].rows.map(
+        (_, rowIndex) => rowIndex,
+      ),
     );
   }
 
@@ -1106,7 +1211,12 @@ export default function LecturaMusical() {
             </Box>
             <Stack direction="row" spacing={1}>
               <Chip
-                label={`${selectedDandelotIndex + 1} de ${DANDELOT_EXERCISES.length}`}
+                label={`${selectedDandelotIndex + 1} de ${dandelotExercises.length}`}
+                size="small"
+                variant="outlined"
+              />
+              <Chip
+                label={`Clave de ${clef === "bass" ? "Fa" : "Sol"}`}
                 size="small"
                 variant="outlined"
               />
@@ -1116,44 +1226,69 @@ export default function LecturaMusical() {
           </Stack>
 
           <Stack
-            direction="row"
+            direction={{ xs: "column", sm: "row" }}
             spacing={1}
-            alignItems="center"
-            sx={{ mb: 2, maxWidth: 420 }}
+            alignItems="stretch"
+            sx={{ mb: 2, maxWidth: 680 }}
           >
-            <IconButton
-              aria-label="Ejercicio anterior"
-              onClick={() => selectDandelotExercise(selectedDandelotIndex - 1)}
-              disabled={selectedDandelotIndex === 0}
-            >
-              <ChevronLeft />
-            </IconButton>
-            <FormControl fullWidth size="small">
-              <InputLabel id="dandelot-exercise-selector-label">
-                Ejercicio
-              </InputLabel>
+            <FormControl size="small" sx={{ minWidth: 210 }}>
+              <InputLabel id="dandelot-clef-selector-label">Clave</InputLabel>
               <Select
-                labelId="dandelot-exercise-selector-label"
-                value={selectedDandelotIndex}
-                label="Ejercicio"
-                onChange={(event) =>
-                  selectDandelotExercise(Number(event.target.value))
-                }
+                labelId="dandelot-clef-selector-label"
+                value={clef}
+                label="Clave"
+                onChange={(event) => selectClef(event.target.value as ClefType)}
               >
-                {DANDELOT_EXERCISES.map((exercise, index) => (
-                  <MenuItem key={exercise.id} value={index}>
-                    {exercise.name}
-                  </MenuItem>
-                ))}
+                <MenuItem value="treble">Clave de Sol (G)</MenuItem>
+                <MenuItem value="bass">Clave de Fa en 4ª línea (F)</MenuItem>
               </Select>
             </FormControl>
-            <IconButton
-              aria-label="Ejercicio siguiente"
-              onClick={() => selectDandelotExercise(selectedDandelotIndex + 1)}
-              disabled={selectedDandelotIndex === DANDELOT_EXERCISES.length - 1}
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{ flex: 1 }}
             >
-              <ChevronRight />
-            </IconButton>
+              <IconButton
+                aria-label="Ejercicio anterior"
+                onClick={() =>
+                  selectDandelotExercise(selectedDandelotIndex - 1)
+                }
+                disabled={selectedDandelotIndex === 0}
+              >
+                <ChevronLeft />
+              </IconButton>
+              <FormControl fullWidth size="small">
+                <InputLabel id="dandelot-exercise-selector-label">
+                  Ejercicio
+                </InputLabel>
+                <Select
+                  labelId="dandelot-exercise-selector-label"
+                  value={selectedDandelotIndex}
+                  label="Ejercicio"
+                  onChange={(event) =>
+                    selectDandelotExercise(Number(event.target.value))
+                  }
+                >
+                  {dandelotExercises.map((exercise, index) => (
+                    <MenuItem key={exercise.id} value={index}>
+                      {exercise.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <IconButton
+                aria-label="Ejercicio siguiente"
+                onClick={() =>
+                  selectDandelotExercise(selectedDandelotIndex + 1)
+                }
+                disabled={
+                  selectedDandelotIndex === dandelotExercises.length - 1
+                }
+              >
+                <ChevronRight />
+              </IconButton>
+            </Stack>
           </Stack>
 
           <Stack
@@ -1293,6 +1428,7 @@ export default function LecturaMusical() {
           <DandelotExerciseSheet
             exerciseNumber={selectedDandelotExercise.number}
             rows={selectedDandelotExercise.rows}
+            clef={clef}
             activeNoteIndex={dandelotNoteIndex}
             showNoteLabels={showDandelotNoteLabels}
             selectedRowIndexes={selectedDandelotRows}
@@ -1347,7 +1483,7 @@ export default function LecturaMusical() {
                 <InputLabel>Clave</InputLabel>
                 <Select
                   value={clef}
-                  onChange={(e) => setSelectedClef(e.target.value as ClefType)}
+                  onChange={(e) => selectClef(e.target.value as ClefType)}
                   label="Clave"
                 >
                   <MenuItem value="treble">Clave de Sol (G)</MenuItem>

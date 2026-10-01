@@ -16,6 +16,7 @@ export type DandelotExerciseRow = readonly DandelotNoteGroup[];
 export type DandelotExerciseSheetProps = {
   exerciseNumber: number | string;
   rows: readonly DandelotExerciseRow[];
+  clef?: "treble" | "bass";
   activeNoteIndex?: number | null;
   showNoteLabels?: boolean;
   selectedRowIndexes?: readonly number[];
@@ -38,6 +39,7 @@ const SPANISH_NOTE_NAMES: Record<string, string> = {
 export default function DandelotExerciseSheet({
   exerciseNumber,
   rows,
+  clef = "treble",
   activeNoteIndex = null,
   showNoteLabels = false,
   selectedRowIndexes,
@@ -48,6 +50,7 @@ export default function DandelotExerciseSheet({
   const rowRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [sheetWidth, setSheetWidth] = useState(MIN_SHEET_WIDTH);
   const rowHeight = showNoteLabels ? ROW_HEIGHT_WITH_LABELS : ROW_HEIGHT;
+  const clefName = clef === "bass" ? "fa" : "sol";
 
   useEffect(() => {
     const sheet = sheetRef.current;
@@ -89,7 +92,7 @@ export default function DandelotExerciseSheet({
         .setEndBarType(
           rowIndex === rows.length - 1 ? BarlineType.END : BarlineType.NONE,
         )
-        .addClef("treble");
+        .addClef(clef);
 
       stave.setContext(context).draw();
       if (row.length === 0) return;
@@ -98,9 +101,10 @@ export default function DandelotExerciseSheet({
       const noteGroups = row.map((group) => {
         const groupNotes = group.map((key, groupNoteIndex) => {
           const note = new StaveNote({
-            clef: "treble",
+            clef,
             keys: [key],
             duration: group.length === 1 ? "q" : "8",
+            auto_stem: true,
           });
           const noteIndex = groupOffset + groupNoteIndex;
 
@@ -132,7 +136,7 @@ export default function DandelotExerciseSheet({
       beams.forEach((beam) => beam.setContext(context).draw());
       noteOffset = groupOffset;
     });
-  }, [activeNoteIndex, rowHeight, rows, sheetWidth, showNoteLabels]);
+  }, [activeNoteIndex, clef, rowHeight, rows, sheetWidth, showNoteLabels]);
 
   return (
     <Box
@@ -145,7 +149,7 @@ export default function DandelotExerciseSheet({
       <Box
         ref={sheetRef}
         role="group"
-        aria-label={`Ejercicio Dandelot ${exerciseNumber}, ${rows.length} renglones en clave de sol`}
+        aria-label={`Ejercicio Dandelot ${exerciseNumber}, ${rows.length} renglones en clave de ${clefName}`}
         sx={{
           minWidth: MIN_SHEET_WIDTH,
           width: "100%",
@@ -176,7 +180,7 @@ export default function DandelotExerciseSheet({
             )}
             <Box
               role="img"
-              aria-label={`Sistema ${rowIndex + 1} en clave de sol`}
+              aria-label={`Sistema ${rowIndex + 1} en clave de ${clefName}`}
               sx={{
                 position: "relative",
                 height: rowHeight,
