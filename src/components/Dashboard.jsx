@@ -217,8 +217,8 @@ const EXERCISE_SECTIONS = [
         iconColor: "info.main",
       },
       {
-        route: "/lectura-musical",
-        title: "Lectura Musical",
+        route: "/lectura-dandelot",
+        title: "Lectura Dandelot",
         description:
           "Practica la lectura de notas estilo Dandelot con ejercicios progresivos en claves de Sol y Fa.",
         buttonLabel: "Comenzar Lectura",
@@ -337,6 +337,19 @@ const EXERCISE_SECTIONS = [
     accent: "#ef6c00",
     icon: AccessTime,
     items: [
+      {
+        route: "/lectura-ritmica",
+        title: "Lectura rítmica — Ta-ka",
+        description:
+          "Practica los ejercicios 25 y 26 con voz ta-ka, silencios, ligaduras y selección por sistemas.",
+        buttonLabel: "Practicar lectura rítmica",
+        buttonSx: {
+          backgroundColor: "#1976d2",
+          "&:hover": { backgroundColor: "#1565c0" },
+        },
+        icon: RecordVoiceOver,
+        iconColor: "#1976d2",
+      },
       {
         route: "/ritmica",
         title: "Rítmica",

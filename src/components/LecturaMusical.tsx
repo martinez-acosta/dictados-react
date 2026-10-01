@@ -699,7 +699,7 @@ export function randomDurations(len: number): DurationSym[] {
 }
 
 // ---------------- Componente principal ----------------
-export default function LecturaMusical() {
+export default function LecturaDandelot() {
   const navigate = useNavigate();
 
   const [selectedExercise, setSelectedExercise] = useState<ExerciseKey>(
@@ -1176,7 +1176,14 @@ export default function LecturaMusical() {
     <Box sx={{ width: "100%", px: 2 }}>
       <Stack spacing={3}>
         {/* Header */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
           <Button
             variant="outlined"
             startIcon={<ArrowBack />}
@@ -1188,8 +1195,14 @@ export default function LecturaMusical() {
             variant="h5"
             sx={{ fontWeight: 800, color: "#0b2a50", flex: 1 }}
           >
-            📖 Lectura Musical — Método Dandelot (Sol · Fa)
+            📖 Lectura Dandelot (Sol · Fa)
           </Typography>
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/lectura-ritmica")}
+          >
+            Lectura rítmica
+          </Button>
         </Box>
 
         <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2.5 } }}>

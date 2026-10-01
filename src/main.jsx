@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard.jsx";
 import DictadosMelodicos from "./components/DictadosMelodicos.jsx";
 import DictadosGranPentagrama from "./components/DictadosGranPentagrama.jsx";
@@ -15,7 +15,8 @@ import IntervalsTrainer from "./components/IntervalsTrainer.tsx";
 import RitmicaTrainer from "./components/RitmicaTrainer.tsx";
 import RitmicaConAlturas from "./components/RitmicaConAlturas.tsx";
 import RitmicaMetricaBaqueiro from "./components/RitmicaMetricaBaqueiro.tsx";
-import LecturaMusical from "./components/LecturaMusical.tsx";
+import LecturaDandelot from "./components/LecturaMusical.tsx";
+import LecturaRitmica from "./components/LecturaRitmica.tsx";
 import LecturaGranPentagrama from "./components/LecturaGranPentagrama.tsx";
 import DictadosIntervalos from "./components/DictadosIntervalos.tsx";
 import TunerPage from "./components/TunerPage.tsx";
@@ -68,7 +69,12 @@ createRoot(document.getElementById("root")).render(
         <Route path="/ritmica-alturas" element={<RitmicaConAlturas />} />
         <Route path="/ritmica-metrica" element={<RitmicaMetricaBaqueiro />} />
         <Route path="/intervalos-piano" element={<IntervalosPiano />} />
-        <Route path="/lectura-musical" element={<LecturaMusical />} />
+        <Route path="/lectura-dandelot" element={<LecturaDandelot />} />
+        <Route
+          path="/lectura-musical"
+          element={<Navigate to="/lectura-dandelot" replace />}
+        />
+        <Route path="/lectura-ritmica" element={<LecturaRitmica />} />
         <Route
           path="/lectura-gran-pentagrama"
           element={<LecturaGranPentagrama />}
