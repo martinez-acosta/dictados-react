@@ -64,6 +64,19 @@ const PHOTOS = [
 ] as const;
 const STORAGE_KEY = "semester-notes:2026-09-21:armonia:turnaround";
 
+function noteInSpanish(note: string) {
+  const names: Record<string, string> = {
+    C: "Do",
+    D: "Re",
+    E: "Mi",
+    F: "Fa",
+    G: "Sol",
+    A: "La",
+    B: "Si",
+  };
+  return `${names[note[0]]}${note.slice(1)}`;
+}
+
 function Heading({ children }: { children: React.ReactNode }) {
   return (
     <Typography component="h3" sx={{ fontWeight: 900, fontSize: 17, mb: 1 }}>
@@ -234,7 +247,7 @@ function TurnaroundWalkthrough({
         </Typography>
       </Box>
       <Box>
-        <Heading>2. Numera las siete notas</Heading>
+        <Heading>2. Encuentra la nota base de cada acorde</Heading>
         <Typography sx={{ color: "#56676a" }}>
           “Grado” significa posición en esa lista. I es 1, VI es 6, ii es 2 y V
           es 5. La tarea pide ese orden, no 1–2–3–4.
@@ -244,9 +257,56 @@ function TurnaroundWalkthrough({
             .map((note, index) => `${index + 1} = ${note}`)
             .join(" · ")}
         </Typography>
-        <Typography sx={{ mt: 1, fontWeight: 800 }}>
-          Tus cuatro fundamentales:{" "}
-          {answer.chords.map((chord) => chord.notes[0]).join(" → ")}.
+        <Typography sx={{ mt: 1, color: "#56676a" }}>
+          La <strong>fundamental</strong> es la nota base desde la que
+          construimos un acorde y que le da su nombre. Por ejemplo, la
+          fundamental de {answer.chords[0].name} es {answer.chords[0].notes[0]}{" "}
+          ({noteInSpanish(answer.chords[0].notes[0])}).
+        </Typography>
+        <Typography sx={{ mt: 1, color: "#56676a" }}>
+          La tarea pide cuatro acordes. Para saber desde qué nota construir cada
+          uno, busca las posiciones <strong>1 → 6 → 2 → 5</strong> en la escala
+          de {answer.name} mayor que acabamos de numerar:
+        </Typography>
+        <Box sx={{ mt: 1, borderTop: "1px solid #dce3e1" }}>
+          {answer.chords.map((chord, index) => (
+            <Box
+              key={chord.degree}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "76px 1fr", sm: "110px 1fr 1fr" },
+                gap: 1,
+                py: 1,
+                borderBottom: "1px solid #dce3e1",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900 }}>
+                Grado {DEGREES[index].index + 1}
+              </Typography>
+              <Typography sx={{ color: "#56676a" }}>
+                Nota base:{" "}
+                <strong>
+                  {chord.notes[0]} ({noteInSpanish(chord.notes[0])})
+                </strong>
+              </Typography>
+              <Typography
+                sx={{ gridColumn: { xs: "2", sm: "auto" }, fontWeight: 750 }}
+              >
+                Acorde: {chord.name}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+        <Typography sx={{ mt: 1.25, fontWeight: 800 }}>
+          Por eso las notas base son:{" "}
+          {answer.chords
+            .map((chord) => noteInSpanish(chord.notes[0]))
+            .join(" → ")}{" "}
+          ({answer.chords.map((chord) => chord.notes[0]).join(" → ")}).
+        </Typography>
+        <Typography sx={{ mt: 0.75, color: "#56676a" }}>
+          Cada una inicia un acorde distinto. En el siguiente paso añadiremos
+          otras tres notas a cada nota base para completar sus cuatro acordes.
         </Typography>
       </Box>
       <Box>
@@ -255,6 +315,12 @@ function TurnaroundWalkthrough({
           Empieza desde su fundamental. Toma la nota 1, salta la 2, toma la 3,
           salta la 4, toma la 5, salta la 6 y toma la 7. Si terminas la escala,
           continúa desde el inicio en la siguiente octava. Conserva sus ♯ o ♭.
+        </Typography>
+        <Typography sx={{ mt: 1, color: "#56676a" }}>
+          Aquí el conteo empieza de nuevo desde la nota base de cada acorde. Por
+          ejemplo, para {answer.chords[1].name}, {answer.chords[1].notes[0]} es
+          ahora la nota 1 del conteo, aunque sea el grado 6 de la escala de{" "}
+          {answer.name} mayor.
         </Typography>
         {answer.chords.map((chord, index) => (
           <Box
