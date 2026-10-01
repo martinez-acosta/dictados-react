@@ -72,6 +72,145 @@ function Heading({ children }: { children: React.ReactNode }) {
   );
 }
 
+function TurnaroundCircle({
+  tone,
+  onChange,
+}: {
+  tone: string;
+  onChange: (tone: string) => void;
+}) {
+  const selected = ANSWERS.find((item) => item.id === tone);
+
+  return (
+    <Box>
+      <Heading>Círculo de quintas</Heading>
+      <Typography sx={{ color: "#56676a", fontSize: 14 }}>
+        Toca un tono para ver su Turn Around.
+      </Typography>
+      <Box
+        role="group"
+        aria-label="Seleccionar tono en el círculo de quintas"
+        sx={{
+          position: "relative",
+          width: "100%",
+          maxWidth: 360,
+          aspectRatio: "1 / 1",
+          mx: "auto",
+          mt: 1,
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            inset: "13%",
+            border: "1px solid #d6dfdd",
+            borderRadius: "50%",
+          }}
+          aria-hidden="true"
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            inset: "32% 25%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            pointerEvents: "none",
+          }}
+          aria-hidden="true"
+        >
+          <Typography sx={{ color: "#677779", fontSize: 12 }}>
+            {selected ? "TONO MAYOR" : "12 TONOS"}
+          </Typography>
+          <Typography sx={{ fontSize: 25, fontWeight: 900 }}>
+            {selected?.name ?? "Todos"}
+          </Typography>
+          <Typography sx={{ color: "#677779", fontSize: 13, mt: 0.5 }}>
+            ↻ por quintas
+          </Typography>
+        </Box>
+        {ANSWERS.map((item, index) => {
+          const angle = (index * Math.PI) / 6 - Math.PI / 2;
+          const isSelected = item.id === tone;
+          return (
+            <Button
+              key={item.id}
+              aria-label={`Ver Turn Around en ${item.name} mayor (${item.id})`}
+              aria-pressed={isSelected}
+              onClick={() => onChange(item.id)}
+              sx={{
+                position: "absolute",
+                left: `${50 + 37 * Math.cos(angle)}%`,
+                top: `${50 + 37 * Math.sin(angle)}%`,
+                transform: "translate(-50%, -50%)",
+                minWidth: 0,
+                width: { xs: 48, sm: 54 },
+                height: { xs: 48, sm: 54 },
+                p: 0.25,
+                borderRadius: "50%",
+                border: "1px solid",
+                borderColor: isSelected ? "#0f766e" : "#d6dfdd",
+                bgcolor: isSelected ? "#0f766e" : "#fff",
+                color: isSelected ? "#fff" : "#183638",
+                textTransform: "none",
+                display: "flex",
+                flexDirection: "column",
+                lineHeight: 1.1,
+                "&:hover": {
+                  bgcolor: isSelected ? "#115e59" : "#eef2f1",
+                },
+                "&.Mui-focusVisible": {
+                  outline: "2px solid #183638",
+                  outlineOffset: 3,
+                },
+              }}
+            >
+              <Box component="span" sx={{ fontSize: 17, fontWeight: 900 }}>
+                {item.id}
+              </Box>
+              <Box component="span" sx={{ fontSize: 11, mt: 0.25 }}>
+                {item.name}
+              </Box>
+            </Button>
+          );
+        })}
+      </Box>
+      {selected && (
+        <Box aria-live="polite" aria-atomic="true">
+          <Typography sx={{ fontWeight: 800, mb: 0.75 }}>
+            Turn Around de {selected.name} mayor
+          </Typography>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(2, 1fr)",
+                sm: "repeat(4, 1fr)",
+              },
+              gap: 1,
+              borderBlock: "1px solid #dce3e1",
+              py: 1.25,
+            }}
+          >
+            {selected.chords.map((chord, index) => (
+              <Box key={chord.degree}>
+                <Typography sx={{ color: "#677779", fontSize: 12 }}>
+                  {index + 1}. {chord.degree}
+                </Typography>
+                <Typography sx={{ fontWeight: 900, fontSize: 18 }}>
+                  {chord.name}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
 function TurnaroundWalkthrough({
   answer,
 }: {
@@ -210,14 +349,7 @@ export default function HarmonyTurnaroundWeek({ view }: { view: View }) {
             del pizarrón. No contamos con apuntes completos de la clase.
           </Typography>
         </Box>
-        <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2 }}>
-          <Typography sx={{ fontSize: 20, fontWeight: 900 }}>
-            Imaj7 → vim7 → iim7 → V7
-          </Typography>
-          <Typography sx={{ mt: 0.75, color: "#56676a" }}>
-            En Do: Cmaj7 → Am7 → Dm7 → G7 → Cmaj7 al repetir.
-          </Typography>
-        </Box>
+        <TurnaroundCircle tone={answer.id} onChange={setTone} />
         <Typography sx={{ color: "#56676a" }}>
           Para la próxima clase: llevar esta progresión en los 12 tonos del
           círculo de quintas. En Respuestas están resueltos los cuatro acordes y
@@ -305,14 +437,12 @@ export default function HarmonyTurnaroundWeek({ view }: { view: View }) {
         <Box>
           <Heading>Turn Around · paso a paso desde cero</Heading>
           <Typography sx={{ color: "#56676a" }}>
-            “Turn Around” es una progresión que prepara volver al inicio.
-            Empezamos con Do mayor y seguimos el mismo procedimiento para los
-            demás tonos.
+            “Turn Around” es una progresión que prepara volver al inicio. Elige
+            un tono en el círculo y sigue su procedimiento debajo.
           </Typography>
         </Box>
-        <Box>
-          <TurnaroundWalkthrough answer={ANSWERS[0]} />
-        </Box>
+        <TurnaroundCircle tone={answer.id} onChange={setTone} />
+        <TurnaroundWalkthrough answer={answer} />
         <Box>
           <Heading>Por qué VI lleva m7</Heading>
           <Typography sx={{ color: "#56676a" }}>
@@ -350,6 +480,7 @@ export default function HarmonyTurnaroundWeek({ view }: { view: View }) {
           acorde, o consulta la lista completa de progresiones.
         </Typography>
       </Box>
+      <TurnaroundCircle tone={tone} onChange={setTone} />
       <FormControl fullWidth size="small">
         <InputLabel id="turnaround-tone-label">Tono</InputLabel>
         <Select
@@ -388,9 +519,6 @@ export default function HarmonyTurnaroundWeek({ view }: { view: View }) {
             <Heading>{answer.name} mayor</Heading>
             <Typography sx={{ color: "#56676a" }}>
               {answer.notes.join(" – ")}
-            </Typography>
-            <Typography sx={{ mt: 1, fontWeight: 900 }}>
-              {answer.sequence}
             </Typography>
           </Box>
           <Box component="dl" sx={{ m: 0 }}>
