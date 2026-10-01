@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, FormControlLabel, Switch } from "@mui/material";
 import {
   Annotation,
   BarlineType,
@@ -18,6 +18,8 @@ export type DandelotExerciseSheetProps = {
   rows: readonly DandelotExerciseRow[];
   activeNoteIndex?: number | null;
   showNoteLabels?: boolean;
+  selectedRowIndexes?: readonly number[];
+  onRowSelectionChange?: (rowIndex: number, selected: boolean) => void;
 };
 
 const MIN_SHEET_WIDTH = 760;
@@ -38,6 +40,8 @@ export default function DandelotExerciseSheet({
   rows,
   activeNoteIndex = null,
   showNoteLabels = false,
+  selectedRowIndexes,
+  onRowSelectionChange,
 }: DandelotExerciseSheetProps) {
   const reactId = useId().replace(/:/g, "");
   const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -122,7 +126,7 @@ export default function DandelotExerciseSheet({
       const notes = noteGroups.flat();
       const beams = noteGroups
         .filter((group) => group.length > 1)
-        .map((group) => new Beam(group));
+        .map((group) => new Beam(group, true));
 
       Formatter.FormatAndDraw(context, stave, notes);
       beams.forEach((beam) => beam.setContext(context).draw());
@@ -140,7 +144,7 @@ export default function DandelotExerciseSheet({
     >
       <Box
         ref={sheetRef}
-        role="img"
+        role="group"
         aria-label={`Ejercicio Dandelot ${exerciseNumber}, ${rows.length} renglones en clave de sol`}
         sx={{
           minWidth: MIN_SHEET_WIDTH,
@@ -154,38 +158,65 @@ export default function DandelotExerciseSheet({
         {rows.map((_, rowIndex) => (
           <Box
             key={`${reactId}-row-${rowIndex}`}
-            sx={{ position: "relative", height: rowHeight }}
+            sx={{ mb: rowIndex < rows.length - 1 ? 1 : 0 }}
           >
-            {rowIndex === 0 && (
-              <Box
-                aria-hidden="true"
-                sx={{
-                  position: "absolute",
-                  zIndex: 1,
-                  top: 31,
-                  left: 8,
-                  minWidth: 38,
-                  height: 38,
-                  px: 0.75,
-                  border: "1px solid #777",
-                  display: "grid",
-                  placeItems: "center",
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  fontSize: 24,
-                  fontWeight: 700,
-                  lineHeight: 1,
-                }}
-              >
-                {exerciseNumber}
-              </Box>
+            {onRowSelectionChange && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={selectedRowIndexes?.includes(rowIndex) ?? true}
+                    onChange={(_, checked) =>
+                      onRowSelectionChange(rowIndex, checked)
+                    }
+                  />
+                }
+                label={`Sistema ${rowIndex + 1}`}
+                sx={{ m: 0, color: "text.primary" }}
+              />
             )}
             <Box
-              id={`dandelot-${reactId}-${rowIndex}`}
-              ref={(element: HTMLDivElement | null) => {
-                rowRefs.current[rowIndex] = element;
+              role="img"
+              aria-label={`Sistema ${rowIndex + 1} en clave de sol`}
+              sx={{
+                position: "relative",
+                height: rowHeight,
+                opacity:
+                  selectedRowIndexes && !selectedRowIndexes.includes(rowIndex)
+                    ? 0.45
+                    : 1,
               }}
-              sx={{ width: "100%", height: rowHeight }}
-            />
+            >
+              {rowIndex === 0 && (
+                <Box
+                  aria-hidden="true"
+                  sx={{
+                    position: "absolute",
+                    zIndex: 1,
+                    top: 31,
+                    left: 8,
+                    minWidth: 38,
+                    height: 38,
+                    px: 0.75,
+                    border: "1px solid #777",
+                    display: "grid",
+                    placeItems: "center",
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    fontSize: 24,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                  }}
+                >
+                  {exerciseNumber}
+                </Box>
+              )}
+              <Box
+                id={`dandelot-${reactId}-${rowIndex}`}
+                ref={(element: HTMLDivElement | null) => {
+                  rowRefs.current[rowIndex] = element;
+                }}
+                sx={{ width: "100%", height: rowHeight }}
+              />
+            </Box>
           </Box>
         ))}
       </Box>

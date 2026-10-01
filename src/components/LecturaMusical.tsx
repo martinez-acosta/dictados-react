@@ -65,8 +65,8 @@ async function ensureAudio() {
       release: 1,
       baseUrl: "https://tonejs.github.io/audio/salamander/",
     }).toDestination();
-    await Tone.loaded();
   }
+  await Tone.loaded();
   if (!clickSynthRef) {
     clickSynthRef = new Tone.Synth({
       oscillator: { type: "square" },
@@ -324,6 +324,39 @@ export const DANDELOT_SERIES_EXERCISE_16 = [
   ],
 ] as const;
 
+export const DANDELOT_SERIES_EXERCISE_17 = [
+  [
+    ["g/4", "a/4"],
+    ["c/5", "e/5"],
+    ["d/5", "b/4"],
+    ["g/4", "f/4"],
+    ["d/4", "e/4"],
+    ["g/4", "b/4"],
+    ["c/5", "a/4"],
+    ["f/4", "e/4"],
+    ["d/4", "b/3"],
+    ["c/4", "e/4"],
+    ["f/4", "a/4"],
+    ["c/5", "e/5"],
+  ],
+  [
+    ["f/5", "e/5"],
+    ["g/5", "e/5"],
+    ["a/5", "g/5"],
+    ["b/5", "g/5"],
+    ["c/6", "a/5"],
+    ["g/5", "e/5"],
+    ["f/5", "d/5"],
+    ["c/5", "b/4"],
+    ["g/4", "a/4"],
+    ["f/4", "d/4"],
+    ["e/4", "g/4"],
+    ["a/4", "f/4"],
+    ["d/4", "b/3"],
+    ["c/4"],
+  ],
+] as const;
+
 export const DANDELOT_EXERCISES = [
   {
     id: "16",
@@ -331,6 +364,13 @@ export const DANDELOT_EXERCISES = [
     name: "Ejercicio 16",
     description: "Lectura continua en tres renglones",
     rows: DANDELOT_SERIES_EXERCISE_16,
+  },
+  {
+    id: "17",
+    number: 17,
+    name: "Ejercicio 17",
+    description: "Lectura continua en dos renglones",
+    rows: DANDELOT_SERIES_EXERCISE_17,
   },
 ] as const;
 
@@ -598,25 +638,32 @@ export default function LecturaMusical() {
   const [showDandelotNoteLabels, setShowDandelotNoteLabels] = useState(true);
   const [dandelotReverseOrder, setDandelotReverseOrder] = useState(false);
   const [selectedDandelotIndex, setSelectedDandelotIndex] = useState(0);
+  const [selectedDandelotRows, setSelectedDandelotRows] = useState<number[]>(
+    () => DANDELOT_EXERCISES[0].rows.map((_, rowIndex) => rowIndex),
+  );
 
   const staff1Ref = useRef<HTMLDivElement | null>(null);
   const metronomeIdRef = useRef<number | null>(null);
+  const dandelotPlaybackRequestRef = useRef(0);
 
   const clef = selectedClef;
   const currentExerciseMap = EXERCISES_BY_CLEF[clef];
   const selectedDandelotExercise = DANDELOT_EXERCISES[selectedDandelotIndex];
-  const dandelotPlayback = useMemo(
-    () =>
-      selectedDandelotExercise.rows.flatMap((row) =>
-        row.flatMap((group) =>
-          group.map((key) => ({
-            key,
-            beats: group.length === 1 ? 1 : 0.5,
-          })),
-        ),
-      ),
-    [selectedDandelotExercise],
-  );
+  const allDandelotRowsSelected =
+    selectedDandelotRows.length === selectedDandelotExercise.rows.length;
+  const dandelotPlayback = useMemo(() => {
+    let noteIndex = 0;
+    return selectedDandelotExercise.rows.flatMap((row, rowIndex) => {
+      const notes = row.flatMap((group) =>
+        group.map((key) => ({
+          key,
+          beats: group.length === 1 ? 1 : 0.5,
+          noteIndex: noteIndex++,
+        })),
+      );
+      return selectedDandelotRows.includes(rowIndex) ? notes : [];
+    });
+  }, [selectedDandelotExercise, selectedDandelotRows]);
 
   useEffect(() => {
     if (
@@ -679,6 +726,7 @@ export default function LecturaMusical() {
 
   // --------- Control del Transport ----------
   function hardStop() {
+    dandelotPlaybackRequestRef.current += 1;
     try {
       Tone.Transport.stop();
       Tone.Transport.cancel(0);
@@ -955,9 +1003,12 @@ export default function LecturaMusical() {
       hardStop();
       return;
     }
+    if (dandelotPlayback.length === 0) return;
 
     hardStop();
+    const playbackRequest = dandelotPlaybackRequestRef.current;
     await ensureAudio();
+    if (playbackRequest !== dandelotPlaybackRequestRef.current) return;
     Tone.Transport.cancel(0);
     Tone.Transport.bpm.value = bpm;
     Tone.Transport.timeSignature = [4, 4];
@@ -967,23 +1018,24 @@ export default function LecturaMusical() {
     setMetronomeActive(true);
     setCurrentBeat(0);
 
-    const playbackOrder = dandelotPlayback.map((note, noteIndex) => ({
-      note,
-      noteIndex,
-    }));
+    const playbackOrder = [...dandelotPlayback];
     if (dandelotReverseOrder) playbackOrder.reverse();
 
     let accumulatedBeats = 0;
-    playbackOrder.forEach(({ note, noteIndex }) => {
+    playbackOrder.forEach(({ key, beats, noteIndex }) => {
       Tone.Transport.schedule((time) => {
-        Tone.Draw.schedule(() => setDandelotNoteIndex(noteIndex), time);
+        Tone.Draw.schedule(() => {
+          if (playbackRequest === dandelotPlaybackRequestRef.current) {
+            setDandelotNoteIndex(noteIndex);
+          }
+        }, time);
         samplerRef!.triggerAttackRelease(
-          keyToSPN(note.key),
-          note.beats === 1 ? "4n" : "8n",
+          keyToSPN(key),
+          beats === 1 ? "4n" : "8n",
           time,
         );
       }, beatsToBBS(accumulatedBeats));
-      accumulatedBeats += note.beats;
+      accumulatedBeats += beats;
     });
 
     Tone.Transport.setLoopPoints("0:0:0", beatsToBBS(accumulatedBeats));
@@ -1000,6 +1052,18 @@ export default function LecturaMusical() {
     if (boundedIndex === selectedDandelotIndex) return;
     hardStop();
     setSelectedDandelotIndex(boundedIndex);
+    setSelectedDandelotRows(
+      DANDELOT_EXERCISES[boundedIndex].rows.map((_, rowIndex) => rowIndex),
+    );
+  }
+
+  function selectDandelotRow(rowIndex: number, selected: boolean) {
+    hardStop();
+    setSelectedDandelotRows((previous) =>
+      selected
+        ? Array.from(new Set([...previous, rowIndex])).sort((a, b) => a - b)
+        : previous.filter((index) => index !== rowIndex),
+    );
   }
 
   // -------------------- UI --------------------
@@ -1120,6 +1184,7 @@ export default function LecturaMusical() {
             <Button
               variant="contained"
               onClick={playDandelotExercise}
+              disabled={dandelotPlayback.length === 0}
               startIcon={dandelotPlaying ? <Pause /> : <PlayArrow />}
               sx={{ minWidth: 190 }}
             >
@@ -1142,7 +1207,7 @@ export default function LecturaMusical() {
                 <Switch
                   checked={dandelotReverseOrder}
                   onChange={(event) => {
-                    if (dandelotPlaying) hardStop();
+                    hardStop();
                     setDandelotReverseOrder(event.target.checked);
                   }}
                 />
@@ -1187,11 +1252,51 @@ export default function LecturaMusical() {
             </Stack>
           )}
 
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1}
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            sx={{ mb: 1 }}
+          >
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={allDandelotRowsSelected}
+                  onChange={(_, checked) => {
+                    hardStop();
+                    setSelectedDandelotRows(
+                      checked
+                        ? selectedDandelotExercise.rows.map((_, index) => index)
+                        : [],
+                    );
+                  }}
+                />
+              }
+              label="Todo el ejercicio"
+              sx={{ m: 0, whiteSpace: "nowrap" }}
+            />
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              aria-live="polite"
+            >
+              {selectedDandelotRows.length === 0
+                ? "Selecciona al menos un sistema para reproducir."
+                : allDandelotRowsSelected
+                  ? "Puedes seleccionar uno o varios sistemas para practicar."
+                  : selectedDandelotRows.length === 1
+                    ? `Se reproduce solo el sistema ${selectedDandelotRows[0] + 1}.`
+                    : `Sistemas ${selectedDandelotRows.map((index) => index + 1).join(", ")}: se reproducen en el orden de la partitura.`}
+            </Typography>
+          </Stack>
+
           <DandelotExerciseSheet
             exerciseNumber={selectedDandelotExercise.number}
             rows={selectedDandelotExercise.rows}
             activeNoteIndex={dandelotNoteIndex}
             showNoteLabels={showDandelotNoteLabels}
+            selectedRowIndexes={selectedDandelotRows}
+            onRowSelectionChange={selectDandelotRow}
           />
         </Paper>
 
