@@ -22,6 +22,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import HarmonyTurnaroundWeek from "./HarmonyTurnaroundWeek";
 
 type SubjectId = "solfeo" | "armonia" | "improvisacion" | "piano";
 type DetailView = "resumen" | "tareas" | "conceptos" | "respuestas";
@@ -48,7 +49,7 @@ const WEEKS: Array<{
     id: "2026-09-21",
     label: "21–27 de septiembre de 2026",
     shortLabel: "21–27 sep",
-    subjects: ["piano"],
+    subjects: ["piano", "armonia"],
   },
 ];
 
@@ -3463,6 +3464,9 @@ export default function SemesterNotes() {
                 {week.id === "2026-09-14" &&
                   subject === "armonia" &&
                   detailView === "respuestas" && <HarmonyWeekTwoAnswersView />}
+                {week.id === "2026-09-21" && subject === "armonia" && (
+                  <HarmonyTurnaroundWeek view={detailView} />
+                )}
                 {week.id === "2026-09-21" &&
                   subject === "piano" &&
                   detailView === "resumen" && <PianoWeekSummaryView />}
