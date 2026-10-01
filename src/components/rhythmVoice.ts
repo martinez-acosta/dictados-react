@@ -1,6 +1,6 @@
 import type { RhythmPosition, RhythmTimeline } from "./rhythmReading";
+import { stretchRhythmSyllable } from "./rhythmVoiceSustain";
 
-type VoiceSample = { buffer: AudioBuffer; loopStart: number; loopEnd: number };
 type PlaybackOptions = {
   timeline: RhythmTimeline;
   bpm: number;
@@ -17,8 +17,8 @@ type PlaybackOptions = {
 };
 
 // Local Spanish voice samples (macOS Paulina: "ta" and "ca", 190 words/minute).
-// Sustain only the vowel, keeping one consonant attack across a written tie.
-function prepareVoiceSample(buffer: AudioBuffer): VoiceSample {
+// Normalize once; the consonant is preserved when the vowel is time-scaled.
+function prepareVoiceSample(buffer: AudioBuffer): AudioBuffer {
   const samples = buffer.getChannelData(0);
   let peak = 0;
   samples.forEach((sample) => {
@@ -27,66 +27,14 @@ function prepareVoiceSample(buffer: AudioBuffer): VoiceSample {
   if (peak > 0) {
     for (let i = 0; i < samples.length; i += 1) samples[i] *= 0.7 / peak;
   }
-  const rate = buffer.sampleRate;
-  const anchor = Math.floor(rate * 0.08);
-  const windowLength = Math.min(
-    Math.floor(rate * 0.04),
-    samples.length - anchor - Math.floor(rate / 80),
-  );
-  let period = Math.floor(rate / 200);
-  let bestCorrelation = -Infinity;
-  for (
-    let lag = Math.floor(rate / 400);
-    lag <= Math.floor(rate / 80);
-    lag += 1
-  ) {
-    let product = 0,
-      firstEnergy = 0,
-      secondEnergy = 0;
-    for (let i = 0; i < windowLength; i += 1) {
-      const first = samples[anchor + i];
-      const second = samples[anchor + i + lag];
-      product += first * second;
-      firstEnergy += first * first;
-      secondEnergy += second * second;
-    }
-    const correlation =
-      product / Math.sqrt(firstEnergy * secondEnergy + 1e-12) - lag * 0.00005;
-    if (correlation > bestCorrelation) {
-      bestCorrelation = correlation;
-      period = lag;
-    }
-  }
-  let start = anchor;
-  for (let i = anchor; i < anchor + period; i += 1) {
-    if (samples[i] <= 0 && samples[i + 1] > 0) {
-      start = i;
-      break;
-    }
-  }
-  const target = Math.min(start + period * 6, samples.length - period - 64);
-  let end = target;
-  let bestDifference = Infinity;
-  for (
-    let candidate = target - Math.floor(period / 2);
-    candidate <= target + Math.floor(period / 2);
-    candidate += 1
-  ) {
-    let difference = 0;
-    for (let i = 0; i < 64; i += 1)
-      difference += (samples[start + i] - samples[candidate + i]) ** 2;
-    if (difference < bestDifference) {
-      bestDifference = difference;
-      end = candidate;
-    }
-  }
-  return { buffer, loopStart: start / rate, loopEnd: end / rate };
+  return buffer;
 }
 
 export class RhythmVoicePlayer {
   private context: AudioContext | null = null;
   private loading: Promise<void> | null = null;
-  private samples: Partial<Record<"ta" | "ka", VoiceSample>> = {};
+  private samples: Partial<Record<"ta" | "ka", AudioBuffer>> = {};
+  private sustainedSamples = new Map<string, AudioBuffer>();
   private sources = new Set<AudioScheduledSourceNode>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private frame: number | null = null;
@@ -128,22 +76,40 @@ export class RhythmVoicePlayer {
     };
   }
 
-  private speak(syllable: "ta" | "ka", start: number, duration: number) {
+  private voiceBuffer(syllable: "ta" | "ka", duration: number) {
     const context = this.context!;
     const sample = this.samples[syllable]!;
+    const length = Math.round(duration * sample.sampleRate);
+    const key = `${syllable}:${length}`;
+    const cached = this.sustainedSamples.get(key);
+    if (cached) return cached;
+    const data = stretchRhythmSyllable(
+      sample.getChannelData(0),
+      sample.sampleRate,
+      duration,
+    );
+    const buffer = context.createBuffer(1, data.length, sample.sampleRate);
+    buffer.getChannelData(0).set(data);
+    if (this.sustainedSamples.size >= 24)
+      this.sustainedSamples.delete(this.sustainedSamples.keys().next().value!);
+    this.sustainedSamples.set(key, buffer);
+    return buffer;
+  }
+
+  private speak(syllable: "ta" | "ka", start: number, duration: number) {
+    const context = this.context!;
     const source = context.createBufferSource();
-    source.buffer = sample.buffer;
-    source.loop = true;
-    source.loopStart = sample.loopStart;
-    source.loopEnd = sample.loopEnd;
+    source.buffer = this.voiceBuffer(syllable, duration);
+    source.loop = false;
+    const end = start + duration;
     const gain = context.createGain();
     gain.gain.setValueAtTime(0, start);
     gain.gain.linearRampToValueAtTime(0.65, start + 0.004);
-    gain.gain.setValueAtTime(0.65, start + Math.max(0.006, duration - 0.025));
-    gain.gain.linearRampToValueAtTime(0, start + duration);
+    gain.gain.setValueAtTime(0.65, end - 0.012);
+    gain.gain.linearRampToValueAtTime(0, end);
     this.connectSource(source, gain);
     source.start(start);
-    source.stop(start + duration);
+    source.stop(end);
   }
 
   private click(start: number, strong: boolean) {
@@ -163,6 +129,11 @@ export class RhythmVoicePlayer {
     if (!options.timeline.positions.length) return;
     const context = this.context!;
     const secondsPerBeat = 60 / options.bpm;
+    // Render unique lengths before taking the audio clock reference, so even
+    // the first attack is scheduled ahead of time rather than after DSP work.
+    options.timeline.attacks.forEach((attack) =>
+      this.voiceBuffer(attack.syllable, attack.beats * secondsPerBeat),
+    );
     const entryBeats = options.countIn ? options.beatsPerMeasure : 0;
     const entryStart = context.currentTime + 0.1;
     const exerciseStart = entryStart + entryBeats * secondsPerBeat;
@@ -250,6 +221,7 @@ export class RhythmVoicePlayer {
 
   dispose() {
     this.stop();
+    this.sustainedSamples.clear();
     void this.context?.close();
   }
 }

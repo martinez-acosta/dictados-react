@@ -3,15 +3,24 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { transformWithEsbuild } from "vite";
 
-async function importTypeScript(path) {
-  const source = readFileSync(new URL(path, import.meta.url), "utf8");
+async function typeScriptUrl(path) {
+  let source = readFileSync(new URL(path, import.meta.url), "utf8");
+  if (source.includes('from "./rhythmVoiceSustain"')) {
+    source = source.replace(
+      '"./rhythmVoiceSustain"',
+      JSON.stringify(
+        await typeScriptUrl("../src/components/rhythmVoiceSustain.ts"),
+      ),
+    );
+  }
   const { code } = await transformWithEsbuild(source, path, {
     loader: "ts",
     define: { "import.meta.env.BASE_URL": '"/dictados-react/"' },
   });
-  return import(
-    `data:text/javascript;base64,${Buffer.from(code).toString("base64")}`
-  );
+  return `data:text/javascript;base64,${Buffer.from(code).toString("base64")}`;
+}
+async function importTypeScript(path) {
+  return import(await typeScriptUrl(path));
 }
 const {
   RHYTHM_READING_EXERCISES: exercises,
@@ -21,6 +30,9 @@ const {
 } = await importTypeScript("../src/components/rhythmReading.ts");
 const { RhythmVoicePlayer } = await importTypeScript(
   "../src/components/rhythmVoice.ts",
+);
+const { stretchRhythmSyllable } = await importTypeScript(
+  "../src/components/rhythmVoiceSustain.ts",
 );
 const allSystems = (exercise) => exercise.systems.map((_, index) => index);
 
@@ -157,6 +169,7 @@ function fakeAudio(t) {
   const oldCancel = globalThis.cancelAnimationFrame;
   let context, frameCallback, intervalCallback;
   class Source {
+    playbackRate = { value: 1 };
     connect() {}
     disconnect() {}
     start(time) {
@@ -179,6 +192,15 @@ function fakeAudio(t) {
     async close() {}
     async decodeAudioData(bytes) {
       return decodeWav(bytes);
+    }
+    createBuffer(channels, length, rate) {
+      assert.equal(channels, 1);
+      const samples = new Float32Array(length);
+      return {
+        sampleRate: rate,
+        duration: length / rate,
+        getChannelData: () => samples,
+      };
     }
     createBufferSource() {
       const source = new Source();
@@ -247,7 +269,7 @@ function fakeAudio(t) {
   };
 }
 
-test("La voz programa ataques exactos, sostiene ligaduras y omite silencios", async (t) => {
+test("La voz dura toda la figura y las ligaduras, sin bucles de audio", async (t) => {
   const fake = fakeAudio(t);
   const player = new RhythmVoicePlayer();
   await player.prepare();
@@ -268,19 +290,98 @@ test("La voz programa ataques exactos, sostiene ligaduras y omite silencios", as
   voices.forEach((voice, index) => {
     const attack = timeline.attacks[index];
     assert.equal(voice.startTime, 0.1 + attack.startBeat);
-    assert.ok(Math.abs(voice.stopTime - voice.startTime - attack.beats) < 1e-9);
+    assert.equal(voice.loop, false);
     assert.ok(
-      voice.loop &&
-        voice.loopStart > 0 &&
-        voice.loopEnd > voice.loopStart &&
-        voice.loopEnd < voice.buffer.duration,
+      Math.abs(voice.buffer.duration - attack.beats) <
+        1 / voice.buffer.sampleRate,
     );
+    assert.ok(Math.abs(voice.stopTime - voice.startTime - attack.beats) < 1e-9);
   });
   assert.equal(voices[4].stopTime, 3.6);
   assert.ok(!voices.some((voice) => voice.startTime === 3.1));
   player.stop();
   assert.ok(voices.every((voice) => voice.stopCalls === 2));
 });
+
+for (const bpm of [40, 72, 160]) {
+  test(`A ${bpm} BPM: duración completa, sin solapamientos ni cambiar el tono`, async (t) => {
+    const fake = fakeAudio(t);
+    const player = new RhythmVoicePlayer();
+    await player.prepare();
+    const timeline = buildRhythmTimeline(exercises[1], [0]);
+    player.start({
+      timeline,
+      bpm,
+      beatsPerMeasure: 2,
+      countIn: false,
+      loop: false,
+      metronome: false,
+      onPosition() {},
+      onFinish() {},
+    });
+    const voices = fake.context().voices;
+    assert.equal(voices.length, timeline.attacks.length);
+    voices.forEach((voice, index) => {
+      const attack = timeline.attacks[index];
+      const duration = (attack.beats * 60) / bpm;
+      assert.ok(
+        Math.abs(voice.startTime - (0.1 + (attack.startBeat * 60) / bpm)) <
+          1e-9,
+      );
+      assert.equal(voice.loop, false);
+      assert.equal(voice.playbackRate.value, 1);
+      assert.ok(Math.abs(voice.stopTime - voice.startTime - duration) < 1e-9);
+      assert.ok(
+        Math.abs(voice.buffer.duration - duration) <
+          1 / voice.buffer.sampleRate,
+      );
+      if (voices[index + 1])
+        assert.ok(voice.stopTime <= voices[index + 1].startTime + 1e-9);
+    });
+    // The opening half note tied to an eighth lasts 2.5 beats both visually
+    // and audibly, with one consonant attack for the whole tie.
+    assert.equal(timeline.attacks[0].beats, 2.5);
+    assert.ok(
+      Math.abs(voices[0].stopTime - voices[0].startTime - (2.5 * 60) / bpm) <
+        1e-9,
+    );
+    player.dispose();
+  });
+}
+
+for (const syllable of ["ta", "ka"]) {
+  test(`${syllable}: conserva la consonante y la vocal no tiene cortes al sostenerse`, () => {
+    const sample = decodeWav(
+      readFileSync(
+        new URL(
+          `../public/audio/lectura-ritmica/${syllable}.wav`,
+          import.meta.url,
+        ),
+      ),
+    );
+    const input = sample.getChannelData(0);
+    for (const duration of [0.1875, 0.5, 1.25, 3.75]) {
+      const output = stretchRhythmSyllable(input, sample.sampleRate, duration);
+      assert.equal(output.length, Math.round(duration * sample.sampleRate));
+      assert.ok(output.every(Number.isFinite));
+      assert.ok(output.every((value) => Math.abs(value) <= 1));
+      const attack = Math.round(sample.sampleRate * 0.04);
+      for (let i = 0; i < attack; i++)
+        assert.ok(Math.abs(output[i] - input[i]) < 1e-7);
+      // No artificial silence or repeated amplitude envelope during the vowel.
+      const window = Math.round(sample.sampleRate * 0.02);
+      for (
+        let start = attack;
+        start + window < output.length - window;
+        start += window
+      ) {
+        let energy = 0;
+        for (let i = start; i < start + window; i++) energy += output[i] ** 2;
+        assert.ok(Math.sqrt(energy / window) > 0.012);
+      }
+    }
+  });
+}
 
 test("Entrada de un compás, posición sincronizada y final automático", async (t) => {
   const fake = fakeAudio(t);

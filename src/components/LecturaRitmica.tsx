@@ -322,7 +322,7 @@ export default function LecturaRitmica() {
                   <Typography variant="body2" color="text.secondary">
                     {playing && position
                       ? `Compás ${position.measureIndex + 1} · Sistema ${position.systemIndex + 1}`
-                      : "Las ligaduras sostienen una sola sílaba; los silencios no llevan voz."}
+                      : "Cada sílaba dura toda la figura; las ligaduras prolongan la vocal sin repetir el ataque."}
                   </Typography>
                 </Box>
                 {playing && (
