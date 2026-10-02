@@ -195,6 +195,14 @@ const SOLFEGE_WEEK_TWO_BOARD_IMAGES = [
     src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-sincopa-2.png`,
     label: "Figuras rítmicas en 4/4",
   },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-compases-1.png`,
+    label: "Numerador, denominador y figuras de referencia · vista general",
+  },
+  {
+    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-compases-2.png`,
+    label: "Comparación de 4/4, 3/4, 3/8 y 4/2 · acercamiento del pizarrón",
+  },
 ] as const;
 
 const HARMONY_BOARD_IMAGES = [

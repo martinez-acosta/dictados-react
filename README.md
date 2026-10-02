@@ -19,6 +19,13 @@ Abre el enlace local que imprime Vite.
 - VexFlow 4 (Factory / EasyScore / Formatter)
 - Web Audio API (síntesis simple tipo piano)
 
+## Documentación vigente
+
+- [Estándar de notas de clase](docs/ESTANDAR_NOTAS_DE_CLASE.md): referencia a seguir
+  al agregar o corregir clases. Incluye el desarrollo de “En clase”, tareas,
+  conceptos, respuestas paso a paso, fotos, una plantilla reutilizable y
+  criterios de verificación.
+
 ## Publicación
 
 Cada push a `main` publica el sitio existente en GitHub Pages mediante
