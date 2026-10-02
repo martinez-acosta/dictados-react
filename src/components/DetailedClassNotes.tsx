@@ -19,8 +19,13 @@ import improvisationTwo from "../data/semester-lessons/improvisacion-2026-09-14.
 import piano from "../data/semester-lessons/piano-2026-09-21.md?raw";
 import improvisationChordStudy from "../data/semester-lessons/improvisacion-2026-09-28.md?raw";
 import harmonyInversions from "../data/semester-lessons/armonia-2026-09-28.md?raw";
+import solfegePulse from "../data/semester-lessons/solfeo-2026-09-28.md?raw";
 
 const LESSONS = {
+  "solfeo-2026-09-28": [
+    "Unidad de tiempo y de compás, lectura en 4/8 y 2/4",
+    solfegePulse,
+  ],
   "armonia-2026-09-28": [
     "Inversiones de tríadas y maj7, escritura y cadencias",
     harmonyInversions,

@@ -26,6 +26,7 @@ import HarmonyTurnaroundWeek from "./HarmonyTurnaroundWeek";
 import DetailedClassNotes from "./DetailedClassNotes";
 import ImprovisationChordStudy from "./ImprovisationChordStudy";
 import HarmonyInversionsWeek from "./HarmonyInversionsWeek";
+import SolfegePulseWeek from "./SolfegePulseWeek";
 
 type SubjectId = "solfeo" | "armonia" | "improvisacion" | "piano";
 type DetailView = "resumen" | "tareas" | "conceptos" | "respuestas";
@@ -58,7 +59,7 @@ const WEEKS: Array<{
     id: "2026-09-28",
     label: "28 de septiembre–2 de octubre de 2026",
     shortLabel: "28 sep–2 oct",
-    subjects: ["improvisacion", "armonia"],
+    subjects: ["solfeo", "armonia", "improvisacion"],
   },
 ];
 
@@ -202,14 +203,6 @@ const SOLFEGE_WEEK_TWO_BOARD_IMAGES = [
   {
     src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-sincopa-2.png`,
     label: "Figuras rítmicas en 4/4",
-  },
-  {
-    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-compases-1.png`,
-    label: "Numerador, denominador y figuras de referencia · vista general",
-  },
-  {
-    src: `${import.meta.env.BASE_URL}semester-notes/2026-09-14/solfeo-compases-2.png`,
-    label: "Comparación de 4/4, 3/4, 3/8 y 4/2 · acercamiento del pizarrón",
   },
 ] as const;
 
@@ -2816,7 +2809,7 @@ export default function SemesterNotes() {
                     <ToggleButton value="resumen">En clase</ToggleButton>
                     <ToggleButton value="tareas">Tareas</ToggleButton>
                     <ToggleButton value="conceptos">Conceptos</ToggleButton>
-                    {subject !== "solfeo" && (
+                    {(subject !== "solfeo" || week.id === "2026-09-28") && (
                       <ToggleButton value="respuestas">Respuestas</ToggleButton>
                     )}
                   </ToggleButtonGroup>
@@ -2827,6 +2820,9 @@ export default function SemesterNotes() {
                 )}
                 {week.id === "2026-09-28" && subject === "armonia" && (
                   <HarmonyInversionsWeek view={detailView} />
+                )}
+                {week.id === "2026-09-28" && subject === "solfeo" && (
+                  <SolfegePulseWeek view={detailView} />
                 )}
                 {week.id === "2026-09-07" &&
                   subject === "solfeo" &&
