@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import HarmonyTurnaroundWeek from "./HarmonyTurnaroundWeek";
 import DetailedClassNotes from "./DetailedClassNotes";
 import ImprovisationChordStudy from "./ImprovisationChordStudy";
+import HarmonyInversionsWeek from "./HarmonyInversionsWeek";
 
 type SubjectId = "solfeo" | "armonia" | "improvisacion" | "piano";
 type DetailView = "resumen" | "tareas" | "conceptos" | "respuestas";
@@ -57,7 +58,7 @@ const WEEKS: Array<{
     id: "2026-09-28",
     label: "28 de septiembre–2 de octubre de 2026",
     shortLabel: "28 sep–2 oct",
-    subjects: ["improvisacion"],
+    subjects: ["improvisacion", "armonia"],
   },
 ];
 
@@ -2823,6 +2824,9 @@ export default function SemesterNotes() {
 
                 {week.id === "2026-09-28" && subject === "improvisacion" && (
                   <ImprovisationChordStudy view={detailView} />
+                )}
+                {week.id === "2026-09-28" && subject === "armonia" && (
+                  <HarmonyInversionsWeek view={detailView} />
                 )}
                 {week.id === "2026-09-07" &&
                   subject === "solfeo" &&

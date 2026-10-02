@@ -18,8 +18,13 @@ import improvisationOne from "../data/semester-lessons/improvisacion-2026-09-07.
 import improvisationTwo from "../data/semester-lessons/improvisacion-2026-09-14.md?raw";
 import piano from "../data/semester-lessons/piano-2026-09-21.md?raw";
 import improvisationChordStudy from "../data/semester-lessons/improvisacion-2026-09-28.md?raw";
+import harmonyInversions from "../data/semester-lessons/armonia-2026-09-28.md?raw";
 
 const LESSONS = {
+  "armonia-2026-09-28": [
+    "Inversiones de tríadas y maj7, escritura y cadencias",
+    harmonyInversions,
+  ],
   "solfeo-2026-09-07": [
     "Interiorizar el pulso, lectura y coordinación",
     solfeoOne,
