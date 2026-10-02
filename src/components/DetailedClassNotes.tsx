@@ -17,6 +17,7 @@ import harmonyTwo from "../data/semester-lessons/armonia-2026-09-14.md?raw";
 import improvisationOne from "../data/semester-lessons/improvisacion-2026-09-07.md?raw";
 import improvisationTwo from "../data/semester-lessons/improvisacion-2026-09-14.md?raw";
 import piano from "../data/semester-lessons/piano-2026-09-21.md?raw";
+import improvisationChordStudy from "../data/semester-lessons/improvisacion-2026-09-28.md?raw";
 
 const LESSONS = {
   "solfeo-2026-09-07": [
@@ -44,6 +45,10 @@ const LESSONS = {
     improvisationTwo,
   ],
   "piano-2026-09-21": ["Piano · martes 22 de septiembre", piano],
+  "improvisacion-2026-09-28": [
+    "Notas del acorde, enlaces y transposición",
+    improvisationChordStudy,
+  ],
 } as const;
 
 function inline(text: string): React.ReactNode {
