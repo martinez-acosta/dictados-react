@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import HarmonyTurnaroundWeek from "./HarmonyTurnaroundWeek";
+import DetailedClassNotes from "./DetailedClassNotes";
 
 type SubjectId = "solfeo" | "armonia" | "improvisacion" | "piano";
 type DetailView = "resumen" | "tareas" | "conceptos" | "respuestas";
@@ -577,77 +578,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 function SummaryView() {
-  return (
-    <Stack spacing={3}>
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
-        >
-          Idea central
-        </Typography>
-        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
-          Interiorizar el pulso y mantener la lectura continua
-        </Typography>
-        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
-          El objetivo no es solo acertar las notas: hay que leer, cantar y
-          continuar dentro del tempo, incluso después de un error.
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Dandelot · Lección 16</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>• Clave de Sol con metrónomo a 60 BPM.</Typography>
-          <Typography>
-            • Sin mover el pie, la cabeza, chasquear ni sostener físicamente el
-            pulso.
-          </Typography>
-          <Typography>
-            • Lectura de principio a fin, de final a principio y por sistemas.
-          </Typography>
-          <Typography>
-            • Palmas en los tiempos 2 y 4 mientras continúa la lectura.
-          </Typography>
-          <Typography>
-            • Meta progresiva mencionada en clase: avanzar hacia 100 BPM.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Baqueiro Foster · Lecciones 24–26</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>• Repaso de compases de 3 y 2 tiempos.</Typography>
-          <Typography>
-            • Un compás completo de cuenta antes de comenzar la lectura.
-          </Typography>
-          <Typography>
-            • Lectura rítmica con sílabas como “ta” y “taca”.
-          </Typography>
-          <Typography>
-            • Ligadura, silencios y subdivisión mental del pulso.
-          </Typography>
-          <Typography>
-            • Coordinación: pies en 1–2 y palmas con negras o corcheas.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
-        <Typography sx={{ fontWeight: 900 }}>Lo que sigue</Typography>
-        <Typography sx={{ color: "#5d6c6e" }}>
-          Segunda parte de Baqueiro Foster, Lección 1. Habrá una introducción
-          teórica; la referencia aproximada es página 66 del libro o 61 del PDF.
-          El tema 4/8 quedó por confirmar en la grabación.
-        </Typography>
-      </Box>
-    </Stack>
-  );
+  return <DetailedClassNotes lessonId="solfeo-2026-09-07" />;
 }
 
 function TasksView() {
@@ -789,138 +720,11 @@ function ConceptsView() {
 }
 
 function SolfegeWeekTwoSummaryView() {
-  const [photoIndex, setPhotoIndex] = useState(0);
-  const photo = SOLFEGE_WEEK_TWO_BOARD_IMAGES[photoIndex];
-
   return (
-    <Stack spacing={3}>
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
-        >
-          Tema nuevo principal
-        </Typography>
-        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
-          Síncopa y contratiempo
-        </Typography>
-        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
-          La clase avanzó de la lectura continua al desplazamiento del acento:
-          reconocer partes fuertes y débiles, escuchar cuándo aparece el sonido
-          y saber si está precedido por silencio.
-        </Typography>
-      </Box>
-
-      <Box component="figure" sx={{ m: 0 }}>
-        <Box
-          component="img"
-          src={photo.src}
-          alt={`Pizarrón de Solfeo: ${photo.label}`}
-          sx={{
-            display: "block",
-            width: "100%",
-            maxHeight: 520,
-            objectFit: "contain",
-            bgcolor: "#eef2f1",
-            border: "1px solid #d6dfdd",
-          }}
-        />
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ mt: 1.25, overflowX: "auto", pb: 0.5 }}
-        >
-          {SOLFEGE_WEEK_TWO_BOARD_IMAGES.map((item, index) => (
-            <Button
-              key={item.src}
-              size="small"
-              variant={photoIndex === index ? "contained" : "outlined"}
-              onClick={() => setPhotoIndex(index)}
-              sx={{ minWidth: "max-content", textTransform: "none" }}
-            >
-              Foto {index + 1}
-            </Button>
-          ))}
-        </Stack>
-        <Typography
-          component="figcaption"
-          variant="caption"
-          sx={{ display: "block", mt: 0.5, color: "#677779" }}
-        >
-          {photo.label}
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Dandelot · Lección 16</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>
-            • Se repitió de principio a fin, al revés, por sistemas, equipos e
-            individualmente.
-          </Typography>
-          <Typography>• Palmas en los tiempos 2 y 4.</Typography>
-          <Typography>
-            • La siguiente revisión será a 70 BPM y será la última de esta
-            lección.
-          </Typography>
-          <Typography>
-            • El pulso debe pasar del metrónomo al oído interno, sin apoyarse en
-            movimientos del cuerpo.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Clave de Fa · Lección 4</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>
-            • Se trabajó con lectura guiada, solos, hacia adelante, al revés y
-            por sistemas.
-          </Typography>
-          <Typography>
-            • Las lecciones 1–15 se mantienen aproximadamente a 60 BPM.
-          </Typography>
-          <Typography>
-            • Alternar Sol y Fa prepara el cambio rápido de clave de una
-            partitura de piano.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Baqueiro Foster · Lecciones 24–26</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>
-            • Puntillo de aumentación: agrega la mitad del valor de la figura.
-          </Typography>
-          <Typography>
-            • Ligadura de prolongación frente a ligadura de fraseo.
-          </Typography>
-          <Typography>
-            • Tiempos fuertes y débiles, subdivisión binaria, contratiempo y
-            síncopa.
-          </Typography>
-          <Typography>
-            • La síncopa debe acentuarse porque da protagonismo a una posición
-            normalmente débil.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
-        <Typography sx={{ fontWeight: 900 }}>Evolución de tempo</Typography>
-        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
-          Dandelot 16: 60 → 70 BPM · Clave de Fa 4–5: 60 BPM · Baqueiro 26: 80
-          BPM.
-        </Typography>
-      </Box>
-    </Stack>
+    <DetailedClassNotes
+      lessonId="solfeo-2026-09-14"
+      photos={SOLFEGE_WEEK_TWO_BOARD_IMAGES}
+    />
   );
 }
 
@@ -1166,102 +970,15 @@ function SolfegeWeekTwoConceptsView() {
 
 function ImprovisationWeekTwoSummaryView() {
   return (
-    <Stack spacing={3}>
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
-        >
-          Idea central
-        </Typography>
-        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
-          Leer el acorde antes de elegir las notas
-        </Typography>
-        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
-          La clase pasó de construir cuatríadas a interpretar cada parte del
-          símbolo y completar los grados 2, 4 y 6 alrededor de 1, 3, 5 y 7 para
-          obtener material de improvisación.
-        </Typography>
-      </Box>
-
-      <Box component="figure" sx={{ m: 0 }}>
-        <Box
-          component="img"
-          src={IMPROVISATION_WEEK_TWO_BOARD_IMAGE}
-          alt="Pizarrón de Improvisación con grados del acorde y extensiones 9, 11 y 13"
-          sx={{
-            display: "block",
-            width: "100%",
-            maxHeight: 560,
-            objectFit: "contain",
-            bgcolor: "#eef2f1",
-            border: "1px solid #d6dfdd",
-          }}
-        />
-        <Typography
-          component="figcaption"
-          variant="caption"
-          sx={{ display: "block", mt: 0.75, color: "#677779" }}
-        >
-          Grados del acorde y extensiones: 9, 11 y 13.
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Cómo se lee un símbolo</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>
-            • Si no aparece “m”, la tríada se entiende mayor: C7 comienza con
-            C–E–G.
-          </Typography>
-          <Typography>
-            • El 7 solo indica séptima menor; Maj7 indica séptima mayor.
-          </Typography>
-          <Typography>
-            • En CmMaj7, “m” modifica la tríada y “Maj7” modifica la séptima.
-          </Typography>
-          <Typography>
-            • En m7♭5 no debe olvidarse la tercera menor: 1–♭3–♭5–♭7.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Acorde aislado ≠ tonalidad</SectionHeading>
-        <Typography sx={{ color: "#344b4d" }}>
-          C7 asegura C–E–G–B♭, pero no asegura por sí mismo que la tonalidad sea
-          F mayor. Solo con contexto podemos llamarlo V7 de F.
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Del acorde a la improvisación</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>1. Lee el símbolo.</Typography>
-          <Typography>2. Identifica 1–3–5–7.</Typography>
-          <Typography>3. Completa los grados 2–4–6.</Typography>
-          <Typography>4. Obtén siete notas como material melódico.</Typography>
-          <Typography>
-            5. Después se estudiarán modos, notas objetivo y tensiones.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
-        <Typography sx={{ fontWeight: 900 }}>Ejemplo</Typography>
-        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
-          C7 aporta C–E–G–B♭. Al completar D, F y A se obtiene C–D–E–F–G–A–B♭,
-          pero el razonamiento comenzó en el acorde, no en una tonalidad
-          inventada.
-        </Typography>
-      </Box>
-    </Stack>
+    <DetailedClassNotes
+      lessonId="improvisacion-2026-09-14"
+      photos={[
+        {
+          src: IMPROVISATION_WEEK_TWO_BOARD_IMAGE,
+          label: "Grados y extensiones 9, 11 y 13",
+        },
+      ]}
+    />
   );
 }
 
@@ -1693,104 +1410,11 @@ function ImprovisationWeekTwoAnswersView() {
 }
 
 function HarmonyWeekTwoSummaryView() {
-  const [photoIndex, setPhotoIndex] = useState(0);
-  const photo = HARMONY_WEEK_TWO_BOARD_IMAGES[photoIndex];
-
   return (
-    <Stack spacing={3}>
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
-        >
-          Tema principal
-        </Typography>
-        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
-          Armonizar la escala mayor con cuatríadas
-        </Typography>
-        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
-          Ahora cada grado se construye con 1–3–5–7. El resultado permite
-          reconocer el tipo y nombrar el acorde que nace naturalmente de la
-          escala.
-        </Typography>
-      </Box>
-
-      <Box component="figure" sx={{ m: 0 }}>
-        <Box
-          component="img"
-          src={photo.src}
-          alt={`Pizarrón de Armonía: ${photo.label}`}
-          sx={{
-            display: "block",
-            width: "100%",
-            maxHeight: 520,
-            objectFit: "contain",
-            bgcolor: "#eef2f1",
-            border: "1px solid #d6dfdd",
-          }}
-        />
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ mt: 1.25, overflowX: "auto", pb: 0.5 }}
-        >
-          {HARMONY_WEEK_TWO_BOARD_IMAGES.map((item, index) => (
-            <Button
-              key={item.src}
-              size="small"
-              variant={photoIndex === index ? "contained" : "outlined"}
-              onClick={() => setPhotoIndex(index)}
-              sx={{ minWidth: "max-content", textTransform: "none" }}
-            >
-              Foto {index + 1}
-            </Button>
-          ))}
-        </Stack>
-        <Typography
-          component="figcaption"
-          variant="caption"
-          sx={{ display: "block", mt: 0.5, color: "#677779" }}
-        >
-          {photo.label}
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Patrón de la escala mayor</SectionHeading>
-        <Typography sx={{ color: "#183638", fontWeight: 900, fontSize: 18 }}>
-          Maj7 – m7 – m7 – Maj7 – 7 – m7 – m7♭5
-        </Typography>
-        <Typography sx={{ color: "#5d6c6e", mt: 1 }}>
-          Imaj7 · iim7 · iiim7 · IVmaj7 · V7 · vim7 · viim7♭5
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Atajos para la séptima</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>• 7ª mayor: medio tono antes de la octava.</Typography>
-          <Typography>• 7ª menor: un tono antes de la octava.</Typography>
-          <Typography>
-            • En el V grado la tríada es mayor, pero la séptima es menor; por
-            eso se llama 7 y no Maj7.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
-        <Typography sx={{ fontWeight: 900 }}>
-          Examen escrito y en piano
-        </Typography>
-        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
-          Habrá que identificar las notas, formar el acorde y tocar las teclas
-          correctas. No se evaluará técnica pianística avanzada.
-        </Typography>
-      </Box>
-    </Stack>
+    <DetailedClassNotes
+      lessonId="armonia-2026-09-14"
+      photos={HARMONY_WEEK_TWO_BOARD_IMAGES}
+    />
   );
 }
 
@@ -2014,109 +1638,11 @@ function HarmonyWeekTwoAnswersView() {
 }
 
 function HarmonySummaryView() {
-  const [photoIndex, setPhotoIndex] = useState(0);
-  const photo = HARMONY_BOARD_IMAGES[photoIndex];
-
   return (
-    <Stack spacing={3}>
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
-        >
-          Idea central
-        </Typography>
-        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
-          De la escala mayor a las tríadas y cuatríadas
-        </Typography>
-        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
-          La clase conectó la fórmula de la escala mayor con la armonización por
-          grados y después añadió la séptima para construir cuatríadas.
-        </Typography>
-      </Box>
-
-      <Box component="figure" sx={{ m: 0 }}>
-        <Box
-          component="img"
-          src={photo.src}
-          alt={`Pizarrón de Armonía: ${photo.label}`}
-          sx={{
-            display: "block",
-            width: "100%",
-            maxHeight: 520,
-            objectFit: "contain",
-            bgcolor: "#eef2f1",
-            border: "1px solid #d6dfdd",
-          }}
-        />
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ mt: 1.25, overflowX: "auto", pb: 0.5 }}
-        >
-          {HARMONY_BOARD_IMAGES.map((item, index) => (
-            <Button
-              key={item.src}
-              size="small"
-              variant={photoIndex === index ? "contained" : "outlined"}
-              onClick={() => setPhotoIndex(index)}
-              sx={{ minWidth: "max-content", textTransform: "none" }}
-            >
-              Foto {index + 1}
-            </Button>
-          ))}
-        </Stack>
-        <Typography
-          component="figcaption"
-          variant="caption"
-          sx={{ display: "block", mt: 0.5, color: "#677779" }}
-        >
-          {photo.label}
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Escala mayor y armonización</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>• Fórmula mayor: T–T–ST–T–T–T–ST.</Typography>
-          <Typography>
-            • Cada grado funciona como fundamental de su propio acorde.
-          </Typography>
-          <Typography>• Patrón de tríadas: M–m–m–M–M–m–°.</Typography>
-          <Typography>
-            • Mayores: I, IV y V · menores: ii, iii y vi · disminuido: vii°.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>De tríada a cuatríada</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>• Tríada: 1–3–5.</Typography>
-          <Typography>• Cuatríada: 1–3–5–7.</Typography>
-          <Typography>
-            • Se trabajaron Maj7, 7, m7, mMaj7, m7♭5/ø7 y dim7/°7.
-          </Typography>
-          <Typography>
-            • La escritura enarmónica debe conservar la función de tercera,
-            quinta o séptima.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
-        <Typography sx={{ fontWeight: 900 }}>Acorde disminuido 7</Typography>
-        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
-          Está formado por terceras menores sucesivas, es simétrico y produce
-          solo tres conjuntos distintos de alturas antes de repetirse por
-          inversión y enarmonía.
-        </Typography>
-      </Box>
-    </Stack>
+    <DetailedClassNotes
+      lessonId="armonia-2026-09-07"
+      photos={HARMONY_BOARD_IMAGES}
+    />
   );
 }
 
@@ -2559,98 +2085,12 @@ function HarmonyAnswersView() {
 
 function ImprovisationSummaryView() {
   return (
-    <Stack spacing={3}>
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
-        >
-          Idea central
-        </Typography>
-        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
-          Reconocer intervalos sin detener la música
-        </Typography>
-        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
-          La improvisación exige identificar rápidamente la distancia y la
-          función de cada nota. La teoría se está usando como base para formar
-          acordes y elegir notas con intención.
-        </Typography>
-      </Box>
-
-      <Box component="figure" sx={{ m: 0 }}>
-        <Box
-          component="img"
-          src={IMPROVISATION_BOARD_IMAGE}
-          alt="Pizarrón de la clase de Improvisación con intervalos escritos en pentagrama"
-          sx={{
-            display: "block",
-            width: "100%",
-            maxHeight: 520,
-            objectFit: "contain",
-            bgcolor: "#eef2f1",
-            border: "1px solid #d6dfdd",
-          }}
-        />
-        <Typography
-          component="figcaption"
-          variant="caption"
-          sx={{ display: "block", mt: 1, color: "#677779" }}
-        >
-          Pizarrón: 2m, 2M, 3m, 3M, 4J, quintas, sextas y séptimas.
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Quintas y formación de acordes</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>
-            • La quinta justa debe reconocerse de memoria: C–G, D–A, E–B, F–C,
-            G–D, A–E y B–F♯.
-          </Typography>
-          <Typography>
-            • Quinta disminuida: bajar un semitono a la quinta justa.
-          </Typography>
-          <Typography>
-            • Quinta aumentada: subir un semitono a la quinta justa.
-          </Typography>
-          <Typography>
-            • Un acorde básico se entiende como fundamental + tercera + quinta
-            (1–3–5).
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Función musical</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>• Un intervalo no es una escala.</Typography>
-          <Typography>
-            • Voicing es la disposición de las notas y sus funciones dentro de
-            un acorde.
-          </Typography>
-          <Typography>
-            • Dos notas pueden sonar igual y cumplir funciones distintas: C y B♯
-            son enarmónicas, pero no equivalentes en todo contexto.
-          </Typography>
-          <Typography>
-            • Los atajos sirven para comprobar intervalos amplios, pero no deben
-            borrar su función original.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
-        <Typography sx={{ fontWeight: 900 }}>Ruta de aprendizaje</Typography>
-        <Typography sx={{ color: "#5d6c6e", mt: 0.5 }}>
-          Intervalos → formación de acordes → función de las notas → voicings →
-          progresiones → Jazz Blues → elección de notas → improvisación.
-        </Typography>
-      </Box>
-    </Stack>
+    <DetailedClassNotes
+      lessonId="improvisacion-2026-09-07"
+      photos={[
+        { src: IMPROVISATION_BOARD_IMAGE, label: "Intervalos en pentagrama" },
+      ]}
+    />
   );
 }
 
@@ -2956,57 +2396,7 @@ function ImprovisationAnswersView() {
 }
 
 function PianoWeekSummaryView() {
-  return (
-    <Stack spacing={3}>
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ color: "#0f766e", fontWeight: 900, letterSpacing: 1 }}
-        >
-          Martes 22 de septiembre
-        </Typography>
-        <Typography sx={{ fontSize: { xs: 20, sm: 24 }, fontWeight: 900 }}>
-          Cinco escalas mayores a tres octavas
-        </Typography>
-        <Typography sx={{ mt: 1, color: "#5d6c6e", maxWidth: 760 }}>
-          La clase dejó Do, Sol, Re, La y Mi mayor, de ida y vuelta. Las cinco
-          siguen el círculo de quintas y conservan la misma digitación base.
-        </Typography>
-      </Box>
-
-      <Box sx={{ borderLeft: "3px solid #0f766e", pl: 2, py: 0.5 }}>
-        <Typography sx={{ fontWeight: 900 }}>Orden de práctica</Typography>
-        <Typography sx={{ color: "#344b4d", mt: 0.5, fontWeight: 750 }}>
-          C → G → D → A → E · ascendente y descendente
-        </Typography>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Qué cambia entre una escala y otra</SectionHeading>
-        <Stack spacing={0.75} sx={{ color: "#344b4d" }}>
-          <Typography>• Do mayor no tiene alteraciones.</Typography>
-          <Typography>• Cada quinta añade un sostenido.</Typography>
-          <Typography>• El orden acumulado es F♯, C♯, G♯ y D♯.</Typography>
-          <Typography>
-            • La digitación permanece; lo que cambia son las teclas negras.
-          </Typography>
-        </Stack>
-      </Box>
-
-      <Divider />
-
-      <Box>
-        <SectionHeading>Proyecto de aplicación</SectionHeading>
-        <Typography sx={{ color: "#344b4d" }}>
-          Se propuso aprender autoacompañamiento para cantar una canción en Re
-          mayor. Quedó como siguiente paso; todavía no hay un arreglo final que
-          memorizar.
-        </Typography>
-      </Box>
-    </Stack>
-  );
+  return <DetailedClassNotes lessonId="piano-2026-09-21" />;
 }
 
 function PianoWeekTasksView() {
@@ -3407,7 +2797,7 @@ export default function SemesterNotes() {
                       },
                     }}
                   >
-                    <ToggleButton value="resumen">Resumen</ToggleButton>
+                    <ToggleButton value="resumen">En clase</ToggleButton>
                     <ToggleButton value="tareas">Tareas</ToggleButton>
                     <ToggleButton value="conceptos">Conceptos</ToggleButton>
                     {subject !== "solfeo" && (
