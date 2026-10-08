@@ -49,7 +49,18 @@ export default function DandelotExerciseSheet({
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const rowRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [sheetWidth, setSheetWidth] = useState(MIN_SHEET_WIDTH);
-  const rowHeight = showNoteLabels ? ROW_HEIGHT_WITH_LABELS : ROW_HEIGHT;
+  const lowestPitch = Math.min(
+    ...rows.flat(2).map((key) => {
+      const [note, octave] = key.split("/");
+      return Number(octave) * 7 + "cdefgab".indexOf(note[0]);
+    }),
+  );
+  // Dar margen a las etiquetas bajo Si3 (Sol) o Mi2 (Fa), sin recortarlas.
+  const extraLabelSpace =
+    Math.max(0, (clef === "treble" ? 27 : 16) - lowestPitch) * 10;
+  const rowHeight = showNoteLabels
+    ? ROW_HEIGHT_WITH_LABELS + extraLabelSpace
+    : ROW_HEIGHT;
   const clefName = clef === "bass" ? "fa" : "sol";
 
   useEffect(() => {

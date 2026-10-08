@@ -34,11 +34,17 @@ import {
   DANDELOT_BASS_EXERCISE_5,
   DANDELOT_BASS_EXERCISE_6,
 } from "../data/dandelotBassExercises.mjs";
+import {
+  DANDELOT_SERIES_EXERCISE_18,
+  DANDELOT_SERIES_EXERCISE_19,
+} from "../data/dandelotTrebleExercises.mjs";
 
 export {
   DANDELOT_BASS_EXERCISE_4,
   DANDELOT_BASS_EXERCISE_5,
   DANDELOT_BASS_EXERCISE_6,
+  DANDELOT_SERIES_EXERCISE_18,
+  DANDELOT_SERIES_EXERCISE_19,
 };
 
 // ---------------- Audio globals (persistentes) ----------------
@@ -384,6 +390,22 @@ export const DANDELOT_EXERCISES = [
     name: "Ejercicio 17",
     description: "Lectura continua en dos renglones",
     rows: DANDELOT_SERIES_EXERCISE_17,
+  },
+  {
+    id: "18",
+    clef: "treble",
+    number: 18,
+    name: "Ejercicio 18",
+    description: "Lectura continua en tres renglones",
+    rows: DANDELOT_SERIES_EXERCISE_18,
+  },
+  {
+    id: "19",
+    clef: "treble",
+    number: 19,
+    name: "Ejercicio 19",
+    description: "Lectura continua en tres renglones",
+    rows: DANDELOT_SERIES_EXERCISE_19,
   },
   {
     id: "fa-4",
