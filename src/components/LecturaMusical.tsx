@@ -29,6 +29,17 @@ import { Factory, StaveNote, Stave, TickContext, Formatter } from "vexflow";
 import * as Tone from "tone";
 import { useNavigate } from "react-router-dom";
 import DandelotExerciseSheet from "./DandelotExerciseSheet";
+import {
+  DANDELOT_BASS_EXERCISE_4,
+  DANDELOT_BASS_EXERCISE_5,
+  DANDELOT_BASS_EXERCISE_6,
+} from "../data/dandelotBassExercises.mjs";
+
+export {
+  DANDELOT_BASS_EXERCISE_4,
+  DANDELOT_BASS_EXERCISE_5,
+  DANDELOT_BASS_EXERCISE_6,
+};
 
 // ---------------- Audio globals (persistentes) ----------------
 let samplerRef: Tone.Sampler | null = null;
@@ -357,79 +368,6 @@ export const DANDELOT_SERIES_EXERCISE_17 = [
   ],
 ] as const;
 
-export const DANDELOT_BASS_EXERCISE_4 = [
-  [
-    ["g/3"],
-    ["f/3"],
-    ["d/3"],
-    ["g/3"],
-    ["d/3"],
-    ["c/3"],
-    ["d/3"],
-    ["f/2"],
-    ["g/2"],
-    ["e/2"],
-    ["f/2"],
-    ["c/4"],
-    ["b/3"],
-    ["d/4"],
-    ["c/4"],
-    ["f/3"],
-    ["e/3"],
-    ["f/2"],
-    ["g/2"],
-    ["d/3"],
-    ["c/3"],
-  ],
-  [
-    ["e/3"],
-    ["f/3"],
-    ["b/3"],
-    ["c/4"],
-    ["c/3"],
-    ["d/3"],
-    ["g/3"],
-    ["f/3"],
-    ["b/2"],
-    ["c/3"],
-    ["e/2"],
-    ["f/2"],
-    ["g/2"],
-    ["f/2"],
-    ["b/2"],
-    ["d/3"],
-    ["c/3"],
-    ["c/4"],
-    ["b/3"],
-    ["g/3"],
-    ["f/3"],
-  ],
-  [
-    ["b/2"],
-    ["c/3"],
-    ["g/2"],
-    ["f/2"],
-    ["d/4"],
-    ["c/4"],
-    ["c/3"],
-    ["f/3"],
-    ["g/3"],
-    ["f/3"],
-    ["f/2"],
-    ["c/3"],
-    ["b/2"],
-    ["g/2"],
-    ["f/2"],
-    ["e/2"],
-    ["g/2"],
-    ["f/2"],
-    ["c/3"],
-    ["f/3"],
-    ["c/4"],
-    ["f/3"],
-  ],
-] as const;
-
 export const DANDELOT_EXERCISES = [
   {
     id: "16",
@@ -454,6 +392,22 @@ export const DANDELOT_EXERCISES = [
     name: "Ejercicio 4",
     description: "Lectura en clave de fa en tres renglones, con negras",
     rows: DANDELOT_BASS_EXERCISE_4,
+  },
+  {
+    id: "fa-5",
+    clef: "bass",
+    number: 5,
+    name: "Ejercicio 5",
+    description: "Lectura en clave de fa en dos renglones, con negras",
+    rows: DANDELOT_BASS_EXERCISE_5,
+  },
+  {
+    id: "fa-6",
+    clef: "bass",
+    number: 6,
+    name: "Ejercicio 6",
+    description: "Lectura en clave de fa en dos renglones, con negras",
+    rows: DANDELOT_BASS_EXERCISE_6,
   },
 ] as const;
 
