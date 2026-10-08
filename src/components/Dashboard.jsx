@@ -218,10 +218,23 @@ const EXERCISE_SECTIONS = [
       },
       {
         route: "/lectura-dandelot",
-        title: "Lectura Dandelot",
+        title: "Ejercicios Dandelot",
         description:
-          "Practica la lectura de notas estilo Dandelot con ejercicios progresivos en claves de Sol y Fa.",
-        buttonLabel: "Comenzar Lectura",
+          "Ejercicios numerados del método Dandelot en claves de Sol y Fa, con tempo y selección de sistemas.",
+        buttonLabel: "Abrir ejercicios",
+        buttonSx: {
+          backgroundColor: "#4caf50",
+          "&:hover": { backgroundColor: "#388e3c" },
+        },
+        icon: MenuBook,
+        iconColor: "#4caf50",
+      },
+      {
+        route: "/practica-lectura-musical",
+        title: "Práctica de lectura musical",
+        description:
+          "Genera secuencias en claves de Sol y Fa con alturas, figuras y metrónomo configurables.",
+        buttonLabel: "Practicar lectura",
         buttonSx: {
           backgroundColor: "#4caf50",
           "&:hover": { backgroundColor: "#388e3c" },

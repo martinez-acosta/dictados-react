@@ -15,7 +15,8 @@ import IntervalsTrainer from "./components/IntervalsTrainer.tsx";
 import RitmicaTrainer from "./components/RitmicaTrainer.tsx";
 import RitmicaConAlturas from "./components/RitmicaConAlturas.tsx";
 import RitmicaMetricaBaqueiro from "./components/RitmicaMetricaBaqueiro.tsx";
-import LecturaDandelot from "./components/LecturaMusical.tsx";
+import EjerciciosDandelot from "./components/LecturaMusical.tsx";
+import PracticaLecturaMusical from "./components/PracticaLecturaMusical.tsx";
 import LecturaRitmica from "./components/LecturaRitmica.tsx";
 import LecturaGranPentagrama from "./components/LecturaGranPentagrama.tsx";
 import DictadosIntervalos from "./components/DictadosIntervalos.tsx";
@@ -69,7 +70,11 @@ createRoot(document.getElementById("root")).render(
         <Route path="/ritmica-alturas" element={<RitmicaConAlturas />} />
         <Route path="/ritmica-metrica" element={<RitmicaMetricaBaqueiro />} />
         <Route path="/intervalos-piano" element={<IntervalosPiano />} />
-        <Route path="/lectura-dandelot" element={<LecturaDandelot />} />
+        <Route path="/lectura-dandelot" element={<EjerciciosDandelot />} />
+        <Route
+          path="/practica-lectura-musical"
+          element={<PracticaLecturaMusical />}
+        />
         <Route
           path="/lectura-musical"
           element={<Navigate to="/lectura-dandelot" replace />}

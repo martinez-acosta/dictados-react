@@ -675,7 +675,11 @@ export function randomDurations(len: number): DurationSym[] {
 }
 
 // ---------------- Componente principal ----------------
-export default function LecturaDandelot() {
+export function MusicalReadingPage({
+  mode,
+}: {
+  mode: "dandelot" | "practice";
+}) {
   const navigate = useNavigate();
 
   const [selectedExercise, setSelectedExercise] = useState<ExerciseKey>(
@@ -757,8 +761,9 @@ export default function LecturaDandelot() {
 
   // Generar ejercicio al cambiar selector
   useEffect(() => {
+    if (mode !== "practice") return;
     generateNewExercise(); /* eslint-disable-line */
-  }, [selectedExercise, clef]);
+  }, [mode, selectedExercise, clef]);
 
   // Recalcular figuras cuando cambia el switch o la duración fija
   useEffect(() => {
@@ -989,6 +994,7 @@ export default function LecturaDandelot() {
   }
 
   useEffect(() => {
+    if (mode !== "practice") return;
     drawStaff(
       staff1Ref,
       currentExercise,
@@ -1008,7 +1014,7 @@ export default function LecturaDandelot() {
         });
       },
     );
-  }, [currentExercise, currentNoteIndex, durSeq, showNoteLabels, clef]);
+  }, [mode, currentExercise, currentNoteIndex, durSeq, showNoteLabels, clef]);
 
   // --------- Reproducción en bucle infinito ----------
   async function playExercise() {
@@ -1168,11 +1174,28 @@ export default function LecturaDandelot() {
             Volver al menú
           </Button>
           <Typography
+            component="h1"
             variant="h5"
-            sx={{ fontWeight: 800, color: "#0b2a50", flex: 1 }}
+            sx={{ fontWeight: 800, color: "#0b2a50", flex: "1 1 240px" }}
           >
-            📖 Lectura Dandelot (Sol · Fa)
+            {mode === "dandelot"
+              ? "Ejercicios Dandelot"
+              : "Práctica de lectura musical"}
           </Typography>
+          <Button
+            variant="text"
+            onClick={() =>
+              navigate(
+                mode === "dandelot"
+                  ? "/practica-lectura-musical"
+                  : "/lectura-dandelot",
+              )
+            }
+          >
+            {mode === "dandelot"
+              ? "Práctica de lectura musical"
+              : "Ejercicios Dandelot"}
+          </Button>
           <Button
             variant="outlined"
             onClick={() => navigate("/lectura-ritmica")}
@@ -1181,713 +1204,746 @@ export default function LecturaDandelot() {
           </Button>
         </Box>
 
-        <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2.5 } }}>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            justifyContent="space-between"
-            alignItems={{ xs: "flex-start", sm: "center" }}
-            spacing={1}
-            sx={{ mb: 1.5 }}
-          >
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 750 }}>
-                Serie Dandelot
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {selectedDandelotExercise.description}, como en la edición
-                impresa.
-              </Typography>
-            </Box>
-            <Stack direction="row" spacing={1}>
-              <Chip
-                label={`${selectedDandelotIndex + 1} de ${dandelotExercises.length}`}
-                size="small"
-                variant="outlined"
-              />
-              <Chip
-                label={`Clave de ${clef === "bass" ? "Fa" : "Sol"}`}
-                size="small"
-                variant="outlined"
-              />
-              <Chip label="4/4" size="small" variant="outlined" />
-              <Chip label={`${bpm} BPM`} size="small" variant="outlined" />
-            </Stack>
-          </Stack>
-
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={1}
-            alignItems="stretch"
-            sx={{ mb: 2, maxWidth: 680 }}
-          >
-            <FormControl size="small" sx={{ minWidth: 210 }}>
-              <InputLabel id="dandelot-clef-selector-label">Clave</InputLabel>
-              <Select
-                labelId="dandelot-clef-selector-label"
-                value={clef}
-                label="Clave"
-                onChange={(event) => selectClef(event.target.value as ClefType)}
-              >
-                <MenuItem value="treble">Clave de Sol (G)</MenuItem>
-                <MenuItem value="bass">Clave de Fa en 4ª línea (F)</MenuItem>
-              </Select>
-            </FormControl>
+        {mode === "dandelot" && (
+          <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2.5 } }}>
             <Stack
-              direction="row"
+              direction={{ xs: "column", sm: "row" }}
+              justifyContent="space-between"
+              alignItems={{ xs: "flex-start", sm: "center" }}
               spacing={1}
-              alignItems="center"
-              sx={{ flex: 1 }}
+              sx={{ mb: 1.5 }}
             >
-              <IconButton
-                aria-label="Ejercicio anterior"
-                onClick={() =>
-                  selectDandelotExercise(selectedDandelotIndex - 1)
-                }
-                disabled={selectedDandelotIndex === 0}
-              >
-                <ChevronLeft />
-              </IconButton>
-              <FormControl fullWidth size="small">
-                <InputLabel id="dandelot-exercise-selector-label">
-                  Ejercicio
-                </InputLabel>
-                <Select
-                  labelId="dandelot-exercise-selector-label"
-                  value={selectedDandelotIndex}
-                  label="Ejercicio"
-                  onChange={(event) =>
-                    selectDandelotExercise(Number(event.target.value))
-                  }
-                >
-                  {dandelotExercises.map((exercise, index) => (
-                    <MenuItem key={exercise.id} value={index}>
-                      {exercise.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <IconButton
-                aria-label="Ejercicio siguiente"
-                onClick={() =>
-                  selectDandelotExercise(selectedDandelotIndex + 1)
-                }
-                disabled={
-                  selectedDandelotIndex === dandelotExercises.length - 1
-                }
-              >
-                <ChevronRight />
-              </IconButton>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 750 }}>
+                  Serie Dandelot
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {selectedDandelotExercise.description}, como en la edición
+                  impresa.
+                </Typography>
+              </Box>
+              <Stack direction="row" spacing={1}>
+                <Chip
+                  label={`${selectedDandelotIndex + 1} de ${dandelotExercises.length}`}
+                  size="small"
+                  variant="outlined"
+                />
+                <Chip
+                  label={`Clave de ${clef === "bass" ? "Fa" : "Sol"}`}
+                  size="small"
+                  variant="outlined"
+                />
+                <Chip label="4/4" size="small" variant="outlined" />
+                <Chip label={`${bpm} BPM`} size="small" variant="outlined" />
+              </Stack>
             </Stack>
-          </Stack>
 
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            alignItems={{ xs: "stretch", sm: "center" }}
-            sx={{ mb: 1.5 }}
-          >
-            <Box sx={{ flex: 1, minWidth: { sm: 240 } }}>
-              <Typography
-                id="dandelot-bpm-label"
-                variant="body2"
-                sx={{ fontWeight: 700 }}
-              >
-                Tempo: {bpm} BPM
-              </Typography>
-              <Slider
-                aria-labelledby="dandelot-bpm-label"
-                value={bpm}
-                min={40}
-                max={180}
-                step={5}
-                valueLabelDisplay="auto"
-                onChange={(_, value) => setBpm(value as number)}
-                sx={{ py: 1 }}
-              />
-            </Box>
-            <Button
-              variant="contained"
-              onClick={playDandelotExercise}
-              disabled={dandelotPlayback.length === 0}
-              startIcon={dandelotPlaying ? <Pause /> : <PlayArrow />}
-              sx={{ minWidth: 190 }}
-            >
-              {dandelotPlaying ? "Detener" : "Reproducir en loop"}
-            </Button>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showDandelotNoteLabels}
-                  onChange={(event) =>
-                    setShowDandelotNoteLabels(event.target.checked)
-                  }
-                />
-              }
-              label="Mostrar nombres de notas"
-              sx={{ m: 0, whiteSpace: "nowrap" }}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={dandelotReverseOrder}
-                  onChange={(event) => {
-                    hardStop();
-                    setDandelotReverseOrder(event.target.checked);
-                  }}
-                />
-              }
-              label="Fin → inicio"
-              sx={{ m: 0, whiteSpace: "nowrap" }}
-            />
-          </Stack>
-
-          {dandelotPlaying && (
             <Stack
-              direction="row"
+              direction={{ xs: "column", sm: "row" }}
               spacing={1}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ mb: 1 }}
+              alignItems="stretch"
+              sx={{ mb: 2, maxWidth: 680 }}
             >
-              <Typography variant="caption" sx={{ fontWeight: 700, mr: 0.5 }}>
-                Pulso
-              </Typography>
-              {[0, 1, 2, 3].map((beat) => (
-                <Box
-                  key={beat}
-                  sx={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    display: "grid",
-                    placeItems: "center",
-                    bgcolor: currentBeat === beat ? "primary.main" : "grey.200",
-                    color:
-                      currentBeat === beat
-                        ? "primary.contrastText"
-                        : "text.secondary",
-                    fontSize: 13,
-                    fontWeight: 700,
-                  }}
-                >
-                  {beat + 1}
-                </Box>
-              ))}
-            </Stack>
-          )}
-
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={1}
-            alignItems={{ xs: "flex-start", sm: "center" }}
-            sx={{ mb: 1 }}
-          >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={allDandelotRowsSelected}
-                  onChange={(_, checked) => {
-                    hardStop();
-                    setSelectedDandelotRows(
-                      checked
-                        ? selectedDandelotExercise.rows.map((_, index) => index)
-                        : [],
-                    );
-                  }}
-                />
-              }
-              label="Todo el ejercicio"
-              sx={{ m: 0, whiteSpace: "nowrap" }}
-            />
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              aria-live="polite"
-            >
-              {selectedDandelotRows.length === 0
-                ? "Selecciona al menos un sistema para reproducir."
-                : allDandelotRowsSelected
-                  ? "Puedes seleccionar uno o varios sistemas para practicar."
-                  : selectedDandelotRows.length === 1
-                    ? `Se reproduce solo el sistema ${selectedDandelotRows[0] + 1}.`
-                    : `Sistemas ${selectedDandelotRows.map((index) => index + 1).join(", ")}: se reproducen en el orden de la partitura.`}
-            </Typography>
-          </Stack>
-
-          <DandelotExerciseSheet
-            exerciseNumber={selectedDandelotExercise.number}
-            rows={selectedDandelotExercise.rows}
-            clef={clef}
-            activeNoteIndex={dandelotNoteIndex}
-            showNoteLabels={showDandelotNoteLabels}
-            selectedRowIndexes={selectedDandelotRows}
-            onRowSelectionChange={selectDandelotRow}
-          />
-        </Paper>
-
-        {/* Controles */}
-        <Paper sx={{ p: 2 }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Ejercicio</InputLabel>
+              <FormControl size="small" sx={{ minWidth: 210 }}>
+                <InputLabel id="dandelot-clef-selector-label">Clave</InputLabel>
                 <Select
-                  value={selectedExercise}
-                  onChange={(e) =>
-                    setSelectedExercise(e.target.value as ExerciseKey)
-                  }
-                  label="Ejercicio"
-                >
-                  {Object.entries(currentExerciseMap).map(([key, cfg]) => (
-                    <MenuItem key={key} value={key}>
-                      {cfg.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>BPM</InputLabel>
-                <Select
-                  value={bpm}
-                  onChange={(e) => setBpm(Number(e.target.value))}
-                  label="BPM"
-                >
-                  {[
-                    40, 45, 50, 55, 60, 65, 70, 72, 75, 80, 85, 90, 95, 96, 100,
-                    105, 110, 115, 120,
-                  ].map((v) => (
-                    <MenuItem key={v} value={v}>
-                      {v} BPM
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Clave</InputLabel>
-                <Select
+                  labelId="dandelot-clef-selector-label"
                   value={clef}
-                  onChange={(e) => selectClef(e.target.value as ClefType)}
                   label="Clave"
+                  onChange={(event) =>
+                    selectClef(event.target.value as ClefType)
+                  }
                 >
                   <MenuItem value="treble">Clave de Sol (G)</MenuItem>
                   <MenuItem value="bass">Clave de Fa en 4ª línea (F)</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={randomFigure}
-                    onChange={(e) => setRandomFigure(e.target.checked)}
-                  />
-                }
-                label="Figuras aleatorias (w/h/q/8)"
-              />
-              <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-                <InputLabel>Duración fija</InputLabel>
-                <Select
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value as DurationSym)}
-                  label="Duración fija"
-                  disabled={randomFigure}
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{ flex: 1 }}
+              >
+                <IconButton
+                  aria-label="Ejercicio anterior"
+                  onClick={() =>
+                    selectDandelotExercise(selectedDandelotIndex - 1)
+                  }
+                  disabled={selectedDandelotIndex === 0}
                 >
-                  <MenuItem value="w">Redonda (w)</MenuItem>
-                  <MenuItem value="h">Blanca (h)</MenuItem>
-                  <MenuItem value="q">Negra (q) - Walking bass</MenuItem>
-                  <MenuItem value="8">Corchea (8) - Swing</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+                  <ChevronLeft />
+                </IconButton>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="dandelot-exercise-selector-label">
+                    Ejercicio
+                  </InputLabel>
+                  <Select
+                    labelId="dandelot-exercise-selector-label"
+                    value={selectedDandelotIndex}
+                    label="Ejercicio"
+                    onChange={(event) =>
+                      selectDandelotExercise(Number(event.target.value))
+                    }
+                  >
+                    {dandelotExercises.map((exercise, index) => (
+                      <MenuItem key={exercise.id} value={index}>
+                        {exercise.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <IconButton
+                  aria-label="Ejercicio siguiente"
+                  onClick={() =>
+                    selectDandelotExercise(selectedDandelotIndex + 1)
+                  }
+                  disabled={
+                    selectedDandelotIndex === dandelotExercises.length - 1
+                  }
+                >
+                  <ChevronRight />
+                </IconButton>
+              </Stack>
+            </Stack>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              alignItems={{ xs: "stretch", sm: "center" }}
+              sx={{ mb: 1.5 }}
+            >
+              <Box sx={{ flex: 1, minWidth: { sm: 240 } }}>
+                <Typography
+                  id="dandelot-bpm-label"
+                  variant="body2"
+                  sx={{ fontWeight: 700 }}
+                >
+                  Tempo: {bpm} BPM
+                </Typography>
+                <Slider
+                  aria-labelledby="dandelot-bpm-label"
+                  value={bpm}
+                  min={40}
+                  max={180}
+                  step={5}
+                  valueLabelDisplay="auto"
+                  onChange={(_, value) => setBpm(value as number)}
+                  sx={{ py: 1 }}
+                />
+              </Box>
+              <Button
+                variant="contained"
+                onClick={playDandelotExercise}
+                disabled={dandelotPlayback.length === 0}
+                startIcon={dandelotPlaying ? <Pause /> : <PlayArrow />}
+                sx={{ minWidth: 190 }}
+              >
+                {dandelotPlaying ? "Detener" : "Reproducir en loop"}
+              </Button>
               <FormControlLabel
                 control={
                   <Switch
-                    checked={showNoteLabels}
-                    onChange={(e) => setShowNoteLabels(e.target.checked)}
+                    checked={showDandelotNoteLabels}
+                    onChange={(event) =>
+                      setShowDandelotNoteLabels(event.target.checked)
+                    }
                   />
                 }
                 label="Mostrar nombres de notas"
-                sx={{ mb: 1 }}
+                sx={{ m: 0, whiteSpace: "nowrap" }}
               />
               <FormControlLabel
                 control={
                   <Switch
-                    checked={jazzStyle}
-                    onChange={(e) => setJazzStyle(e.target.checked)}
+                    checked={dandelotReverseOrder}
+                    onChange={(event) => {
+                      hardStop();
+                      setDandelotReverseOrder(event.target.checked);
+                    }}
                   />
                 }
-                label={
-                  jazzStyle
-                    ? "🎺 Metrónomo Jazz (2 y 4)"
-                    : "🎼 Metrónomo Clásico (1)"
-                }
-                sx={{ mb: 1 }}
+                label="Fin → inicio"
+                sx={{ m: 0, whiteSpace: "nowrap" }}
               />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={reverseOrder}
-                    onChange={(e) => setReverseOrder(e.target.checked)}
-                  />
-                }
-                label="🔄 Invertir orden (fin → inicio)"
+            </Stack>
+
+            {dandelotPlaying && (
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                justifyContent="center"
                 sx={{ mb: 1 }}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                <Button
-                  variant="contained"
-                  onClick={playExercise}
-                  startIcon={isPlaying ? <Pause /> : <PlayArrow />}
-                  disabled={currentExercise.length === 0}
-                >
-                  {isPlaying ? "Detener" : "Reproducir (loop)"}
-                </Button>
-                <Button
-                  variant={
-                    metronomeActive && !isPlaying ? "contained" : "outlined"
-                  }
-                  color={
-                    metronomeActive && !isPlaying ? "secondary" : "inherit"
-                  }
-                  onClick={toggleMetronomeOnly}
-                  startIcon={<AccessTime />}
-                  disabled={isPlaying}
-                >
-                  {metronomeActive && !isPlaying
-                    ? "Parar metrónomo"
-                    : "Metrónomo"}
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={generateNewExercise}
-                  startIcon={<Refresh />}
-                >
-                  Nuevo
-                </Button>
-              </Stack>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                <Chip
-                  size="small"
-                  label={`${noteDisplayPool.length} alturas`}
-                  color="primary"
-                />
-                <Chip
-                  size="small"
-                  label={`Clave: ${clef === "treble" ? "Sol" : "Fa en 4ª"}`}
-                  color="secondary"
-                />
-                <Chip size="small" label="Ámbito variable" variant="outlined" />
-                <Chip
-                  size="small"
-                  label={
-                    randomFigure
-                      ? "Figuras: aleatorias"
-                      : `Figura fija: ${duration.toUpperCase()}`
-                  }
-                />
-                <Chip
-                  size="small"
-                  label={
-                    showNoteLabels
-                      ? "Etiquetas: visibles"
-                      : "Etiquetas: ocultas"
-                  }
-                  color={showNoteLabels ? "default" : "success"}
-                  variant={showNoteLabels ? "outlined" : "filled"}
-                />
-              </Stack>
-            </Grid>
-          </Grid>
-        </Paper>
-
-        {/* Descripción del ejercicio */}
-        <Paper sx={{ p: 2, bgcolor: "rgba(25, 118, 210, 0.05)" }}>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: "primary.main", mb: 1 }}
-          >
-            {config.name}
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            {config.description}
-          </Typography>
-          <Stack direction="row" spacing={1} flexWrap="wrap">
-            <Typography variant="body2" sx={{ fontWeight: 600, mr: 1 }}>
-              Notas disponibles:
-            </Typography>
-            {noteDisplayPool.map((n) => {
-              const written = NOTE_WRITTEN[n] ?? NOTE_NAMES[n] ?? n;
-              const sounds = NOTE_SOUNDS[n];
-              const label =
-                clef === "bass" && sounds
-                  ? `${written} (${sounds})`
-                  : (NOTE_NAMES[n] ?? n);
-              return (
-                <Chip
-                  key={n}
-                  size="small"
-                  label={label}
-                  variant="outlined"
-                  color="primary"
-                />
-              );
-            })}
-          </Stack>
-        </Paper>
-
-        {/* Pentagrama de Lectura + metrónomo visual */}
-        <Paper sx={{ p: 2 }}>
-          <Typography
-            variant="subtitle1"
-            sx={{
-              fontWeight: 700,
-              mb: 2,
-              color: "primary.main",
-              textAlign: "center",
-            }}
-          >
-            📖 Pentagrama de Lectura
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ mb: 2, color: "text.secondary", textAlign: "center" }}
-          >
-            Lee las notas siguiendo el metrónomo (4/4). El ejercicio se repite
-            en bucle hasta que detengas.
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ mb: 2, color: "text.secondary", textAlign: "center" }}
-          >
-            Clave actual:{" "}
-            {clef === "treble" ? "Sol (G clef)" : "Fa en 4ª línea (F clef)"}
-            {clef === "bass" && (
-              <span style={{ color: "#ff6b35", fontWeight: 600 }}>
-                {" "}
-                - Notación 8vb: se escribe Do2 pero suena Do1 🎸
-              </span>
-            )}
-          </Typography>
-
-          {(metronomeActive || isPlaying) && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 1,
-                py: 1,
-                mb: 2,
-                backgroundColor: jazzStyle
-                  ? "rgba(255, 152, 0, 0.08)"
-                  : "rgba(33, 150, 243, 0.08)",
-                borderRadius: 1,
-              }}
-            >
-              <Typography variant="body2" sx={{ fontWeight: "bold", mr: 1 }}>
-                {bpm} BPM {jazzStyle ? "🎺" : "🎼"}:
-              </Typography>
-              {[0, 1, 2, 3].map((beat) => {
-                const isStrongBeat = jazzStyle
-                  ? beat === 1 || beat === 3
-                  : beat === 0;
-                const isActive = currentBeat === beat;
-                return (
+              >
+                <Typography variant="caption" sx={{ fontWeight: 700, mr: 0.5 }}>
+                  Pulso
+                </Typography>
+                {[0, 1, 2, 3].map((beat) => (
                   <Box
                     key={beat}
                     sx={{
-                      width: isStrongBeat ? 26 : 22,
-                      height: isStrongBeat ? 26 : 22,
+                      width: 28,
+                      height: 28,
                       borderRadius: "50%",
-                      backgroundColor: isActive
-                        ? jazzStyle
-                          ? "#ff9800"
-                          : "#2196f3"
-                        : isStrongBeat
-                          ? "#ffcc80"
-                          : "#e0e0e0",
-                      transition: "background-color 0.1s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      border: isStrongBeat ? "2px solid #ff9800" : "none",
+                      display: "grid",
+                      placeItems: "center",
+                      bgcolor:
+                        currentBeat === beat ? "primary.main" : "grey.200",
+                      color:
+                        currentBeat === beat
+                          ? "primary.contrastText"
+                          : "text.secondary",
+                      fontSize: 13,
+                      fontWeight: 700,
                     }}
                   >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: isActive ? "white" : "#666",
-                        fontWeight: isStrongBeat ? "bold" : "normal",
-                      }}
-                    >
-                      {beat + 1}
-                    </Typography>
+                    {beat + 1}
                   </Box>
-                );
-              })}
-            </Box>
-          )}
+                ))}
+              </Stack>
+            )}
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              mb: 2,
-              width: "100%",
-            }}
-          >
-            <Box
-              sx={{
-                position: "relative",
-                width: "95%",
-                border: "1px solid #e0e0e0",
-                borderRadius: 1,
-                bgcolor: "rgba(0,0,0,0.01)",
-                minHeight: 180,
-                overflow: "hidden",
-              }}
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              sx={{ mb: 1 }}
             >
-              <Box
-                id="staff1"
-                ref={staff1Ref}
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  bottom: 0,
-                  left: 72,
-                  right: 12,
-                  minHeight: 180,
-                }}
-              />
-              {lineReferences.map((key, idx) => {
-                const top = lineChipPositions[idx];
-                return (
-                  <Chip
-                    key={`${key}-${idx}`}
-                    size="small"
-                    label={keyToSPN(key)}
-                    sx={{
-                      position: "absolute",
-                      left: 12,
-                      top: top != null ? top - 10 : 32 + idx * 24,
-                      fontSize: "0.6rem",
-                      height: 18,
-                      minHeight: "unset",
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={allDandelotRowsSelected}
+                    onChange={(_, checked) => {
+                      hardStop();
+                      setSelectedDandelotRows(
+                        checked
+                          ? selectedDandelotExercise.rows.map(
+                              (_, index) => index,
+                            )
+                          : [],
+                      );
                     }}
-                    variant="outlined"
                   />
-                );
-              })}
-            </Box>
-          </Box>
-
-          {currentExercise.length > 0 && (
-            <Box sx={{ mt: 2, textAlign: "center" }}>
-              <Typography variant="caption" sx={{ fontWeight: 600, mr: 1 }}>
-                Secuencia actual:
+                }
+                label="Todo el ejercicio"
+                sx={{ m: 0, whiteSpace: "nowrap" }}
+              />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                aria-live="polite"
+              >
+                {selectedDandelotRows.length === 0
+                  ? "Selecciona al menos un sistema para reproducir."
+                  : allDandelotRowsSelected
+                    ? "Puedes seleccionar uno o varios sistemas para practicar."
+                    : selectedDandelotRows.length === 1
+                      ? `Se reproduce solo el sistema ${selectedDandelotRows[0] + 1}.`
+                      : `Sistemas ${selectedDandelotRows.map((index) => index + 1).join(", ")}: se reproducen en el orden de la partitura.`}
               </Typography>
-              <Box sx={{ mt: 1 }}>
-                {currentExercise.map((note, i) => {
-                  const written =
-                    NOTE_WRITTEN[note] ?? NOTE_NAMES[note] ?? note;
-                  const sounds = NOTE_SOUNDS[note];
-                  const noteLabel =
+            </Stack>
+
+            <DandelotExerciseSheet
+              exerciseNumber={selectedDandelotExercise.number}
+              rows={selectedDandelotExercise.rows}
+              clef={clef}
+              activeNoteIndex={dandelotNoteIndex}
+              showNoteLabels={showDandelotNoteLabels}
+              selectedRowIndexes={selectedDandelotRows}
+              onRowSelectionChange={selectDandelotRow}
+            />
+          </Paper>
+        )}
+
+        {mode === "practice" && (
+          <>
+            <Typography variant="body2" color="text.secondary">
+              Genera secuencias de notas en clave de Sol o Fa. Elige las
+              alturas, las figuras y el tempo para practicar a tu ritmo.
+            </Typography>
+            {/* Controles */}
+            <Paper sx={{ p: 2 }}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} sm={6} md={4}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Ejercicio</InputLabel>
+                    <Select
+                      value={selectedExercise}
+                      onChange={(e) =>
+                        setSelectedExercise(e.target.value as ExerciseKey)
+                      }
+                      label="Ejercicio"
+                    >
+                      {Object.entries(currentExerciseMap).map(([key, cfg]) => (
+                        <MenuItem key={key} value={key}>
+                          {cfg.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={2}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>BPM</InputLabel>
+                    <Select
+                      value={bpm}
+                      onChange={(e) => setBpm(Number(e.target.value))}
+                      label="BPM"
+                    >
+                      {[
+                        40, 45, 50, 55, 60, 65, 70, 72, 75, 80, 85, 90, 95, 96,
+                        100, 105, 110, 115, 120,
+                      ].map((v) => (
+                        <MenuItem key={v} value={v}>
+                          {v} BPM
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Clave</InputLabel>
+                    <Select
+                      value={clef}
+                      onChange={(e) => selectClef(e.target.value as ClefType)}
+                      label="Clave"
+                    >
+                      <MenuItem value="treble">Clave de Sol (G)</MenuItem>
+                      <MenuItem value="bass">
+                        Clave de Fa en 4ª línea (F)
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={randomFigure}
+                        onChange={(e) => setRandomFigure(e.target.checked)}
+                      />
+                    }
+                    label="Figuras aleatorias (w/h/q/8)"
+                  />
+                  <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+                    <InputLabel>Duración fija</InputLabel>
+                    <Select
+                      value={duration}
+                      onChange={(e) =>
+                        setDuration(e.target.value as DurationSym)
+                      }
+                      label="Duración fija"
+                      disabled={randomFigure}
+                    >
+                      <MenuItem value="w">Redonda (w)</MenuItem>
+                      <MenuItem value="h">Blanca (h)</MenuItem>
+                      <MenuItem value="q">Negra (q) - Walking bass</MenuItem>
+                      <MenuItem value="8">Corchea (8) - Swing</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={showNoteLabels}
+                        onChange={(e) => setShowNoteLabels(e.target.checked)}
+                      />
+                    }
+                    label="Mostrar nombres de notas"
+                    sx={{ mb: 1 }}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={jazzStyle}
+                        onChange={(e) => setJazzStyle(e.target.checked)}
+                      />
+                    }
+                    label={
+                      jazzStyle
+                        ? "🎺 Metrónomo Jazz (2 y 4)"
+                        : "🎼 Metrónomo Clásico (1)"
+                    }
+                    sx={{ mb: 1 }}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={reverseOrder}
+                        onChange={(e) => setReverseOrder(e.target.checked)}
+                      />
+                    }
+                    label="🔄 Invertir orden (fin → inicio)"
+                    sx={{ mb: 1 }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <Stack direction="row" spacing={1} flexWrap="wrap">
+                    <Button
+                      variant="contained"
+                      onClick={playExercise}
+                      startIcon={isPlaying ? <Pause /> : <PlayArrow />}
+                      disabled={currentExercise.length === 0}
+                    >
+                      {isPlaying ? "Detener" : "Reproducir (loop)"}
+                    </Button>
+                    <Button
+                      variant={
+                        metronomeActive && !isPlaying ? "contained" : "outlined"
+                      }
+                      color={
+                        metronomeActive && !isPlaying ? "secondary" : "inherit"
+                      }
+                      onClick={toggleMetronomeOnly}
+                      startIcon={<AccessTime />}
+                      disabled={isPlaying}
+                    >
+                      {metronomeActive && !isPlaying
+                        ? "Parar metrónomo"
+                        : "Metrónomo"}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      onClick={generateNewExercise}
+                      startIcon={<Refresh />}
+                    >
+                      Nuevo
+                    </Button>
+                  </Stack>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Stack direction="row" spacing={1} flexWrap="wrap">
+                    <Chip
+                      size="small"
+                      label={`${noteDisplayPool.length} alturas`}
+                      color="primary"
+                    />
+                    <Chip
+                      size="small"
+                      label={`Clave: ${clef === "treble" ? "Sol" : "Fa en 4ª"}`}
+                      color="secondary"
+                    />
+                    <Chip
+                      size="small"
+                      label="Ámbito variable"
+                      variant="outlined"
+                    />
+                    <Chip
+                      size="small"
+                      label={
+                        randomFigure
+                          ? "Figuras: aleatorias"
+                          : `Figura fija: ${duration.toUpperCase()}`
+                      }
+                    />
+                    <Chip
+                      size="small"
+                      label={
+                        showNoteLabels
+                          ? "Etiquetas: visibles"
+                          : "Etiquetas: ocultas"
+                      }
+                      color={showNoteLabels ? "default" : "success"}
+                      variant={showNoteLabels ? "outlined" : "filled"}
+                    />
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Paper>
+
+            {/* Descripción del ejercicio */}
+            <Paper sx={{ p: 2, bgcolor: "rgba(25, 118, 210, 0.05)" }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700, color: "primary.main", mb: 1 }}
+              >
+                {config.name}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {config.description}
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                <Typography variant="body2" sx={{ fontWeight: 600, mr: 1 }}>
+                  Notas disponibles:
+                </Typography>
+                {noteDisplayPool.map((n) => {
+                  const written = NOTE_WRITTEN[n] ?? NOTE_NAMES[n] ?? n;
+                  const sounds = NOTE_SOUNDS[n];
+                  const label =
                     clef === "bass" && sounds
                       ? `${written} (${sounds})`
-                      : (NOTE_NAMES[note] ?? note);
+                      : (NOTE_NAMES[n] ?? n);
                   return (
                     <Chip
-                      key={`${note}-${i}`}
+                      key={n}
                       size="small"
-                      label={`${noteLabel} · ${durSeq[i] ?? duration}`}
-                      sx={{
-                        mr: 0.5,
-                        mb: 0.5,
-                        bgcolor: currentNoteIndex === i ? "#ff6b35" : undefined,
-                        color: currentNoteIndex === i ? "white" : undefined,
-                      }}
+                      label={label}
+                      variant="outlined"
+                      color="primary"
                     />
                   );
                 })}
-              </Box>
-            </Box>
-          )}
-          <Typography
-            variant="caption"
-            sx={{
-              display: "block",
-              mt: 2,
-              color: "text.secondary",
-              fontStyle: "italic",
-              textAlign: "center",
-            }}
-          >
-            💡 En 4/4: redonda=4 beats, blanca=2, negra=1, corchea=0.5.{" "}
-            {jazzStyle
-              ? "🎺 Jazz: énfasis en beats 2 y 4 (backbeat)."
-              : "🎼 Clásico: énfasis en beat 1."}{" "}
-            Loop infinito hasta pulsar "Detener".
-          </Typography>
-        </Paper>
+              </Stack>
+            </Paper>
 
-        {/* Instrucciones */}
-        <Paper sx={{ p: 2, bgcolor: "rgba(255, 193, 7, 0.05)" }}>
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 700, color: "#f57c00", mb: 1 }}
-          >
-            📚 Instrucciones de uso
-          </Typography>
-          <Stack spacing={1}>
-            <Typography variant="body2">
-              <strong>1.</strong> Elige un ejercicio. 🎺 Jazz: progresión
-              incremental desde Do-Sol. 📖 Clásico: ejercicios tradicionales.
-            </Typography>
-            <Typography variant="body2">
-              <strong>2.</strong> Ajusta el BPM (40-120 recomendado para jazz).
-            </Typography>
-            <Typography variant="body2">
-              <strong>3.</strong> Elige metrónomo: Jazz (énfasis 2 y 4) o
-              Clásico (énfasis en 1).
-            </Typography>
-            <Typography variant="body2">
-              <strong>4.</strong> Activa "Figuras aleatorias" o fija una figura
-              (negras para walking bass, corcheas para swing).
-            </Typography>
-            <Typography variant="body2">
-              <strong>5.</strong> Pulsa "Reproducir (loop)" para que el
-              ejercicio se repita indefinidamente.
-            </Typography>
-            <Typography variant="body2">
-              <strong>6.</strong> Pulsa "Detener" para parar el transporte y el
-              metrónomo.
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ mt: 1, fontStyle: "italic", color: "#ff9800" }}
-            >
-              💡 <strong>Tip de Jazz:</strong> En swing, las corcheas se tocan
-              con un "feeling" desigual (la primera es más larga que la
-              segunda), aunque en la partitura se vean iguales.
-            </Typography>
-          </Stack>
-        </Paper>
+            {/* Pentagrama de Lectura + metrónomo visual */}
+            <Paper sx={{ p: 2 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 700,
+                  mb: 2,
+                  color: "primary.main",
+                  textAlign: "center",
+                }}
+              >
+                📖 Pentagrama de Lectura
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ mb: 2, color: "text.secondary", textAlign: "center" }}
+              >
+                Lee las notas siguiendo el metrónomo (4/4). El ejercicio se
+                repite en bucle hasta que detengas.
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ mb: 2, color: "text.secondary", textAlign: "center" }}
+              >
+                Clave actual:{" "}
+                {clef === "treble" ? "Sol (G clef)" : "Fa en 4ª línea (F clef)"}
+                {clef === "bass" && (
+                  <span style={{ color: "#ff6b35", fontWeight: 600 }}>
+                    {" "}
+                    - Notación 8vb: se escribe Do2 pero suena Do1 🎸
+                  </span>
+                )}
+              </Typography>
+
+              {(metronomeActive || isPlaying) && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 1,
+                    py: 1,
+                    mb: 2,
+                    backgroundColor: jazzStyle
+                      ? "rgba(255, 152, 0, 0.08)"
+                      : "rgba(33, 150, 243, 0.08)",
+                    borderRadius: 1,
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: "bold", mr: 1 }}
+                  >
+                    {bpm} BPM {jazzStyle ? "🎺" : "🎼"}:
+                  </Typography>
+                  {[0, 1, 2, 3].map((beat) => {
+                    const isStrongBeat = jazzStyle
+                      ? beat === 1 || beat === 3
+                      : beat === 0;
+                    const isActive = currentBeat === beat;
+                    return (
+                      <Box
+                        key={beat}
+                        sx={{
+                          width: isStrongBeat ? 26 : 22,
+                          height: isStrongBeat ? 26 : 22,
+                          borderRadius: "50%",
+                          backgroundColor: isActive
+                            ? jazzStyle
+                              ? "#ff9800"
+                              : "#2196f3"
+                            : isStrongBeat
+                              ? "#ffcc80"
+                              : "#e0e0e0",
+                          transition: "background-color 0.1s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          border: isStrongBeat ? "2px solid #ff9800" : "none",
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: isActive ? "white" : "#666",
+                            fontWeight: isStrongBeat ? "bold" : "normal",
+                          }}
+                        >
+                          {beat + 1}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              )}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  mb: 2,
+                  width: "100%",
+                }}
+              >
+                <Box
+                  sx={{
+                    position: "relative",
+                    width: "95%",
+                    border: "1px solid #e0e0e0",
+                    borderRadius: 1,
+                    bgcolor: "rgba(0,0,0,0.01)",
+                    minHeight: 180,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Box
+                    id="staff1"
+                    ref={staff1Ref}
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      bottom: 0,
+                      left: 72,
+                      right: 12,
+                      minHeight: 180,
+                    }}
+                  />
+                  {lineReferences.map((key, idx) => {
+                    const top = lineChipPositions[idx];
+                    return (
+                      <Chip
+                        key={`${key}-${idx}`}
+                        size="small"
+                        label={keyToSPN(key)}
+                        sx={{
+                          position: "absolute",
+                          left: 12,
+                          top: top != null ? top - 10 : 32 + idx * 24,
+                          fontSize: "0.6rem",
+                          height: 18,
+                          minHeight: "unset",
+                        }}
+                        variant="outlined"
+                      />
+                    );
+                  })}
+                </Box>
+              </Box>
+
+              {currentExercise.length > 0 && (
+                <Box sx={{ mt: 2, textAlign: "center" }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, mr: 1 }}>
+                    Secuencia actual:
+                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    {currentExercise.map((note, i) => {
+                      const written =
+                        NOTE_WRITTEN[note] ?? NOTE_NAMES[note] ?? note;
+                      const sounds = NOTE_SOUNDS[note];
+                      const noteLabel =
+                        clef === "bass" && sounds
+                          ? `${written} (${sounds})`
+                          : (NOTE_NAMES[note] ?? note);
+                      return (
+                        <Chip
+                          key={`${note}-${i}`}
+                          size="small"
+                          label={`${noteLabel} · ${durSeq[i] ?? duration}`}
+                          sx={{
+                            mr: 0.5,
+                            mb: 0.5,
+                            bgcolor:
+                              currentNoteIndex === i ? "#ff6b35" : undefined,
+                            color: currentNoteIndex === i ? "white" : undefined,
+                          }}
+                        />
+                      );
+                    })}
+                  </Box>
+                </Box>
+              )}
+              <Typography
+                variant="caption"
+                sx={{
+                  display: "block",
+                  mt: 2,
+                  color: "text.secondary",
+                  fontStyle: "italic",
+                  textAlign: "center",
+                }}
+              >
+                💡 En 4/4: redonda=4 beats, blanca=2, negra=1, corchea=0.5.{" "}
+                {jazzStyle
+                  ? "🎺 Jazz: énfasis en beats 2 y 4 (backbeat)."
+                  : "🎼 Clásico: énfasis en beat 1."}{" "}
+                Loop infinito hasta pulsar "Detener".
+              </Typography>
+            </Paper>
+
+            {/* Instrucciones */}
+            <Paper sx={{ p: 2, bgcolor: "rgba(255, 193, 7, 0.05)" }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 700, color: "#f57c00", mb: 1 }}
+              >
+                📚 Instrucciones de uso
+              </Typography>
+              <Stack spacing={1}>
+                <Typography variant="body2">
+                  <strong>1.</strong> Elige un ejercicio. 🎺 Jazz: progresión
+                  incremental desde Do-Sol. 📖 Clásico: ejercicios
+                  tradicionales.
+                </Typography>
+                <Typography variant="body2">
+                  <strong>2.</strong> Ajusta el BPM (40-120 recomendado para
+                  jazz).
+                </Typography>
+                <Typography variant="body2">
+                  <strong>3.</strong> Elige metrónomo: Jazz (énfasis 2 y 4) o
+                  Clásico (énfasis en 1).
+                </Typography>
+                <Typography variant="body2">
+                  <strong>4.</strong> Activa "Figuras aleatorias" o fija una
+                  figura (negras para walking bass, corcheas para swing).
+                </Typography>
+                <Typography variant="body2">
+                  <strong>5.</strong> Pulsa "Reproducir (loop)" para que el
+                  ejercicio se repita indefinidamente.
+                </Typography>
+                <Typography variant="body2">
+                  <strong>6.</strong> Pulsa "Detener" para parar el transporte y
+                  el metrónomo.
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1, fontStyle: "italic", color: "#ff9800" }}
+                >
+                  💡 <strong>Tip de Jazz:</strong> En swing, las corcheas se
+                  tocan con un "feeling" desigual (la primera es más larga que
+                  la segunda), aunque en la partitura se vean iguales.
+                </Typography>
+              </Stack>
+            </Paper>
+          </>
+        )}
       </Stack>
     </Box>
   );
+}
+
+export default function EjerciciosDandelot() {
+  return <MusicalReadingPage mode="dandelot" />;
 }
