@@ -93,6 +93,14 @@ export default function CancionesMenu() {
       color: "#0b7285",
     },
     {
+      id: "tu-eres-bueno-b",
+      titulo: "Tú Eres Bueno",
+      artista: "Conquistando Fronteras",
+      tonalidad: "B",
+      archivo: "/dictados-react/src/TuEresBuenoB.html",
+      color: "#e67700",
+    },
+    {
       id: "digno-de-adorar-e",
       titulo: "Digno de Adorar (Worthy of It All)",
       artista: "Conquistando Fronteras · David Brymer",
