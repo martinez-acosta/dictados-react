@@ -199,6 +199,14 @@ export default function CancionesMenu() {
       color: "#2b8a3e",
     },
     {
+      id: "tu-nombre-digno-es-eb",
+      titulo: "Tu Nombre Digno Es (Worthy)",
+      artista: "Elevation Worship",
+      tonalidad: "Eb",
+      archivo: "/dictados-react/src/TuNombreDignoEsEb.html",
+      color: "#9c36b5",
+    },
+    {
       id: "como-en-el-cielo-d",
       titulo: "Como en el Cielo (Here as in Heaven)",
       artista: "Elevation Worship",
