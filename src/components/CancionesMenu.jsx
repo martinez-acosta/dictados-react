@@ -183,6 +183,14 @@ export default function CancionesMenu() {
       color: "#1c7ed6",
     },
     {
+      id: "tumbas-a-jardines-b",
+      titulo: "Tumbas a Jardines (Graves Into Gardens)",
+      artista: "Elevation Worship feat. Brandon Lake",
+      tonalidad: "B",
+      archivo: "/dictados-react/src/TumbasAJardinesB.html",
+      color: "#2b8a3e",
+    },
+    {
       id: "como-en-el-cielo-d",
       titulo: "Como en el Cielo (Here as in Heaven)",
       artista: "Elevation Worship",
