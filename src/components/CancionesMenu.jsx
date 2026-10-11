@@ -199,6 +199,14 @@ export default function CancionesMenu() {
       color: "#2b8a3e",
     },
     {
+      id: "agnus-dei-a",
+      titulo: "Agnus Dei",
+      artista: "Michael W. Smith",
+      tonalidad: "A",
+      archivo: "/dictados-react/src/AgnusDeiA.html",
+      color: "#6741d9",
+    },
+    {
       id: "tu-nombre-digno-es-eb",
       titulo: "Tu Nombre Digno Es (Worthy)",
       artista: "Elevation Worship",
