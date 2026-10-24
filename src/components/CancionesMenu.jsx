@@ -207,6 +207,14 @@ export default function CancionesMenu() {
       color: "#2b8a3e",
     },
     {
+      id: "deja-tu-gloria-caer-g",
+      titulo: "Deja Tu Gloria Caer",
+      artista: "En Espíritu y En Verdad",
+      tonalidad: "G",
+      archivo: "/dictados-react/src/DejaTuGloriaCaerG.html",
+      color: "#1971c2",
+    },
+    {
       id: "gracia-sublime-es-b",
       titulo: "Gracia Sublime Es (This Is Amazing Grace)",
       artista: "En Espíritu y En Verdad",
