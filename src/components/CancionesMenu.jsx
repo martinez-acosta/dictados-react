@@ -59,6 +59,14 @@ export default function CancionesMenu() {
       color: "#f59f00",
     },
     {
+      id: "por-tu-gloria-e",
+      titulo: "Por Tu Gloria",
+      artista: "Conquistando Fronteras",
+      tonalidad: "E",
+      archivo: "/dictados-react/src/PorTuGloriaE.html",
+      color: "#e8590c",
+    },
+    {
       id: "en-pos-de-ti-c",
       titulo: "En Pos de Ti",
       artista: "Conquistando Fronteras",
