@@ -62,7 +62,7 @@ export default function CancionesMenu() {
       id: "por-tu-gloria-e",
       titulo: "Por Tu Gloria",
       artista: "Conquistando Fronteras",
-      tonalidad: "B",
+      tonalidad: "E",
       archivo: "/dictados-react/src/PorTuGloriaE.html",
       color: "#e8590c",
     },
