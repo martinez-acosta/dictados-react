@@ -14,10 +14,8 @@
     h2{font-size:15px;margin:5px 0 4px;text-transform:uppercase}
     .note{font-size:12px;color:#555;margin:0 0 5px}
     .cifra{margin:3px 0 4px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.3;white-space:pre;overflow-x:auto}
-    details{margin:12px 0}summary{font-size:14px;font-weight:600;cursor:pointer}
-    .tab{font-size:11px;line-height:1.2}.tablaturas{margin-top:20px}
-    @media(max-width:1000px){.sheet{grid-template-columns:1fr}.cifra{font-size:12px}.tab{font-size:10px}}
-    @media print{@page{margin:6mm}.wrap{margin:0;padding:0;max-width:100%}.sheet{grid-template-columns:1fr 1fr;gap:8mm}h1{font-size:21px}.meta{font-size:13px}.flow{font-size:11px}.note{font-size:10px}.cifra{font-size:9px;overflow:visible}section{margin:6px 0 8px}.tablaturas{display:none}}
+    @media(max-width:1000px){.sheet{grid-template-columns:1fr}.cifra{font-size:12px}}
+    @media print{@page{margin:6mm}.wrap{margin:0;padding:0;max-width:100%}.sheet{grid-template-columns:1fr 1fr;gap:8mm}h1{font-size:21px}.meta{font-size:13px}.flow{font-size:11px}.note{font-size:10px}.cifra{font-size:9px;overflow:visible}section{margin:6px 0 8px}}
   </style>
 </head>
 <body>
@@ -30,7 +28,6 @@
       <section id="intro">
         <h2>Intro ×2 / Final ×2</h2>
         <pre class="cifra">B   G#m   A   E</pre>
-        <div class="note">En la segunda vuelta del intro, usar el remate de guitarra indicado en la tablatura.</div>
       </section>
       <section id="verso-1">
         <h2>Verso 1</h2>
@@ -72,78 +69,9 @@ El Rey viene ya El Rey viene ya//</pre>
       </section>
       <section id="solo">
         <h2>Solo de guitarra</h2>
-        <div class="note">Ver la tablatura desplegable al pie de la hoja. El material compartido no indica los acordes de acompañamiento del solo.</div>
         <div class="note">Después: Verso 2 ×2 → Intro ×2 para terminar.</div>
       </section>
     </div>
-  </div>
-  <div class="tablaturas">
-    <h2>Tablaturas de guitarra</h2>
-    <div class="note">Digitaciones del material compartido: no cambian al transportar los acordes. No se incluyen en la impresión.</div>
-    <details id="tab-intro">
-      <summary>Intro y remate de la segunda vuelta</summary>
-      <pre class="cifra tab">E|--------------------------------------------------------------|
-B|--------------------------------------------------------------|
-G|-----------------------------------7h9-^9v7-----------------x2|
-D|-7h9-9-9-7----7h9-9-9-7----7h9-9-9----------9-7----7-9--------|
-A|-----------9------------9-----------------------9-------------|
-E|--------------------------------------------------------------|</pre>
-      <div class="note">En la segunda vuelta, sustituir el final por este remate:</div>
-      <pre class="cifra tab">E|--------------------------------------------------------------|
-B|--------------------------------------------------------------|
-G|---------7-9-^9v7-----------7-^9v7-----------7-^9v7-----------|
-D|-7h9-9-9----------9-7---7-9--------9-7---7-9--------9-7---7-9-|
-A|----------------------9----------------9----------------9-----|
-E|--------------------------------------------------------------|
-
-E|--------7-------7-------7-------7-----------------------------|
-B|------7-------7-------7-------7----10------------------------|
-G|-7-^9------^9------^9------^9---------------------------------|
-D|--------------------------------------------------------------|
-A|--------------------------------------------------------------|
-E|--------------------------------------------------------------|</pre>
-    </details>
-    <details id="tab-solo">
-      <summary>Solo</summary>
-      <pre class="cifra tab">E|-------4------4------4------4---------------------------------|
-B|-----4------4------4------4---------------------------4-------|
-G|-^6------^6-----^6-----^6-----6/7-6-------------------4-------|
-D|------------------------------------9-9hr-----4-6-4---4-------|
-A|------------------------------------------4-6-------6---------|
-E|--------------------------------------------------------------|
-
-E|--------------------------------------------------------------|
-B|---------------7/9-7-5----------------------------------------|
-G|-----------------------^8v-6-6--6-4---------------------------|
-D|-6-4-6--6-4-6-----------------------6-4---4-6-4---------------|
-A|----------------------------------------6-------6-4---4-6-----|
-E|----------------------------------------------------7-----7-4-|
-
-       T        T        T        T        T       T
-E|-14p11p9--16p11p9--14p11p9--16p11p9--14p11p9--16p11p9-/16|
-B|--------------------------------------------------------------|
-G|--------------------------------------------------------------|
-D|--------------------------------------------------------------|
-A|--------------------------------------------------------------|
-E|--------------------------------------------------------------|
-
-E|-^19-^19--12-11-----------------------------------^18---------|
-B|----------------12-11-/5-4------------------------------------|
-G|----------------------------4-3-------------16-18-------------|
-D|--------------------------------------16-18-------------------|
-A|--------------------------------16-18-------------------------|
-E|--------------------------------------------------------------|</pre>
-      <div class="note">El texto original añade «ñ-16ñ» después de la figura de tapping; esos caracteres no permiten identificar una digitación y no se han interpretado.</div>
-    </details>
-    <details id="tab-figura">
-      <summary>Figura de guitarra: <span class="chords">A   E   E/D#</span></summary>
-      <pre class="cifra tab">E|--------------------------------------------------------------|
-B|------------------------5-5-4-x-x-5-5-4-----------------------|
-G|------------9-9-9-9-9---4-4-4-x-x-4-4-4-----------------------|
-D|--7-7-7-7---9-9-9-9-9---2-2-2-x-x-2-2-2-----------------------|
-A|--7-7-7-7---7-7-7-7-7-----------------------------------------|
-E|--5-5-5-5-----------------------------------------------------|</pre>
-    </details>
   </div>
 </div>
 <script src="./song-transposer.js"></script>
