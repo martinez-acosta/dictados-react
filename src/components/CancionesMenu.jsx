@@ -199,6 +199,14 @@ export default function CancionesMenu() {
       color: "#2b8a3e",
     },
     {
+      id: "gracia-sublime-es-b",
+      titulo: "Gracia Sublime Es (This Is Amazing Grace)",
+      artista: "En Espíritu y En Verdad",
+      tonalidad: "B",
+      archivo: "/dictados-react/src/GraciaSublimeEsB.html",
+      color: "#e67700",
+    },
+    {
       id: "agnus-dei-a",
       titulo: "Agnus Dei",
       artista: "Michael W. Smith",
