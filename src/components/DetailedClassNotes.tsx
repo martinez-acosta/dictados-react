@@ -24,8 +24,22 @@ import harmonyOctober from "../data/semester-lessons/armonia-2026-10-19.md?raw";
 import harmonyOctoberTasks from "../data/semester-supplements/armonia-2026-10-19-tareas.md?raw";
 import harmonyOctoberConcepts from "../data/semester-supplements/armonia-2026-10-19-conceptos.md?raw";
 import harmonyOctoberAnswers from "../data/semester-supplements/armonia-2026-10-19-respuestas.md?raw";
+import solfegeOctober from "../data/semester-lessons/solfeo-2026-10-19.md?raw";
+import solfegeOctoberTasks from "../data/semester-supplements/solfeo-2026-10-19-tareas.md?raw";
+import solfegeOctoberConcepts from "../data/semester-supplements/solfeo-2026-10-19-conceptos.md?raw";
+import solfegeOctoberAnswers from "../data/semester-supplements/solfeo-2026-10-19-respuestas.md?raw";
 
 const LESSONS = {
+  "solfeo-2026-10-19": ["Solfeo · jueves 22 de octubre", solfegeOctober],
+  "solfeo-2026-10-19-tareas": ["Tareas de Solfeo", solfegeOctoberTasks],
+  "solfeo-2026-10-19-conceptos": [
+    "Conceptos de Solfeo",
+    solfegeOctoberConcepts,
+  ],
+  "solfeo-2026-10-19-respuestas": [
+    "Respuestas de Solfeo",
+    solfegeOctoberAnswers,
+  ],
   "armonia-2026-10-19": ["Armonía · jueves 22 de octubre", harmonyOctober],
   "armonia-2026-10-19-tareas": ["Tareas de Armonía", harmonyOctoberTasks],
   "armonia-2026-10-19-conceptos": [

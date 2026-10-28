@@ -65,11 +65,17 @@ const WEEKS: Array<{
     id: "2026-10-19",
     label: "19–25 de octubre de 2026",
     shortLabel: "19–25 oct",
-    subjects: ["armonia"],
+    subjects: ["armonia", "solfeo"],
   },
 ];
 
 const OCTOBER_19_LESSONS = {
+  solfeo: {
+    resumen: "solfeo-2026-10-19",
+    tareas: "solfeo-2026-10-19-tareas",
+    conceptos: "solfeo-2026-10-19-conceptos",
+    respuestas: "solfeo-2026-10-19-respuestas",
+  },
   armonia: {
     resumen: "armonia-2026-10-19",
     tareas: "armonia-2026-10-19-tareas",
@@ -2824,19 +2830,22 @@ export default function SemesterNotes() {
                     <ToggleButton value="resumen">En clase</ToggleButton>
                     <ToggleButton value="tareas">Tareas</ToggleButton>
                     <ToggleButton value="conceptos">Conceptos</ToggleButton>
-                    {(subject !== "solfeo" || week.id === "2026-09-28") && (
+                    {(subject !== "solfeo" ||
+                      week.id === "2026-09-28" ||
+                      week.id === "2026-10-19") && (
                       <ToggleButton value="respuestas">Respuestas</ToggleButton>
                     )}
                   </ToggleButtonGroup>
                 </Stack>
 
-                {week.id === "2026-10-19" && subject === "armonia" && (
-                  <DetailedClassNotes
-                    key={OCTOBER_19_LESSONS[subject][detailView]}
-                    lessonId={OCTOBER_19_LESSONS[subject][detailView]}
-                    section={detailView}
-                  />
-                )}
+                {week.id === "2026-10-19" &&
+                  (subject === "armonia" || subject === "solfeo") && (
+                    <DetailedClassNotes
+                      key={OCTOBER_19_LESSONS[subject][detailView]}
+                      lessonId={OCTOBER_19_LESSONS[subject][detailView]}
+                      section={detailView}
+                    />
+                  )}
                 {week.id === "2026-09-28" && subject === "improvisacion" && (
                   <ImprovisationChordStudy view={detailView} />
                 )}
