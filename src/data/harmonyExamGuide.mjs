@@ -97,3 +97,28 @@ export function buildHarmonyGuide(tonic) {
     turnaround: [chords[0], chords[5], chords[1], chords[4]],
   };
 }
+
+// Parejas diatónicas ascendentes: desde cada grado hasta dos notas después.
+export function buildDiatonicThirds(tonic) {
+  const { notes } = buildHarmonyGuide(tonic);
+  const naturalPitches = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  const pitch = (note) => {
+    const accidental = note.slice(1);
+    const shift = accidental === "♯" ? 1 : accidental === "♭" ? -1 : 0;
+    return (naturalPitches[note[0]] + shift + 12) % 12;
+  };
+  return notes.map((start, index) => {
+    const skipped = notes[(index + 1) % 7];
+    const end = notes[(index + 2) % 7];
+    const semitones = (pitch(end) - pitch(start) + 12) % 12;
+    return {
+      degree: index + 1,
+      start,
+      skipped,
+      end,
+      semitones,
+      quality: semitones === 4 ? "mayor" : "menor",
+      wrapsScale: index + 2 >= notes.length,
+    };
+  });
+}

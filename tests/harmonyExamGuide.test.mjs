@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   HARMONY_KEYS,
+  buildDiatonicThirds,
   buildHarmonyGuide,
 } from "../src/data/harmonyExamGuide.mjs";
 
@@ -34,6 +35,30 @@ test("las doce escalas del círculo conservan grados y distancias mayores", () =
       key.tonic,
     );
   }
+});
+
+test("las parejas avanzan por terceras de la escala sin perder alteraciones", () => {
+  for (const key of HARMONY_KEYS) {
+    const pairs = buildDiatonicThirds(key.tonic);
+    assert.equal(pairs.length, 7);
+    assert.deepEqual(
+      pairs.map((pair) => pair.semitones),
+      [4, 3, 3, 4, 4, 3, 3],
+      key.tonic,
+    );
+    pairs.forEach((pair, index) => {
+      assert.equal(pair.start, key.notes[index]);
+      assert.equal(pair.skipped, key.notes[(index + 1) % 7]);
+      assert.equal(pair.end, key.notes[(index + 2) % 7]);
+      assert.equal(pair.semitones, distance(pair.start, pair.end));
+      assert.equal(pair.wrapsScale, index >= 5);
+    });
+  }
+  assert.deepEqual(
+    buildDiatonicThirds("C").map(({ start, end }) => `${start}–${end}`),
+    ["C–E", "D–F", "E–G", "F–A", "G–B", "A–C", "B–D"],
+  );
+  assert.equal(buildDiatonicThirds("G")[4].end, "F♯");
 });
 
 test("cada campo armónico y Turn Around mantiene las calidades correctas", () => {

@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { ChordStaff } from "./HarmonyInversionsWeek";
 import {
   HARMONY_KEYS,
+  buildDiatonicThirds,
   buildHarmonyGuide,
   spanishNote,
 } from "../data/harmonyExamGuide.mjs";
@@ -213,6 +214,122 @@ function Circle({
   );
 }
 
+function ThirdPairs({
+  tonic,
+  index,
+  onChange,
+}: {
+  tonic: string;
+  index: number;
+  onChange: (index: number) => void;
+}) {
+  const pairs = buildDiatonicThirds(tonic);
+  const pair = pairs[index];
+
+  return (
+    <Box sx={{ mt: 2 }}>
+      <Typography component="h3" sx={{ fontWeight: 850, fontSize: 19 }}>
+        Parejas por terceras · {spanishNote(tonic)} mayor
+      </Typography>
+      <Typography sx={{ color: "#56696a", mt: 0.75, lineHeight: 1.7 }}>
+        Desde cada nota cuenta tres nombres: toma la primera, salta la siguiente
+        y toma la tercera. Avanza por los grados de la escala, conservando sus
+        alteraciones.
+      </Typography>
+      <Box
+        aria-live="polite"
+        aria-atomic="true"
+        sx={{ mt: 1.5, py: 1.5, borderBlock: "1px solid #dce3e1" }}
+      >
+        <Typography sx={{ fontSize: 21, fontWeight: 850 }}>
+          {spanishNote(pair.start)} – {spanishNote(pair.end)}{" "}
+          <Box
+            component="span"
+            sx={{ color: "#56696a", fontSize: 16, fontWeight: 600 }}
+          >
+            ({pair.start} – {pair.end})
+          </Box>
+        </Typography>
+        <Typography sx={{ mt: 0.5, lineHeight: 1.7 }}>
+          1: {spanishNote(pair.start)} → 2: {spanishNote(pair.skipped)} (se
+          salta) → 3: {spanishNote(pair.end)}.
+        </Typography>
+        <Typography sx={{ color: "#56696a", lineHeight: 1.7 }}>
+          Tercera {pair.quality} · {pair.semitones} semitonos
+          {pair.wrapsScale
+            ? " · la cuenta continúa al volver al inicio de la escala"
+            : ""}
+          .
+        </Typography>
+      </Box>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ mt: 1 }}
+      >
+        <Button
+          startIcon={<ChevronLeft />}
+          onClick={() => onChange(index - 1)}
+          disabled={index === 0}
+          sx={{ textTransform: "none" }}
+        >
+          Pareja anterior
+        </Button>
+        <Typography sx={{ color: "#56696a", fontSize: 14 }}>
+          {index + 1} / {pairs.length}
+        </Typography>
+        <Button
+          endIcon={<ChevronRight />}
+          onClick={() => onChange(index + 1)}
+          disabled={index === pairs.length - 1}
+          sx={{ textTransform: "none" }}
+        >
+          Siguiente pareja
+        </Button>
+      </Stack>
+      <Box
+        role="group"
+        aria-label="Parejas por terceras de la escala"
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(2, minmax(0, 1fr))",
+            sm: "repeat(4, minmax(0, 1fr))",
+          },
+          gap: 0.5,
+          mt: 1,
+        }}
+      >
+        {pairs.map((item, pairIndex) => (
+          <Button
+            key={item.degree}
+            aria-pressed={index === pairIndex}
+            aria-label={`Pareja ${item.degree}: ${spanishNote(item.start)} a ${spanishNote(item.end)} (${item.start} a ${item.end})`}
+            onClick={() => onChange(pairIndex)}
+            sx={{
+              textTransform: "none",
+              justifyContent: "flex-start",
+              color: index === pairIndex ? accent : "#344b4d",
+              bgcolor: index === pairIndex ? "#edf7f4" : "transparent",
+              fontWeight: index === pairIndex ? 800 : 500,
+              fontSize: 14,
+            }}
+          >
+            {item.start} – {item.end}
+          </Button>
+        ))}
+      </Box>
+      <Typography
+        sx={{ color: "#667678", fontSize: 14, mt: 1, lineHeight: 1.65 }}
+      >
+        Cada botón muestra una pareja, no un acorde completo. Para formar un
+        acorde por terceras puedes encadenarlas: Do–Mi, Mi–Sol, Sol–Si.
+      </Typography>
+    </Box>
+  );
+}
+
 const keyboardExamples = [
   {
     name: "Cmaj7",
@@ -371,6 +488,8 @@ export default function HarmonyExamGuide() {
   const navigate = useNavigate();
   const [topic, setTopic] = useState(0);
   const [tonic, setTonic] = useState("C");
+  const [pairIndex, setPairIndex] = useState(0);
+  const [referenceOpen, setReferenceOpen] = useState(false);
   const [chordIndex, setChordIndex] = useState(0);
   const key = buildHarmonyGuide(tonic);
   const example = keyboardExamples[chordIndex];
@@ -411,6 +530,51 @@ export default function HarmonyExamGuide() {
             p: { xs: 1.5, sm: 3 },
           }}
         >
+          <Button
+            variant="outlined"
+            aria-expanded={referenceOpen}
+            aria-controls="harmony-quick-reference"
+            onClick={() => setReferenceOpen((current) => !current)}
+            sx={{
+              color: accent,
+              borderColor: accent,
+              textTransform: "none",
+              mb: 2,
+            }}
+          >
+            {referenceOpen
+              ? "Ocultar círculo y terceras"
+              : "Ver círculo y parejas por terceras"}
+          </Button>
+          {referenceOpen && (
+            <Box
+              id="harmony-quick-reference"
+              sx={{ pb: 2.5, mb: 2.5, borderBottom: "1px solid #dce3e1" }}
+            >
+              <Typography component="h2" sx={{ fontSize: 21, fontWeight: 850 }}>
+                Círculo de quintas · referencia
+              </Typography>
+              <Typography sx={{ mt: 0.75, color: "#56696a", lineHeight: 1.7 }}>
+                Elige una tonalidad mayor en el círculo; las parejas de abajo
+                usan las notas y alteraciones de esa escala. La misma tonalidad
+                se usa en armonización y Turn Around.
+              </Typography>
+              <Circle selected={tonic} onSelect={setTonic} />
+              <Typography sx={{ lineHeight: 1.7 }}>
+                <strong>
+                  {spanishNote(tonic)} mayor ({tonic})
+                </strong>{" "}
+                · {key.signature}
+                <br />
+                Escala: {notes([...key.notes, key.tonic])}.
+              </Typography>
+              <ThirdPairs
+                tonic={tonic}
+                index={pairIndex}
+                onChange={setPairIndex}
+              />
+            </Box>
+          )}
           <FormControl fullWidth size="small" sx={{ mb: 3 }}>
             <InputLabel id="harmony-exam-topic-label">
               Tema de la guía
@@ -613,7 +777,21 @@ export default function HarmonyExamGuide() {
                   Re. En sentido contrario se avanza por cuartas: Do → Fa → Si♭.
                   Toca una tonalidad para ver su armadura y su relativa menor.
                 </p>
-                <Circle selected={tonic} onSelect={setTonic} />
+                {!referenceOpen ? (
+                  <>
+                    <Circle selected={tonic} onSelect={setTonic} />
+                    <ThirdPairs
+                      tonic={tonic}
+                      index={pairIndex}
+                      onChange={setPairIndex}
+                    />
+                  </>
+                ) : (
+                  <p>
+                    El círculo y las parejas por terceras están abiertos en la
+                    referencia de arriba.
+                  </p>
+                )}
                 <Typography aria-live="polite">
                   <strong>
                     {spanishNote(tonic)} mayor ({tonic})
