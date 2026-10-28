@@ -984,75 +984,315 @@ export default function HarmonyExamGuide() {
                 <Heading>Simulacro: intenta antes de abrir</Heading>
                 <p>
                   Estas preguntas son <strong>práctica añadida</strong>, no
-                  preguntas confirmadas del examen. Escribe las respuestas y
-                  abre cada solución para comprobar el procedimiento.
+                  preguntas confirmadas del examen. Intenta cada ejercicio y
+                  abre su solución para aprender el procedimiento paso a paso.
+                  Puedes consultar los pasos mientras lo haces.
                 </p>
                 <Answer question="1. ¿Cuál es la relativa menor de Sol mayor?">
+                  <ol>
+                    <li>
+                      <strong>Escribe Sol mayor.</strong> Sus notas son Sol – La
+                      – Si – Do – Re – Mi – Fa♯ – Sol. La armadura tiene un
+                      sostenido: Fa♯.
+                    </li>
+                    <li>
+                      <strong>Cuenta hasta el sexto grado.</strong> Sol es 1, La
+                      es 2, Si es 3, Do es 4, Re es 5 y <strong>Mi es 6</strong>
+                      .
+                    </li>
+                    <li>
+                      <strong>Empieza desde Mi sin cambiar la armadura.</strong>{" "}
+                      Reordena las mismas notas: Mi – Fa♯ – Sol – La – Si – Do –
+                      Re – Mi. Esa es la escala de Mi menor natural.
+                    </li>
+                    <li>
+                      <strong>Comprueba la distancia.</strong> Desde Sol baja
+                      tres semitonos: Sol → Fa♯ → Fa → Mi. Llegas a la misma
+                      nota, una tercera menor descendente.
+                    </li>
+                  </ol>
                   <p>
-                    Sol mayor: Sol–La–Si–Do–Re–Mi–Fa♯. El sexto grado es Mi, por
-                    lo que es <strong>Mi menor natural</strong>:
-                    Mi–Fa♯–Sol–La–Si–Do–Re–Mi.
+                    <strong>Respuesta:</strong> la relativa menor de Sol mayor
+                    es <strong>Mi menor</strong>. Ambas comparten Fa♯, pero su
+                    tónica es distinta.
                   </p>
                 </Answer>
                 <Answer question="2. Escribe Re menor natural e indica su relativa mayor.">
+                  <ol>
+                    <li>
+                      <strong>Escribe las letras desde Re.</strong> Re – Mi – Fa
+                      – Sol – La – Si – Do – Re. Todavía falta comprobar las
+                      alteraciones.
+                    </li>
+                    <li>
+                      <strong>Aplica la fórmula menor natural:</strong> tono –
+                      semitono – tono – tono – semitono – tono – tono. Re–Mi es
+                      tono y Mi–Fa es semitono; Fa–Sol y Sol–La son tonos.
+                      Después de La necesitas un semitono, por eso la siguiente
+                      nota es <strong>Si♭</strong>, no Si natural.
+                    </li>
+                    <li>
+                      <strong>Completa la escala.</strong> Si♭–Do y Do–Re son
+                      tonos: Re – Mi – Fa – Sol – La – Si♭ – Do – Re.
+                    </li>
+                    <li>
+                      <strong>Busca el tercer grado:</strong> Re es 1, Mi es 2 y
+                      Fa es 3. La relativa mayor es <strong>Fa mayor</strong>.
+                    </li>
+                  </ol>
                   <p>
-                    Re–Mi–Fa–Sol–La–Si♭–Do–Re. El tercer grado es Fa, así que su
-                    relativa es <strong>Fa mayor</strong>; ambas comparten Si♭.
+                    <strong>Comprobación:</strong> Fa mayor es Fa – Sol – La –
+                    Si♭ – Do – Re – Mi – Fa. Tiene las mismas notas y el mismo
+                    Si♭; cambia la tónica, de Re a Fa.
                   </p>
                 </Answer>
                 <Answer question="3. Construye Gmaj7 y G7. ¿Qué cambia?">
+                  <ol>
+                    <li>
+                      <strong>Identifica la fundamental.</strong> G significa
+                      Sol. Escribe Sol mayor: Sol – La – Si – Do – Re – Mi – Fa♯
+                      – Sol.
+                    </li>
+                    <li>
+                      <strong>Forma Gmaj7.</strong> Maj7 usa los grados 1 – 3 –
+                      5 – 7 de esa escala: Sol – Si – Re – Fa♯. Los primeros
+                      tres forman la tríada mayor y Fa♯ es la séptima mayor.
+                    </li>
+                    <li>
+                      <strong>Forma G7.</strong> Su fórmula es 1 – 3 – 5 – ♭7:
+                      conserva Sol – Si – Re y baja la séptima Fa♯ un semitono a{" "}
+                      <strong>Fa natural</strong>. Queda Sol – Si – Re – Fa.
+                    </li>
+                    <li>
+                      <strong>Compara las séptimas.</strong> Fa♯ está a un
+                      semitono de la octava Sol; Fa natural está a un tono. Por
+                      eso una es mayor y la otra menor.
+                    </li>
+                  </ol>
                   <p>
-                    Gmaj7 = Sol–Si–Re–Fa♯. G7 = Sol–Si–Re–Fa. La tríada
-                    permanece igual: la séptima baja de mayor a menor.
+                    <strong>Respuesta:</strong> Gmaj7 = Sol – Si – Re – Fa♯; G7
+                    = Sol – Si – Re – Fa. Solo cambia la séptima.
                   </p>
                 </Answer>
                 <Answer question="4. Construye Dm7 y explica la fórmula.">
+                  <ol>
+                    <li>
+                      <strong>Lee el símbolo:</strong> D es Re; la m indica
+                      tríada menor y el 7 indica séptima menor. La fórmula es 1
+                      – ♭3 – 5 – ♭7.
+                    </li>
+                    <li>
+                      <strong>Usa Re mayor como punto de comparación:</strong>{" "}
+                      Re – Mi – Fa♯ – Sol – La – Si – Do♯ – Re. Sus grados 1, 3,
+                      5 y 7 son Re, Fa♯, La y Do♯.
+                    </li>
+                    <li>
+                      <strong>Baja la tercera y la séptima un semitono.</strong>{" "}
+                      Fa♯ pasa a Fa natural; Do♯ pasa a Do natural. Re y La
+                      permanecen igual.
+                    </li>
+                    <li>
+                      <strong>Ordena las cuatro notas:</strong> Re – Fa – La –
+                      Do. Desde Re, Fa es tercera menor, La quinta justa y Do
+                      séptima menor.
+                    </li>
+                  </ol>
                   <p>
-                    Re–Fa–La–Do: 1=Re, ♭3=Fa, 5=La, ♭7=Do. Re–Fa es tercera
-                    menor y Re–Do séptima menor.
+                    <strong>Respuesta:</strong> Dm7 ={" "}
+                    <strong>Re – Fa – La – Do</strong>. Comprueba que hay cuatro
+                    notas y que no dejaste Fa♯ ni Do♯ del acorde de referencia.
                   </p>
                 </Answer>
                 <Answer question="5. Diferencia Bm7♭5 de Bdim7.">
+                  <ol>
+                    <li>
+                      <strong>Empieza en la misma fundamental:</strong> B = Si.
+                      Los dos acordes usan una tríada disminuida: 1 – ♭3 – ♭5.
+                    </li>
+                    <li>
+                      <strong>Construye esa tríada.</strong> En Si mayor, los
+                      grados 1, 3 y 5 son Si, Re♯ y Fa♯. Baja Re♯ y Fa♯ un
+                      semitono: queda <strong>Si – Re – Fa</strong>.
+                    </li>
+                    <li>
+                      <strong>Para Bm7♭5 agrega séptima menor.</strong> La
+                      séptima de Si debe llamarse La; la menor es La natural.
+                      Resultado: Si – Re – Fa – La. También se llama Bø7.
+                    </li>
+                    <li>
+                      <strong>
+                        Para Bdim7 baja esa séptima un semitono más.
+                      </strong>{" "}
+                      La pasa a La♭: Si – Re – Fa – La♭. Es una séptima
+                      disminuida, por eso se escribe La♭ y no Sol♯.
+                    </li>
+                  </ol>
                   <p>
-                    Bm7♭5 = Si–Re–Fa–La. Bdim7 = Si–Re–Fa–La♭. La tríada es
-                    igual; La es séptima menor y La♭ séptima disminuida.
+                    <strong>Comprobación:</strong> la tríada es igual en ambos;
+                    solo cambia la última nota. La está a diez semitonos de Si y
+                    La♭, a nueve.
                   </p>
                 </Answer>
                 <Answer question="6. ¿Cuál es la primera inversión de Sol mayor?">
+                  <ol>
+                    <li>
+                      <strong>Construye el acorde:</strong> G = Sol mayor. De la
+                      escala de Sol toma 1, 3 y 5: Sol – Si – Re.
+                    </li>
+                    <li>
+                      <strong>Identifica el bajo actual.</strong> En Sol3 – Si3
+                      – Re4, Sol3 es la nota más grave: está en posición
+                      fundamental.
+                    </li>
+                    <li>
+                      <strong>Sube el bajo una octava.</strong> Mueve Sol3 a
+                      Sol4 y deja Si3 y Re4 donde están. De grave a agudo queda
+                      Si3 – Re4 – Sol4.
+                    </li>
+                    <li>
+                      <strong>Mira el nuevo bajo.</strong> Si es la tercera del
+                      acorde; tercera en el bajo significa primera inversión.
+                    </li>
+                  </ol>
                   <p>
-                    Sol mayor es Sol–Si–Re. Sube Sol una octava:{" "}
-                    <strong>Si–Re–Sol</strong>. Si es el bajo; puede escribirse
-                    G/B.
+                    <strong>Respuesta:</strong> Si – Re – Sol, también G/B. La
+                    fundamental sigue siendo Sol: G/B significa «Sol mayor con
+                    Si en el bajo», no Si mayor.
                   </p>
                 </Answer>
                 <Answer question="7. Escribe la tercera inversión de Cmaj7.">
+                  <ol>
+                    <li>
+                      <strong>Construye Cmaj7.</strong> C = Do; maj7 usa 1 – 3 –
+                      5 – 7 de Do mayor: Do – Mi – Sol – Si.
+                    </li>
+                    <li>
+                      <strong>Parte de la posición fundamental:</strong> Do4 –
+                      Mi4 – Sol4 – Si4. El bajo es Do.
+                    </li>
+                    <li>
+                      <strong>Primera inversión:</strong> sube Do4 una octava.
+                      Obtienes Mi4 – Sol4 – Si4 – Do5; el bajo es Mi.
+                    </li>
+                    <li>
+                      <strong>Segunda inversión:</strong> sube Mi4. Queda Sol4 –
+                      Si4 – Do5 – Mi5; el bajo es Sol.
+                    </li>
+                    <li>
+                      <strong>Tercera inversión:</strong> sube Sol4. Queda Si4 –
+                      Do5 – Mi5 – Sol5; ahora el bajo es Si, la séptima.
+                    </li>
+                  </ol>
                   <p>
-                    Cmaj7 = Do–Mi–Sol–Si. La tercera inversión pone la séptima
-                    en el bajo: <strong>Si–Do–Mi–Sol</strong>. Conserva las
-                    cuatro notas.
+                    <strong>Respuesta:</strong> Si – Do – Mi – Sol, de grave a
+                    agudo. Comprueba que siguen las cuatro notas originales y
+                    que la séptima, Si, está abajo.
                   </p>
                 </Answer>
                 <Answer question="8. Armoniza Do mayor a cuatro voces.">
+                  <ol>
+                    <li>
+                      <strong>Escribe la escala:</strong> Do – Re – Mi – Fa –
+                      Sol – La – Si. En Do mayor no se agregan alteraciones.
+                    </li>
+                    <li>
+                      <strong>Numera cada nota:</strong> Do = I, Re = ii, Mi =
+                      iii, Fa = IV, Sol = V, La = vi y Si = vii.
+                    </li>
+                    <li>
+                      <strong>Apila terceras sobre cada grado.</strong> Empieza
+                      en la nota del acorde y toma una sí y otra no hasta tener
+                      cuatro: desde Do, Do – Mi – Sol – Si. Si llegas al final
+                      de la escala, continúa desde Do en la siguiente octava.
+                    </li>
+                    <li>
+                      <strong>Nombra cada resultado</strong> según su tríada y
+                      su séptima. La tabla muestra el procedimiento completo
+                      para los siete grados:
+                    </li>
+                  </ol>
+                  <Table
+                    headings={["Grado", "Notas de 1 – 3 – 5 – 7", "Acorde"]}
+                    rows={[
+                      ["I", "Do – Mi – Sol – Si", "Cmaj7"],
+                      ["ii", "Re – Fa – La – Do", "Dm7"],
+                      ["iii", "Mi – Sol – Si – Re", "Em7"],
+                      ["IV", "Fa – La – Do – Mi", "Fmaj7"],
+                      ["V", "Sol – Si – Re – Fa", "G7"],
+                      ["vi", "La – Do – Mi – Sol", "Am7"],
+                      ["vii", "Si – Re – Fa – La", "Bm7♭5 / Bø7"],
+                    ]}
+                  />
                   <p>
-                    Cmaj7 (Do Mi Sol Si), Dm7 (Re Fa La Do), Em7 (Mi Sol Si Re),
-                    Fmaj7 (Fa La Do Mi), G7 (Sol Si Re Fa), Am7 (La Do Mi Sol),
-                    Bm7♭5 (Si Re Fa La).
+                    <strong>Comprueba:</strong> el V es G7 porque Fa es una
+                    séptima menor sobre Sol; el vii es semidisminuido porque su
+                    quinta es Fa y su séptima es La. No lleva una séptima
+                    disminuida.
                   </p>
                 </Answer>
                 <Answer question="9. Forma el Turn Around de Re mayor.">
+                  <ol>
+                    <li>
+                      <strong>Escribe Re mayor:</strong> Re – Mi – Fa♯ – Sol –
+                      La – Si – Do♯. Su armadura tiene Fa♯ y Do♯.
+                    </li>
+                    <li>
+                      <strong>Numera la escala.</strong> Re = 1, Mi = 2, Fa♯ =
+                      3, Sol = 4, La = 5, Si = 6 y Do♯ = 7.
+                    </li>
+                    <li>
+                      <strong>Elige las fundamentales del Turn Around:</strong>{" "}
+                      I – vi – ii – V significa grados 1 – 6 – 2 – 5. Aquí son
+                      <strong> Re – Si – Mi – La</strong>: son las notas donde
+                      comienza cada acorde, no cuatro notas de un solo acorde.
+                    </li>
+                    <li>
+                      <strong>Apila terceras desde cada fundamental.</strong>{" "}
+                      Usa las notas de Re mayor y toma una sí y una no hasta
+                      tener cuatro:
+                    </li>
+                  </ol>
+                  <Table
+                    headings={["Grado", "Notas", "Nombre"]}
+                    rows={[
+                      ["Imaj7", "Re – Fa♯ – La – Do♯", "Dmaj7"],
+                      ["vim7", "Si – Re – Fa♯ – La", "Bm7"],
+                      ["iim7", "Mi – Sol – Si – Re", "Em7"],
+                      ["V7", "La – Do♯ – Mi – Sol", "A7"],
+                    ]}
+                  />
                   <p>
-                    Re mayor: Re–Mi–Fa♯–Sol–La–Si–Do♯. Grados 1, 6, 2 y 5:
-                    Re–Si–Mi–La. Resultado:{" "}
-                    <strong>Dmaj7 – Bm7 – Em7 – A7</strong>. Sus notas son Re
-                    Fa♯ La Do♯; Si Re Fa♯ La; Mi Sol Si Re; La Do♯ Mi Sol.
+                    <strong>Respuesta:</strong> Dmaj7 – Bm7 – Em7 – A7. Para
+                    comprobar Bm7, vuelve a contar desde Si: Si es 1, Re es ♭3,
+                    Fa♯ es 5 y La es ♭7; no cuentas desde Re en esa fórmula.
                   </p>
                 </Answer>
                 <Answer question="10. ¿Por qué F♯maj7 lleva Mi♯ y no Fa escrito?">
+                  <ol>
+                    <li>
+                      <strong>Lee el símbolo:</strong> F♯ = Fa♯ y maj7 pide una
+                      tríada mayor más una séptima mayor: 1 – 3 – 5 – 7.
+                    </li>
+                    <li>
+                      <strong>Cuenta los nombres hasta la séptima.</strong> Fa =
+                      1, Sol = 2, La = 3, Si = 4, Do = 5, Re = 6 y Mi = 7. La
+                      séptima debe escribirse con la letra <strong>Mi</strong>.
+                    </li>
+                    <li>
+                      <strong>Comprueba la distancia.</strong> La séptima mayor
+                      queda un semitono antes de la octava Fa♯. Mi natural está
+                      a un tono; <strong>Mi♯</strong> queda a un semitono.
+                    </li>
+                    <li>
+                      <strong>Completa el acorde:</strong> Fa♯ – La♯ – Do♯ –
+                      Mi♯. Son sus grados 1, 3, 5 y 7.
+                    </li>
+                  </ol>
                   <p>
-                    La séptima desde Fa se llama Mi: Fa–Sol–La–Si–Do–Re–Mi. Debe
-                    quedar a un semitono de Fa♯, así que es <strong>Mi♯</strong>
-                    . Suena en la tecla de Fa, pero escribir Fa repetiría la
-                    letra de la fundamental.
+                    <strong>Comprobación:</strong> Mi♯ y Fa natural son
+                    enarmónicos en el piano, pero Fa natural se escribiría con
+                    la misma letra que la fundamental. Mi♯ conserva el nombre de
+                    séptima.
                   </p>
                 </Answer>
               </>
