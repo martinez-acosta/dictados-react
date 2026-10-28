@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { ChordStaff } from "./HarmonyInversionsWeek";
 import {
   HARMONY_KEYS,
   buildHarmonyGuide,
@@ -24,7 +25,7 @@ const topics = [
   "Escalas y relativas",
   "Círculo de quintas",
   "Tríadas",
-  "Cuatríadas y piano",
+  "Cuatríadas y séptimas",
   "Armonización",
   "Inversiones",
   "Cadencias y Turn Around",
@@ -445,20 +446,17 @@ export default function HarmonyExamGuide() {
                   tareas.
                 </p>
                 <p>
-                  En una clase anterior se mencionó una parte escrita y otra al
-                  piano. En la grabación más reciente se repasan los temas, pero
-                  no queda confirmada una lista exhaustiva del examen. Usa esto
-                  como guía de estudio, no como una promesa de preguntas
-                  exactas.
+                  En la grabación más reciente se repasan los temas de Armonía,
+                  pero no queda confirmada una lista exhaustiva del examen. Usa
+                  esto como guía de estudio; el simulacro contiene ejercicios de
+                  práctica, no preguntas confirmadas.
                 </p>
                 <ol>
                   <li>Empieza por nombres de notas, tonos y semitonos.</li>
                   <li>
                     Construye una escala mayor y encuentra su menor relativa.
                   </li>
-                  <li>
-                    Forma tríadas y séptimas; toca sus notas en el teclado.
-                  </li>
+                  <li>Construye e identifica tríadas y acordes con séptima.</li>
                   <li>Armoniza la escala y cambia los acordes de inversión.</li>
                   <li>
                     Resuelve el simulacro sin mirar y después comprueba cada
@@ -741,7 +739,9 @@ export default function HarmonyExamGuide() {
                   <strong>disminuido 7</strong> comparten tríada disminuida,
                   pero tienen séptima menor y disminuida, respectivamente.
                 </p>
-                <Subheading>Mira las teclas y compara</Subheading>
+                <Subheading>
+                  Teclado de referencia · apoyo visual opcional
+                </Subheading>
                 <FormControl size="small" fullWidth>
                   <InputLabel id="exam-chord-label">
                     Acorde de ejemplo
@@ -769,9 +769,9 @@ export default function HarmonyExamGuide() {
                 </p>
                 <p>{example.text}</p>
                 <p>
-                  Las teclas negras marcadas muestran la posición; la escritura
-                  correcta de cada nota está en la línea anterior. Para el
-                  examen práctico, busca esas teclas y tócalas juntas.
+                  El teclado ayuda a visualizar las distancias y equivalencias
+                  entre notas. Para resolver el acorde de Armonía, escribe sus
+                  notas y alteraciones como aparecen en la línea anterior.
                 </p>
                 <Subheading>Disminuidos 7 de la tarea anterior</Subheading>
                 <p>
@@ -882,6 +882,10 @@ export default function HarmonyExamGuide() {
                     ["2ª inversión", "Sol4 – Do5 – Mi5", "Sol: 5", "C/G · I⁶₄"],
                   ]}
                 />
+                <ChordStaff
+                  chord={{ root: "C", name: "Do", notes: ["C", "E", "G", "B"] }}
+                  triad
+                />
                 <p>
                   Para pasar a la siguiente disposición, sube la nota de abajo
                   una octava. Los números 6 y 6/4 son intervalos sobre el bajo
@@ -897,6 +901,10 @@ export default function HarmonyExamGuide() {
                     ["2ª", "Sol4 Si4 Do5 Mi5", "Sol · quinta"],
                     ["3ª", "Si4 Do5 Mi5 Sol5", "Si · séptima"],
                   ]}
+                />
+                <ChordStaff
+                  chord={{ root: "C", name: "Do", notes: ["C", "E", "G", "B"] }}
+                  triad={false}
                 />
                 <p>
                   Una tríada tiene tres posiciones en total; una cuatríada,
@@ -976,9 +984,8 @@ export default function HarmonyExamGuide() {
                 <Heading>Simulacro: intenta antes de abrir</Heading>
                 <p>
                   Estas preguntas son <strong>práctica añadida</strong>, no
-                  preguntas confirmadas del examen. Escribe las respuestas,
-                  tócalas en el piano cuando puedas y abre cada solución para
-                  comprobar el procedimiento.
+                  preguntas confirmadas del examen. Escribe las respuestas y
+                  abre cada solución para comprobar el procedimiento.
                 </p>
                 <Answer question="1. ¿Cuál es la relativa menor de Sol mayor?">
                   <p>

@@ -87,7 +87,7 @@ function Table({
   );
 }
 
-function ChordStaff({ chord, triad }: { chord: Chord; triad: boolean }) {
+export function ChordStaff({ chord, triad }: { chord: Chord; triad: boolean }) {
   const holder = useRef<HTMLDivElement>(null);
   const id = `inversion-staff-${useId().replace(/:/g, "")}`;
   const positions = inversions(chord, triad);
