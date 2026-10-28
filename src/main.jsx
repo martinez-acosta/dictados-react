@@ -32,6 +32,7 @@ import WorkbookTheory from "./components/WorkbookTheory.tsx";
 import EquinoxStudy from "./components/EquinoxStudy.tsx";
 import BassRhythmLab from "./components/BassRhythmLab.tsx";
 import SemesterNotes from "./components/SemesterNotes.tsx";
+import HarmonyExamGuide from "./components/HarmonyExamGuide.tsx";
 import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
@@ -104,6 +105,7 @@ createRoot(document.getElementById("root")).render(
         />
         <Route path="/canciones" element={<CancionesMenu />} />
         <Route path="/notas-semestre" element={<SemesterNotes />} />
+        <Route path="/guia-examen-armonia" element={<HarmonyExamGuide />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

@@ -2790,6 +2790,20 @@ export default function SemesterNotes() {
           </Tabs>
 
           <Box sx={{ p: { xs: 1.5, sm: 3 } }}>
+            {subject === "armonia" && (
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/guia-examen-armonia")}
+                sx={{
+                  mb: 2,
+                  textTransform: "none",
+                  borderColor: "#0f766e",
+                  color: "#0f766e",
+                }}
+              >
+                Guía de examen de Armonía
+              </Button>
+            )}
             {hasNotes ? (
               <>
                 <Stack

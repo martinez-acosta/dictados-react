@@ -266,6 +266,15 @@ const EXERCISE_SECTIONS = [
     icon: LibraryMusic,
     items: [
       {
+        route: "/guia-examen-armonia",
+        title: "Guía de examen de Armonía",
+        description:
+          "Repasa las clases con diagramas, ejemplos al piano y un simulacro con respuestas.",
+        buttonLabel: "Abrir guía",
+        icon: MenuBook,
+        iconColor: "#0f766e",
+      },
+      {
         route: "/triadas",
         title: "Entrenador de Tríadas",
         description:
