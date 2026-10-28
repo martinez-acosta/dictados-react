@@ -981,12 +981,20 @@ export default function HarmonyExamGuide() {
             )}
             {topic === 9 && (
               <>
-                <Heading>Simulacro: intenta antes de abrir</Heading>
+                <Heading>Simulacro: aprende paso a paso</Heading>
                 <p>
-                  Estas preguntas son <strong>práctica añadida</strong>, no
-                  preguntas confirmadas del examen. Intenta cada ejercicio y
-                  abre su solución para aprender el procedimiento paso a paso.
-                  Puedes consultar los pasos mientras lo haces.
+                  Abre una pregunta y sigue la explicación mientras la resuelves
+                  en tu cuaderno. Cada solución comienza con los datos, explica
+                  cómo llegar al resultado y termina con una comprobación. Son
+                  ejercicios de práctica, no preguntas confirmadas del examen.
+                </p>
+                <p>
+                  <strong>Antes de empezar:</strong> una escala es una lista de
+                  notas; un <strong>grado</strong> es la posición de una nota en
+                  esa lista. Una <strong>fundamental</strong> es la nota que da
+                  nombre a un acorde. Un semitono es la distancia cromática más
+                  pequeña entre dos notas vecinas; un tono son dos semitonos. ♯
+                  sube un semitono y ♭ lo baja.
                 </p>
                 <Answer question="1. ¿Cuál es la relativa menor de Sol mayor?">
                   <ol>
@@ -1011,6 +1019,35 @@ export default function HarmonyExamGuide() {
                       nota, una tercera menor descendente.
                     </li>
                   </ol>
+                  <p>
+                    <strong>¿Por qué usamos el sexto grado?</strong> Una escala
+                    mayor y su relativa menor natural comparten las mismas siete
+                    notas y la misma armadura. Si empiezas la lista de Sol mayor
+                    en su sexto grado, Mi, aparece la sucesión de tonos y
+                    semitonos de Mi menor natural. Comparten notas, pero Mi pasa
+                    a ser el centro o <strong>tónica</strong> de la menor.
+                  </p>
+                  <Table
+                    headings={[
+                      "Grado en Sol mayor",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                    ]}
+                    rows={[
+                      ["Nota", "Sol", "La", "Si", "Do", "Re", "Mi", "Fa♯"],
+                    ]}
+                  />
+                  <p>
+                    <strong>Revisa la menor:</strong> Mi–Fa♯ es tono; Fa♯–Sol,
+                    semitono; Sol–La y La–Si, tonos; Si–Do, semitono; Do–Re y
+                    Re–Mi, tonos. Se cumple T–ST–T–T–ST–T–T. No quites el Fa♯:
+                    compartir armadura significa conservarlo.
+                  </p>
                   <p>
                     <strong>Respuesta:</strong> la relativa menor de Sol mayor
                     es <strong>Mi menor</strong>. Ambas comparten Fa♯, pero su
@@ -1041,6 +1078,29 @@ export default function HarmonyExamGuide() {
                     </li>
                   </ol>
                   <p>
+                    <strong>Comprueba cada salto, no solo los bemoles:</strong>{" "}
+                    empieza en Re y compara cada pareja de notas con la fórmula.
+                    La columna «resultado» es la siguiente nota que escribes.
+                  </p>
+                  <Table
+                    headings={["Desde", "Distancia pedida", "Llegas a"]}
+                    rows={[
+                      ["Re", "1 tono", "Mi"],
+                      ["Mi", "1 semitono", "Fa"],
+                      ["Fa", "1 tono", "Sol"],
+                      ["Sol", "1 tono", "La"],
+                      ["La", "1 semitono", "Si♭"],
+                      ["Si♭", "1 tono", "Do"],
+                      ["Do", "1 tono", "Re · octava"],
+                    ]}
+                  />
+                  <p>
+                    La <strong>octava</strong> repite el nombre de la tónica en
+                    un registro más agudo. Para encontrar la relativa mayor,
+                    cuenta Re como 1, no como 0: Re–Mi–Fa. Es Fa mayor, no Fa
+                    menor; la palabra «mayor» forma parte de la respuesta.
+                  </p>
+                  <p>
                     <strong>Comprobación:</strong> Fa mayor es Fa – Sol – La –
                     Si♭ – Do – Re – Mi – Fa. Tiene las mismas notas y el mismo
                     Si♭; cambia la tónica, de Re a Fa.
@@ -1070,6 +1130,32 @@ export default function HarmonyExamGuide() {
                     </li>
                   </ol>
                   <p>
+                    <strong>Desglose de los grados:</strong> cada número indica
+                    una posición de la escala de Sol. Primero toma la nota del
+                    grado, y después fíjate si el símbolo pide modificarla.
+                  </p>
+                  <Table
+                    headings={["Qué buscamos", "En Sol mayor", "Gmaj7", "G7"]}
+                    rows={[
+                      ["1 · fundamental", "Sol", "Sol", "Sol"],
+                      ["3 · tercera mayor", "Si", "Si", "Si"],
+                      ["5 · quinta justa", "Re", "Re", "Re"],
+                      [
+                        "7 · séptima",
+                        "Fa♯",
+                        "Fa♯ · mayor",
+                        "Fa natural · menor",
+                      ],
+                    ]}
+                  />
+                  <p>
+                    <strong>¿Qué significa ♭7?</strong> Se compara con el
+                    séptimo grado de la escala mayor de la misma fundamental. En
+                    Sol, ese grado es Fa♯; bajarlo un semitono da Fa natural. El
+                    símbolo ♭7 describe la distancia, no obliga a que la nota
+                    final lleve un bemol escrito.
+                  </p>
+                  <p>
                     <strong>Respuesta:</strong> Gmaj7 = Sol – Si – Re – Fa♯; G7
                     = Sol – Si – Re – Fa. Solo cambia la séptima.
                   </p>
@@ -1097,6 +1183,32 @@ export default function HarmonyExamGuide() {
                       séptima menor.
                     </li>
                   </ol>
+                  <p>
+                    <strong>Tabla para no saltarte ninguna nota:</strong> toma
+                    cada grado desde <em>Re</em>, la fundamental de este acorde,
+                    y aplica el cambio de la fórmula. La ♭ delante del número
+                    significa bajar ese grado un semitono respecto de Re mayor.
+                  </p>
+                  <Table
+                    headings={[
+                      "Fórmula",
+                      "En Re mayor",
+                      "Cambio",
+                      "Nota de Dm7",
+                    ]}
+                    rows={[
+                      ["1", "Re", "Sin cambio", "Re"],
+                      ["♭3", "Fa♯", "Bajar 1 semitono", "Fa natural"],
+                      ["5", "La", "Sin cambio", "La"],
+                      ["♭7", "Do♯", "Bajar 1 semitono", "Do natural"],
+                    ]}
+                  />
+                  <p>
+                    <strong>Comprueba las distancias desde Re:</strong> Re → Re♯
+                    → Mi → Fa son 3 semitonos, una tercera menor; Re hasta La
+                    son 7, una quinta justa; Re hasta Do son 10, una séptima
+                    menor. Así sabes por qué se llama <strong>menor 7</strong>.
+                  </p>
                   <p>
                     <strong>Respuesta:</strong> Dm7 ={" "}
                     <strong>Re – Fa – La – Do</strong>. Comprueba que hay cuatro
@@ -1128,6 +1240,28 @@ export default function HarmonyExamGuide() {
                     </li>
                   </ol>
                   <p>
+                    <strong>Construcción nota por nota:</strong> Si mayor es Si
+                    – Do♯ – Re♯ – Mi – Fa♯ – Sol♯ – La♯ – Si. Partimos de sus
+                    grados 1, 3, 5 y 7 y bajamos los que indique cada fórmula.
+                  </p>
+                  <Table
+                    headings={["Grado", "Si mayor", "Bm7♭5", "Bdim7"]}
+                    rows={[
+                      ["1", "Si", "Si", "Si"],
+                      ["♭3", "Re♯", "Re natural", "Re natural"],
+                      ["♭5", "Fa♯", "Fa natural", "Fa natural"],
+                      ["7", "La♯", "La natural · ♭7", "La♭ · ♭♭7"],
+                    ]}
+                  />
+                  <p>
+                    <strong>
+                      ¿Por qué la última nota sigue llamándose La?
+                    </strong>{" "}
+                    Al contar letras desde Si, la séptima es La: Si–Do–Re–Mi–
+                    Fa–Sol–La. La♭ y Sol♯ pueden sonar igual, pero Sol sería una
+                    sexta escrita; La♭ conserva el nombre de séptima.
+                  </p>
+                  <p>
                     <strong>Comprobación:</strong> la tríada es igual en ambos;
                     solo cambia la última nota. La está a diez semitonos de Si y
                     La♭, a nueve.
@@ -1154,6 +1288,25 @@ export default function HarmonyExamGuide() {
                       acorde; tercera en el bajo significa primera inversión.
                     </li>
                   </ol>
+                  <p>
+                    <strong>De dónde sale Sol–Si–Re:</strong> escribe Sol mayor
+                    Sol–La–Si–Do–Re–Mi–Fa♯. Su primer grado es Sol, el tercero
+                    Si y el quinto Re. Esos son 1–3–5 del acorde; no se añade
+                    Fa♯ porque aquí se pide una tríada, no una cuatríada.
+                  </p>
+                  <Diagram label="Sol mayor: Sol en el bajo pasa a Si en el bajo al subir Sol una octava">
+                    Fundamental: <strong>Sol3</strong> – Si3 – Re4
+                    <br />
+                    Sube Sol3 → Sol4
+                    <br />
+                    Primera inversión: <strong>Si3</strong> – Re4 – Sol4
+                  </Diagram>
+                  <p>
+                    Los números 3 y 4 indican el <strong>registro</strong>, no
+                    grados del acorde. Una octava más arriba es la misma nota en
+                    un registro más agudo. Si la consigna no fija octavas, usa
+                    un registro donde Si sea realmente la nota más grave.
+                  </p>
                   <p>
                     <strong>Respuesta:</strong> Si – Re – Sol, también G/B. La
                     fundamental sigue siendo Sol: G/B significa «Sol mayor con
@@ -1183,6 +1336,29 @@ export default function HarmonyExamGuide() {
                       Do5 – Mi5 – Sol5; ahora el bajo es Si, la séptima.
                     </li>
                   </ol>
+                  <p>
+                    <strong>
+                      Antes de invertir, identifica el papel de cada nota:
+                    </strong>{" "}
+                    Do es la fundamental, Mi la tercera, Sol la quinta y Si la
+                    séptima mayor. El número de la inversión depende de cuál
+                    queda abajo; no significa cambiar el nombre del acorde.
+                  </p>
+                  <Table
+                    headings={["Estado", "De grave a agudo", "Nota del bajo"]}
+                    rows={[
+                      ["Fundamental", "Do4 – Mi4 – Sol4 – Si4", "Do · 1"],
+                      ["Primera", "Mi4 – Sol4 – Si4 – Do5", "Mi · 3"],
+                      ["Segunda", "Sol4 – Si4 – Do5 – Mi5", "Sol · 5"],
+                      ["Tercera", "Si4 – Do5 – Mi5 – Sol5", "Si · 7"],
+                    ]}
+                  />
+                  <p>
+                    Una cuatríada tiene cuatro notas: por eso existen cuatro
+                    posiciones en total, pero solo tres se llaman inversiones.
+                    Si escribieras Si♭, cambiarías la séptima y obtendrías un
+                    acorde distinto de Cmaj7.
+                  </p>
                   <p>
                     <strong>Respuesta:</strong> Si – Do – Mi – Sol, de grave a
                     agudo. Comprueba que siguen las cuatro notas originales y
@@ -1224,6 +1400,56 @@ export default function HarmonyExamGuide() {
                     ]}
                   />
                   <p>
+                    <strong>Ahora hazlo uno por uno.</strong> «Toma» significa
+                    escribir esa nota en el acorde; «salta» significa pasar a la
+                    siguiente sin incluirla. Todas son notas de Do mayor, aunque
+                    el recorrido continúe después de Si.
+                  </p>
+                  <ol>
+                    <li>
+                      <strong>I: desde Do.</strong> Toma Do, salta Re, toma Mi,
+                      salta Fa, toma Sol, salta La y toma Si → Do–Mi–Sol–Si.
+                      Do–Mi es tercera mayor y Do–Si, séptima mayor:{" "}
+                      <strong>Cmaj7</strong>.
+                    </li>
+                    <li>
+                      <strong>ii: desde Re.</strong> Toma Re, salta Mi, toma Fa,
+                      salta Sol, toma La, salta Si y toma Do → Re–Fa–La–Do.
+                      Re–Fa es tercera menor y Re–Do, séptima menor:{" "}
+                      <strong>Dm7</strong>.
+                    </li>
+                    <li>
+                      <strong>iii: desde Mi.</strong> Toma Mi, salta Fa, toma
+                      Sol, salta La, toma Si, salta Do y toma Re → Mi–Sol–Si–Re.
+                      Mi–Sol es tercera menor y Mi–Re, séptima menor:{" "}
+                      <strong>Em7</strong>.
+                    </li>
+                    <li>
+                      <strong>IV: desde Fa.</strong> Toma Fa, salta Sol, toma
+                      La, salta Si, toma Do, salta Re y toma Mi → Fa–La–Do–Mi.
+                      Fa–La es tercera mayor y Fa–Mi, séptima mayor:{" "}
+                      <strong>Fmaj7</strong>.
+                    </li>
+                    <li>
+                      <strong>V: desde Sol.</strong> Toma Sol, salta La, toma
+                      Si, salta Do, toma Re, salta Mi y toma Fa → Sol–Si–Re–Fa.
+                      Sol–Si es tercera mayor, pero Sol–Fa es séptima menor:{" "}
+                      <strong>G7</strong>, no Gmaj7.
+                    </li>
+                    <li>
+                      <strong>vi: desde La.</strong> Toma La, salta Si, toma Do,
+                      salta Re, toma Mi, salta Fa y toma Sol → La–Do–Mi–Sol.
+                      La–Do es tercera menor y La–Sol, séptima menor:{" "}
+                      <strong>Am7</strong>.
+                    </li>
+                    <li>
+                      <strong>vii: desde Si.</strong> Toma Si, salta Do, toma
+                      Re, salta Mi, toma Fa, salta Sol y toma La → Si–Re–Fa–La.
+                      Si–Re es tercera menor, Si–Fa quinta disminuida y Si–La
+                      séptima menor: <strong>Bm7♭5</strong>.
+                    </li>
+                  </ol>
+                  <p>
                     <strong>Comprueba:</strong> el V es G7 porque Fa es una
                     séptima menor sobre Sol; el vii es semidisminuido porque su
                     quinta es Fa y su séptima es La. No lleva una séptima
@@ -1262,6 +1488,46 @@ export default function HarmonyExamGuide() {
                     ]}
                   />
                   <p>
+                    <strong>Qué significa cada apellido:</strong> maj7 = tríada
+                    mayor y séptima mayor; m7 = tríada menor y séptima menor; 7
+                    = tríada mayor y séptima menor. Vamos a construir los
+                    cuatro, sin saltarnos el conteo:
+                  </p>
+                  <ol>
+                    <li>
+                      <strong>Imaj7, empezando en Re.</strong> Toma Re, salta
+                      Mi, toma Fa♯, salta Sol, toma La, salta Si y toma Do♯.
+                      Re–Fa♯ es tercera mayor; Re–Do♯ es séptima mayor. Por eso
+                      Re–Fa♯–La–Do♯ se llama <strong>Dmaj7</strong>.
+                    </li>
+                    <li>
+                      <strong>vim7, empezando en Si.</strong> Toma Si, salta
+                      Do♯, toma Re, salta Mi, toma Fa♯, salta Sol y toma La.
+                      Si–Re es tercera menor y Si–La, séptima menor:{" "}
+                      <strong>Bm7</strong>. Al terminar en Do♯, la lista vuelve
+                      a empezar en Re, conservando la armadura de Re mayor.
+                    </li>
+                    <li>
+                      <strong>iim7, empezando en Mi.</strong> Toma Mi, salta
+                      Fa♯, toma Sol, salta La, toma Si, salta Do♯ y toma Re.
+                      Mi–Sol es tercera menor y Mi–Re, séptima menor:{" "}
+                      <strong>Em7</strong>.
+                    </li>
+                    <li>
+                      <strong>V7, empezando en La.</strong> Toma La, salta Si,
+                      toma Do♯, salta Re, toma Mi, salta Fa♯ y toma Sol. La–Do♯
+                      es tercera mayor y La–Sol, séptima menor:{" "}
+                      <strong>A7</strong>.
+                    </li>
+                  </ol>
+                  <p>
+                    <strong>Dos conteos diferentes:</strong> al elegir el vi, Si
+                    es el grado 6 de <em>Re mayor</em>. Cuando construyes Bm7,
+                    Si se convierte en la fundamental o 1 de <em>ese acorde</em>
+                    ; Re es su tercera. Ambos conteos son correctos porque
+                    responden a preguntas distintas.
+                  </p>
+                  <p>
                     <strong>Respuesta:</strong> Dmaj7 – Bm7 – Em7 – A7. Para
                     comprobar Bm7, vuelve a contar desde Si: Si es 1, Re es ♭3,
                     Fa♯ es 5 y La es ♭7; no cuentas desde Re en esa fórmula.
@@ -1288,6 +1554,42 @@ export default function HarmonyExamGuide() {
                       Mi♯. Son sus grados 1, 3, 5 y 7.
                     </li>
                   </ol>
+                  <p>
+                    <strong>
+                      Ahora construye las cuatro notas, una por una:
+                    </strong>{" "}
+                    la escala de Fa♯ mayor es Fa♯ – Sol♯ – La♯ – Si – Do♯ – Re♯
+                    – Mi♯ – Fa♯. El número de grado se cuenta desde Fa♯,
+                    incluyendo Fa♯ como 1.
+                  </p>
+                  <Table
+                    headings={["Grado del acorde", "Nota", "Cómo comprobarla"]}
+                    rows={[
+                      [
+                        "1 · fundamental",
+                        "Fa♯",
+                        "Es la nota que da nombre al acorde",
+                      ],
+                      [
+                        "3 · tercera mayor",
+                        "La♯",
+                        "Fa♯–Sol–Sol♯–La–La♯: 4 semitonos",
+                      ],
+                      ["5 · quinta justa", "Do♯", "Está a 7 semitonos de Fa♯"],
+                      [
+                        "7 · séptima mayor",
+                        "Mi♯",
+                        "Está a 11 semitonos de Fa♯ y a 1 de la octava",
+                      ],
+                    ]}
+                  />
+                  <p>
+                    <strong>Cuenta la séptima completa:</strong> Fa♯ → Sol →
+                    Sol♯ → La → La♯ → Si → Do → Do♯ → Re → Re♯ → Mi → Mi♯. Hay
+                    once pasos de semitono. Uno más, Mi♯ → Fa♯, llega a la
+                    octava. Mi natural aparece en el paso diez: sería séptima
+                    menor y formaría F♯7, no F♯maj7.
+                  </p>
                   <p>
                     <strong>Comprobación:</strong> Mi♯ y Fa natural son
                     enarmónicos en el piano, pero Fa natural se escribiría con
