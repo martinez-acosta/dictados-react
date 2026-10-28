@@ -61,7 +61,22 @@ const WEEKS: Array<{
     shortLabel: "28 sep–2 oct",
     subjects: ["solfeo", "armonia", "improvisacion"],
   },
+  {
+    id: "2026-10-19",
+    label: "19–25 de octubre de 2026",
+    shortLabel: "19–25 oct",
+    subjects: ["armonia"],
+  },
 ];
+
+const OCTOBER_19_LESSONS = {
+  armonia: {
+    resumen: "armonia-2026-10-19",
+    tareas: "armonia-2026-10-19-tareas",
+    conceptos: "armonia-2026-10-19-conceptos",
+    respuestas: "armonia-2026-10-19-respuestas",
+  },
+} as const;
 
 const SUBJECTS: Array<{ id: SubjectId; label: string }> = [
   { id: "solfeo", label: "Solfeo" },
@@ -2815,6 +2830,13 @@ export default function SemesterNotes() {
                   </ToggleButtonGroup>
                 </Stack>
 
+                {week.id === "2026-10-19" && subject === "armonia" && (
+                  <DetailedClassNotes
+                    key={OCTOBER_19_LESSONS[subject][detailView]}
+                    lessonId={OCTOBER_19_LESSONS[subject][detailView]}
+                    section={detailView}
+                  />
+                )}
                 {week.id === "2026-09-28" && subject === "improvisacion" && (
                   <ImprovisationChordStudy view={detailView} />
                 )}

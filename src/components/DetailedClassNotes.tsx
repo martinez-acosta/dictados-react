@@ -20,8 +20,22 @@ import piano from "../data/semester-lessons/piano-2026-09-21.md?raw";
 import improvisationChordStudy from "../data/semester-lessons/improvisacion-2026-09-28.md?raw";
 import harmonyInversions from "../data/semester-lessons/armonia-2026-09-28.md?raw";
 import solfegePulse from "../data/semester-lessons/solfeo-2026-09-28.md?raw";
+import harmonyOctober from "../data/semester-lessons/armonia-2026-10-19.md?raw";
+import harmonyOctoberTasks from "../data/semester-supplements/armonia-2026-10-19-tareas.md?raw";
+import harmonyOctoberConcepts from "../data/semester-supplements/armonia-2026-10-19-conceptos.md?raw";
+import harmonyOctoberAnswers from "../data/semester-supplements/armonia-2026-10-19-respuestas.md?raw";
 
 const LESSONS = {
+  "armonia-2026-10-19": ["Armonía · jueves 22 de octubre", harmonyOctober],
+  "armonia-2026-10-19-tareas": ["Tareas de Armonía", harmonyOctoberTasks],
+  "armonia-2026-10-19-conceptos": [
+    "Conceptos de Armonía",
+    harmonyOctoberConcepts,
+  ],
+  "armonia-2026-10-19-respuestas": [
+    "Respuestas de Armonía",
+    harmonyOctoberAnswers,
+  ],
   "solfeo-2026-09-28": [
     "Unidad de tiempo y de compás, lectura en 4/8 y 2/4",
     solfegePulse,
@@ -123,9 +137,11 @@ function NoteBlock({ block }: { block: any }) {
 export default function DetailedClassNotes({
   lessonId,
   photos = [],
+  section = "resumen",
 }: {
   lessonId: keyof typeof LESSONS;
   photos?: ReadonlyArray<{ src: string; label: string }>;
+  section?: "resumen" | "tareas" | "conceptos" | "respuestas";
 }) {
   const [title, markdown] = LESSONS[lessonId];
   const sections = parseStudyNotes(markdown);
@@ -143,16 +159,28 @@ export default function DetailedClassNotes({
         >
           {title}
         </Typography>
-        <Typography sx={{ mt: 1, color: "#59696b", lineHeight: 1.7 }}>
-          Apuntes desarrollados: explicaciones, definiciones registradas,
-          ejemplos, correcciones y ejercicios de clase.
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1, color: "#667678" }}>
-          Reconstruidos a partir del material que compartiste; las definiciones
-          no son citas literales verificadas del audio. Los ejemplos
-          conceptuales se distinguen de las partituras originales. Tareas y
-          soluciones siguen en sus apartados.
-        </Typography>
+        {section === "resumen" ? (
+          <>
+            <Typography sx={{ mt: 1, color: "#59696b", lineHeight: 1.7 }}>
+              Apuntes desarrollados: explicaciones, definiciones registradas,
+              ejemplos, correcciones y ejercicios de clase.
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1, color: "#667678" }}>
+              Reconstruidos a partir del material que compartiste; las
+              definiciones no son citas literales verificadas del audio. Los
+              ejemplos conceptuales se distinguen de las partituras originales.
+              Tareas y soluciones siguen en sus apartados.
+            </Typography>
+          </>
+        ) : (
+          <Typography variant="body2" sx={{ mt: 1, color: "#667678" }}>
+            {section === "tareas"
+              ? "Consignas identificadas en la clase; las dudas se indican en cada caso."
+              : section === "respuestas"
+                ? "Procedimientos y guías para las tareas que pueden resolverse con el material disponible."
+                : "Referencia breve para repasar lo explicado en clase."}
+          </Typography>
+        )}
       </Box>
 
       <Stack
