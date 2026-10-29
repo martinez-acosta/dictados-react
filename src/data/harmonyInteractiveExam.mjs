@@ -207,7 +207,7 @@ export const EXAM_QUESTIONS = [
     [
       "Sol mayor es Sol – Si – Re: fundamental, tercera y quinta.",
       "La primera inversión pone la tercera en el bajo. Sube Sol una octava: Si – Re – Sol.",
-      "El acorde sigue siendo Sol mayor; se puede escribir G/B.",
+      "También puedes ordenar las notas superiores como Si – Sol – Re, de grave a agudo. Sigue siendo primera inversión porque Si permanece en el bajo; se puede escribir G/B.",
     ],
   ),
   notes(
@@ -220,7 +220,7 @@ export const EXAM_QUESTIONS = [
       "Cmaj7 en posición fundamental es Do – Mi – Sol – Si.",
       "En una cuatríada, la tercera inversión coloca la séptima en el bajo.",
       "Sube sucesivamente Do, Mi y Sol una octava: Si – Do – Mi – Sol.",
-      "Siguen las mismas cuatro notas; Si es el bajo y Do continúa siendo la fundamental.",
+      "También puedes colocar las notas superiores en otro orden, por ejemplo Si – Sol – Mi – Do, cada una más aguda que la anterior. Si sigue en el bajo y Do continúa siendo la fundamental.",
     ],
   ),
   notes(
@@ -303,4 +303,19 @@ export function evaluateExamNotes(answers, expected) {
       normalizeExamNote(answers[index] || "") !== null &&
       normalizeExamNote(answers[index]) === normalizeExamNote(note),
   );
+}
+
+// La inversión depende de la nota del bajo; las voces superiores pueden
+// disponerse en cualquier orden, sin cambiar la escritura de cada nota.
+export function evaluateInversionNotes(answers, expected) {
+  const remaining = expected.slice(1).map(normalizeExamNote);
+  return expected.map((note, index) => {
+    const answer = normalizeExamNote(answers[index] || "");
+    if (answer === null) return false;
+    if (index === 0) return answer === normalizeExamNote(note);
+    const match = remaining.indexOf(answer);
+    if (match < 0) return false;
+    remaining.splice(match, 1);
+    return true;
+  });
 }

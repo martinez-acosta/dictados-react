@@ -284,7 +284,7 @@ export function generateRandomExam(topic = "todos", random = Math.random) {
       [
         `En posición fundamental: ${display(inversion.chords[0].triad)}. La primera nota es la fundamental.`,
         `Sube ${spanishNote(inversion.tonic)} una octava: la tercera, ${spanishNote(inversion.chords[0].triad[1])}, queda en el bajo.`,
-        `De grave a agudo queda ${display(rotate(inversion.chords[0].triad, 1))}. El acorde no cambia de nombre.`,
+        `Una disposición de grave a agudo es ${display(rotate(inversion.chords[0].triad, 1))}. También puedes escribir ${display([inversion.chords[0].triad[1], inversion.chords[0].triad[0], inversion.chords[0].triad[2]])}, situando cada nota más aguda que la anterior. En ambos casos la tercera permanece en el bajo.`,
       ],
     ),
     noteQuestion(
@@ -298,6 +298,7 @@ export function generateRandomExam(topic = "todos", random = Math.random) {
         `Primera inversión: sube la fundamental una octava → ${display(rotate(inversion7.chords[0].seventh, 1))}.`,
         `Segunda inversión: sube la tercera una octava → ${display(rotate(inversion7.chords[0].seventh, 2))}.`,
         `Tercera inversión: sube la quinta una octava → ${display(rotate(inversion7.chords[0].seventh, 3))}. La séptima queda en el bajo.`,
+        `Las tres notas superiores también pueden estar en otro orden, por ejemplo ${display([inversion7.chords[0].seventh[3], inversion7.chords[0].seventh[2], inversion7.chords[0].seventh[1], inversion7.chords[0].seventh[0]])}, siempre de grave a agudo y con la séptima en el bajo.`,
       ],
     ),
     noteQuestion(

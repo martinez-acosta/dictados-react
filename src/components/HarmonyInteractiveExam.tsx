@@ -18,6 +18,7 @@ import {
   EXAM_QUESTIONS,
   EXAM_TOPICS,
   evaluateExamNotes,
+  evaluateInversionNotes,
 } from "../data/harmonyInteractiveExam.mjs";
 import { spanishNote } from "../data/harmonyExamGuide.mjs";
 import { generateRandomExam } from "../data/harmonyRandomExam.mjs";
@@ -93,6 +94,8 @@ export default function HarmonyInteractiveExam() {
   const question = questions[index];
   const usesStaff =
     question?.topic === "septimas" && question?.kind === "notes";
+  const isInversion =
+    question?.topic === "inversiones" && question?.kind === "notes";
   const drawingAnswer = usesStaff && answerMode === "pentagrama";
   const evaluatedCount = Object.keys(firstResults).length;
   const correctCount = Object.values(firstResults).filter(Boolean).length;
@@ -135,7 +138,7 @@ export default function HarmonyInteractiveExam() {
     if (!question || !inputComplete || (feedback && !answerChanged)) return;
     const fields =
       question.kind === "notes"
-        ? evaluateExamNotes(
+        ? (isInversion ? evaluateInversionNotes : evaluateExamNotes)(
             drawingAnswer ? staffAnswers(staffNotes) : answers,
             question.answers,
           )
@@ -314,6 +317,13 @@ export default function HarmonyInteractiveExam() {
                 {question.hint}
               </Typography>
             )}
+            {isInversion && (
+              <Typography sx={{ color: "#56696a", mt: 1, lineHeight: 1.7 }}>
+                La inversión la determina la nota del bajo. Las demás notas
+                pueden ir en otro orden, siempre escritas de grave a agudo y sin
+                repetirlas. Como no se piden octavas, la app asume ese orden.
+              </Typography>
+            )}
 
             <Button
               type="button"
@@ -343,7 +353,9 @@ export default function HarmonyInteractiveExam() {
                 </Typography>
                 <ExamExplanation question={question} />
                 <Typography sx={{ lineHeight: 1.7 }}>
-                  <strong>Respuesta:</strong>{" "}
+                  <strong>
+                    {isInversion ? "Una disposición posible:" : "Respuesta:"}
+                  </strong>{" "}
                   {question.kind === "notes"
                     ? question.answers
                         .map((note) => `${spanishNote(note)} (${note})`)
@@ -431,7 +443,9 @@ export default function HarmonyInteractiveExam() {
                     )}
                     helperText={
                       feedback && !answerChanged && !feedback.fields[i]
-                        ? `Esperado: ${spanishNote(expected)} (${expected})`
+                        ? isInversion && i > 0
+                          ? `Usa una vez cada nota superior: ${question.answers.slice(1).map(spanishNote).join(" y ")}.`
+                          : `Esperado: ${spanishNote(expected)} (${expected})`
                         : undefined
                     }
                     inputProps={{
@@ -513,7 +527,9 @@ export default function HarmonyInteractiveExam() {
                       <br />
                     </>
                   )}
-                  <strong>Respuesta:</strong>{" "}
+                  <strong>
+                    {isInversion ? "Una disposición posible:" : "Respuesta:"}
+                  </strong>{" "}
                   {question.kind === "notes"
                     ? question.answers
                         .map((note) => `${spanishNote(note)} (${note})`)

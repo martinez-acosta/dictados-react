@@ -5,6 +5,7 @@ import {
   EXAM_TOPICS,
   normalizeExamNote,
   evaluateExamNotes,
+  evaluateInversionNotes,
 } from "../src/data/harmonyInteractiveExam.mjs";
 import {
   buildHarmonyGuide,
@@ -18,6 +19,53 @@ test("las preguntas originales del repaso son las cinco cuatríadas del pizarró
     ),
     ["c-maj7", "c7", "dm7", "b-half-dim", "b-dim7"],
   );
+});
+
+test("las inversiones admiten cualquier orden de voces superiores sin cambiar el bajo", () => {
+  const cFirst = ["E", "G", "C"];
+  assert.deepEqual(evaluateInversionNotes(["Mi", "Do", "Sol"], cFirst), [
+    true,
+    true,
+    true,
+  ]);
+  assert.deepEqual(evaluateInversionNotes(["E", "G", "C"], cFirst), [
+    true,
+    true,
+    true,
+  ]);
+  assert.deepEqual(evaluateInversionNotes(["C", "E", "G"], cFirst), [
+    false,
+    false,
+    true,
+  ]);
+  assert.deepEqual(evaluateInversionNotes(["E", "C", "C"], cFirst), [
+    true,
+    true,
+    false,
+  ]);
+  assert.deepEqual(evaluateInversionNotes(["E", "C♯", "G"], cFirst), [
+    true,
+    false,
+    true,
+  ]);
+  const cThird = ["B", "C", "E", "G"];
+  assert.deepEqual(evaluateInversionNotes(["Si", "Sol", "Mi", "Do"], cThird), [
+    true,
+    true,
+    true,
+    true,
+  ]);
+  assert.deepEqual(evaluateInversionNotes(["B", "G", "E", "G"], cThird), [
+    true,
+    true,
+    true,
+    false,
+  ]);
+  assert.deepEqual(evaluateExamNotes(["E", "C", "G"], cFirst), [
+    true,
+    false,
+    false,
+  ]);
 });
 
 test("acepta cifrado y solfeo sin perder alteraciones ni confundir enarmonías", () => {

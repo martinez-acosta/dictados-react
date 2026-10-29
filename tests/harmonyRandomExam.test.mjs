@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { generateRandomExam } from "../src/data/harmonyRandomExam.mjs";
-import { evaluateExamNotes } from "../src/data/harmonyInteractiveExam.mjs";
+import {
+  evaluateExamNotes,
+  evaluateInversionNotes,
+} from "../src/data/harmonyInteractiveExam.mjs";
 import { spanishNote } from "../src/data/harmonyExamGuide.mjs";
 
 const rng = (seed) => () =>
@@ -51,6 +54,15 @@ test("los simulacros generan respuestas calificables, armónicamente correctas y
       assert.ok(
         evaluateExamNotes(question.answers, question.answers).every(Boolean),
       );
+      if (question.topic === "inversiones") {
+        const alternate = [
+          question.answers[0],
+          ...question.answers.slice(1).reverse(),
+        ];
+        assert.ok(
+          evaluateInversionNotes(alternate, question.answers).every(Boolean),
+        );
+      }
       assert.ok(
         evaluateExamNotes(
           question.answers.map(spanishNote),
