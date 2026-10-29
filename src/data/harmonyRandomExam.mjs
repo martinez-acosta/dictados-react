@@ -340,6 +340,32 @@ export function generateRandomExam(topic = "todos", random = Math.random) {
       ],
     },
   ];
+  // Conserva la escala de referencia de cada pregunta para enseñar cómo se
+  // construye, incluso cuando la tonalidad es distinta en cada intento.
+  const explanationScales = {
+    "random-major": [major.tonic, "mayor"],
+    "random-minor": [minor.tonic, "menor natural"],
+    "random-relative": [relative.tonic, "mayor"],
+    "random-relative-major": [relativeMajor.tonic, "menor natural"],
+    "random-circle": [circle.tonic, "mayor"],
+    "random-third": [thirdKey.tonic, "mayor"],
+    "random-major-triad": [majorTriad.tonic, "mayor"],
+    "random-minor-triad": [minorTriad.tonic, "mayor"],
+    "random-dim-triad": [dimTriad.tonic, "mayor"],
+    "random-maj7": [maj7.tonic, "mayor"],
+    "random-dominant": [dominant.tonic, "mayor"],
+    "random-minor7": [minor7.tonic, "mayor"],
+    "random-half": [half.tonic, "mayor"],
+    "random-first-inversion": [inversion.tonic, "mayor"],
+    "random-third-inversion": [inversion7.tonic, "mayor"],
+    "random-harmonization": [harmonization.tonic, "mayor"],
+    "random-turnaround": [turnaround.tonic, "mayor"],
+    "random-identify-half": [identify.tonic, "mayor"],
+  };
+  for (const question of questions) {
+    if (explanationScales[question.id])
+      question.explanationScale = explanationScales[question.id];
+  }
   return questions.filter(
     (question) => topic === "todos" || question.topic === topic,
   );

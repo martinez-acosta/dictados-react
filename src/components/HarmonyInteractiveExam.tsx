@@ -21,8 +21,40 @@ import {
 } from "../data/harmonyInteractiveExam.mjs";
 import { spanishNote } from "../data/harmonyExamGuide.mjs";
 import { generateRandomExam } from "../data/harmonyRandomExam.mjs";
+import { explainExamQuestion } from "../data/harmonyExamExplanations.mjs";
 
 type Question = (typeof EXAM_QUESTIONS)[number];
+
+function ExamExplanation({ question }: { question: Question }) {
+  const { foundation, steps } = explainExamQuestion(question);
+  return (
+    <>
+      {foundation.length > 0 && (
+        <>
+          <Typography component="h4" sx={{ fontWeight: 800, mt: 2 }}>
+            Primero, construyamos la base desde cero
+          </Typography>
+          <Box
+            component="ol"
+            sx={{ pl: 3, "& li": { mb: 1.5, lineHeight: 1.7 } }}
+          >
+            {foundation.map((step, i) => (
+              <li key={i}>{step}</li>
+            ))}
+          </Box>
+        </>
+      )}
+      <Typography component="h4" sx={{ fontWeight: 800, mt: 2 }}>
+        Ahora, resolvamos la pregunta
+      </Typography>
+      <Box component="ol" sx={{ pl: 3, "& li": { mb: 1.5, lineHeight: 1.7 } }}>
+        {steps.map((step, i) => (
+          <li key={i}>{step}</li>
+        ))}
+      </Box>
+    </>
+  );
+}
 
 function shuffled(items: Question[]) {
   const result = [...items];
@@ -286,14 +318,7 @@ export default function HarmonyInteractiveExam() {
                   Esta guía muestra la respuesta. Puedes consultarla sin perder
                   lo que ya escribiste; abrirla no califica la pregunta.
                 </Typography>
-                <Box
-                  component="ol"
-                  sx={{ pl: 3, mt: 2, "& li": { mb: 1.5, lineHeight: 1.7 } }}
-                >
-                  {question.steps.map((step, i) => (
-                    <li key={i}>{step}</li>
-                  ))}
-                </Box>
+                <ExamExplanation question={question} />
                 <Typography sx={{ lineHeight: 1.7 }}>
                   <strong>Respuesta:</strong>{" "}
                   {question.kind === "notes"
@@ -415,17 +440,7 @@ export default function HarmonyInteractiveExam() {
                         .join(" – ")
                     : question.correctOption}
                 </Typography>
-                <Typography component="h4" sx={{ fontWeight: 800, mt: 1.5 }}>
-                  Cómo resolverlo
-                </Typography>
-                <Box
-                  component="ol"
-                  sx={{ pl: 3, "& li": { mb: 0.5, lineHeight: 1.7 } }}
-                >
-                  {question.steps.map((step, i) => (
-                    <li key={i}>{step}</li>
-                  ))}
-                </Box>
+                <ExamExplanation question={question} />
                 <Stack
                   direction={{ xs: "column", sm: "row" }}
                   spacing={1}
