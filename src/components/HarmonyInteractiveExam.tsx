@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -44,6 +48,7 @@ export default function HarmonyInteractiveExam() {
   } | null>(null);
   const [firstResults, setFirstResults] = useState<Record<string, boolean>>({});
   const [finished, setFinished] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const question = questions[index];
   const evaluatedCount = Object.keys(firstResults).length;
   const correctCount = Object.values(firstResults).filter(Boolean).length;
@@ -76,6 +81,7 @@ export default function HarmonyInteractiveExam() {
     setFeedback(null);
     setFirstResults({});
     setFinished(false);
+    setHelpOpen(false);
   }
 
   function grade() {
@@ -98,6 +104,7 @@ export default function HarmonyInteractiveExam() {
 
   function next() {
     if (!feedback) return;
+    setHelpOpen(false);
     if (index === questions.length - 1) {
       setFinished(true);
       return;
@@ -124,9 +131,9 @@ export default function HarmonyInteractiveExam() {
         Simulacro interactivo de Armonía
       </Typography>
       <Typography sx={{ color: "#56696a", lineHeight: 1.7, mb: 2 }}>
-        Responde una pregunta a la vez y pulsa «Calificar». Después verás la
-        respuesta y una explicación. Es práctica basada en las clases, no una
-        lista confirmada de preguntas del examen.
+        Responde una pregunta a la vez y pulsa «Calificar». Si necesitas ayuda,
+        abre el paso a paso antes de responder. Es práctica basada en las
+        clases, no una lista confirmada de preguntas del examen.
       </Typography>
 
       <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
@@ -252,6 +259,56 @@ export default function HarmonyInteractiveExam() {
                 {question.hint}
               </Typography>
             )}
+
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={() => setHelpOpen(true)}
+              sx={{ mt: 1.5, textTransform: "none" }}
+            >
+              Ver paso a paso
+            </Button>
+            <Dialog
+              open={helpOpen}
+              onClose={() => setHelpOpen(false)}
+              aria-labelledby="harmony-exam-help-title"
+              fullWidth
+              maxWidth="sm"
+            >
+              <DialogTitle id="harmony-exam-help-title">
+                Cómo resolver esta pregunta
+              </DialogTitle>
+              <DialogContent dividers>
+                <Typography sx={{ fontWeight: 700, lineHeight: 1.6 }}>
+                  {question.prompt}
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#56696a", mt: 1 }}>
+                  Esta guía muestra la respuesta. Puedes consultarla sin perder
+                  lo que ya escribiste; abrirla no califica la pregunta.
+                </Typography>
+                <Box
+                  component="ol"
+                  sx={{ pl: 3, mt: 2, "& li": { mb: 1.5, lineHeight: 1.7 } }}
+                >
+                  {question.steps.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </Box>
+                <Typography sx={{ lineHeight: 1.7 }}>
+                  <strong>Respuesta:</strong>{" "}
+                  {question.kind === "notes"
+                    ? question.answers
+                        .map((note) => `${spanishNote(note)} (${note})`)
+                        .join(" – ")
+                    : question.correctOption}
+                </Typography>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setHelpOpen(false)}>
+                  Volver a la pregunta
+                </Button>
+              </DialogActions>
+            </Dialog>
 
             {question.kind === "notes" ? (
               <Box
