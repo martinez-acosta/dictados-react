@@ -16,6 +16,7 @@ import {
   evaluateExamNotes,
 } from "../data/harmonyInteractiveExam.mjs";
 import { spanishNote } from "../data/harmonyExamGuide.mjs";
+import { generateRandomExam } from "../data/harmonyRandomExam.mjs";
 
 type Question = (typeof EXAM_QUESTIONS)[number];
 
@@ -30,9 +31,10 @@ function shuffled(items: Question[]) {
 
 export default function HarmonyInteractiveExam() {
   const [topic, setTopic] = useState("todos");
-  const [questions, setQuestions] = useState<Question[]>(() => [
-    ...EXAM_QUESTIONS,
-  ]);
+  const [mode, setMode] = useState("aleatorias");
+  const [questions, setQuestions] = useState<Question[]>(() =>
+    generateRandomExam(),
+  );
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedOption, setSelectedOption] = useState("");
@@ -52,13 +54,21 @@ export default function HarmonyInteractiveExam() {
       ? Boolean(selectedOption)
       : question?.answers?.every((_, i) => Boolean(answers[i]?.trim()));
 
-  function start(nextTopic: string, randomize = false, only?: Question[]) {
+  function start(
+    nextTopic: string,
+    randomize = false,
+    only?: Question[],
+    nextMode = mode,
+  ) {
     const available =
       only ??
-      EXAM_QUESTIONS.filter(
-        (item) => nextTopic === "todos" || item.topic === nextTopic,
-      );
+      (nextMode === "aleatorias"
+        ? generateRandomExam(nextTopic)
+        : EXAM_QUESTIONS.filter(
+            (item) => nextTopic === "todos" || item.topic === nextTopic,
+          ));
     setTopic(nextTopic);
+    setMode(nextMode);
     setQuestions(randomize ? shuffled(available) : [...available]);
     setIndex(0);
     setAnswers([]);
@@ -119,25 +129,44 @@ export default function HarmonyInteractiveExam() {
         lista confirmada de preguntas del examen.
       </Typography>
 
-      <FormControl fullWidth size="small">
-        <InputLabel id="harmony-exam-filter">Tema de práctica</InputLabel>
-        <Select
-          labelId="harmony-exam-filter"
-          label="Tema de práctica"
-          value={topic}
-          onChange={(event) => start(event.target.value)}
-        >
-          {EXAM_TOPICS.map(([id, label]) => (
-            <MenuItem key={id} value={id}>
-              {label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="harmony-exam-filter">Tema de práctica</InputLabel>
+          <Select
+            labelId="harmony-exam-filter"
+            label="Tema de práctica"
+            value={topic}
+            onChange={(event) => start(event.target.value)}
+          >
+            {EXAM_TOPICS.map(([id, label]) => (
+              <MenuItem key={id} value={id}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth size="small">
+          <InputLabel id="harmony-exam-mode">Tipo de preguntas</InputLabel>
+          <Select
+            labelId="harmony-exam-mode"
+            label="Tipo de preguntas"
+            value={mode}
+            onChange={(event) =>
+              start(topic, false, undefined, event.target.value)
+            }
+          >
+            <MenuItem value="aleatorias">Preguntas aleatorias</MenuItem>
+            <MenuItem value="originales">Preguntas originales</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
       <Typography variant="body2" sx={{ color: "#667678", mt: 0.75 }}>
-        Al cambiar el tema comienza otro simulacro. Acepta Do o C, Mi o E, Si♭ o
-        Bb, Fa♯ o F#. Escribe las alteraciones; se comprueba el nombre de la
-        nota, no solo si suena igual.
+        {mode === "aleatorias"
+          ? "Cada simulacro genera nuevas tonalidades para los mismos tipos de pregunta; algunas pueden repetirse. "
+          : "Las preguntas originales son fijas; puedes cambiar su orden. "}
+        Al cambiar el tema o el tipo comienza otro simulacro. Acepta Do o C, Mi
+        o E, Si♭ o Bb, Fa♯ o F#. Escribe las alteraciones; se comprueba el
+        nombre de la nota, no solo si suena igual.
       </Typography>
 
       {!finished && (
@@ -146,7 +175,9 @@ export default function HarmonyInteractiveExam() {
           onClick={() => start(topic, true)}
           sx={{ mt: 0.5, textTransform: "none" }}
         >
-          Mezclar y reiniciar
+          {mode === "aleatorias"
+            ? "Generar nuevas preguntas"
+            : "Mezclar y reiniciar"}
         </Button>
       )}
 
