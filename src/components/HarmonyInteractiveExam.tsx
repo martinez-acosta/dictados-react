@@ -22,6 +22,10 @@ import {
 import { spanishNote } from "../data/harmonyExamGuide.mjs";
 import { generateRandomExam } from "../data/harmonyRandomExam.mjs";
 import { explainExamQuestion } from "../data/harmonyExamExplanations.mjs";
+import HarmonyChordStaffInput, {
+  type StaffEntry,
+} from "./HarmonyChordStaffInput";
+import { staffAnswers } from "../data/harmonyStaffInput.mjs";
 
 type Question = (typeof EXAM_QUESTIONS)[number];
 
@@ -82,13 +86,21 @@ export default function HarmonyInteractiveExam() {
   const [finished, setFinished] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [answerChanged, setAnswerChanged] = useState(false);
+  const [staffNotes, setStaffNotes] = useState<StaffEntry[]>([]);
+  const [answerMode, setAnswerMode] = useState<"pentagrama" | "texto">(
+    "pentagrama",
+  );
   const question = questions[index];
+  const usesStaff =
+    question?.topic === "septimas" && question?.kind === "notes";
+  const drawingAnswer = usesStaff && answerMode === "pentagrama";
   const evaluatedCount = Object.keys(firstResults).length;
   const correctCount = Object.values(firstResults).filter(Boolean).length;
   const topicName =
     EXAM_TOPICS.find(([id]) => id === question?.topic)?.[1] ?? "";
-  const inputComplete =
-    question?.kind === "choice"
+  const inputComplete = drawingAnswer
+    ? staffNotes.length === question.answers.length
+    : question?.kind === "choice"
       ? Boolean(selectedOption)
       : question?.answers?.every((_, i) => Boolean(answers[i]?.trim()));
 
@@ -110,6 +122,7 @@ export default function HarmonyInteractiveExam() {
     setQuestions(randomize ? shuffled(available) : [...available]);
     setIndex(0);
     setAnswers([]);
+    setStaffNotes([]);
     setSelectedOption("");
     setFeedback(null);
     setAnswerChanged(false);
@@ -122,7 +135,10 @@ export default function HarmonyInteractiveExam() {
     if (!question || !inputComplete || (feedback && !answerChanged)) return;
     const fields =
       question.kind === "notes"
-        ? evaluateExamNotes(answers, question.answers)
+        ? evaluateExamNotes(
+            drawingAnswer ? staffAnswers(staffNotes) : answers,
+            question.answers,
+          )
         : [];
     const correct =
       question.kind === "notes"
@@ -146,6 +162,7 @@ export default function HarmonyInteractiveExam() {
     }
     setIndex((current) => current + 1);
     setAnswers([]);
+    setStaffNotes([]);
     setSelectedOption("");
     setFeedback(null);
     setAnswerChanged(false);
@@ -339,7 +356,48 @@ export default function HarmonyInteractiveExam() {
               </DialogActions>
             </Dialog>
 
-            {question.kind === "notes" ? (
+            {usesStaff && (
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ mt: 2 }}
+                role="group"
+                aria-label="Forma de responder"
+              >
+                {(
+                  [
+                    ["pentagrama", "Dibujar en pentagrama"],
+                    ["texto", "Escribir notas"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <Button
+                    key={value}
+                    type="button"
+                    variant={answerMode === value ? "contained" : "outlined"}
+                    aria-pressed={answerMode === value}
+                    onClick={() => {
+                      if (value !== answerMode && feedback)
+                        setAnswerChanged(true);
+                      setAnswerMode(value);
+                    }}
+                    sx={{ textTransform: "none" }}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </Stack>
+            )}
+
+            {drawingAnswer ? (
+              <HarmonyChordStaffInput
+                notes={staffNotes}
+                maxNotes={question.answers.length}
+                onChange={(nextNotes) => {
+                  setStaffNotes(nextNotes);
+                  if (feedback) setAnswerChanged(true);
+                }}
+              />
+            ) : question.kind === "notes" ? (
               <Box
                 sx={{
                   display: "grid",
@@ -444,6 +502,15 @@ export default function HarmonyInteractiveExam() {
                       : "Todavía no. Revisa la respuesta:"}
                 </Typography>
                 <Typography sx={{ mt: 0.75, lineHeight: 1.7 }}>
+                  {drawingAnswer && !answerChanged && (
+                    <>
+                      <strong>Tu respuesta:</strong>{" "}
+                      {staffAnswers(staffNotes)
+                        .map((note: string) => `${spanishNote(note)} (${note})`)
+                        .join(" – ")}
+                      <br />
+                    </>
+                  )}
                   <strong>Respuesta:</strong>{" "}
                   {question.kind === "notes"
                     ? question.answers
