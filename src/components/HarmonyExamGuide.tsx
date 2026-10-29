@@ -381,32 +381,38 @@ const chordReferenceDetails = [
   {
     name: "Mayor con séptima mayor",
     symbol: "maj7 / Δ7",
-    construction: "Tríada mayor + séptima mayor.",
+    triad: "Mayor",
+    seventh: "Mayor",
   },
   {
     name: "Séptima de dominante",
     symbol: "7",
-    construction: "Tríada mayor + séptima menor.",
+    triad: "Mayor",
+    seventh: "Menor",
   },
   {
     name: "Menor con séptima menor",
     symbol: "m7",
-    construction: "Tríada menor + séptima menor.",
+    triad: "Menor",
+    seventh: "Menor",
   },
   {
     name: "Menor con séptima mayor",
     symbol: "mMaj7",
-    construction: "Tríada menor + séptima mayor.",
+    triad: "Menor",
+    seventh: "Mayor",
   },
   {
-    name: "Semidisminuido (menor séptima con quinta disminuida)",
+    name: "Semidisminuido",
     symbol: "m7♭5 / ø7",
-    construction: "Tríada disminuida + séptima menor: semidisminuido.",
+    triad: "Disminuida",
+    seventh: "Menor",
   },
   {
-    name: "Disminuido con séptima disminuida (disminuido completo)",
+    name: "Disminuido completo",
     symbol: "dim7 / °7",
-    construction: "Tríada disminuida + séptima disminuida.",
+    triad: "Disminuida",
+    seventh: "Disminuida",
   },
 ];
 
@@ -430,31 +436,62 @@ function SeventhChordQuickReference() {
         fundamental: ♭ baja ese grado un semitono y ♭♭ lo baja dos. Los ejemplos
         son desde Do, aunque elijas otra tonalidad en el círculo.
       </Typography>
-      <Box component="dl" sx={{ m: 0, mt: 1.5 }}>
-        {keyboardExamples.map((example, index) => (
-          <Box
-            key={example.name}
-            sx={{ py: 1.25, borderBottom: "1px solid #dce3e1" }}
-          >
-            <Typography
-              component="dt"
-              sx={{ fontWeight: 800, lineHeight: 1.6 }}
-            >
-              {chordReferenceDetails[index].name}
-            </Typography>
-            <Box
-              component="dd"
-              sx={{ m: 0, lineHeight: 1.7, color: "#354c4e" }}
-            >
-              <strong>{chordReferenceDetails[index].symbol}</strong> ·{" "}
-              {example.formula}
-              <br />
-              {chordReferenceDetails[index].construction}
-              <br />
-              Ejemplo: {example.name} = {notes(example.notes)}.
-            </Box>
-          </Box>
-        ))}
+      <Box sx={{ mt: 1.5, overflowX: "auto", maxWidth: "100%" }}>
+        <Box
+          component="table"
+          aria-label="Fórmulas y construcción de cuatríadas"
+          sx={{
+            width: "100%",
+            borderCollapse: "collapse",
+            tableLayout: "fixed",
+            fontSize: { xs: 13, sm: 15 },
+            "& th, & td": {
+              textAlign: "left",
+              verticalAlign: "top",
+              px: { xs: 0.5, sm: 1 },
+              py: 1.1,
+              borderBottom: "1px solid #dce3e1",
+              lineHeight: 1.45,
+            },
+            "& thead th": { color: "#56696a", fontWeight: 750 },
+          }}
+        >
+          <colgroup>
+            <col style={{ width: "37%" }} />
+            <col style={{ width: "27%" }} />
+            <col style={{ width: "36%" }} />
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Acorde y símbolo</th>
+              <th scope="col">Tríada + séptima</th>
+              <th scope="col">Fórmula</th>
+            </tr>
+          </thead>
+          <tbody>
+            {keyboardExamples.map((example, index) => {
+              const detail = chordReferenceDetails[index];
+              return (
+                <tr key={example.name}>
+                  <th scope="row">
+                    {detail.name}
+                    <br />
+                    <span style={{ fontWeight: 500 }}>{detail.symbol}</span>
+                  </th>
+                  <td>
+                    {detail.triad} + {detail.seventh.toLowerCase()}
+                  </td>
+                  <Box
+                    component="td"
+                    sx={{ whiteSpace: "nowrap", fontSize: { xs: 12, sm: 15 } }}
+                  >
+                    {example.formula}
+                  </Box>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Box>
       </Box>
       <Typography
         variant="body2"
@@ -464,6 +501,26 @@ function SeventhChordQuickReference() {
         completo usa ♭♭7. En Cdim7, Si𝄫 suena como La, pero se escribe Si𝄫
         porque es la séptima de Do.
       </Typography>
+      <Typography component="h4" sx={{ fontWeight: 800, mt: 2 }}>
+        Ejemplos desde Do
+      </Typography>
+      <Typography
+        variant="body2"
+        sx={{ color: "#56696a", mt: 0.5, lineHeight: 1.7 }}
+      >
+        Parte de Do mayor: 1 = Do, 3 = Mi, 5 = Sol y 7 = Si. Baja los grados que
+        indique cada fórmula.
+      </Typography>
+      <Box
+        component="ul"
+        sx={{ pl: 2.5, mt: 1, "& li": { mb: 0.5, lineHeight: 1.6 } }}
+      >
+        {keyboardExamples.map((example) => (
+          <li key={example.name}>
+            <strong>{example.name}</strong> = {notes(example.notes)}
+          </li>
+        ))}
+      </Box>
     </Box>
   );
 }
