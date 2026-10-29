@@ -377,6 +377,41 @@ const keyboardExamples = [
   },
 ];
 
+const triadQuickReference = [
+  {
+    name: "Mayor",
+    symbol: "Sin sufijo (ej. C)",
+    construction: "3ª mayor + 5ª justa",
+    formula: "1 – 3 – 5",
+    example: "C",
+    notes: ["C", "E", "G"],
+  },
+  {
+    name: "Menor",
+    symbol: "m",
+    construction: "3ª menor + 5ª justa",
+    formula: "1 – ♭3 – 5",
+    example: "Cm",
+    notes: ["C", "E♭", "G"],
+  },
+  {
+    name: "Disminuida",
+    symbol: "dim / °",
+    construction: "3ª menor + 5ª disminuida",
+    formula: "1 – ♭3 – ♭5",
+    example: "Cdim",
+    notes: ["C", "E♭", "G♭"],
+  },
+  {
+    name: "Aumentada",
+    symbol: "aug / +",
+    construction: "3ª mayor + 5ª aumentada",
+    formula: "1 – 3 – ♯5",
+    example: "Caug",
+    notes: ["C", "E", "G♯"],
+  },
+];
+
 const chordReferenceDetails = [
   {
     name: "Mayor con séptima mayor",
@@ -428,18 +463,19 @@ function SeventhChordQuickReference() {
         component="h3"
         sx={{ fontSize: 19, fontWeight: 800 }}
       >
-        Fórmulas de cuatríadas
+        Fórmulas de tríadas y cuatríadas
       </Typography>
       <Typography sx={{ mt: 0.75, color: "#56696a", lineHeight: 1.7 }}>
-        Una cuatríada tiene cuatro notas: fundamental (1), tercera (3), quinta
-        (5) y séptima (7). Las fórmulas se comparan con la escala mayor de la
-        fundamental: ♭ baja ese grado un semitono y ♭♭ lo baja dos. Los ejemplos
-        son desde Do, aunque elijas otra tonalidad en el círculo.
+        Una tríada tiene tres notas: fundamental (1), tercera (3) y quinta (5).
+        Una cuatríada añade una séptima (7). Las fórmulas se comparan con la
+        escala mayor de la fundamental: ♭ baja el grado un semitono, ♭♭ lo baja
+        dos y ♯ lo sube uno. Los ejemplos son desde Do, aunque elijas otra
+        tonalidad en el círculo.
       </Typography>
       <Box sx={{ mt: 1.5, overflowX: "auto", maxWidth: "100%" }}>
         <Box
           component="table"
-          aria-label="Fórmulas y construcción de cuatríadas"
+          aria-label="Fórmulas y construcción de tríadas y cuatríadas"
           sx={{
             width: "100%",
             borderCollapse: "collapse",
@@ -464,11 +500,39 @@ function SeventhChordQuickReference() {
           <thead>
             <tr>
               <th scope="col">Acorde y símbolo</th>
-              <th scope="col">Tríada + séptima</th>
+              <th scope="col">Cómo se forma</th>
               <th scope="col">Fórmula</th>
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <th scope="rowgroup" colSpan={3}>
+                Tríadas · 3 notas
+              </th>
+            </tr>
+            {triadQuickReference.map((triad) => (
+              <tr key={triad.name}>
+                <th scope="row">
+                  {triad.name}
+                  <br />
+                  <span style={{ fontWeight: 500 }}>{triad.symbol}</span>
+                </th>
+                <td>{triad.construction}</td>
+                <Box
+                  component="td"
+                  sx={{ whiteSpace: "nowrap", fontSize: { xs: 12, sm: 15 } }}
+                >
+                  {triad.formula}
+                </Box>
+              </tr>
+            ))}
+          </tbody>
+          <tbody>
+            <tr>
+              <th scope="rowgroup" colSpan={3}>
+                Cuatríadas · tríada + séptima
+              </th>
+            </tr>
             {keyboardExamples.map((example, index) => {
               const detail = chordReferenceDetails[index];
               return (
@@ -497,9 +561,10 @@ function SeventhChordQuickReference() {
         variant="body2"
         sx={{ mt: 1, color: "#56696a", lineHeight: 1.7 }}
       >
-        Para distinguir los dos últimos: el semidisminuido usa ♭7; el disminuido
-        completo usa ♭♭7. En Cdim7, Si𝄫 suena como La, pero se escribe Si𝄫
-        porque es la séptima de Do.
+        En las cuatríadas, «mayor + menor», por ejemplo, significa tríada mayor
+        + séptima menor. Para distinguir los dos últimos: el semidisminuido usa
+        ♭7; el disminuido completo usa ♭♭7. En Cdim7, Si𝄫 suena como La, pero se
+        escribe Si𝄫 porque es la séptima de Do.
       </Typography>
       <Typography component="h4" sx={{ fontWeight: 800, mt: 2 }}>
         Ejemplos desde Do
@@ -508,8 +573,24 @@ function SeventhChordQuickReference() {
         variant="body2"
         sx={{ color: "#56696a", mt: 0.5, lineHeight: 1.7 }}
       >
-        Parte de Do mayor: 1 = Do, 3 = Mi, 5 = Sol y 7 = Si. Baja los grados que
-        indique cada fórmula.
+        Parte de Do mayor: 1 = Do, 3 = Mi, 5 = Sol y 7 = Si. Baja o sube los
+        grados que indique cada fórmula.
+      </Typography>
+      <Typography component="h5" sx={{ fontWeight: 800, mt: 1 }}>
+        Tríadas
+      </Typography>
+      <Box
+        component="ul"
+        sx={{ pl: 2.5, mt: 0.5, "& li": { mb: 0.5, lineHeight: 1.6 } }}
+      >
+        {triadQuickReference.map((triad) => (
+          <li key={triad.example}>
+            <strong>{triad.example}</strong> = {notes(triad.notes)}
+          </li>
+        ))}
+      </Box>
+      <Typography component="h5" sx={{ fontWeight: 800, mt: 1 }}>
+        Cuatríadas
       </Typography>
       <Box
         component="ul"
