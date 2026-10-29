@@ -376,6 +376,76 @@ const keyboardExamples = [
     text: "La tríada y la séptima son disminuidas. Si doble bemol se toca en la tecla de La, pero se escribe Si𝄫 para conservar el nombre de séptima.",
   },
 ];
+
+const chordReferenceDetails = [
+  { symbol: "maj7 / Δ7", construction: "Tríada mayor + séptima mayor." },
+  { symbol: "7 (dominante)", construction: "Tríada mayor + séptima menor." },
+  { symbol: "m7", construction: "Tríada menor + séptima menor." },
+  { symbol: "mMaj7", construction: "Tríada menor + séptima mayor." },
+  {
+    symbol: "m7♭5 / ø7",
+    construction: "Tríada disminuida + séptima menor: semidisminuido.",
+  },
+  {
+    symbol: "dim7 / °7",
+    construction: "Tríada disminuida + séptima disminuida.",
+  },
+];
+
+function SeventhChordQuickReference() {
+  return (
+    <Box
+      component="section"
+      aria-labelledby="chord-quick-reference-title"
+      sx={{ mt: 3 }}
+    >
+      <Typography
+        id="chord-quick-reference-title"
+        component="h3"
+        sx={{ fontSize: 19, fontWeight: 800 }}
+      >
+        Fórmulas de cuatríadas
+      </Typography>
+      <Typography sx={{ mt: 0.75, color: "#56696a", lineHeight: 1.7 }}>
+        Una cuatríada tiene cuatro notas: fundamental (1), tercera (3), quinta
+        (5) y séptima (7). Las fórmulas se comparan con la escala mayor de la
+        fundamental: ♭ baja ese grado un semitono y ♭♭ lo baja dos. Los ejemplos
+        son desde Do, aunque elijas otra tonalidad en el círculo.
+      </Typography>
+      <Box component="dl" sx={{ m: 0, mt: 1.5 }}>
+        {keyboardExamples.map((example, index) => (
+          <Box
+            key={example.name}
+            sx={{ py: 1.25, borderBottom: "1px solid #dce3e1" }}
+          >
+            <Typography
+              component="dt"
+              sx={{ fontWeight: 800, lineHeight: 1.6 }}
+            >
+              {chordReferenceDetails[index].symbol} · {example.formula}
+            </Typography>
+            <Box
+              component="dd"
+              sx={{ m: 0, lineHeight: 1.7, color: "#354c4e" }}
+            >
+              {chordReferenceDetails[index].construction}
+              <br />
+              Ejemplo: {example.name} = {notes(example.notes)}.
+            </Box>
+          </Box>
+        ))}
+      </Box>
+      <Typography
+        variant="body2"
+        sx={{ mt: 1, color: "#56696a", lineHeight: 1.7 }}
+      >
+        Para distinguir los dos últimos: el semidisminuido usa ♭7; el disminuido
+        completo usa ♭♭7. En Cdim7, Si𝄫 suena como La, pero se escribe Si𝄫
+        porque es la séptima de Do.
+      </Typography>
+    </Box>
+  );
+}
 function Keyboard({
   pitches,
   writtenNotes,
@@ -548,8 +618,8 @@ export default function HarmonyExamGuide() {
             }}
           >
             {referenceOpen
-              ? "Ocultar círculo y terceras"
-              : "Ver círculo y parejas por terceras"}
+              ? "Ocultar referencia"
+              : "Ver círculo, terceras y fórmulas"}
           </Button>
           <Button
             variant="text"
@@ -580,6 +650,7 @@ export default function HarmonyExamGuide() {
                 <br />
                 Escala: {notes([...key.notes, key.tonic])}.
               </Typography>
+              <SeventhChordQuickReference />
               <ThirdPairs
                 tonic={tonic}
                 index={pairIndex}
