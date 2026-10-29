@@ -70,10 +70,10 @@ function shuffled(items: Question[]) {
 }
 
 export default function HarmonyInteractiveExam() {
-  const [topic, setTopic] = useState("septimas");
+  const [topic, setTopic] = useState("todos");
   const [mode, setMode] = useState("aleatorias");
   const [questions, setQuestions] = useState<Question[]>(() =>
-    generateRandomExam("septimas"),
+    generateRandomExam("todos"),
   );
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -185,12 +185,28 @@ export default function HarmonyInteractiveExam() {
       </Typography>
       <Typography sx={{ color: "#56696a", lineHeight: 1.7, mb: 2 }}>
         Responde una pregunta a la vez y pulsa «Calificar». Si necesitas ayuda,
-        abre el paso a paso antes de responder. Este simulacro practica las
-        cinco cuatríadas del repaso de clase: maj7, 7, m7, m7♭5 y dim7. No es
-        una lista confirmada de preguntas del examen.
+        abre el paso a paso antes de responder. Puedes elegir un tema o
+        practicar todos. En cuatríadas se incluyen los cinco tipos del repaso de
+        clase: maj7, 7, m7, m7♭5 y dim7. No es una lista confirmada de preguntas
+        del examen.
       </Typography>
 
       <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="harmony-exam-filter">Tema de práctica</InputLabel>
+          <Select
+            labelId="harmony-exam-filter"
+            label="Tema de práctica"
+            value={topic}
+            onChange={(event) => start(event.target.value)}
+          >
+            {EXAM_TOPICS.map(([id, label]) => (
+              <MenuItem key={id} value={id}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <FormControl fullWidth size="small">
           <InputLabel id="harmony-exam-mode">Tipo de preguntas</InputLabel>
           <Select
@@ -208,11 +224,11 @@ export default function HarmonyInteractiveExam() {
       </Stack>
       <Typography variant="body2" sx={{ color: "#667678", mt: 0.75 }}>
         {mode === "aleatorias"
-          ? "Cada simulacro genera nuevas tonalidades para las cinco cuatríadas; algunas pueden repetirse. "
+          ? "Cada simulacro genera nuevas tonalidades para las preguntas; algunas pueden repetirse. "
           : "Las preguntas originales son fijas; puedes cambiar su orden. "}
-        Al cambiar el tipo de preguntas comienza otro simulacro. Acepta Do o C,
-        Mi o E, Si♭ o Bb, Fa♯ o F#. Escribe las alteraciones; se comprueba el
-        nombre de la nota, no solo si suena igual.
+        Al cambiar el tema o el tipo de preguntas comienza otro simulacro.
+        Acepta Do o C, Mi o E, Si♭ o Bb, Fa♯ o F#. Escribe las alteraciones; se
+        comprueba el nombre de la nota, no solo si suena igual.
       </Typography>
 
       {!finished && (
