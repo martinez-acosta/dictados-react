@@ -378,15 +378,33 @@ const keyboardExamples = [
 ];
 
 const chordReferenceDetails = [
-  { symbol: "maj7 / Δ7", construction: "Tríada mayor + séptima mayor." },
-  { symbol: "7 (dominante)", construction: "Tríada mayor + séptima menor." },
-  { symbol: "m7", construction: "Tríada menor + séptima menor." },
-  { symbol: "mMaj7", construction: "Tríada menor + séptima mayor." },
   {
+    name: "Mayor con séptima mayor",
+    symbol: "maj7 / Δ7",
+    construction: "Tríada mayor + séptima mayor.",
+  },
+  {
+    name: "Séptima de dominante",
+    symbol: "7",
+    construction: "Tríada mayor + séptima menor.",
+  },
+  {
+    name: "Menor con séptima menor",
+    symbol: "m7",
+    construction: "Tríada menor + séptima menor.",
+  },
+  {
+    name: "Menor con séptima mayor",
+    symbol: "mMaj7",
+    construction: "Tríada menor + séptima mayor.",
+  },
+  {
+    name: "Semidisminuido (menor séptima con quinta disminuida)",
     symbol: "m7♭5 / ø7",
     construction: "Tríada disminuida + séptima menor: semidisminuido.",
   },
   {
+    name: "Disminuido con séptima disminuida (disminuido completo)",
     symbol: "dim7 / °7",
     construction: "Tríada disminuida + séptima disminuida.",
   },
@@ -422,12 +440,15 @@ function SeventhChordQuickReference() {
               component="dt"
               sx={{ fontWeight: 800, lineHeight: 1.6 }}
             >
-              {chordReferenceDetails[index].symbol} · {example.formula}
+              {chordReferenceDetails[index].name}
             </Typography>
             <Box
               component="dd"
               sx={{ m: 0, lineHeight: 1.7, color: "#354c4e" }}
             >
+              <strong>{chordReferenceDetails[index].symbol}</strong> ·{" "}
+              {example.formula}
+              <br />
               {chordReferenceDetails[index].construction}
               <br />
               Ejemplo: {example.name} = {notes(example.notes)}.
