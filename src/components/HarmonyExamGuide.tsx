@@ -11,8 +11,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChordStaff } from "./HarmonyInversionsWeek";
+import HarmonyInteractiveExam from "./HarmonyInteractiveExam";
 import {
   HARMONY_KEYS,
   buildDiatonicThirds,
@@ -31,6 +32,7 @@ const topics = [
   "Inversiones",
   "Cadencias y Turn Around",
   "Simulacro con respuestas",
+  "Simulacro interactivo",
 ];
 const accent = "#0f766e";
 const notes = (items: readonly string[]) => items.map(spanishNote).join(" – ");
@@ -486,7 +488,10 @@ function Answer({
 
 export default function HarmonyExamGuide() {
   const navigate = useNavigate();
-  const [topic, setTopic] = useState(0);
+  const [searchParams] = useSearchParams();
+  const [topic, setTopic] = useState(() =>
+    searchParams.get("tema") === "simulacro-interactivo" ? 10 : 0,
+  );
   const [tonic, setTonic] = useState("C");
   const [pairIndex, setPairIndex] = useState(0);
   const [referenceOpen, setReferenceOpen] = useState(false);
@@ -545,6 +550,13 @@ export default function HarmonyExamGuide() {
             {referenceOpen
               ? "Ocultar círculo y terceras"
               : "Ver círculo y parejas por terceras"}
+          </Button>
+          <Button
+            variant="text"
+            onClick={() => setTopic(10)}
+            sx={{ color: accent, textTransform: "none", mb: 2, ml: { sm: 1 } }}
+          >
+            Ir al simulacro interactivo
           </Button>
           {referenceOpen && (
             <Box
@@ -1166,6 +1178,13 @@ export default function HarmonyExamGuide() {
                   cómo llegar al resultado y termina con una comprobación. Son
                   ejercicios de práctica, no preguntas confirmadas del examen.
                 </p>
+                <Button
+                  variant="outlined"
+                  onClick={() => setTopic(10)}
+                  sx={{ textTransform: "none", mt: 1, mb: 1 }}
+                >
+                  Practicar respondiendo preguntas
+                </Button>
                 <p>
                   <strong>Antes de empezar:</strong> una escala es una lista de
                   notas; un <strong>grado</strong> es la posición de una nota en
@@ -1777,6 +1796,9 @@ export default function HarmonyExamGuide() {
                 </Answer>
               </>
             )}
+            <Box sx={{ display: topic === 10 ? "block" : "none" }}>
+              <HarmonyInteractiveExam />
+            </Box>
           </Box>
           <Stack
             direction="row"
