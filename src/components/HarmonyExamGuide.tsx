@@ -355,13 +355,6 @@ const keyboardExamples = [
     text: "Mi♭ convierte la tríada en menor; Si♭ es la séptima menor.",
   },
   {
-    name: "CmMaj7",
-    notes: ["C", "E♭", "G", "B"],
-    pitches: ["C", "D♯", "G", "B"],
-    formula: "1 – ♭3 – 5 – 7",
-    text: "Mi♭ forma la tríada menor; Si es la séptima mayor. La m describe la tríada y Maj7 describe la séptima.",
-  },
-  {
     name: "Cm7♭5",
     notes: ["C", "E♭", "G♭", "B♭"],
     pitches: ["C", "D♯", "F♯", "A♯"],
@@ -432,12 +425,6 @@ const chordReferenceDetails = [
     seventh: "Menor",
   },
   {
-    name: "Menor con séptima mayor",
-    symbol: "mMaj7",
-    triad: "Menor",
-    seventh: "Mayor",
-  },
-  {
     name: "Semidisminuido",
     symbol: "m7♭5 / ø7",
     triad: "Disminuida",
@@ -471,6 +458,15 @@ function SeventhChordQuickReference() {
         escala mayor de la fundamental: ♭ baja el grado un semitono, ♭♭ lo baja
         dos y ♯ lo sube uno. Los ejemplos son desde Do, aunque elijas otra
         tonalidad en el círculo.
+      </Typography>
+      <Typography
+        variant="body2"
+        sx={{ mt: 1, color: "#56696a", lineHeight: 1.7 }}
+      >
+        Las cinco cuatríadas de esta tabla aparecen en el repaso y el pizarrón
+        de Armonía. Un apunte anterior también menciona mMaj7, pero no aparece
+        en ese repaso; por ahora queda fuera de esta práctica. El temario exacto
+        del examen no está confirmado.
       </Typography>
       <Box sx={{ mt: 1.5, overflowX: "auto", maxWidth: "100%" }}>
         <Box
@@ -695,10 +691,13 @@ function Keyboard({
 function Answer({
   question,
   children,
+  visible = true,
 }: {
   question: string;
   children: React.ReactNode;
+  visible?: boolean;
 }) {
+  if (!visible) return null;
   return (
     <Box
       component="details"
@@ -1144,7 +1143,6 @@ export default function HarmonyExamGuide() {
                     ["maj7 / Δ7", "1 – 3 – 5 – 7", "Cmaj7: Do Mi Sol Si"],
                     ["7", "1 – 3 – 5 – ♭7", "C7: Do Mi Sol Si♭"],
                     ["m7", "1 – ♭3 – 5 – ♭7", "Cm7: Do Mi♭ Sol Si♭"],
-                    ["mMaj7", "1 – ♭3 – 5 – 7", "CmMaj7: Do Mi♭ Sol Si"],
                     ["m7♭5 / ø7", "1 – ♭3 – ♭5 – ♭7", "Cm7♭5: Do Mi♭ Sol♭ Si♭"],
                     [
                       "dim7 / °7",
@@ -1406,7 +1404,8 @@ export default function HarmonyExamGuide() {
                   Abre una pregunta y sigue la explicación mientras la resuelves
                   en tu cuaderno. Cada solución comienza con los datos, explica
                   cómo llegar al resultado y termina con una comprobación. Son
-                  ejercicios de práctica, no preguntas confirmadas del examen.
+                  ejercicios sobre las cinco cuatríadas del repaso de clase, no
+                  preguntas confirmadas del examen.
                 </p>
                 <Button
                   variant="outlined"
@@ -1423,7 +1422,10 @@ export default function HarmonyExamGuide() {
                   pequeña entre dos notas vecinas; un tono son dos semitonos. ♯
                   sube un semitono y ♭ lo baja.
                 </p>
-                <Answer question="1. ¿Cuál es la relativa menor de Sol mayor?">
+                <Answer
+                  visible={false}
+                  question="1. ¿Cuál es la relativa menor de Sol mayor?"
+                >
                   <ol>
                     <li>
                       <strong>Escribe Sol mayor.</strong> Sus notas son Sol – La
@@ -1481,7 +1483,10 @@ export default function HarmonyExamGuide() {
                     tónica es distinta.
                   </p>
                 </Answer>
-                <Answer question="2. Escribe Re menor natural e indica su relativa mayor.">
+                <Answer
+                  visible={false}
+                  question="2. Escribe Re menor natural e indica su relativa mayor."
+                >
                   <ol>
                     <li>
                       <strong>Escribe las letras desde Re.</strong> Re – Mi – Fa
@@ -1533,7 +1538,7 @@ export default function HarmonyExamGuide() {
                     Si♭; cambia la tónica, de Re a Fa.
                   </p>
                 </Answer>
-                <Answer question="3. Construye Gmaj7 y G7. ¿Qué cambia?">
+                <Answer question="1. Construye Gmaj7 y G7. ¿Qué cambia?">
                   <ol>
                     <li>
                       <strong>Identifica la fundamental.</strong> G significa
@@ -1587,7 +1592,7 @@ export default function HarmonyExamGuide() {
                     = Sol – Si – Re – Fa. Solo cambia la séptima.
                   </p>
                 </Answer>
-                <Answer question="4. Construye Dm7 y explica la fórmula.">
+                <Answer question="2. Construye Dm7 y explica la fórmula.">
                   <ol>
                     <li>
                       <strong>Lee el símbolo:</strong> D es Re; la m indica
@@ -1642,7 +1647,7 @@ export default function HarmonyExamGuide() {
                     notas y que no dejaste Fa♯ ni Do♯ del acorde de referencia.
                   </p>
                 </Answer>
-                <Answer question="5. Diferencia Bm7♭5 de Bdim7.">
+                <Answer question="3. Diferencia Bm7♭5 de Bdim7.">
                   <ol>
                     <li>
                       <strong>Empieza en la misma fundamental:</strong> B = Si.
@@ -1694,7 +1699,10 @@ export default function HarmonyExamGuide() {
                     La♭, a nueve.
                   </p>
                 </Answer>
-                <Answer question="6. ¿Cuál es la primera inversión de Sol mayor?">
+                <Answer
+                  visible={false}
+                  question="6. ¿Cuál es la primera inversión de Sol mayor?"
+                >
                   <ol>
                     <li>
                       <strong>Construye el acorde:</strong> G = Sol mayor. De la
@@ -1740,7 +1748,10 @@ export default function HarmonyExamGuide() {
                     Si en el bajo», no Si mayor.
                   </p>
                 </Answer>
-                <Answer question="7. Escribe la tercera inversión de Cmaj7.">
+                <Answer
+                  visible={false}
+                  question="7. Escribe la tercera inversión de Cmaj7."
+                >
                   <ol>
                     <li>
                       <strong>Construye Cmaj7.</strong> C = Do; maj7 usa 1 – 3 –
@@ -1792,7 +1803,10 @@ export default function HarmonyExamGuide() {
                     que la séptima, Si, está abajo.
                   </p>
                 </Answer>
-                <Answer question="8. Armoniza Do mayor a cuatro voces.">
+                <Answer
+                  visible={false}
+                  question="8. Armoniza Do mayor a cuatro voces."
+                >
                   <ol>
                     <li>
                       <strong>Escribe la escala:</strong> Do – Re – Mi – Fa –
@@ -1883,7 +1897,10 @@ export default function HarmonyExamGuide() {
                     disminuida.
                   </p>
                 </Answer>
-                <Answer question="9. Forma el Turn Around de Re mayor.">
+                <Answer
+                  visible={false}
+                  question="9. Forma el Turn Around de Re mayor."
+                >
                   <ol>
                     <li>
                       <strong>Escribe Re mayor:</strong> Re – Mi – Fa♯ – Sol –
@@ -1960,7 +1977,7 @@ export default function HarmonyExamGuide() {
                     Fa♯ es 5 y La es ♭7; no cuentas desde Re en esa fórmula.
                   </p>
                 </Answer>
-                <Answer question="10. ¿Por qué F♯maj7 lleva Mi♯ y no Fa escrito?">
+                <Answer question="4. ¿Por qué F♯maj7 lleva Mi♯ y no Fa escrito?">
                   <ol>
                     <li>
                       <strong>Lee el símbolo:</strong> F♯ = Fa♯ y maj7 pide una

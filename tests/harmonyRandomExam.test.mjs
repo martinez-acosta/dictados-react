@@ -84,3 +84,26 @@ test("el filtro conserva solo preguntas del tema y la generación admite resulta
   assert.deepEqual(generateRandomExam("todos", rng(123)), all);
   assert.notDeepEqual(generateRandomExam("todos", rng(124)), all);
 });
+
+test("la práctica de cuatríadas cubre únicamente los cinco tipos del repaso", () => {
+  const expected = [
+    "random-maj7",
+    "random-dominant",
+    "random-minor7",
+    "random-half",
+    "random-dim7",
+  ];
+  for (let seed = 1; seed <= 100; seed++) {
+    const questions = generateRandomExam("septimas", rng(seed));
+    assert.deepEqual(
+      questions.map((question) => question.id),
+      expected,
+    );
+    assert.ok(
+      questions.every(
+        (question) =>
+          question.kind === "notes" && question.answers.length === 4,
+      ),
+    );
+  }
+});

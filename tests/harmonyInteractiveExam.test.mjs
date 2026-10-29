@@ -11,6 +11,15 @@ import {
   spanishNote,
 } from "../src/data/harmonyExamGuide.mjs";
 
+test("las preguntas originales del repaso son las cinco cuatríadas del pizarrón", () => {
+  assert.deepEqual(
+    EXAM_QUESTIONS.filter((question) => question.topic === "septimas").map(
+      (question) => question.id,
+    ),
+    ["c-maj7", "c7", "dm7", "b-half-dim", "b-dim7"],
+  );
+});
+
 test("acepta cifrado y solfeo sin perder alteraciones ni confundir enarmonías", () => {
   for (const [input, expected] of [
     ["E", "E"],
