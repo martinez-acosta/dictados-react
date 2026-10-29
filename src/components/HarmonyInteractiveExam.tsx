@@ -81,6 +81,7 @@ export default function HarmonyInteractiveExam() {
   const [firstResults, setFirstResults] = useState<Record<string, boolean>>({});
   const [finished, setFinished] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [answerChanged, setAnswerChanged] = useState(false);
   const question = questions[index];
   const evaluatedCount = Object.keys(firstResults).length;
   const correctCount = Object.values(firstResults).filter(Boolean).length;
@@ -111,13 +112,14 @@ export default function HarmonyInteractiveExam() {
     setAnswers([]);
     setSelectedOption("");
     setFeedback(null);
+    setAnswerChanged(false);
     setFirstResults({});
     setFinished(false);
     setHelpOpen(false);
   }
 
   function grade() {
-    if (!question || !inputComplete || feedback) return;
+    if (!question || !inputComplete || (feedback && !answerChanged)) return;
     const fields =
       question.kind === "notes"
         ? evaluateExamNotes(answers, question.answers)
@@ -127,6 +129,7 @@ export default function HarmonyInteractiveExam() {
         ? fields.every(Boolean)
         : selectedOption === question.correctOption;
     setFeedback({ correct, fields });
+    setAnswerChanged(false);
     setFirstResults((previous) =>
       Object.prototype.hasOwnProperty.call(previous, question.id)
         ? previous
@@ -135,7 +138,7 @@ export default function HarmonyInteractiveExam() {
   }
 
   function next() {
-    if (!feedback) return;
+    if (!feedback || answerChanged) return;
     setHelpOpen(false);
     if (index === questions.length - 1) {
       setFinished(true);
@@ -145,6 +148,7 @@ export default function HarmonyInteractiveExam() {
     setAnswers([]);
     setSelectedOption("");
     setFeedback(null);
+    setAnswerChanged(false);
   }
 
   const missed = questions.filter((item) => firstResults[item.id] === false);
@@ -352,23 +356,25 @@ export default function HarmonyInteractiveExam() {
                     key={i}
                     label={question.labels[i]}
                     value={answers[i] ?? ""}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      if (feedback) setAnswerChanged(true);
                       setAnswers((current) => {
                         const updated = [...current];
                         updated[i] = event.target.value;
                         return updated;
-                      })
-                    }
+                      });
+                    }}
                     size="small"
                     fullWidth
-                    error={Boolean(feedback && !feedback.fields[i])}
+                    error={Boolean(
+                      feedback && !answerChanged && !feedback.fields[i],
+                    )}
                     helperText={
-                      feedback && !feedback.fields[i]
+                      feedback && !answerChanged && !feedback.fields[i]
                         ? `Esperado: ${spanishNote(expected)} (${expected})`
                         : undefined
                     }
                     inputProps={{
-                      readOnly: Boolean(feedback),
                       autoCorrect: "off",
                       spellCheck: false,
                     }}
@@ -396,8 +402,11 @@ export default function HarmonyInteractiveExam() {
                       selectedOption === option ? "contained" : "outlined"
                     }
                     aria-pressed={selectedOption === option}
-                    disabled={Boolean(feedback)}
-                    onClick={() => setSelectedOption(option)}
+                    onClick={() => {
+                      if (feedback && option !== selectedOption)
+                        setAnswerChanged(true);
+                      setSelectedOption(option);
+                    }}
                     sx={{ justifyContent: "flex-start", textTransform: "none" }}
                   >
                     {option}
@@ -406,14 +415,14 @@ export default function HarmonyInteractiveExam() {
               </Box>
             )}
 
-            {!feedback && (
+            {(!feedback || answerChanged) && (
               <Button
                 type="submit"
                 variant="contained"
                 disabled={!inputComplete}
                 sx={{ mt: 2 }}
               >
-                Calificar
+                {feedback ? "Volver a calificar" : "Calificar"}
               </Button>
             )}
 
@@ -428,9 +437,11 @@ export default function HarmonyInteractiveExam() {
                     color: feedback.correct ? "#116453" : "#9b332c",
                   }}
                 >
-                  {feedback.correct
-                    ? "¡Correcto!"
-                    : "Todavía no. Revisa la respuesta:"}
+                  {answerChanged
+                    ? "Respuesta modificada. Vuelve a calificarla para comprobarla."
+                    : feedback.correct
+                      ? "¡Correcto!"
+                      : "Todavía no. Revisa la respuesta:"}
                 </Typography>
                 <Typography sx={{ mt: 0.75, lineHeight: 1.7 }}>
                   <strong>Respuesta:</strong>{" "}
@@ -446,24 +457,20 @@ export default function HarmonyInteractiveExam() {
                   spacing={1}
                   sx={{ mt: 2 }}
                 >
-                  {!feedback.correct && (
-                    <Button
-                      variant="outlined"
-                      onClick={() => setFeedback(null)}
-                    >
-                      Corregir mi respuesta
-                    </Button>
-                  )}
-                  <Button variant="contained" onClick={next}>
+                  <Button
+                    variant="contained"
+                    onClick={next}
+                    disabled={answerChanged}
+                  >
                     {index === questions.length - 1
                       ? "Ver resultado"
                       : "Siguiente pregunta"}
                   </Button>
                 </Stack>
-                {!feedback.correct && (
+                {(!feedback.correct || answerChanged) && (
                   <Typography variant="body2" sx={{ color: "#667678", mt: 1 }}>
-                    Puedes corregirla; la puntuación conserva el resultado del
-                    primer intento.
+                    Puedes editar tu respuesta directamente; la puntuación
+                    conserva el resultado del primer intento.
                   </Typography>
                 )}
               </Box>
